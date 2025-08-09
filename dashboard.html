@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUZZ Data Manager - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+     Sidebar 
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="d-flex align-items-center">
+                <i class="fas fa-database text-primary me-2" style="font-size: 1.5rem;"></i>
+                <div>
+                    <h5 class="font-primary mb-0 text-primary">BUZZ</h5>
+                    <small class="text-muted font-mono">DATA MANAGER</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="dashboard.html">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="inventario.html">
+                        <i class="fas fa-boxes"></i> Inventario
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="pedidos.html">
+                        <i class="fas fa-shopping-cart"></i> Pedidos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="envios.html">
+                        <i class="fas fa-truck"></i> Envíos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="importacion.html">
+                        <i class="fas fa-upload"></i> Importación
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="admin.html">
+                        <i class="fas fa-users-cog"></i> Administración
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="about.html">
+                        <i class="fas fa-info-circle"></i> Acerca de
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+         User info 
+        <div class="mt-auto p-3 border-top border-secondary">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                    <i class="fas fa-user text-dark"></i>
+                </div>
+                <div>
+                    <div class="font-mono" style="font-size: 0.9rem;" id="userName">Usuario</div>
+                    <small class="text-muted" id="userRole">Administrador</small>
+                </div>
+            </div>
+            <div class="mt-2">
+                <small class="text-muted font-mono">Sesión: <span id="sessionTime">00:00:00</span></small>
+            </div>
+            <button class="btn btn-outline-buzz btn-sm mt-2 w-100" onclick="logout()">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </div>
+    </nav>
+
+     Main Content 
+    <main class="main-content">
+         Top Navbar 
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="font-primary mb-0">CENTRO DE COMANDO</h1>
+                <span class="text-muted ms-2 font-mono">/ DASHBOARD</span>
+            </div>
+            <div class="d-flex align-items-center">
+                <span class="text-muted font-mono me-3">ÚLTIMA ACTUALIZACIÓN: <span id="lastUpdate"></span></span>
+                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
+                <span class="text-success font-mono ms-2">SISTEMA ONLINE</span>
+            </div>
+        </nav>
+
+         Stats Cards 
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card fade-in">
+                    <span class="stats-number" id="totalProducts">0</span>
+                    <span class="stats-label">Productos Activos</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card fade-in">
+                    <span class="stats-number" id="totalOrders">0</span>
+                    <span class="stats-label">Pedidos Totales</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card fade-in">
+                    <span class="stats-number" id="pendingShipments">0</span>
+                    <span class="stats-label">Envíos Pendientes</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card fade-in">
+                    <span class="stats-number" id="monthlyRevenue">$0</span>
+                    <span class="stats-label">Ingresos del Mes</span>
+                </div>
+            </div>
+        </div>
+
+         Charts and Activity 
+        <div class="row">
+             Sales Chart 
+            <div class="col-lg-8 mb-4">
+                <div class="buzz-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-primary text-primary mb-0">ACTIVIDAD DE VENTAS</h5>
+                        <div class="d-flex align-items-center">
+                            <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                            <span class="font-mono text-muted" style="font-size: 0.8rem;">TIEMPO REAL</span>
+                        </div>
+                    </div>
+                    <canvas id="salesChart" height="100"></canvas>
+                </div>
+            </div>
+
+             Activity Log 
+            <div class="col-lg-4 mb-4">
+                <div class="buzz-card">
+                    <h5 class="font-primary text-primary mb-3">REGISTRO DE ACTIVIDAD</h5>
+                    <div id="activityLog" style="max-height: 300px; overflow-y: auto;">
+                         Activity items will be populated by JavaScript 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         Top Products 
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="buzz-card">
+                    <h5 class="font-primary text-primary mb-3">TOP 5 PRODUCTOS MÁS VENDIDOS</h5>
+                    <div id="topProducts">
+                         Will be populated by JavaScript 
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6 mb-4">
+                <div class="buzz-card">
+                    <h5 class="font-primary text-primary mb-3">PRODUCTOS CON STOCK BAJO</h5>
+                    <div id="lowStockProducts">
+                         Will be populated by JavaScript 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+</body>
+</html>
