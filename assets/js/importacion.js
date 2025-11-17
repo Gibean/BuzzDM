@@ -5,6 +5,8 @@ let importHistory = []
 document.addEventListener("DOMContentLoaded", () => {
   initImport()
   setupEventListeners()
+  // Add event listener for form submission
+  document.getElementById("importForm").addEventListener("submit", handleFormSubmit)
 })
 
 function initImport() {
@@ -21,7 +23,10 @@ function setupEventListeners() {
 
   // Drag and drop
   uploadArea.addEventListener("dragover", handleDragOver)
-  uploadArea.addEventListener("drop", handleDrop)
+  uploadArea.addEventListener(
+    "drop",
+    handleDrop
+  )
   uploadArea.addEventListener("click", () => fileInput.click())
 }
 
@@ -53,14 +58,14 @@ function validateAndSetFile(file) {
   const fileExtension = "." + file.name.split(".").pop().toLowerCase()
 
   if (!allowedTypes.includes(fileExtension)) {
-    showNotification("Tipo de archivo no soportado. Use CSV o Excel.", "error")
+    showModal({ title: "Error de Archivo", message: "Tipo de archivo no soportado. Use CSV o Excel.", type: "error" })
     return
   }
 
   // Validate file size (max 10MB)
   const maxSize = 10 * 1024 * 1024
   if (file.size > maxSize) {
-    showNotification("El archivo es demasiado grande. Máximo 10MB.", "error")
+        showModal({ title: "Error de Archivo", message: "El archivo es demasiado grande. Máximo 10MB.", type: "error" })
     return
   }
 
@@ -94,118 +99,110 @@ function formatFileSize(bytes) {
   return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
 }
 
-function startImport() {
+async function handleFormSubmit(event) {
+  event.preventDefault() // Prevent default form submission
+
   if (!selectedFile) {
-    showNotification("Por favor, selecciona un archivo primero.", "error")
+    showModal({ title: "Error de Importación", message: "Por favor, selecciona un archivo primero.", type: "error" })
     return
   }
 
-  const dataType = document.getElementById("dataType").value
-  const updateExisting = document.getElementById("updateExisting").checked
-  const validateData = document.getElementById("validateData").checked
+  const importForm = document.getElementById("importForm")
+  const formData = new FormData(importForm)
 
   // Show progress section
   document.getElementById("importProgress").style.display = "block"
   document.getElementById("importBtn").disabled = true
+  document.getElementById("currentStatus").textContent = "Enviando archivo..."
 
-  // Simulate import process
-  simulateImport(dataType, updateExisting, validateData)
-}
+  try {
+    const response = await fetch(importForm.action, {
+      method: "POST",
+      body: formData,
+    })
 
-function simulateImport(dataType, updateExisting, validateData) {
-  const totalRecords = Math.floor(Math.random() * 1000) + 100
-  let processed = 0
-  let successful = 0
-  let errors = 0
+    const result = await response.json()
 
-  document.getElementById("totalCount").textContent = totalRecords
-  document.getElementById("currentStatus").textContent = "Iniciando importación..."
-
-  const interval = setInterval(() => {
-    // Simulate processing
-    const batchSize = Math.floor(Math.random() * 20) + 5
-    processed = Math.min(processed + batchSize, totalRecords)
-
-    // Simulate some errors
-    const batchErrors = Math.floor(Math.random() * 3)
-    errors += batchErrors
-    successful = processed - errors
-
-    // Update progress
-    const progress = (processed / totalRecords) * 100
-    document.getElementById("progressBar").style.width = progress + "%"
-    document.getElementById("processedCount").textContent = processed
-    document.getElementById("successCount").textContent = successful
-    document.getElementById("errorCount").textContent = errors
-
-    // Update status
-    if (processed < totalRecords) {
-      document.getElementById("currentStatus").textContent = `Procesando registros... ${processed}/${totalRecords}`
-    } else {
-      document.getElementById("currentStatus").textContent = "Importación completada"
-      clearInterval(interval)
-
-      // Add to history
+    if (result.success) {
+      showNotification("¡Importación exitosa! " + result.message, "success")
+      document.getElementById("currentStatus").textContent = "Archivo procesado en el servidor."
+      // Here you would typically get actual import progress/results from the server
+      // For now, we'll simulate a successful import for history
       addToImportHistory({
         date: new Date().toISOString(),
-        type: dataType,
+        type: formData.get("dataType"),
+        filename: result.data.fileName,
+        status: "exitoso", // Assuming success for now
+        records: 0, // Placeholder
+        errors: 0, // Placeholder
+        user: "admin", // Placeholder
+      })
+    } else {
+      document.getElementById("currentStatus").textContent = "Error en la importación."
+      let errorMessage = result.message || "Error inesperado durante la importación."
+      if (result.errors && Array.isArray(result.errors) && result.errors.length > 0) {
+        errorMessage += "\n\nDetalles de los errores:\n"
+        result.errors.forEach(error => {
+          errorMessage += `- Fila ${error.row}: ${error.message}\n`
+          if (error.data) {
+            errorMessage += `  Datos: ${JSON.stringify(error.data)}\n`
+          }
+        })
+      }
+      showNotification("Importación fallida: " + errorMessage, "error")
+      addToImportHistory({
+        date: new Date().toISOString(),
+        type: formData.get("dataType"),
         filename: selectedFile.name,
-        status: errors > 0 ? "completado-errores" : "exitoso",
-        records: successful,
-        errors: errors,
+        status: "error",
+        records: (result.data && result.data.importedRecords) || 0,
+        errors: (result.data && result.data.errorsEncountered) || 1,
         user: "admin",
       })
-
-      // Re-enable import button
-      setTimeout(() => {
-        document.getElementById("importBtn").disabled = false
-        showNotification(
-          `Importación completada. ${successful} registros procesados, ${errors} errores.`,
-          errors > 0 ? "warning" : "success",
-        )
-      }, 1000)
     }
-  }, 100)
-}
-
-function loadImportHistory() {
-  // Simulate loading import history
-  importHistory = [
-    {
-      id: 1,
-      date: "2024-01-15T10:30:00Z",
-      type: "products",
-      filename: "productos_enero.csv",
-      status: "exitoso",
-      records: 245,
-      errors: 0,
-      user: "admin",
-    },
-    {
-      id: 2,
-      date: "2024-01-14T15:45:00Z",
-      type: "customers",
-      filename: "clientes_nuevos.xlsx",
-      status: "completado-errores",
-      records: 189,
-      errors: 3,
-      user: "admin",
-    },
-    {
-      id: 3,
-      date: "2024-01-13T09:15:00Z",
-      type: "orders",
-      filename: "pedidos_diciembre.csv",
+  } catch (error) {
+    console.error("Error durante la importación:", error)
+    showNotification("Error de conexión o del servidor: " + error.message, "error")
+    document.getElementById("currentStatus").textContent = "Error de conexión."
+    addToImportHistory({
+      date: new Date().toISOString(),
+      type: formData.get("dataType"),
+      filename: selectedFile.name,
       status: "error",
       records: 0,
-      errors: 156,
-      user: "vendedor1",
-    },
-  ]
+      errors: 1, // Indicate an error
+      user: "admin",
+    })
+  } finally {
+    document.getElementById("importBtn").disabled = false
+    document.getElementById("importProgress").style.display = "none" // Hide progress section
+    clearFile() // Clear selected file after attempt
+  }
+}
+
+async function loadImportHistory() {
+  console.log('Attempting to load import history...');
+  try {
+    const response = await fetch('php/get_import_history.php');
+    const result = await response.json();
+    console.log('Response from get_import_history.php:', result);
+
+    if (result.success) {
+      importHistory = result.history;
+      console.log('Import history data:', importHistory);
+      renderImportHistory();
+    } else {
+      showNotification('Error al cargar el historial de importaciones: ' + result.message, 'error');
+    }
+  } catch (error) {
+    console.error('Error fetching import history:', error);
+    showNotification('Error de conexión al cargar el historial de importaciones.', 'error');
+  }
 }
 
 function renderImportHistory() {
   const tbody = document.getElementById("importHistoryTable")
+  console.log('Rendering import history. Data length:', importHistory.length);
 
   tbody.innerHTML = importHistory
     .map(
@@ -226,7 +223,7 @@ function renderImportHistory() {
                 <button class="btn btn-outline-buzz btn-sm" onclick="viewImportDetails(${item.id})" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
-                ${
+                ${ 
                   item.status === "error"
                     ? `
                     <button class="btn btn-outline-warning btn-sm ms-1" onclick="retryImport(${item.id})" title="Reintentar">
@@ -237,9 +234,10 @@ function renderImportHistory() {
                 }
             </td>
         </tr>
-    `,
+    `
     )
     .join("")
+    console.log('Table body innerHTML:', tbody.innerHTML);
 }
 
 function getTypeColor(type) {
@@ -271,13 +269,8 @@ function getStatusBadge(status) {
 }
 
 function addToImportHistory(importData) {
-  const newImport = {
-    id: Math.max(...importHistory.map((h) => h.id)) + 1,
-    ...importData,
-  }
-
-  importHistory.unshift(newImport)
-  renderImportHistory()
+  // After a new import, refresh the entire history from the database
+  loadImportHistory();
 }
 
 function viewImportDetails(importId) {
@@ -301,11 +294,3 @@ function retryImport(importId) {
   }
 }
 
-function showNotification(message, type) {
-  console.log(`Notification (${type}): ${message}`)
-}
-
-function formatDateTime(dateString) {
-  const date = new Date(dateString)
-  return date.toLocaleString()
-}

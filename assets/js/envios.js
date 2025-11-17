@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setupEventListeners()
 })
 
-function initShipments() {
-  loadShipments()
+async function initShipments() {
+  await loadShipments()
   renderShipments()
   updateStats()
   setupFilters()
@@ -20,62 +20,38 @@ function setupEventListeners() {
   document.getElementById("sortBy").addEventListener("change", sortShipments)
 }
 
-function loadShipments() {
-  // Simulate loading shipments from API
-  shipments = [
-    {
-      id: 1001,
-      customer: "Juan Pérez",
-      date: "2024-01-15",
-      amount: 1709.97,
-      status: "entregado",
-      address: "Calle Mayor 123, Madrid, 28001",
-      trackingNumber: "TRK001234567",
-      estimatedDelivery: "2024-01-17",
-    },
-    {
-      id: 1002,
-      customer: "María García",
-      date: "2024-01-14",
-      amount: 359.98,
-      status: "enviado",
-      address: "Avenida de la Paz 45, Barcelona, 08001",
-      trackingNumber: "TRK001234568",
-      estimatedDelivery: "2024-01-18",
-    },
-    {
-      id: 1003,
-      customer: "Carlos López",
-      date: "2024-01-13",
-      amount: 149.99,
-      status: "pendiente",
-      address: "Plaza España 12, Valencia, 46001",
-      trackingNumber: "",
-      estimatedDelivery: "2024-01-19",
-    },
-    {
-      id: 1004,
-      customer: "Ana Martín",
-      date: "2024-01-12",
-      amount: 899.99,
-      status: "enviado",
-      address: "Gran Vía 88, Sevilla, 41001",
-      trackingNumber: "TRK001234569",
-      estimatedDelivery: "2024-01-16",
-    },
-    {
-      id: 1005,
-      customer: "Luis Rodríguez",
-      date: "2024-01-11",
-      amount: 299.99,
-      status: "entregado",
-      address: "Paseo de Gracia 100, Barcelona, 08008",
-      trackingNumber: "TRK001234570",
-      estimatedDelivery: "2024-01-15",
-    },
-  ]
+async function loadShipments() {
+  try {
+    const searchInput = document.getElementById('searchInput').value;
+    const statusFilter = document.getElementById('statusFilter').value;
+    const sortBy = document.getElementById('sortBy').value;
 
-  filteredShipments = [...shipments]
+    let url = `/buzz/php/envios_actions.php?`;
+    if (searchInput) {
+        url += `&search=${encodeURIComponent(searchInput)}`;
+    }
+    if (statusFilter) {
+        url += `&statusFilter=${encodeURIComponent(statusFilter)}`;
+    }
+    if (sortBy) {
+        url += `&sortBy=${encodeURIComponent(sortBy)}`;
+    }
+
+    const data = await fetchJSON(url);
+    if (data.success) {
+      shipments = data.data.shipments; // Assuming 'data' contains 'shipments' array
+      filteredShipments = [...shipments];
+    } else {
+      showNotification(`Error al cargar envíos: ${data.message}`, "error");
+      shipments = [];
+      filteredShipments = [];
+    }
+  } catch (error) {
+    console.error('Error fetching shipments:', error);
+    showNotification(`Error al cargar envíos: ${error.message}`, "error");
+    shipments = [];
+    filteredShipments = [];
+  }
 }
 
 function renderShipments() {
@@ -124,7 +100,7 @@ function renderShipments() {
                 ? `
                 <div class="row mt-3 pt-3 border-top border-secondary">
                     <div class="col-md-6">
-                        <small class="text-muted">Entrega estimada: ${formatDate(shipment.estimatedDelivery)}</small>
+                        <small class="text-muted">Entrega estimada: ${shipment.estimatedDelivery ? formatDate(shipment.estimatedDelivery) : 'N/A'}</small>
                     </div>
                     <div class="col-md-6 text-end">
                         <div class="progress" style="height: 6px;">
@@ -194,7 +170,9 @@ function getProgressText(status) {
   return texts[status] || ""
 }
 
-function updateStats() {
+async function updateStats() {
+  // Re-fetch data to get accurate stats from the backend
+  await loadShipments(); 
   const pending = shipments.filter((s) => s.status === "pendiente").length
   const shipped = shipments.filter((s) => s.status === "enviado").length
   const delivered = shipments.filter((s) => s.status === "entregado").length
@@ -206,28 +184,15 @@ function updateStats() {
   document.getElementById("totalShipments").textContent = total
 }
 
-function setupFilters() {
-  filterShipments()
+async function filterShipments() {
+  await loadShipments(); // Load shipments with current filters
+  renderShipments();
+  updateStats();
 }
 
-function filterShipments() {
-  const searchTerm = document.getElementById("searchInput").value.toLowerCase()
-  const statusFilter = document.getElementById("statusFilter").value
-
-  filteredShipments = shipments.filter((shipment) => {
-    const matchesSearch =
-      !searchTerm ||
-      shipment.id.toString().includes(searchTerm) ||
-      shipment.customer.toLowerCase().includes(searchTerm) ||
-      shipment.address.toLowerCase().includes(searchTerm) ||
-      (shipment.trackingNumber && shipment.trackingNumber.toLowerCase().includes(searchTerm))
-
-    const matchesStatus = !statusFilter || shipment.status === statusFilter
-
-    return matchesSearch && matchesStatus
-  })
-
-  sortShipments()
+function setupFilters() {
+  // Filters are applied in loadShipments now
+  filterShipments();
 }
 
 function sortShipments() {
@@ -251,7 +216,7 @@ function sortShipments() {
   renderShipments()
 }
 
-function updateShipmentStatus(shipmentId, newStatus) {
+async function updateShipmentStatus(shipmentId, newStatus) {
   const shipment = shipments.find((s) => s.id === shipmentId)
   if (!shipment) return
 
@@ -261,18 +226,32 @@ function updateShipmentStatus(shipmentId, newStatus) {
       : "¿Confirmar que el pedido ha sido entregado?"
 
   if (confirm(confirmMessage)) {
-    shipment.status = newStatus
-
-    // Generate tracking number if marking as shipped
-    if (newStatus === "enviado" && !shipment.trackingNumber) {
-      shipment.trackingNumber = "TRK" + Date.now().toString().slice(-9)
+    let trackingNumber = shipment.trackingNumber;
+    if (newStatus === "enviado" && !trackingNumber) {
+      trackingNumber = "TRK" + Date.now().toString().slice(-9);
     }
 
-    filterShipments()
-    updateStats()
+    try {
+      const response = await fetchJSON(`/buzz/php/envios_actions.php`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: shipmentId, status: newStatus, trackingNumber: trackingNumber })
+      });
 
-    const statusText = newStatus === "enviado" ? "enviado" : "entregado"
-    showNotification(`Pedido #${shipmentId} marcado como ${statusText}`, "success")
+      if (response.success) {
+        showNotification('Estado de envío actualizado exitosamente.', 'success');
+        // Update local data and re-render
+        shipment.status = newStatus;
+        shipment.trackingNumber = trackingNumber;
+        filterShipments(); // Re-apply filters and re-render to reflect changes
+        updateStats();
+      } else {
+        showNotification(`Error al actualizar estado de envío: ${response.message}`, "error");
+      }
+    } catch (error) {
+      console.error('Error updating shipment status:', error);
+      showNotification(`Error al actualizar estado de envío: ${error.message}`, "error");
+    }
   }
 }
 

@@ -1,0 +1,96 @@
+<?php require_once 'php/sesion.php'; ?>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUZZ Data Manager - Envíos</title>
+    <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+    <!--  Sidebar (same as other pages) --> 
+    <?php require_once 'php/sidebar.php'; ?>
+
+     <!-- Main Content  -->
+    <main class="main-content">
+         <!-- Top Navbar  -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="font-primary mb-0">GESTIÓN DE ENVÍOS</h1>
+                <span class="text-muted ms-2 font-mono">/ LOGÍSTICA</span>
+            </div>
+        </nav>
+
+        <!--  Stats Cards  -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <span class="stats-number" id="pendingShipments">0</span>
+                    <span class="stats-label">Pendientes</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <span class="stats-number" id="shippedOrders">0</span>
+                    <span class="stats-label">Enviados</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <span class="stats-number" id="deliveredOrders">0</span>
+                    <span class="stats-label">Entregados</span>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="stats-card">
+                    <span class="stats-number" id="totalShipments">0</span>
+                    <span class="stats-label">Total Envíos</span>
+                </div>
+            </div>
+        </div>
+
+         <!-- Filters  -->
+        <div class="buzz-card mb-4">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Buscar</label>
+                    <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID pedido, cliente...">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Estado de envío</label>
+                    <select class="form-control form-control-buzz" id="statusFilter">
+                        <option value="">Todos los estados</option>
+                        <option value="pendiente">Pendiente</option>
+                        <option value="enviado">Enviado</option>
+                        <option value="entregado">Entregado</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label text-muted">Ordenar por</label>
+                    <select class="form-control form-control-buzz" id="sortBy">
+                        <option value="date">Fecha</option>
+                        <option value="status">Estado</option>
+                        <option value="customer">Cliente</option>
+                        <option value="amount">Monto</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+         <!-- Shipments Cards  -->
+        <div id="shipmentsContainer">
+             Shipments will be populated by JavaScript 
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/envios.js"></script>
+</body>
+</html>

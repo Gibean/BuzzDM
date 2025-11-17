@@ -1,358 +1,289 @@
-// Inventory management functionality
-let products = []
-let filteredProducts = []
-let currentPage = 1
-const itemsPerPage = 10
-let editingProductId = null
+document.addEventListener('DOMContentLoaded', function() {
+    const productModal = document.getElementById('productModal');
+    const productForm = document.getElementById('productForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const productIdHidden = document.getElementById('productIdHidden');
+    const productSku = document.getElementById('productSku');
+    const productName = document.getElementById('productName');
+    const productDescription = document.getElementById('productDescription');
+    const productPrice = document.getElementById('productPrice');
+    const productStock = document.getElementById('productStock');
+    const productMinStock = document.getElementById('productMinStock');
+    const productStatus = document.getElementById('productStatus');
+    const productsTableBody = document.getElementById('productsTableBody');
+    const paginationContainer = document.getElementById('pagination');
+    const showingFromSpan = document.getElementById('showingFrom');
+    const showingToSpan = document.getElementById('showingTo');
+    const totalProductsSpan = document.getElementById('totalProducts');
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const sortBySelect = document.getElementById('sortBy');
 
-function formatCurrency(amount) {
-  return amount.toLocaleString("es-ES", { style: "currency", currency: "EUR" })
-}
+    let currentPage = 1;
+    const productsPerPage = 10;
+    let totalProducts = 0;
+    const product_actions_url = 'php/product_actions.php';
 
-function showNotification(message, type) {
-  const notification = document.createElement("div")
-  notification.className = `notification ${type}`
-  notification.textContent = message
-  document.body.appendChild(notification)
+    
 
-  setTimeout(() => {
-    document.body.removeChild(notification)
-  }, 3000)
-}
+    async function fetchProducts() {
+        const search = searchInput.value;
+        const status = statusFilter.value;
+        const sortBy = sortBySelect.value;
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: productsPerPage,
+            search: search,
+            status: status,
+            sortBy: sortBy,
+            sortOrder: 'ASC'
+        });
 
-document.addEventListener("DOMContentLoaded", () => {
-  initInventory()
-  setupEventListeners()
-})
+        try {
+            const response = await fetch(`${product_actions_url}?${params.toString()}`);
+            const data = await response.json();
 
-function initInventory() {
-  loadProducts()
-  renderProducts()
-  setupFilters()
-}
+            if (data.success) {
+                productsTableBody.innerHTML = '';
+                totalProducts = data.total;
 
-function setupEventListeners() {
-  // Search input
-  document.getElementById("searchInput").addEventListener("input", filterProducts)
+                if (data.products.length > 0) {
+                    data.products.forEach(product => {
+                        const row = productsTableBody.insertRow();
+                        row.insertCell().textContent = product.sku;
+                        row.insertCell().textContent = product.name;
+                        row.insertCell().textContent = product.description;
+                        row.insertCell().textContent = parseFloat(product.price).toFixed(2);
+                        row.insertCell().textContent = product.stock;
 
-  // Status filter
-  document.getElementById("statusFilter").addEventListener("change", filterProducts)
+                        const statusCell = row.insertCell();
+                        const statusBadge = document.createElement('span');
+                        let displayStatus = 'ABASTECIDO';
+                        let badgeClass = 'badge-success';
 
-  // Sort by
-  document.getElementById("sortBy").addEventListener("change", sortProducts)
+                        if (product.stock <= 0) {
+                            displayStatus = 'AGOTADO';
+                            badgeClass = 'badge-secondary';
+                        } else if (product.min_stock && product.stock <= product.min_stock) {
+                            displayStatus = 'REABASTECER';
+                            badgeClass = 'badge-warning';
+                        }
+                        
+                        statusBadge.textContent = displayStatus;
+                        statusBadge.classList.add('badge', badgeClass);
+                        statusCell.appendChild(statusBadge);
 
-  // Product form
-  document.getElementById("productForm").addEventListener("submit", handleProductSubmit)
-}
+                        const actionsCell = row.insertCell();
+                        actionsCell.innerHTML = `
+                            <button class="btn btn-outline-buzz btn-sm me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-outline-danger btn-sm delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                        `;
+                    });
+                } else {
+                    productsTableBody.innerHTML = '<tr><td colspan="7" class="text-center">No hay productos registrados.</td></tr>';
+                }
 
-function loadProducts() {
-  // Simulate loading products from API
-  products = [
-    {
-      id: 1,
-      sku: "LAP-001",
-      name: "Laptop Gaming Pro",
-      description: "Laptop para gaming de alta gama con RTX 4070",
-      price: 1499.99,
-      stock: 15,
-      minStock: 10,
-      status: "activo",
-    },
-    {
-      id: 2,
-      sku: "MOU-005",
-      name: "Mouse Inalámbrico",
-      description: "Mouse inalámbrico ergonómico con sensor óptico",
-      price: 59.99,
-      stock: 7,
-      minStock: 20,
-      status: "activo",
-    },
-    {
-      id: 3,
-      sku: "KEY-003",
-      name: "Teclado Mecánico",
-      description: "Teclado mecánico RGB con switches Cherry MX",
-      price: 149.99,
-      stock: 2,
-      minStock: 15,
-      status: "activo",
-    },
-    {
-      id: 4,
-      sku: "MON-002",
-      name: "Monitor 4K",
-      description: "Monitor 4K de 27 pulgadas con HDR",
-      price: 599.99,
-      stock: 0,
-      minStock: 5,
-      status: "activo",
-    },
-    {
-      id: 5,
-      sku: "AUR-004",
-      name: "Auriculares Premium",
-      description: "Auriculares con cancelación de ruido activa",
-      price: 299.99,
-      stock: 25,
-      minStock: 10,
-      status: "activo",
-    },
-  ]
-
-  filteredProducts = [...products]
-}
-
-function renderProducts() {
-  const tbody = document.getElementById("productsTableBody")
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const pageProducts = filteredProducts.slice(startIndex, endIndex)
-
-  tbody.innerHTML = pageProducts
-    .map(
-      (product) => `
-        <tr>
-            <td class="font-mono">${product.sku}</td>
-            <td>${product.name}</td>
-            <td class="text-muted" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">${product.description}</td>
-            <td class="font-mono">${formatCurrency(product.price)}</td>
-            <td class="font-mono">${product.stock}</td>
-            <td>${getStatusBadge(product)}</td>
-            <td>
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editProduct(${product.id})" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm" onclick="deleteProduct(${product.id})" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </td>
-        </tr>
-    `,
-    )
-    .join("")
-
-  updatePagination()
-  updateProductCount()
-}
-
-function getStatusBadge(product) {
-  if (product.stock === 0) {
-    return '<span class="badge badge-danger">Agotado</span>'
-  } else if (product.stock <= product.minStock) {
-    return '<span class="badge badge-warning">Stock Bajo</span>'
-  } else {
-    return '<span class="badge badge-success">Activo</span>'
-  }
-}
-
-function updatePagination() {
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
-  const pagination = document.getElementById("pagination")
-
-  let paginationHTML = ""
-
-  // Previous button
-  if (currentPage > 1) {
-    paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Anterior</a></li>`
-  }
-
-  // Page numbers
-  for (let i = 1; i <= totalPages; i++) {
-    if (i === currentPage) {
-      paginationHTML += `<li class="page-item active"><span class="page-link">${i}</span></li>`
-    } else {
-      paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${i})">${i}</a></li>`
+                updatePaginationInfo();
+                renderPagination();
+            } else {
+                showToast('Error al cargar productos: ' + data.message, 'danger');
+            }
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            showToast('Error al conectar con el servidor para obtener productos.', 'danger');
+        }
     }
-  }
 
-  // Next button
-  if (currentPage < totalPages) {
-    paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Siguiente</a></li>`
-  }
-
-  pagination.innerHTML = paginationHTML
-}
-
-function updateProductCount() {
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = Math.min(startIndex + itemsPerPage, filteredProducts.length)
-
-  document.getElementById("showingFrom").textContent = filteredProducts.length > 0 ? startIndex + 1 : 0
-  document.getElementById("showingTo").textContent = endIndex
-  document.getElementById("totalProducts").textContent = filteredProducts.length
-}
-
-function changePage(page) {
-  currentPage = page
-  renderProducts()
-}
-
-function setupFilters() {
-  filterProducts()
-}
-
-function filterProducts() {
-  const searchTerm = document.getElementById("searchInput").value.toLowerCase()
-  const statusFilter = document.getElementById("statusFilter").value
-
-  filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      !searchTerm ||
-      product.sku.toLowerCase().includes(searchTerm) ||
-      product.name.toLowerCase().includes(searchTerm) ||
-      product.description.toLowerCase().includes(searchTerm)
-
-    const matchesStatus = !statusFilter || getProductStatus(product) === statusFilter
-
-    return matchesSearch && matchesStatus
-  })
-
-  currentPage = 1
-  sortProducts()
-}
-
-function getProductStatus(product) {
-  if (product.stock === 0) {
-    return "agotado"
-  } else if (product.stock <= product.minStock) {
-    return "stock-bajo"
-  } else {
-    return "activo"
-  }
-}
-
-function sortProducts() {
-  const sortBy = document.getElementById("sortBy").value
-
-  filteredProducts.sort((a, b) => {
-    switch (sortBy) {
-      case "name":
-        return a.name.localeCompare(b.name)
-      case "sku":
-        return a.sku.localeCompare(b.sku)
-      case "stock":
-        return b.stock - a.stock
-      case "price":
-        return b.price - a.price
-      default:
-        return 0
+    function updatePaginationInfo() {
+        const start = (currentPage - 1) * productsPerPage + 1;
+        const end = Math.min(currentPage * productsPerPage, totalProducts);
+        showingFromSpan.textContent = totalProducts === 0 ? 0 : start;
+        showingToSpan.textContent = end;
+        totalProductsSpan.textContent = totalProducts;
     }
-  })
 
-  renderProducts()
-}
+    function renderPagination() {
+        paginationContainer.innerHTML = '';
+        const totalPages = Math.ceil(totalProducts / productsPerPage);
 
-function clearFilters() {
-  document.getElementById("searchInput").value = ""
-  document.getElementById("statusFilter").value = ""
-  document.getElementById("sortBy").value = "name"
-  filterProducts()
-}
+        if (totalPages <= 1) return;
 
-function openProductModal(productId = null) {
-  editingProductId = productId
-  const modal = document.getElementById("productModal")
-  const modalTitle = document.getElementById("modalTitle")
+        const createPageItem = (content, page, isDisabled = false, isActive = false) => {
+            const li = document.createElement('li');
+            li.className = `page-item ${isDisabled ? 'disabled' : ''} ${isActive ? 'active' : ''}`;
+            const a = document.createElement('a');
+            a.className = 'page-link';
+            a.href = '#';
+            a.innerHTML = content;
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!isDisabled) {
+                    currentPage = page;
+                    fetchProducts();
+                }
+            });
+            li.appendChild(a);
+            return li;
+        };
 
-  if (productId) {
-    const product = products.find((p) => p.id === productId)
-    modalTitle.textContent = "Editar Producto"
-    fillProductForm(product)
-  } else {
-    modalTitle.textContent = "Nuevo Producto"
-    clearProductForm()
-  }
+        paginationContainer.appendChild(createPageItem('&laquo;', currentPage - 1, currentPage === 1));
+        for (let i = 1; i <= totalPages; i++) {
+            paginationContainer.appendChild(createPageItem(i, i, false, i === currentPage));
+        }
+        paginationContainer.appendChild(createPageItem('&raquo;', currentPage + 1, currentPage === totalPages));
+    }
 
-  modal.style.display = "block"
-}
+    window.openProductModal = function(product = null) {
+        productForm.reset();
+        productIdHidden.value = '';
+        productSku.readOnly = !!product;
 
-function closeProductModal() {
-  document.getElementById("productModal").style.display = "none"
-  editingProductId = null
-}
+        if (product) {
+            modalTitle.textContent = 'Editar Producto';
+            productIdHidden.value = product.id;
+            productSku.value = product.sku;
+            productName.value = product.name;
+            productDescription.value = product.description;
+            productPrice.value = product.price;
+            productStock.value = product.stock;
+            productMinStock.value = product.min_stock || 10;
+            productStatus.value = product.status;
+        } else {
+            modalTitle.textContent = 'Nuevo Producto';
+        }
+        
+        productModal.style.display = 'block';
+    };
 
-function fillProductForm(product) {
-  document.getElementById("productSku").value = product.sku
-  document.getElementById("productName").value = product.name
-  document.getElementById("productDescription").value = product.description
-  document.getElementById("productPrice").value = product.price
-  document.getElementById("productStock").value = product.stock
-  document.getElementById("productMinStock").value = product.minStock
-  document.getElementById("productStatus").value = product.status
-}
+    window.closeProductModal = function() {
+        productModal.style.display = 'none';
+    };
 
-function clearProductForm() {
-  document.getElementById("productForm").reset()
-  document.getElementById("productMinStock").value = "10"
-  document.getElementById("productStatus").value = "activo"
-}
+    productForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        await saveProduct();
+    });
 
-function handleProductSubmit(e) {
-  e.preventDefault()
+    async function saveProduct() {
+        const id = productIdHidden.value;
+        const method = id ? 'PUT' : 'POST';
+        
+        const productData = {
+            id: id,
+            sku: productSku.value.trim(),
+            name: productName.value.trim(),
+            description: productDescription.value.trim(),
+            price: parseFloat(productPrice.value),
+            stock: parseInt(productStock.value),
+            min_stock: parseInt(productMinStock.value),
+            status: productStatus.value
+        };
 
-  const formData = {
-    sku: document.getElementById("productSku").value,
-    name: document.getElementById("productName").value,
-    description: document.getElementById("productDescription").value,
-    price: Number.parseFloat(document.getElementById("productPrice").value),
-    stock: Number.parseInt(document.getElementById("productStock").value),
-    minStock: Number.parseInt(document.getElementById("productMinStock").value),
-    status: document.getElementById("productStatus").value,
-  }
+        // Validation for required fields
+        if (!productData.sku) {
+            showToast('El campo SKU es obligatorio.', 'warning');
+            return;
+        }
+        if (!productData.name) {
+            showToast('El campo Nombre es obligatorio.', 'warning');
+            return;
+        }
+        if (isNaN(productData.price)) {
+            showToast('El campo Precio Unitario es obligatorio y debe ser un número.', 'warning');
+            return;
+        }
+        if (isNaN(productData.stock)) {
+            showToast('El campo Stock Actual es obligatorio y debe ser un número entero.', 'warning');
+            return;
+        }
 
-  // Validate SKU uniqueness
-  const existingProduct = products.find((p) => p.sku === formData.sku && p.id !== editingProductId)
-  if (existingProduct) {
-    showNotification("El SKU ya existe. Por favor, usa un SKU único.", "error")
-    return
-  }
+        // Validation for negative values
+        if (productData.price < 0) {
+            showToast('El Precio Unitario no puede ser negativo.', 'warning');
+            return;
+        }
+        if (productData.stock < 0) {
+            showToast('El Stock Actual no puede ser negativo.', 'warning');
+            return;
+        }
+        if (productData.min_stock < 0) {
+            showToast('El Stock Mínimo no puede ser negativo.', 'warning');
+            return;
+        }
 
-  if (editingProductId) {
-    updateProduct(editingProductId, formData)
-  } else {
-    createProduct(formData)
-  }
-}
+        try {
+            const response = await fetch(product_actions_url + (method === 'PUT' ? `?id=${id}` : ''), {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
+            });
+            const data = await response.json();
+            if (data.success) {
+                showToast(data.message, 'success');
+                closeProductModal();
+                fetchProducts();
+            } else {
+                showToast('Error: ' + data.message, 'danger');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showToast('Ocurrió un error al guardar el producto.', 'danger');
+        }
+    }
 
-function createProduct(productData) {
-  const newProduct = {
-    id: Math.max(...products.map((p) => p.id)) + 1,
-    ...productData,
-  }
+    window.deleteProduct = async function(id) {
+        showModal({
+            title: "Confirmar Eliminación",
+            message: "¿Estás seguro de que quieres eliminar este producto?",
+            type: "confirm",
+            onConfirm: async () => {
+                try {
+                    const response = await fetch(product_actions_url, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id: id })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        fetchProducts();
+                    } else {
+                        showToast('Error: ' + data.message, 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Ocurrió un error al eliminar el producto.', 'danger');
+                }
+            }
+        });
+    };
 
-  products.push(newProduct)
-  filterProducts()
-  closeProductModal()
-  showNotification("Producto creado exitosamente", "success")
-}
+    searchInput.addEventListener('input', () => { currentPage = 1; fetchProducts(); });
+    statusFilter.addEventListener('change', () => { currentPage = 1; fetchProducts(); });
+    sortBySelect.addEventListener('change', () => { currentPage = 1; fetchProducts(); });
 
-function updateProduct(productId, productData) {
-  const productIndex = products.findIndex((p) => p.id === productId)
-  if (productIndex !== -1) {
-    products[productIndex] = { ...products[productIndex], ...productData }
-    filterProducts()
-    closeProductModal()
-    showNotification("Producto actualizado exitosamente", "success")
-  }
-}
+    productsTableBody.addEventListener('click', async (event) => {
+        const editButton = event.target.closest('.edit-product-btn');
+        const deleteButton = event.target.closest('.delete-product-btn');
 
-function editProduct(productId) {
-  openProductModal(productId)
-}
+        if (editButton) {
+            const id = editButton.dataset.id;
+            try {
+                const response = await fetch(`${product_actions_url}?id=${id}`);
+                const data = await response.json();
+                if (data.success && data.products.length > 0) {
+                    openProductModal(data.products[0]);
+                } else {
+                    showToast('Error al cargar datos del producto: ' + (data.message || 'No encontrado.'), 'danger');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar los datos del producto.', 'danger');
+            }
+        } else if (deleteButton) {
+            deleteProduct(deleteButton.dataset.id);
+        }
+    });
 
-function deleteProduct(productId) {
-  const product = products.find((p) => p.id === productId)
-  if (confirm(`¿Estás seguro de que deseas eliminar el producto "${product.name}"?`)) {
-    products = products.filter((p) => p.id !== productId)
-    filterProducts()
-    showNotification("Producto eliminado exitosamente", "success")
-  }
-}
-
-// Close modal when clicking outside
-document.getElementById("productModal").addEventListener("click", function (e) {
-  if (e.target === this) {
-    closeProductModal()
-  }
-})
+    fetchProducts();
+});
