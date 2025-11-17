@@ -1,0 +1,21 @@
+SKU,Producto,Descripción,Precio,Valores,MinStock,Categoría
+MIEL001,Miel de Abeja Pura 500g,Miel 100% natural de flor de ácido,350.00,25,5,4
+MIEL002,Miel con Propóleo,Miel enriquecida con propóleo antibacterial,450.00,15,3,4
+ABEJ001,Figura Decorativa Abeja,Figura de cerámica pintada a mano,280.00,40,10,3
+ABEJ002,Porta Llaves Abejorro,Porta llaves de metal con diseño de abeja,120.00,60,15,3
+CERA001,Vela Aromática de Miel,Vela de cera de abeja con aroma a miel,180.00,35,8,5
+CERA002,Bálsamo Labial de Cera de Abeja,Bálsamo hidratante con cera natural,95.00,80,20,5
+POL001,Polen de Abeja en Gránulos,Polen fresco recolectado naturalmente,320.00,20,4,4
+JAB001,Jabón de Miel y Avena,Jabón artesanal con miel y avena,150.00,50,12,5
+TAZ001,"Taza ""Bzzz... Good Morning""",Taza de cerámica con diseño de abeja,220.00,30,6,3
+CAMI001,"Camiseta ""Save the Bees""",Camiseta de algodón orgánico con estampado,420.00,25,5,3
+PROP001,Extracto de Propóleo,Propóleo en solución alcohólica 30%,280.00,18,3,5
+JARR001,Jarrón con Colmena,Jarrón de vidrio con diseño de colmena,680.00,12,2,3
+MIEL003,Miel de Abeja con Nuez,Miel cremosa con trozos de nuez,380.00,22,4,4
+ABEJ003,Set de Postales de Abejas,Set de 5 postales ilustradas con abejas,160.00,45,10,3
+CERA003,Velas Decorativas Colmena,Set de 3 velas en forma de panal,250.00,28,5,5
+BOLS001,"Bolsa de Tela ""Bee Happy""",Bolsa ecológica con diseño de abeja,180.00,35,8,3
+MIEL004,Miel de Abeja con Almendras,Miel natural con almendras caramelizadas,420.00,16,3,4
+ABEJ004,Llavero Colmena de Madera,Llavero tallado en madera con forma de panal,140.00,55,12,3
+CREM001,Crema Corporal de Miel,Crema hidratante con miel y propóleo,320.00,30,6,5
+ABEJ005,"Libreta ""Abejita Productiva""",Libreta con diseño de abeja y hojas pautadas,190.00,40,8,1

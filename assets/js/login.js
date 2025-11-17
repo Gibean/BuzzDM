@@ -21,44 +21,62 @@ document.addEventListener("DOMContentLoaded", () => {
       return
     }
 
-    // Simular autenticación (aquí iría la llamada al backend)
     authenticateUser(email, password)
   })
 
   function authenticateUser(email, password) {
     // Mostrar loading
-    const submitBtn = loginForm.querySelector('button[type="submit"]')
-    const originalText = submitBtn.innerHTML
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...'
-    submitBtn.disabled = true
+    const submitBtn = loginForm.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+    submitBtn.disabled = true;
 
-    // Simular delay de red
-    setTimeout(() => {
-      // Credenciales de prueba
-      if (email === "admin@buzz.com" && password === "admin123") {
-        // Login exitoso
-        localStorage.setItem(
-          "buzzUser",
-          JSON.stringify({
-            email: email,
-            name: "Administrador",
-            role: "admin",
-            loginTime: new Date().toISOString(),
-          }),
-        )
-
-        // Redireccionar al dashboard
-        window.location.href = "dashboard.html"
-      } else {
-        // Login fallido
-        showAlert("Credenciales incorrectas. Usa admin@buzz.com / admin123")
-        submitBtn.innerHTML = originalText
-        submitBtn.disabled = false
-      }
-    }, 1500)
+    fetch("/buzz/php/login_guard.php", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({ email, password }),
+    })
+    .then(response => {
+        if (!response.ok) {
+            // If server response is not ok (e.g., 500, 404),
+            // try to parse the error message from the body,
+            // otherwise throw a generic error.
+            return response.json().then(errorData => {
+                throw new Error(errorData.message || `Error del servidor: ${response.status}`);
+            }).catch(() => {
+                // This catch is for cases where response.json() fails (e.g., empty response)
+                throw new Error(`Error del servidor: ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect || '/buzz/dashboard.php';
+        } else {
+            // This handles cases where response.ok is true, but the application
+            // logic returns a failure (e.g., wrong password).
+            showAlert(data.message || "Error inesperado. Por favor, intente nuevamente.");
+        }
+    })
+    .catch((error) => {
+        console.error("Error de conexión o del servidor:", error);
+        // Display the specific error message thrown from the .then() block
+        showAlert(error.message || "No se pudo conectar con el servidor. Verifique su conexión.");
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
   }
 
   function showAlert(message) {
+    if (!loginAlertText || !loginAlert) {
+      console.error("Elemento loginAlertText o loginAlert no encontrado en el DOM.")
+      return
+    }
     loginAlertText.textContent = message
     loginAlert.style.display = "block"
 
@@ -69,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isValidEmail(email) {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return emailRegex.test(email)
   }
 })

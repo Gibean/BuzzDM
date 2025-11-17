@@ -9,7 +9,7 @@
   --buzz-primary-color: #ffa000;
   --buzz-text-color: #dfe5eb;
   --buzz-text-muted: #a9b1bb;
-  --buzz-success: #28a745;
+  --buzz-success: #28a745;  
   --buzz-warning: #ffc107;
   --buzz-danger: #dc3545;
   --font-primary: "Orbitron", sans-serif;
@@ -212,7 +212,7 @@ body {
   color: white;
 }
 .badge-primary {
-  background-color: var(--buzz-primary-color);
+  background-color: var(--buzz-primary-color) !important;
   color: var(--buzz-dark-bg);
 }
 
@@ -232,6 +232,36 @@ body {
   border-color: var(--buzz-primary-color);
   box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2);
 }
+
+/* Asegurar que los campos de formulario mantengan el color de fondo y texto en modo oscuro */
+input,
+textarea,
+select {
+  background-color: var(--buzz-card-bg) !important;
+  color: var(--buzz-text-color) !important;
+  border: 1px solid var(--buzz-border-color) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: var(--buzz-card-bg) !important;
+  color: var(--buzz-text-color) !important;
+  border-color: var(--buzz-primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2) !important;
+}
+
+/* Anular los estilos de autocompletado del navegador para asegurar el color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px var(--buzz-card-bg) inset !important;
+  -webkit-text-fill-color: var(--buzz-text-color) !important;
+  caret-color: var(--buzz-text-color) !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 
 /* Modales */
 .modal-buzz {
@@ -326,4 +356,187 @@ body {
     flex: 0 0 100%;
     max-width: 100%;
   }
+}
+
+.sidebar-logo {
+    width: 100%; 
+    max-width: 350px;
+    height: auto;
+    object-fit: contain;
+    display: block;
+}
+
+
+.sidebar-header .d-flex {
+    justify-content: center;
+    padding: 10px;
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.toast {
+    background-color: var(--buzz-card-bg);
+    color: var(--buzz-text-color);
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-left: 5px solid var(--buzz-primary-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast.success { border-left-color: var(--buzz-success); }
+.toast.error { border-left-color: var(--buzz-danger); }
+.toast.info { border-left-color: var(--buzz-primary-color); }
+
+/* Centered Modal */
+#modal-overlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9990;
+    justify-content: center;
+    align-items: center;
+}
+
+#modal-dialog {
+    background-color: var(--buzz-card-bg);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid var(--buzz-border-color);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    width: 90%;
+    max-width: 450px;
+    text-align: center;
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s ease-out;
+}
+
+#modal-overlay.show #modal-dialog {
+    transform: scale(1);
+    opacity: 1;
+}
+
+#modal-title {
+    font-family: var(--font-primary);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+#modal-message {
+    margin-bottom: 1.5rem;
+    color: var(--buzz-text-muted);
+}
+
+#modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* Modal Type Specific Styling */
+.modal-dialog.modal-success {
+    border-color: var(--buzz-success);
+}
+.modal-dialog.modal-success #modal-title {
+    color: var(--buzz-success);
+}
+
+.modal-dialog.modal-error {
+    border-color: var(--buzz-danger);
+}
+.modal-dialog.modal-error #modal-title {
+    color: var(--buzz-danger);
+}
+
+.modal-dialog.modal-info {
+    border-color: var(--buzz-primary-color);
+}
+.modal-dialog.modal-info #modal-title {
+    color: var(--buzz-primary-color);
+}
+
+.modal-dialog.modal-confirm {
+    border-color: var(--buzz-warning);
+}
+.modal-dialog.modal-confirm #modal-title {
+    color: var(--buzz-warning);
+}
+
+.border-buzz-light {
+  border-color: var(--buzz-border-color) !important;
+}
+
+.report-option {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.report-option:hover {
+  background-color: var(--buzz-dark-bg);
+  border-color: var(--buzz-primary-color);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(255, 160, 0, 0.2);
+}
+
+.report-option.selected {
+  background-color: var(--buzz-primary-color);
+  color: var(--buzz-dark-bg) !important;
+  border-color: var(--buzz-primary-color);
+}
+
+.report-option.selected i,
+.report-option.selected p {
+  color: var(--buzz-dark-bg) !important;
+}
+
+/* Override Bootstrap Modal for Dark Theme */
+.modal-content.buzz-modal-dark-override {
+  background-color: var(--buzz-card-bg) !important;
+  color: var(--buzz-text-color) !important;
+  border: 1px solid var(--buzz-border-color) !important;
+}
+
+.modal-header {
+  background-color: var(--buzz-card-bg) !important;
+  border-bottom: 1px solid var(--buzz-border-color) !important;
+}
+
+.modal-title {
+  color: var(--buzz-primary-color) !important;
+}
+
+.modal-body {
+  background-color: var(--buzz-card-bg) !important;
+  color: var(--buzz-text-color) !important;
+}
+
+.modal-footer {
+  background-color: var(--buzz-card-bg) !important;
+  border-top: 1px solid var(--buzz-border-color) !important;
+}
+
+.btn-close {
+  filter: invert(1) hue-rotate(180deg) brightness(1.5); /* Adjust for dark theme visibility */
 }

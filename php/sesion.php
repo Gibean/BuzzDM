@@ -1,0 +1,206 @@
+<?php
+// Inicia la sesión en cada página que lo requiera
+
+use function PHPSTORM_META\map;
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// List of API scripts that should return JSON on auth/access failure
+$api_scripts = [
+    'api_sales_chart.php',
+    'clientes_actions.php',
+    'get_import_history.php',
+    'pedidos_actions.php',
+    'product_actions.php',
+    'search_api.php',
+    'process_import.php'
+];
+
+$current_page = basename($_SERVER['PHP_SELF']);
+$is_api_call = in_array($current_page, $api_scripts);
+
+// Function to send JSON error response for API calls
+function json_auth_error($message) {
+    header('Content-Type: application/json');
+    http_response_code(401); // Unauthorized
+    echo json_encode(['success' => false, 'message' => $message]);
+    exit;
+}
+
+// Si no existe la variable de sesión del ID de usuario, significa que no ha iniciado sesión
+if (!isset($_SESSION['usuario_id'])) {
+    if ($is_api_call) {
+        json_auth_error('No autenticado. Por favor, inicia sesión.');
+    } else {
+        header('Location: login.php');
+        exit();
+    }
+}
+
+// Conexión a la base de datos
+require_once 'db.php'; // This now provides the getDbConnection() function
+$pdo = getDbConnection(); // Call the function to get the PDO object
+
+// Verificar si el usuario está logeado y obtener su rol
+if (isset($_SESSION['usuario_id'])) {
+    $usuarioId = $_SESSION['usuario_id'];
+
+    // Consultar el rol y nombre del usuario
+    $query = "SELECT nombre, rol FROM usuarios WHERE id = ?";
+    $stmt = $pdo->prepare($query); // Use $pdo
+    $stmt->bindParam(1, $usuarioId, PDO::PARAM_INT); // Use bindParam
+    $stmt->execute();
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch directly
+
+    if ($usuario) { // Check if user was found
+        $_SESSION['usuario_nombre'] = $usuario['nombre'];
+        $_SESSION['usuario_rol'] = $usuario['rol'];
+    } else {
+        // Si el usuario no se encuentra en la DB, destruir sesión y redirigir
+        session_unset();
+        session_destroy();
+        if ($is_api_call) {
+            json_auth_error('Usuario no encontrado. Sesión inválida.');
+        } else {
+            header('Location: login.php');
+            exit();
+        }
+    }
+
+    // No need for $stmt->close() with PDO
+}
+
+// --- Lógica de Control de Acceso Basada en Roles ---
+
+// Definir las páginas permitidas para cada rol
+$allowed_pages = [
+    'admin' => [
+        'dashboard.php',
+        'pedidos.php',
+        'envios.php',
+        'inventario.php',
+        'importacion.php',
+        'admin.php',
+        'about.php',
+        'login.php',
+        'logout.php',
+        'api_sales_chart.php',
+        'create_admin.php',
+        'get_import_history.php',
+        'product_actions.php',
+        'users.php',
+        'sesion.php',
+        'db.php',
+        'sidebar.php',
+        'reports.php',
+        'pedidos_actions.php',
+        'search_api.php', 
+        'clientes.php', 
+        'clientes_actions.php', 
+        'api_sales_by_status_chart.php',
+        'envios_actions.php', 
+        'company_settings.php', 
+        'company_settings_actions.php', 
+        'backup.php', 
+        'logs.php',
+        'api_sales_chart.php',
+        'clientes_actions.php',
+        'get_import_history.php',
+        'pedidos_actions.php',
+        'product_actions.php',
+        'search_api.php',
+        'process_import.php'
+
+        
+    ],
+    'supervisor' => [
+        'dashboard.php',
+        'pedidos.php',
+        'envios.php',
+        'inventario.php',
+        'importacion.php',
+        'about.php',
+        'login.php',
+        'logout.php',
+        'api_sales_chart.php',
+        'get_import_history.php',
+        'product_actions.php',
+        'users.php',
+        'sesion.php',
+        'db.php',
+        'sidebar.php',
+        'reports.php',
+        'pedidos_actions.php',
+        'search_api.php', 
+        'clientes.php', 
+        'clientes_actions.php', 
+        'api_sales_by_status_chart.php',
+        'envios_actions.php',
+        'api_sales_chart.php',
+        'clientes_actions.php',
+        'get_import_history.php',
+        'pedidos_actions.php',
+        'product_actions.php',
+        'search_api.php',
+        'process_import.php'
+    ],
+    'operador' => [
+        'dashboard.php',
+        'pedidos.php',
+        'envios.php',
+        'about.php',
+        'login.php',
+        'logout.php',
+        'api_sales_chart.php',
+        'sesion.php',
+        'db.php',
+        'sidebar.php',
+        'pedidos_actions.php',
+        'search_api.php', 
+        'api_sales_by_status_chart.php',
+        'envios_actions.php',
+        'pedidos_actions.php',
+        'product_actions.php',
+        'search_api.php'
+
+    ]
+];
+
+// Obtener el rol del usuario de la sesión
+$user_role = $_SESSION['usuario_rol'] ?? 'guest';
+
+// Verificar si la página actual está permitida para el rol del usuario
+if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_pages[$user_role])) {
+    if ($is_api_call) {
+        json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
+    } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
+        header('Location: /buzz/dashboard.php');
+    } else {
+        header('Location: login.php');
+    }
+    exit();
+}
+
+// Asegurarse de que los usuarios "supervisor" y "operador" no puedan acceder a admin.php directamente
+if ($current_page === 'admin.php' && ($user_role === 'supervisor' || $user_role === 'operador')) {
+    if ($is_api_call) {
+        json_auth_error('Acceso denegado a la administración.');
+    } else {
+        header('Location: /buzz/dashboard.php');
+        exit();
+    }
+}
+
+// Asegurarse de que los usuarios "operador" no puedan acceder a inventario.php o importacion.php
+if (($current_page === 'inventario.php' || $current_page === 'importacion.php') && $user_role === 'operador') {
+    if ($is_api_call) {
+        json_auth_error('Acceso denegado al inventario/importación.');
+    } else {
+        header('Location: /buzz/dashboard.php');
+        exit();
+    }
+}
+
+?>
