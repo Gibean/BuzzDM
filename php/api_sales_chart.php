@@ -1,10 +1,9 @@
 <?php
 header('Content-Type: application/json');
-require_once 'db.php';
+require_once 'db.php'; // Provides $pdo
 
 try {
     $pdo = getDbConnection();
-
     // Consulta para obtener las ventas diarias de los últimos 30 días
     $query = "
         SELECT 
@@ -17,8 +16,8 @@ try {
         ORDER BY fecha ASC;
     ";
 
-    $stmt = $pdo->query($query); // Use PDO query
-    $results = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all results
+    $stmt = $pdo->query($query);
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $data = [
         'labels' => [],

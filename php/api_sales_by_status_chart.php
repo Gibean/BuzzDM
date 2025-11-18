@@ -1,10 +1,9 @@
 <?php
 header('Content-Type: application/json');
-require_once 'db.php';
+require_once 'db.php'; // Provides $pdo
 
 try {
     $pdo = getDbConnection();
-
     $query = "
         SELECT 
             estado_pago,

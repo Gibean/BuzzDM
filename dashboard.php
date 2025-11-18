@@ -18,15 +18,9 @@ try {
     $stmtLowStock = $pdo->query($queryLowStock);
     $lowStockProducts = $stmtLowStock->fetchAll(PDO::FETCH_ASSOC);
 
-    // 3. Consultar REGISTRO DE ACTIVIDAD (unificado)
-    $queryActivity = "
-        (SELECT detalles, fecha FROM v_op_import)
-        UNION ALL
-        (SELECT detalles, fecha FROM v_op_backup)
-        ORDER BY fecha DESC
-        LIMIT 10";
+    // 3. Consultar REGISTRO DE ACTIVIDAD (desde la tabla de logs)
+    $queryActivity = "SELECT detalles FROM logs ORDER BY fecha DESC LIMIT 10";
     $stmtActivity = $pdo->query($queryActivity);
-    // Fetching just the 'detalles' column
     $activityLog = $stmtActivity->fetchAll(PDO::FETCH_COLUMN, 0);
 
 } catch (PDOException $e) {
