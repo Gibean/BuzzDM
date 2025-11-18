@@ -8,59 +8,24 @@ $response = ['success' => false, 'message' => '', 'history' => []];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        $query = "SELECT i.id, i.fecha, i.tipo, i.archivo_nombre, i.estado, i.detalles, u.nombre as usuario_nombre
-                  FROM importaciones i
-                  LEFT JOIN usuarios u ON i.usuario_id = u.id
-                  ORDER BY i.fecha DESC";
-        $pdo = getDbConnection();
+        // Query the logs table for import and backup actions
+        $query = "SELECT l.id, l.fecha, l.accion, l.detalles, u.nombre as usuario_nombre
+                  FROM logs l
+                  LEFT JOIN usuarios u ON l.usuario_id = u.id
+                  WHERE l.accion LIKE 'Importación%' OR l.accion LIKE 'Backup%'
+                  ORDER BY l.fecha DESC
+                  LIMIT 50"; // Limit to the last 50 entries
+
         $stmt = $pdo->prepare($query);
         $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $history = [];
-        foreach ($results as $row) {
-            $totalProcessed = 0;
-            $totalInserted = 0;
-            $totalUpdated = 0;
-            $totalFailed = 0;
-            $allErrors = [];
-
-            if (!empty($row['detalles'])) {
-                $details = json_decode($row['detalles'], true);
-                if (is_array($details)) {
-                    foreach ($details as $sheetResult) {
-                        $totalProcessed += ($sheetResult['processed'] ?? 0);
-                        $totalInserted += ($sheetResult['inserted'] ?? 0);
-                        $totalUpdated += ($sheetResult['updated'] ?? 0);
-                        $totalFailed += ($sheetResult['failed'] ?? 0);
-                        if (!empty($sheetResult['errors'])) {
-                            $allErrors = array_merge($allErrors, $sheetResult['errors']);
-                        }
-                    }
-                }
-            }
-
-            $history[] = [
-                'id' => $row['id'],
-                'date' => $row['fecha'],
-                'type' => $row['tipo'],
-                'filename' => $row['archivo_nombre'],
-                'status' => $row['estado'],
-                'processed' => $totalProcessed,
-                'inserted' => $totalInserted,
-                'updated' => $totalUpdated,
-                'failed' => $totalFailed,
-                'errors_list' => $allErrors,
-                'user' => $row['usuario_nombre'] ?? 'Desconocido'
-            ];
-        }
-
         $response['success'] = true;
-        $response['history'] = $history;
+        $response['history'] = $results;
 
     } catch (Exception $e) {
-        $response['message'] = 'Error al obtener el historial de importaciones: ' . $e->getMessage();
-        error_log("Error fetching import history: " . $e->getMessage());
+        $response['message'] = 'Error al obtener el historial: ' . $e->getMessage();
+        error_log("Error fetching history: " . $e->getMessage());
     }
 } else {
     $response['message'] = 'Método de solicitud no permitido.';

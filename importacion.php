@@ -113,12 +113,9 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Tipo</th>
-                            <th>Archivo</th>
-                            <th>Estado</th>
-                            <th>Registros</th>
+                            <th>Acción</th>
+                            <th>Detalles</th>
                             <th>Usuario</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="importHistoryTable">
@@ -332,7 +329,38 @@
 
             // Initial state
             clearFile();
+            loadImportHistory(); // Load history on page load
         });
+
+        async function loadImportHistory() {
+            const importHistoryTable = document.getElementById('importHistoryTable');
+            importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">Cargando historial...</td></tr>';
+
+            try {
+                const response = await fetch('php/get_import_history.php');
+                const data = await response.json();
+
+                if (data.success && data.history.length > 0) {
+                    importHistoryTable.innerHTML = '';
+                    data.history.forEach(log => {
+                        const row = `
+                            <tr>
+                                <td>${new Date(log.fecha).toLocaleString('es-ES')}</td>
+                                <td>${log.accion}</td>
+                                <td>${log.detalles}</td>
+                                <td>${log.usuario_nombre || 'Sistema'}</td>
+                            </tr>
+                        `;
+                        importHistoryTable.insertAdjacentHTML('beforeend', row);
+                    });
+                } else {
+                    importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">No hay historial de importaciones o backups.</td></tr>';
+                }
+            } catch (error) {
+                console.error('Error al cargar el historial:', error);
+                importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">Error al cargar el historial.</td></tr>';
+            }
+        }
 
         // Function to show notifications (assuming it's defined in common.js or similar)
         function showNotification(message, type) {

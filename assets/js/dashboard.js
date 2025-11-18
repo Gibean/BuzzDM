@@ -1,13 +1,42 @@
 document.addEventListener('DOMContentLoaded', function () {
     initSalesChart();
     initPaymentStatusChart(); // Initialize the new pie chart
+    loadStats(); 
     // Las siguientes funciones quedan comentadas o eliminadas porque ahora los datos
     // se cargan directamente desde PHP en el HTML.
-    // loadStats(); 
     // loadActivityLog();
     // loadTopProducts();
     // loadLowStockProducts();
 });
+
+async function loadStats() {
+    try {
+        const response = await fetch('php/api_stats.php');
+        if (!response.ok) {
+            throw new Error(`Error de red: ${response.statusText}`);
+        }
+        const stats = await response.json();
+
+        if (stats.error) {
+            throw new Error(`Error en la API: ${stats.error}`);
+        }
+
+        animateCounter('totalProducts', stats.totalProducts);
+        animateCounter('totalOrders', stats.totalOrders);
+        animateCounter('pendingShipments', stats.pendingShipments);
+        animateCounter('monthlyRevenue', stats.monthlyRevenue, true);
+
+        // Actualizar la fecha de "ÚLTIMA ACTUALIZACIÓN"
+        const lastUpdateElement = document.getElementById('lastUpdate');
+        if (lastUpdateElement) {
+            lastUpdateElement.textContent = new Date().toLocaleString('es-ES');
+        }
+
+    } catch (error) {
+        console.error("No se pudieron cargar las estadísticas:", error);
+        // Opcional: Mostrar un mensaje de error en la UI
+    }
+}
 
 async function initSalesChart() {
     const ctx = document.getElementById('salesChart');
