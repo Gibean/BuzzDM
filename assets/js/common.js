@@ -187,3 +187,7 @@ function hideModal() {
         }, { once: true });
     }
 }
+
+function logout() {
+    window.location.href = '/buzz/php/logout.php';
+}
