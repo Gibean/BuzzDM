@@ -1,6 +1,7 @@
 <?php require_once 'php/sesion.php'; ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +11,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+
 <body>
-     Sidebar 
+    Sidebar
     <?php require_once 'php/sidebar.php'; ?>
 
-     Main Content 
+    Main Content
     <main class="main-content">
-         <!-- Top Navbar --> 
+        <!-- Top Navbar -->
         <nav class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
@@ -27,17 +29,17 @@
             </div>
         </nav>
 
-         <!-- System Info  -->
+        <!-- System Info  -->
         <div class="row">
             <div class="col-lg-8">
                 <div class="buzz-card mb-4">
                     <div class="text-center mb-4">
                         <div class="d-flex align-items-center justify-content-center">
-            <img src="assets/img/logov1.png" alt="BUZZ Logo" class="sidebar-logo">
-        </div>
+                            <img src="assets/img/logov1.png" alt="BUZZ Logo" class="sidebar-logo">
+                        </div>
                         <p class="text-muted font-mono">Sistema de Gestión de Pedidos e Inventario</p>
                     </div>
-                    
+
                     <div class="row text-center">
                         <div class="col-md-4 mb-3">
                             <div class="border border-secondary rounded p-3">
@@ -116,7 +118,7 @@
                                     <i class="fas fa-check text-success me-2"></i>
                                     <span class="font-mono">Visualización de movimientos administrativos</span>
                                 </li>
-                                
+
                                 <li class="mb-2">
                                     <i class="fa-solid fa-spinner"></i>
                                     <span class="font-mono">2FA Autentication</span>
@@ -190,13 +192,15 @@
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
                             <span class="text-muted">Memoria (PHP Peak):</span>
-                            <span class="font-mono"><?php echo round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB'; ?></span>
+                            <span
+                                class="font-mono"><?php echo round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB'; ?></span>
                         </div>
                     </div>
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
                             <span class="text-muted">Espacio (Libre/Total):</span>
-                            <span class="font-mono"><?php echo round(disk_free_space('/') / (1024 * 1024 * 1024), 2) . ' GB / ' . round(disk_total_space('/') / (1024 * 1024 * 1024), 2) . ' GB'; ?></span>
+                            <span
+                                class="font-mono"><?php echo round(disk_free_space('/') / (1024 * 1024 * 1024), 2) . ' GB / ' . round(disk_total_space('/') / (1024 * 1024 * 1024), 2) . ' GB'; ?></span>
                         </div>
                     </div>
                 </div>
@@ -218,7 +222,8 @@
                     <div class="mb-3">
                         <div class="d-flex align-items-center">
                             <i class="fas fa-book text-primary me-2"></i>
-                            <a href="#" class="font-mono text-primary" style="text-decoration: none;">Manual de Usuario</a>
+                            <a href="manual.php" class="font-mono text-primary" style="text-decoration: none;">Manual de
+                                Usuario</a>
                         </div>
                     </div>
                 </div>
@@ -226,11 +231,15 @@
                 <div class="buzz-card">
                     <h5 class="font-primary text-primary mb-3">LICENCIA</h5>
                     <p class="text-muted font-mono" style="font-size: 0.9rem;">
-                        © 2025 <b>Proyecto Socio-Tecnológico BUZZ Data Manager.</b> Este software es para fines educativos y está protegido por derechos de autor. No se permite la distribución sin autorización.
-                        <br><br> Todos los derechos reservados a Gisvel Aray V-30535128, Estudiante del PNFI T4F1 desarrolladora full stack del proyecto bajo el seudónimo de "HareBit"
-                    
+                        © 2025 <b>Proyecto Socio-Tecnológico BUZZ Data Manager.</b> Este software es para fines
+                        educativos y está protegido por derechos de autor. No se permite la distribución sin
+                        autorización.
+                        <br><br> Todos los derechos reservados a Gisvel Aray V-30535128, Estudiante del PNFI T4F1
+                        desarrolladora full stack del proyecto bajo el seudónimo de "HareBit"
+
                     </p>
-                    <img src="assets/img/harebit.png" alt="HareBit Development Logo" style="width: 100%; height: auto; display: block; margin-top: 1rem;">
+                    <img src="assets/img/harebit.png" alt="HareBit Development Logo"
+                        style="width: 100%; height: auto; display: block; margin-top: 1rem;">
                 </div>
             </div>
         </div>
@@ -239,4 +248,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>
 </body>
+
 </html>
