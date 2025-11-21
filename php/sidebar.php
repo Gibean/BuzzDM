@@ -17,14 +17,16 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     <div class="sidebar-nav">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>" href="dashboard.php">
+                <a class="nav-link <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>"
+                    href="dashboard.php">
                     <i class="fas fa-home"></i> Dashboard
                 </a>
             </li>
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>" href="inventario.php">
+                <a class="nav-link <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
+                    href="inventario.php">
                     <i class="fas fa-box"></i> Inventario
                 </a>
             </li>
@@ -49,7 +51,8 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>" href="importacion.php">
+                <a class="nav-link <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
+                    href="importacion.php">
                     <i class="fas fa-upload"></i> Importación
                 </a>
             </li>
@@ -73,16 +76,20 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
     <div class="mt-auto p-3 border-top border-secondary">
         <div class="d-flex align-items-center">
-            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
+                style="width: 40px; height: 40px;">
                 <i class="fas fa-user text-dark"></i>
             </div>
             <div>
-                <div class="font-mono" style="font-size: 0.9rem;" id="userName"><?php echo htmlspecialchars($usuarioNombre); ?></div>
+                <div class="font-mono" style="font-size: 0.9rem;" id="userName">
+                    <?php echo htmlspecialchars($usuarioNombre); ?></div>
                 <small class="text-muted" id="userRole"><?php echo htmlspecialchars($usuarioRol); ?></small>
             </div>
         </div>
-        <button class="btn btn-outline-buzz btn-sm mt-2 w-100" onclick="logout()">
-            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-        </button>
+        <form action="php/logout.php" method="POST" class="d-grid">
+            <button type="submit" class="btn btn-outline-buzz btn-sm">
+                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+            </button>
+        </form>
     </div>
 </nav>

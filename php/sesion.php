@@ -84,6 +84,7 @@ $allowed_pages = [
         'importacion.php',
         'admin.php',
         'about.php',
+        'manual.php',
         'login.php',
         'logout.php',
         'api_sales_chart.php',
@@ -96,14 +97,14 @@ $allowed_pages = [
         'sidebar.php',
         'reports.php',
         'pedidos_actions.php',
-        'search_api.php', 
-        'clientes.php', 
-        'clientes_actions.php', 
+        'search_api.php',
+        'clientes.php',
+        'clientes_actions.php',
         'api_sales_by_status_chart.php',
-        'envios_actions.php', 
-        'company_settings.php', 
-        'company_settings_actions.php', 
-        'backup.php', 
+        'envios_actions.php',
+        'company_settings.php',
+        'company_settings_actions.php',
+        'backup.php',
         'logs.php',
         'api_sales_chart.php',
         'clientes_actions.php',
@@ -111,9 +112,10 @@ $allowed_pages = [
         'pedidos_actions.php',
         'product_actions.php',
         'search_api.php',
-        'process_import.php'
+        'process_import.php',
+        'manual.php'
 
-        
+
     ],
     'supervisor' => [
         'dashboard.php',
@@ -122,6 +124,7 @@ $allowed_pages = [
         'inventario.php',
         'importacion.php',
         'about.php',
+        'manual.php',
         'login.php',
         'logout.php',
         'api_sales_chart.php',
@@ -133,9 +136,9 @@ $allowed_pages = [
         'sidebar.php',
         'reports.php',
         'pedidos_actions.php',
-        'search_api.php', 
-        'clientes.php', 
-        'clientes_actions.php', 
+        'search_api.php',
+        'clientes.php',
+        'clientes_actions.php',
         'api_sales_by_status_chart.php',
         'envios_actions.php',
         'api_sales_chart.php',
@@ -144,13 +147,15 @@ $allowed_pages = [
         'pedidos_actions.php',
         'product_actions.php',
         'search_api.php',
-        'process_import.php'
+        'process_import.php',
+        'manual.php'
     ],
     'operador' => [
         'dashboard.php',
         'pedidos.php',
         'envios.php',
         'about.php',
+        'manual.php',
         'login.php',
         'logout.php',
         'api_sales_chart.php',
@@ -158,12 +163,13 @@ $allowed_pages = [
         'db.php',
         'sidebar.php',
         'pedidos_actions.php',
-        'search_api.php', 
+        'search_api.php',
         'api_sales_by_status_chart.php',
         'envios_actions.php',
         'pedidos_actions.php',
         'product_actions.php',
-        'search_api.php'
+        'search_api.php',
+        'manual.php'
 
     ]
 ];
