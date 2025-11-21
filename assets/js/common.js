@@ -189,5 +189,5 @@ function hideModal() {
 }
 
 function logout() {
-    window.location.href = '/buzz/php/logout.php';
+    window.location.href = "php/logout.php"
 }

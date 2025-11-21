@@ -24,10 +24,13 @@ try {
     $stmtEmpresa = $pdo->query("SELECT rif, nombre, direccion, telefono, email, logo_svg FROM empresa LIMIT 1");
     $empresa = $stmtEmpresa->fetch(PDO::FETCH_ASSOC);
 
-    // Rutas a las imágenes.
-    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . '/buzz/';
+    // Rutas a las imágenes - dynamic base URL detection
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+    $host = $_SERVER['HTTP_HOST'];
+    $scriptPath = dirname(dirname($_SERVER['SCRIPT_NAME'])); // Get parent directory of the script
+    $baseUrl = $protocol . "://" . $host . $scriptPath . '/';
     $rutaLogo = $empresa && !empty($empresa['logo_svg']) ? $baseUrl . 'uploads/' . $empresa['logo_svg'] : $baseUrl . 'assets/img/default_logo.png';
-    $rutaBanner = $baseUrl . 'assets/img/banner.png'; // Corrected path
+    $rutaBanner = $baseUrl . 'assets/img/banner.png';
 
     // Función para generar el HTML del reporte
     function generarReporteHTML($tipoReporte, $datos, $empresa, $rutaLogo, $rutaBanner) {

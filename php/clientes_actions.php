@@ -38,18 +38,18 @@ try {
             } elseif (isset($_GET['action']) && $_GET['action'] === 'frequent') {
                 // Fetch frequent customers (e.g., top 5 by number of orders)
                 $stmt = $pdo->prepare("
-                    SELECT 
-                        c.id, 
-                        c.nombre, 
-                        c.email, 
+                    SELECT
+                        c.id,
+                        c.nombre,
+                        c.email,
                         COUNT(p.id) AS total_orders
-                    FROM 
+                    FROM
                         clientes c
-                    JOIN 
+                    JOIN
                         pedidos p ON c.id = p.cliente_id
-                    GROUP BY 
+                    GROUP BY
                         c.id, c.nombre, c.email
-                    ORDER BY 
+                    ORDER BY
                         total_orders DESC
                     LIMIT 5
                 ");
@@ -84,11 +84,11 @@ try {
                 $stmt->execute([
                     $input['id'],
                     $input['nombre'],
-                    $input['email'],
-                    $input['telefono'],
-                    $input['direccion'],
-                    $input['notas'],
-                    isset($input['vip']) ? 1 : 0
+                    $input['email'] ?? null,
+                    $input['telefono'] ?? null,
+                    $input['direccion'] ?? null,
+                    $input['notas'] ?? null,
+                    isset($input['vip']) && $input['vip'] == 1 ? 1 : 0
                 ]);
                 json_response(true, ['id' => $input['id']], 'Cliente creado exitosamente.');
             } catch (PDOException $e) {
@@ -103,11 +103,11 @@ try {
                 $stmt = $pdo->prepare("UPDATE clientes SET nombre = ?, email = ?, telefono = ?, direccion = ?, notas = ?, vip = ? WHERE id = ?");
                 $stmt->execute([
                     $input['nombre'],
-                    $input['email'],
-                    $input['telefono'],
-                    $input['direccion'],
-                    $input['notas'],
-                    isset($input['vip']) ? 1 : 0,
+                    $input['email'] ?? null,
+                    $input['telefono'] ?? null,
+                    $input['direccion'] ?? null,
+                    $input['notas'] ?? null,
+                    isset($input['vip']) && $input['vip'] == 1 ? 1 : 0,
                     $customerId
                 ]);
                 json_response(true, [], 'Cliente actualizado exitosamente.');

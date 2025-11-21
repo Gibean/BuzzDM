@@ -19,6 +19,6 @@ if (ini_get("session.use_cookies")) {
 session_destroy();
 
 // Redirige a la página de login
-header("Location: /buzz/login.php");
+header("Location: ../login.php");
 exit;
 ?>
