@@ -26,55 +26,68 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function authenticateUser(email, password) {
     // Mostrar loading
-    const submitBtn = loginForm.querySelector('button[type="submit"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
-    submitBtn.disabled = true;
+    const submitBtn = loginForm.querySelector('button[type="submit"]')
+    const originalText = submitBtn.innerHTML
+    submitBtn.innerHTML =
+      '<i class="fas fa-spinner fa-spin"></i> Verificando...'
+    submitBtn.disabled = true
 
-    fetch("/buzz/php/login_guard.php", {
+    fetch("./php/login_guard.php", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded"
       },
-      body: new URLSearchParams({ email, password }),
+      body: new URLSearchParams({ email, password })
     })
-    .then(response => {
+      .then((response) => {
         if (!response.ok) {
-            // If server response is not ok (e.g., 500, 404),
-            // try to parse the error message from the body,
-            // otherwise throw a generic error.
-            return response.json().then(errorData => {
-                throw new Error(errorData.message || `Error del servidor: ${response.status}`);
-            }).catch(() => {
-                // This catch is for cases where response.json() fails (e.g., empty response)
-                throw new Error(`Error del servidor: ${response.status}`);
-            });
+          // If server response is not ok (e.g., 500, 404),
+          // try to parse the error message from the body,
+          // otherwise throw a generic error.
+          return response
+            .json()
+            .then((errorData) => {
+              throw new Error(
+                errorData.message || `Error del servidor: ${response.status}`
+              )
+            })
+            .catch(() => {
+              // This catch is for cases where response.json() fails (e.g., empty response)
+              throw new Error(`Error del servidor: ${response.status}`)
+            })
         }
-        return response.json();
-    })
-    .then(data => {
+        return response.json()
+      })
+      .then((data) => {
         if (data.success) {
-            window.location.href = data.redirect || '/buzz/dashboard.php';
+          window.location.href = data.redirect || "./dashboard.php"
         } else {
-            // This handles cases where response.ok is true, but the application
-            // logic returns a failure (e.g., wrong password).
-            showAlert(data.message || "Error inesperado. Por favor, intente nuevamente.");
+          // This handles cases where response.ok is true, but the application
+          // logic returns a failure (e.g., wrong password).
+          showAlert(
+            data.message || "Error inesperado. Por favor, intente nuevamente."
+          )
         }
-    })
-    .catch((error) => {
-        console.error("Error de conexión o del servidor:", error);
+      })
+      .catch((error) => {
+        console.error("Error de conexión o del servidor:", error)
         // Display the specific error message thrown from the .then() block
-        showAlert(error.message || "No se pudo conectar con el servidor. Verifique su conexión.");
-    })
-    .finally(() => {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
-    });
+        showAlert(
+          error.message ||
+            "No se pudo conectar con el servidor. Verifique su conexión."
+        )
+      })
+      .finally(() => {
+        submitBtn.innerHTML = originalText
+        submitBtn.disabled = false
+      })
   }
 
   function showAlert(message) {
     if (!loginAlertText || !loginAlert) {
-      console.error("Elemento loginAlertText o loginAlert no encontrado en el DOM.")
+      console.error(
+        "Elemento loginAlertText o loginAlert no encontrado en el DOM."
+      )
       return
     }
     loginAlertText.textContent = message
@@ -87,7 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function isValidEmail(email) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
     return emailRegex.test(email)
   }
 })

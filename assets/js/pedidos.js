@@ -13,7 +13,7 @@ async function fetchAndRenderOrders() {
         const dateFrom = document.getElementById('dateFrom').value;
         const dateTo = document.getElementById('dateTo').value;
 
-        let url = `/buzz/php/pedidos_actions.php?page=${currentPage}&limit=${ordersPerPage}`;
+        let url = `php/pedidos_actions.php?page=${currentPage}&limit=${ordersPerPage}`;
         if (searchInput) {
             url += `&search=${encodeURIComponent(searchInput)}`;
         }
@@ -124,7 +124,7 @@ async function toggleOrderProducts(button, orderId) {
         if (!productsDiv.dataset.loaded) {
             productsDiv.innerHTML = `<div class="text-center p-3"><i class="fas fa-spinner fa-spin text-muted"></i> Cargando productos...</div>`;
             try {
-                const data = await fetchJSON(`/buzz/php/pedidos_actions.php?action=get_products&order_id=${orderId}`);
+                const data = await fetchJSON(`php/pedidos_actions.php?action=get_products&order_id=${orderId}`);
                 if (data.products && data.products.length > 0) {
                     productsDiv.innerHTML = `
                         <table class="table table-sm table-bordered mt-2">
@@ -162,7 +162,7 @@ async function toggleOrderProducts(button, orderId) {
 
 async function viewOrderDetail(orderId) {
     try {
-        const data = await fetchJSON(`/buzz/php/pedidos_actions.php?id=${orderId}`);
+        const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`);
         const order = data.order;
 
         if (order) {
@@ -218,7 +218,7 @@ async function viewOrderDetail(orderId) {
 
 async function editOrder(orderId) {
     try {
-        const data = await fetchJSON(`/buzz/php/pedidos_actions.php?id=${orderId}`);
+        const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`);
         const order = data.order;
 
         if (order) {
@@ -301,7 +301,7 @@ async function editOrder(orderId) {
                     }
 
                     try {
-                        const data = await fetchJSON(`/buzz/php/search_api.php?action=search_products&query=${encodeURIComponent(query)}`);
+                        const data = await fetchJSON(`php/search_api.php?action=search_products&query=${encodeURIComponent(query)}`);
                         if (data.success && data.products.length > 0) {
                             productSearchResultsDiv.innerHTML = data.products.map(p => `
                                 <a href="#" class="list-group-item list-group-item-action" 
@@ -417,7 +417,7 @@ async function editOrder(orderId) {
                 }
 
                 try {
-                    await fetchJSON(`/buzz/php/pedidos_actions.php?id=${orderId}`, {
+                    await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
                         method: 'PUT',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(updatedOrder)
@@ -475,7 +475,7 @@ async function openOrderModal() {
         }
 
         try {
-            const data = await fetchJSON(`/buzz/php/search_api.php?action=search_clients&query=${encodeURIComponent(query)}`);
+            const data = await fetchJSON(`php/search_api.php?action=search_clients&query=${encodeURIComponent(query)}`);
             if (data.success && data.clients.length > 0) {
                 clientSearchResultsDiv.innerHTML = data.clients.map(client => `
                     <a href="#" class="list-group-item list-group-item-action" 
@@ -563,7 +563,7 @@ async function openOrderModal() {
             }
 
             try {
-                const data = await fetchJSON(`/buzz/php/search_api.php?action=search_products&query=${encodeURIComponent(query)}`);
+                const data = await fetchJSON(`php/search_api.php?action=search_products&query=${encodeURIComponent(query)}`);
                 if (data.success && data.products.length > 0) {
                     productSearchResultsDiv.innerHTML = data.products.map(product => `
                         <a href="#" class="list-group-item list-group-item-action" 
@@ -670,7 +670,7 @@ async function openOrderModal() {
         }
 
         try {
-            await fetchJSON(`/buzz/php/pedidos_actions.php`, {
+            await fetchJSON(`php/pedidos_actions.php`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newOrder)
@@ -697,7 +697,7 @@ async function deleteOrder(orderId) {
         type: "confirm",
         onConfirm: async () => {
             try {
-                await fetchJSON(`/buzz/php/pedidos_actions.php`, {
+                await fetchJSON(`php/pedidos_actions.php`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: orderId })

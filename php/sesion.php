@@ -176,7 +176,7 @@ if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_page
     if ($is_api_call) {
         json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
     } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
-        header('Location: /buzz/dashboard.php');
+        header('Location: dashboard.php');
     } else {
         header('Location: login.php');
     }
@@ -188,7 +188,7 @@ if ($current_page === 'admin.php' && ($user_role === 'supervisor' || $user_role 
     if ($is_api_call) {
         json_auth_error('Acceso denegado a la administración.');
     } else {
-        header('Location: /buzz/dashboard.php');
+        header('Location: dashboard.php');
         exit();
     }
 }
@@ -198,7 +198,7 @@ if (($current_page === 'inventario.php' || $current_page === 'importacion.php') 
     if ($is_api_call) {
         json_auth_error('Acceso denegado al inventario/importación.');
     } else {
-        header('Location: /buzz/dashboard.php');
+        header('Location: dashboard.php');
         exit();
     }
 }

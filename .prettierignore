@@ -1,0 +1,15 @@
+# Ignore artifacts:
+node_modules
+vendor
+composer.lock
+
+# Ignore all SQL files
+*.sql
+
+# Ignore uploads
+uploads/
+assets/img/uploads/
+
+# Ignore vendor libraries
+assets/js/chart.js
+
