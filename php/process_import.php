@@ -5,7 +5,20 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/sesion.php'; // Include sesion.php to access session variables
 
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
+
+/**
+ * Busca un registro por nombre en una tabla. Si no existe, lo crea.
+ * Devuelve el ID del registro (existente o nuevo).
+ */
+function findOrCreate(PDO $pdo, string $tableName, ?string $name): ?int {
+    if (empty(trim($name))) return null;
+    $stmt = $pdo->prepare("SELECT id FROM {$tableName} WHERE LOWER(nombre) = LOWER(?)");
+    $stmt->execute([trim($name)]);
+    if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) return (int)$result['id'];
+    $stmt = $pdo->prepare("INSERT INTO {$tableName} (nombre) VALUES (?)");
+    $stmt->execute([trim($name)]);
+    return (int)$pdo->lastInsertId();
+}
 
 header('Content-Type: application/json');
 error_log("--- Starting Import Process ---");
@@ -13,7 +26,8 @@ error_log("--- Starting Import Process ---");
 $response = [
     'success' => false,
     'message' => '',
-    'results' => []
+    'results' => [],
+    'summary' => ['created' => []]
 ];
 
 if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
@@ -48,17 +62,19 @@ try {
 
     $mappings = [
         'Productos' => [
-            'sheet_name' => 'prueba',
+            'sheet_name' => 'prueba', // o el nombre de tu hoja de productos
             'table' => 'productos',
             'unique_key' => 'sku',
             'columns' => [
                 'SKU' => ['db_col' => 'sku', 'type' => 'string'],
                 'Producto' => ['db_col' => 'nombre', 'type' => 'string'],
                 'Descripción' => ['db_col' => 'descripcion', 'type' => 'string'],
-                'Precio' => ['db_col' => 'precio', 'type' => 'float'],
-                'Valores' => ['db_col' => 'stock', 'type' => 'integer'],
-                'MinStock' => ['db_col' => 'min_stock', 'type' => 'integer'],
-                'Categoría' => ['db_col' => 'categoria', 'type' => 'integer'],
+                'Precio' => ['db_col' => 'precio', 'type' => 'float', 'default' => 0.0],
+                'Stock' => ['db_col' => 'stock', 'type' => 'integer', 'default' => 0],
+                'MinStock' => ['db_col' => 'min_stock', 'type' => 'integer', 'default' => 10],
+                'Categoría' => ['db_col' => 'categoria', 'type' => 'fk', 'target_table' => 'categorias'],
+                'Marca' => ['db_col' => 'marca_id', 'type' => 'fk', 'target_table' => 'marcas'],
+                'Proveedor' => ['db_col' => 'proveedor_id', 'type' => 'fk', 'target_table' => 'proveedores'],
             ],
         ],
         'Clientes' => [
@@ -92,6 +108,7 @@ try {
     ];
 
     $overallStatus = 'procesado';
+    $importResults = [];
     foreach ($mappings as $sheetType => $sheetConfig) {
         error_log("--- Processing Sheet Type: {$sheetType} ---");
         $sheetName = $sheetConfig['sheet_name'];
@@ -104,30 +121,17 @@ try {
             continue;
         }
 
-        $importResults[$sheetType] = ['processed' => 0, 'inserted' => 0, 'updated' => 0, 'failed' => 0, 'errors' => []];
+        $importResults[$sheetType] = ['processed' => 0, 'inserted' => 0, 'updated' => 0, 'failed' => 0, 'errors' => [], 'status' => 'success'];
         $headerRow = $sheet->getRowIterator(1, 1)->current();
         $headerCells = [];
         foreach ($headerRow->getCellIterator() as $cell) {
-            $headerCells[] = $cell->getValue();
+            $headerCells[trim($cell->getColumn())] = trim($cell->getValue());
         }
 
-        $dbColumns = [];
-        $placeholders = [];
-        $updateSet = [];
-        foreach ($sheetConfig['columns'] as $excelHeader => $colConfig) {
-            $dbCol = $colConfig['db_col'];
-            $dbColumns[] = $dbCol;
-            $placeholders[] = '?';
-            if ($dbCol !== $sheetConfig['unique_key']) {
-                $updateSet[] = "{$dbCol} = VALUES({$dbCol})";
-            }
-        }
-
-        $upsertSql = "INSERT INTO {$table} (" . implode(', ', $dbColumns) . ") VALUES (" . implode(', ', $placeholders) . ") ON DUPLICATE KEY UPDATE " . implode(', ', $updateSet);
-        error_log("Generated SQL for '{$sheetName}': {$upsertSql}");
+        // Invert header map for easy lookup: Excel Header => Column Letter
+        $headerMap = array_flip($headerCells);
 
         $pdo->beginTransaction();
-        $stmtInsert = $pdo->prepare($upsertSql);
 
         $rowIndex = 0;
         foreach ($sheet->getRowIterator() as $row) {
@@ -135,32 +139,59 @@ try {
             if ($rowIndex == 1) continue; // Skip header
 
             $rowData = [];
-            $cellIterator = $row->getCellIterator();
-            $cellIterator->setIterateOnlyExistingCells(false);
-            foreach ($cellIterator as $cell) {
-                $rowData[] = $cell->getValue();
-            }
-
-            $mappedData = [];
-            // Associate row data with headers
-            for ($i = 0; $i < count($headerCells); $i++) {
-                $mappedData[$headerCells[$i]] = $rowData[$i] ?? null;
-            }
-
-            $params = [];
             foreach ($sheetConfig['columns'] as $excelHeader => $colConfig) {
-                $params[] = $mappedData[$excelHeader] ?? null;
+                $colLetter = $headerMap[$excelHeader] ?? null;
+                $cellValue = $colLetter ? $sheet->getCell($colLetter . $rowIndex)->getValue() : null;
+
+                if ($colConfig['type'] === 'fk') {
+                    $rowData[$colConfig['db_col']] = findOrCreate($pdo, $colConfig['target_table'], $cellValue);
+                } else {
+                    $value = $cellValue ?? $colConfig['default'] ?? null;
+                    switch ($colConfig['type']) {
+                        case 'integer': $value = (int)$value; break;
+                        case 'float':   $value = (float)$value; break;
+                        case 'boolean': $value = filter_var($value, FILTER_VALIDATE_BOOLEAN); break;
+                    }
+                    $rowData[$colConfig['db_col']] = $value;
+                }
             }
 
-            error_log("Row {$rowIndex} in '{$sheetName}' | Data: " . json_encode($mappedData));
-            error_log("Executing query with params: " . json_encode($params));
+            error_log("Row {$rowIndex} in '{$sheetName}' | Data: " . json_encode($rowData));
 
             try {
-                $stmtInsert->execute($params);
-                if ($stmtInsert->rowCount() == 1) {
-                    $importResults[$sheetType]['inserted']++;
-                } elseif ($stmtInsert->rowCount() > 1) {
+                $uniqueKey = $sheetConfig['unique_key'];
+                $uniqueValue = $rowData[$uniqueKey];
+
+                $stmtCheck = $pdo->prepare("SELECT id FROM {$table} WHERE {$uniqueKey} = ?");
+                $stmtCheck->execute([$uniqueValue]);
+                $exists = $stmtCheck->fetch();
+
+                if ($exists) { // UPDATE
+                    $updateFields = [];
+                    foreach ($rowData as $key => $value) {
+                        if ($key !== $uniqueKey) $updateFields[] = "{$key} = :{$key}";
+                    }
+                    $sql = "UPDATE {$table} SET " . implode(', ', $updateFields) . " WHERE {$uniqueKey} = :{$uniqueKey}";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($rowData);
                     $importResults[$sheetType]['updated']++;
+                } else { // INSERT
+                    $columns = implode(', ', array_keys($rowData));
+                    $placeholders = ':' . implode(', :', array_keys($rowData));
+                    $sql = "INSERT INTO {$table} ({$columns}) VALUES ({$placeholders})";
+                    $stmt = $pdo->prepare($sql);
+                    $stmt->execute($rowData);
+                    $importResults[$sheetType]['inserted']++;
+
+                    // If a new product with stock is inserted, create an initial inventory movement
+                    if ($sheetType === 'Productos' && $rowData['stock'] > 0) {
+                        $productId = $pdo->lastInsertId();
+                        $movStmt = $pdo->prepare(
+                            "INSERT INTO movimientos_inventario (producto_id, usuario_id, tipo_movimiento, cantidad, justificacion, stock_anterior, stock_actual)
+                             VALUES (?, ?, 'entrada', ?, 'Stock inicial de importación', 0, ?)"
+                        );
+                        $movStmt->execute([$productId, $userId, $rowData['stock'], $rowData['stock']]);
+                    }
                 }
                 $importResults[$sheetType]['processed']++;
             } catch (PDOException $e) {
@@ -169,6 +200,7 @@ try {
                 $importResults[$sheetType]['errors'][] = $errorMsg;
                 error_log("DB Error on '{$sheetName}', Row {$rowIndex}: " . $e->getMessage());
                 $overallStatus = 'error';
+                $importResults[$sheetType]['status'] = 'failed';
             }
         }
 
@@ -178,6 +210,7 @@ try {
         } else {
             $pdo->rollBack();
             error_log("FAILURE: Rolled back changes for sheet '{$sheetName}' due to errors.");
+            $importResults[$sheetType]['message'] = "Importación de '{$sheetType}' fallida. Se encontraron errores.";
         }
     }
 
