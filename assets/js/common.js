@@ -111,81 +111,75 @@ function showToast(message, type = 'info', duration = 3000) {
  * @param {function} [options.onConfirm] - Callback if the confirm button is clicked.
  * @param {function} [options.onCancel] - Callback if the cancel button is clicked.
  */
-function showModal({ title, message, type = 'info', onConfirm, onCancel }) {
-    let overlay = document.getElementById('modal-overlay');
-    if (!overlay) {
-        // Create the modal structure if it doesn't exist
-        const modalHTML = `
+function showModal({ title, message, type = "info", onConfirm, onCancel }) {
+  let overlay = document.getElementById("modal-overlay")
+  if (!overlay) {
+    // Create the modal structure if it doesn't exist
+    const modalHTML = `
             <div id="modal-dialog">
                 <h3 id="modal-title"></h3>
                 <p id="modal-message"></p>
                 <div id="modal-buttons"></div>
             </div>
-        `;
-        overlay = document.createElement('div');
-        overlay.id = 'modal-overlay';
-        overlay.innerHTML = modalHTML;
-        document.body.appendChild(overlay);
+        `
+    overlay = document.createElement("div")
+    overlay.id = "modal-overlay"
+    overlay.innerHTML = modalHTML
+    document.body.appendChild(overlay)
+  }
+
+  const dialog = overlay.querySelector("#modal-dialog")
+  const modalTitle = overlay.querySelector("#modal-title")
+  const modalMessage = overlay.querySelector("#modal-message")
+  const modalButtons = overlay.querySelector("#modal-buttons")
+
+  // Reset
+  modalButtons.innerHTML = ""
+  dialog.className = "" // Reset classes
+
+  // Set content
+  modalTitle.textContent = title
+  modalMessage.textContent = message
+  dialog.classList.add(`modal-${type}`)
+
+  // Create buttons based on type
+  if (type === "confirm") {
+    const confirmBtn = document.createElement("button")
+    confirmBtn.className = "btn btn-buzz"
+    confirmBtn.textContent = "Confirmar"
+    confirmBtn.onclick = () => {
+      if (onConfirm) onConfirm()
+      hideModal()
     }
 
-    const dialog = overlay.querySelector('#modal-dialog');
-    const modalTitle = overlay.querySelector('#modal-title');
-    const modalMessage = overlay.querySelector('#modal-message');
-    const modalButtons = overlay.querySelector('#modal-buttons');
-
-    // Reset
-    modalButtons.innerHTML = '';
-    dialog.className = 'modal-dialog'; // Reset classes
-
-    // Set content
-    modalTitle.textContent = title;
-    modalMessage.textContent = message;
-    dialog.classList.add(`modal-${type}`);
-
-    // Create buttons based on type
-    if (type === 'confirm') {
-        const confirmBtn = document.createElement('button');
-        confirmBtn.className = 'btn btn-buzz';
-        confirmBtn.textContent = 'Confirmar';
-        confirmBtn.onclick = () => {
-            if (onConfirm) onConfirm();
-            hideModal();
-        };
-
-        const cancelBtn = document.createElement('button');
-        cancelBtn.className = 'btn btn-outline-buzz';
-        cancelBtn.textContent = 'Cancelar';
-        cancelBtn.onclick = () => {
-            if (onCancel) onCancel();
-            hideModal();
-        };
-        modalButtons.append(cancelBtn, confirmBtn);
-    } else {
-        const okBtn = document.createElement('button');
-        okBtn.className = 'btn btn-buzz';
-        okBtn.textContent = 'OK';
-        okBtn.onclick = () => {
-            if (onConfirm) onConfirm(); // Can be used as a simple OK callback
-            hideModal();
-        };
-        modalButtons.appendChild(okBtn);
+    const cancelBtn = document.createElement("button")
+    cancelBtn.className = "btn btn-outline-buzz"
+    cancelBtn.textContent = "Cancelar"
+    cancelBtn.onclick = () => {
+      if (onCancel) onCancel()
+      hideModal()
     }
+    modalButtons.append(cancelBtn, confirmBtn)
+  } else {
+    const okBtn = document.createElement("button")
+    okBtn.className = "btn btn-buzz"
+    okBtn.textContent = "OK"
+    okBtn.onclick = () => {
+      if (onConfirm) onConfirm() // Can be used as a simple OK callback
+      hideModal()
+    }
+    modalButtons.appendChild(okBtn)
+  }
 
-    // Show the modal
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.classList.add('show'), 10);
+  // Show the modal - using simple display toggle like modal-buzz
+  overlay.style.display = "block"
 }
 
 function hideModal() {
-    const overlay = document.getElementById('modal-overlay');
-    if (overlay) {
-        overlay.classList.remove('show');
-        overlay.addEventListener('transitionend', () => {
-            if (!overlay.classList.contains('show')) {
-                overlay.style.display = 'none';
-            }
-        }, { once: true });
-    }
+  const overlay = document.getElementById("modal-overlay")
+  if (overlay) {
+    overlay.style.display = "none"
+  }
 }
 
 function logout() {
