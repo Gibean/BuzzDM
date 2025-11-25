@@ -9,7 +9,7 @@
   --buzz-primary-color: #ffa000;
   --buzz-text-color: #dfe5eb;
   --buzz-text-muted: #a9b1bb;
-  --buzz-success: #28a745;  
+  --buzz-success: #28a745;
   --buzz-warning: #ffc107;
   --buzz-danger: #dc3545;
   --font-primary: "Orbitron", sans-serif;
@@ -359,7 +359,7 @@ input:-webkit-autofill:active {
 }
 
 .sidebar-logo {
-    width: 100%; 
+    width: 100%;
     max-width: 350px;
     height: auto;
     object-fit: contain;
@@ -405,37 +405,29 @@ input:-webkit-autofill:active {
 .toast.error { border-left-color: var(--buzz-danger); }
 .toast.info { border-left-color: var(--buzz-primary-color); }
 
-/* Centered Modal */
+/* Centered Modal - Confirmation Modal */
 #modal-overlay {
     display: none; /* Hidden by default */
     position: fixed;
-    top: 0;
+    z-index: 2001;
     left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9990;
-    justify-content: center;
-    align-items: center;
+    overflow: auto;
 }
 
 #modal-dialog {
     background-color: var(--buzz-card-bg);
+    margin: 15% auto;
     padding: 2rem;
-    border-radius: 8px;
     border: 1px solid var(--buzz-border-color);
-    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    border-radius: 8px;
     width: 90%;
     max-width: 450px;
+    position: relative;
     text-align: center;
-    transform: scale(0.9);
-    opacity: 0;
-    transition: all 0.3s ease-out;
-}
-
-#modal-overlay.show #modal-dialog {
-    transform: scale(1);
-    opacity: 1;
 }
 
 #modal-title {
@@ -456,31 +448,31 @@ input:-webkit-autofill:active {
 }
 
 /* Modal Type Specific Styling */
-.modal-dialog.modal-success {
+#modal-dialog.modal-success {
     border-color: var(--buzz-success);
 }
-.modal-dialog.modal-success #modal-title {
+#modal-dialog.modal-success #modal-title {
     color: var(--buzz-success);
 }
 
-.modal-dialog.modal-error {
+#modal-dialog.modal-error {
     border-color: var(--buzz-danger);
 }
-.modal-dialog.modal-error #modal-title {
+#modal-dialog.modal-error #modal-title {
     color: var(--buzz-danger);
 }
 
-.modal-dialog.modal-info {
+#modal-dialog.modal-info {
     border-color: var(--buzz-primary-color);
 }
-.modal-dialog.modal-info #modal-title {
+#modal-dialog.modal-info #modal-title {
     color: var(--buzz-primary-color);
 }
 
-.modal-dialog.modal-confirm {
+#modal-dialog.modal-confirm {
     border-color: var(--buzz-warning);
 }
-.modal-dialog.modal-confirm #modal-title {
+#modal-dialog.modal-confirm #modal-title {
     color: var(--buzz-warning);
 }
 
