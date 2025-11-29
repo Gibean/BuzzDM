@@ -742,6 +742,7 @@ async function openOrderModal() {
             query
           )}`
         )
+        console.log(data)
         if (data.success && data.products.length > 0) {
           productSearchResultsDiv.innerHTML = data.products
             .map((product) => {
@@ -762,7 +763,7 @@ async function openOrderModal() {
                                data-product-stock="${product.stock}"
                                ${
                                  isOutOfStock
-                                   ? 'style="pointer-events: none; opacity: 0.6;"'
+                                   ? 'style="pointer-events: none; opacity: 0.8;"'
                                    : ""
                                }>
                                 ${product.nombre} (SKU: ${
