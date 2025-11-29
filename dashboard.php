@@ -49,7 +49,7 @@ try {
     <?php require_once 'php/sidebar.php'; ?>
 
     <main class="main-content">
-        <!-- Top Navbar ---> 
+        <!-- Top Navbar --->
         <nav class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
@@ -92,7 +92,7 @@ try {
             </div>
         </div>
 
-       <!---  Charts and Activity --> 
+       <!---  Charts and Activity -->
         <div class="row">
             <div class="col-lg-8 mb-4">
                 <div class="buzz-card">
@@ -118,7 +118,7 @@ try {
                 </div>
             </div>
 
-            
+
             </div>
 
         <div class="row">

@@ -89,15 +89,15 @@ try {
                 $total = $totalStmt->fetchColumn();
 
                 $select_fields = "
-                    p.id, 
-                    p.referencia, 
-                    c.nombre AS customer, 
-                    c.email, 
-                    p.fecha_creacion AS date, 
-                    p.total, 
-                    p.estado_pago AS paymentStatus, 
-                    p.estado_envio AS shippingStatus, 
-                    p.direccion_envio AS shippingAddress, 
+                    p.id,
+                    p.referencia,
+                    c.nombre AS customer,
+                    c.email,
+                    p.fecha_creacion AS date,
+                    p.total,
+                    p.estado_pago AS paymentStatus,
+                    p.estado_envio AS shippingStatus,
+                    p.direccion_envio AS shippingAddress,
                     p.notas_envio AS shippingNotes
                 ";
                 $dataSql = "SELECT $select_fields " . $sql_from;
@@ -135,12 +135,20 @@ try {
                 // Insert products if provided
                 if (isset($input['products']) && is_array($input['products'])) {
                     $stmt_products = $pdo->prepare("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)");
+                    $stmt_update_stock = $pdo->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?");
+
                     foreach ($input['products'] as $product) {
                         $stmt_products->execute([
                             $orderId,
                             $product['producto_id'],
                             $product['cantidad'],
                             $product['precio_unitario']
+                        ]);
+
+                        // Update inventory - subtract sold quantity from stock
+                        $stmt_update_stock->execute([
+                            $product['cantidad'],
+                            $product['producto_id']
                         ]);
                     }
                 }
@@ -157,6 +165,20 @@ try {
             $orderId = (int)$_GET['id']; // Assuming ID is passed in URL for PUT
             $pdo->beginTransaction();
             try {
+                // First, restore inventory from old products before deleting them
+                $stmt_get_old_products = $pdo->prepare("SELECT producto_id, cantidad FROM detalle_pedido WHERE pedido_id = ?");
+                $stmt_get_old_products->execute([$orderId]);
+                $old_products = $stmt_get_old_products->fetchAll(PDO::FETCH_ASSOC);
+
+                $stmt_restore_stock = $pdo->prepare("UPDATE productos SET stock = stock + ? WHERE id = ?");
+                foreach ($old_products as $old_product) {
+                    // Return quantities to inventory
+                    $stmt_restore_stock->execute([
+                        $old_product['cantidad'],
+                        $old_product['producto_id']
+                    ]);
+                }
+
                 // Update order
                 $stmt = $pdo->prepare("UPDATE pedidos SET cliente_id = ?, referencia = ?, total = ?, estado_pago = ?, estado_envio = ?, direccion_envio = ?, notas_envio = ? WHERE id = ?");
                 $stmt->execute([
@@ -176,12 +198,20 @@ try {
 
                 if (isset($input['products']) && is_array($input['products'])) {
                     $stmt_insert_products = $pdo->prepare("INSERT INTO detalle_pedido (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)");
+                    $stmt_update_stock = $pdo->prepare("UPDATE productos SET stock = stock - ? WHERE id = ?");
+
                     foreach ($input['products'] as $product) {
                         $stmt_insert_products->execute([
                             $orderId,
                             $product['producto_id'],
                             $product['cantidad'],
                             $product['precio_unitario']
+                        ]);
+
+                        // Subtract new quantities from inventory
+                        $stmt_update_stock->execute([
+                            $product['cantidad'],
+                            $product['producto_id']
                         ]);
                     }
                 }
@@ -198,6 +228,20 @@ try {
             $orderId = (int)$input['id']; // Assuming ID is passed in body for DELETE
             $pdo->beginTransaction();
             try {
+                // First, restore inventory from products before deleting them
+                $stmt_get_products = $pdo->prepare("SELECT producto_id, cantidad FROM detalle_pedido WHERE pedido_id = ?");
+                $stmt_get_products->execute([$orderId]);
+                $products = $stmt_get_products->fetchAll(PDO::FETCH_ASSOC);
+
+                $stmt_restore_stock = $pdo->prepare("UPDATE productos SET stock = stock + ? WHERE id = ?");
+                foreach ($products as $product) {
+                    // Return quantities to inventory
+                    $stmt_restore_stock->execute([
+                        $product['cantidad'],
+                        $product['producto_id']
+                    ]);
+                }
+
                 // Delete products first due to foreign key constraints
                 $stmt_delete_products = $pdo->prepare("DELETE FROM detalle_pedido WHERE pedido_id = ?");
                 $stmt_delete_products->execute([$orderId]);

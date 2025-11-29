@@ -87,7 +87,7 @@
         <!--  Orders List  -->
         <div class="buzz-card">
             <div id="ordersList">
-                 Orders will be populated by JavaScript 
+                 Orders will be populated by JavaScript
             </div>
         </div>
     </main>
@@ -110,7 +110,7 @@
                                 <div id="createOrderClientSearchResults" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
                                 <div id="createOrderSelectedClientDisplay" class="mt-2 text-success"></div>
                             </div>
-                            
+
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Dirección de envío *</label>
@@ -120,7 +120,7 @@
                             <label class="form-label text-muted">Notas de envío</label>
                             <textarea class="form-control form-control-buzz" id="createOrderShippingNotes" rows="2"></textarea>
                         </div>
-                        
+
                         <!-- Products Section -->
                         <div class="mb-3">
                             <label class="form-label text-muted">Productos</label>
@@ -228,7 +228,7 @@
                             <label class="form-label text-muted">Notas de envío</label>
                             <textarea class="form-control form-control-buzz" id="editOrderShippingNotes" rows="2"></textarea>
                         </div>
-                        
+
                         <!-- Products Section -->
                         <div class="mb-3">
                             <label class="form-label text-muted">Productos</label>
