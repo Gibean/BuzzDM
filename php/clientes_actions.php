@@ -47,6 +47,8 @@ try {
                         clientes c
                     JOIN
                         pedidos p ON c.id = p.cliente_id
+                    WHERE
+                        c.deleted_at IS NULL
                     GROUP BY
                         c.id, c.nombre, c.email
                     ORDER BY
@@ -60,8 +62,12 @@ try {
                 // Fetch list of all customers
                 $search = isset($_GET['search']) ? '%' . $_GET['search'] . '%' : '%';
                 $typeFilter = isset($_GET['type']) ? $_GET['type'] : '';
+                $showDeleted = isset($_GET['show_deleted']) && $_GET['show_deleted'] === 'true';
 
                 $sql = "SELECT * FROM clientes WHERE (id LIKE ? OR nombre LIKE ? OR email LIKE ?)";
+                if (!$showDeleted) {
+                    $sql .= " AND deleted_at IS NULL";
+                }
                 $params = [$search, $search, $search];
 
                 if ($typeFilter === 'vip') {
@@ -79,6 +85,19 @@ try {
 
         case 'POST':
             $input = json_decode(file_get_contents('php://input'), true);
+
+            // Handle Restore Action
+            if (isset($input['action']) && $input['action'] === 'restore') {
+                $customerId = $input['id'] ?? null;
+                if (!$customerId) {
+                    json_response(false, [], 'ID de cliente no proporcionado para restaurar.');
+                }
+                $stmt = $pdo->prepare("UPDATE clientes SET deleted_at = NULL WHERE id = ?");
+                $stmt->execute([$customerId]);
+                json_response(true, [], 'Cliente restaurado exitosamente.');
+                return;
+            }
+
             try {
                 $stmt = $pdo->prepare("INSERT INTO clientes (id, nombre, email, telefono, direccion, notas, vip) VALUES (?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
@@ -119,7 +138,8 @@ try {
         case 'DELETE':
             $customerId = $_GET['id']; // Assuming ID is passed in URL for DELETE
             try {
-                $stmt = $pdo->prepare("DELETE FROM clientes WHERE id = ?");
+                // Soft delete
+                $stmt = $pdo->prepare("UPDATE clientes SET deleted_at = NOW() WHERE id = ?");
                 $stmt->execute([$customerId]);
                 json_response(true, [], 'Cliente eliminado exitosamente.');
             } catch (PDOException $e) {

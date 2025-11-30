@@ -15,13 +15,15 @@ $api_scripts = [
     'pedidos_actions.php',
     'product_actions.php',
     'search_api.php',
-    'process_import.php'
+    'process_import.php',
+    'settings_actions.php',
+    'logs.php',
+    'users.php'
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
 $is_api_call = in_array($current_page, $api_scripts);
 
-// Function to send JSON error response for API calls
 function json_auth_error($message) {
     header('Content-Type: application/json');
     http_response_code(401); // Unauthorized
@@ -113,7 +115,8 @@ $allowed_pages = [
         'product_actions.php',
         'search_api.php',
         'process_import.php',
-        'manual.php'
+        'manual.php',
+        'settings_actions.php'
 
 
     ],

@@ -13,9 +13,9 @@
 <body>
     <!-- Sidebar -->
     <?php require_once 'php/sidebar.php'; ?>
-     Main Content 
+     Main Content
     <main class="main-content">
-       <!--  Top Navbar --> 
+       <!--  Top Navbar -->
         <nav class="top-navbar">
             <div class="d-flex align-items-center">
                 <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
@@ -58,6 +58,15 @@
                 </div>
                 <div class="col-md-2 mb-3">
                     <label class="form-label text-muted">&nbsp;</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                        <label class="form-check-label text-muted" for="showDeletedFilter">
+                            Ver eliminados
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label class="form-label text-muted">&nbsp;</label>
                     <button class="btn btn-outline-buzz w-100" onclick="clearFilters()">
                         <i class="fas fa-times"></i> Limpiar
                     </button>
@@ -84,7 +93,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
              <!-- Pagination -->
             <div class="d-flex justify-content-between align-items-center mt-3">
                 <div class="text-muted font-mono">
@@ -164,6 +173,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>
-        <script src="assets/js/inventario.js"></script>
+    <script src="assets/js/confirmation_modal.js"></script>
+    <script src="assets/js/inventario.js"></script>
 </body>
 </html>

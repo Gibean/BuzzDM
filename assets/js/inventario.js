@@ -265,11 +265,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     window.deleteProduct = async function(id) {
-        showModal({
-            title: "Confirmar Eliminación",
-            message: "¿Estás seguro de que quieres eliminar este producto?",
-            type: "confirm",
-            onConfirm: async () => {
+        showConfirmation(
+            "Eliminar Producto",
+            "¿Estás seguro de que quieres eliminar este producto?",
+            async () => {
                 try {
                     const response = await fetch(product_actions_url, {
                         method: 'DELETE',
@@ -288,12 +287,130 @@ document.addEventListener('DOMContentLoaded', function() {
                     showToast('Ocurrió un error al eliminar el producto.', 'danger');
                 }
             }
-        });
+        );
+    };
+
+    window.restoreProduct = async function(id) {
+        showConfirmation(
+            "Restaurar Producto",
+            "¿Estás seguro de que quieres restaurar este producto?",
+            async () => {
+                try {
+                    const response = await fetch(product_actions_url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'restore', id: id })
+                    });
+                    const data = await response.json();
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        fetchProducts();
+                    } else {
+                        showToast('Error: ' + data.message, 'danger');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showToast('Ocurrió un error al restaurar el producto.', 'danger');
+                }
+            }
+        );
     };
 
     searchInput.addEventListener('input', () => { currentPage = 1; fetchProducts(); });
     statusFilter.addEventListener('change', () => { currentPage = 1; fetchProducts(); });
     sortBySelect.addEventListener('change', () => { currentPage = 1; fetchProducts(); });
+
+    // Add listener for show deleted filter
+    const showDeletedFilter = document.getElementById('showDeletedFilter');
+    if(showDeletedFilter) {
+        showDeletedFilter.addEventListener('change', () => { currentPage = 1; fetchProducts(); });
+    }
+
+    // Update fetchProducts to include show_deleted
+    const originalFetchProducts = fetchProducts;
+    fetchProducts = async function() {
+        const search = searchInput.value
+        const status = statusFilter.value
+        const sortBy = sortBySelect.value
+        const showDeleted = document.getElementById('showDeletedFilter') ? document.getElementById('showDeletedFilter').checked : false;
+
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: productsPerPage,
+            search: search,
+            status: status,
+            sortBy: sortBy,
+            sortOrder: "ASC"
+        })
+
+        if (showDeleted) {
+            params.append('show_deleted', 'true');
+        }
+
+        try {
+            const response = await fetch(`${product_actions_url}?${params.toString()}`)
+            const data = await response.json()
+
+            if (data.success) {
+                productsTableBody.innerHTML = ""
+                totalProducts = data.total
+
+                if (data.products.length > 0) {
+                    data.products.forEach((product) => {
+                        const isDeleted = product.deleted_at !== null;
+                        const row = productsTableBody.insertRow()
+                        if (isDeleted) row.classList.add('table-danger');
+
+                        row.insertCell().textContent = product.sku
+                        row.insertCell().textContent = product.name
+                        row.insertCell().textContent = product.description
+                        row.insertCell().textContent = parseFloat(product.price).toFixed(2)
+                        row.insertCell().textContent = product.stock
+
+                        const statusCell = row.insertCell()
+                        const statusBadge = document.createElement("span")
+                        let displayStatus = "ABASTECIDO"
+                        let badgeClass = "badge-success"
+
+                        if (product.stock <= 0) {
+                            displayStatus = "AGOTADO"
+                            badgeClass = "badge-secondary"
+                        } else if (product.min_stock && product.stock <= product.min_stock) {
+                            displayStatus = "REABASTECER"
+                            badgeClass = "badge-warning"
+                        }
+
+                        statusBadge.textContent = displayStatus
+                        statusBadge.classList.add("badge", badgeClass)
+                        statusCell.appendChild(statusBadge)
+
+                        const actionsCell = row.insertCell()
+
+                        if (isDeleted) {
+                            actionsCell.innerHTML = `
+                                <button class="btn btn-outline-success btn-sm me-1" onclick="restoreProduct(${product.id})" title="Restaurar"><i class="fas fa-trash-restore"></i></button>
+                            `
+                        } else {
+                            actionsCell.innerHTML = `
+                                <button class="btn btn-outline-buzz btn-sm me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-outline-danger btn-sm delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            `
+                        }
+                    })
+                } else {
+                    productsTableBody.innerHTML = '<tr><td colspan="7" class="text-center">No hay productos registrados.</td></tr>'
+                }
+
+                updatePaginationInfo()
+                renderPagination()
+            } else {
+                showToast("Error al cargar productos: " + data.message, "danger")
+            }
+        } catch (error) {
+            console.error("Error fetching products:", error)
+            showToast("Error al conectar con el servidor para obtener productos.", "danger")
+        }
+    }
 
     productsTableBody.addEventListener('click', async (event) => {
         const editButton = event.target.closest('.edit-product-btn');

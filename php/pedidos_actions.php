@@ -58,8 +58,12 @@ try {
                 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
                 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
                 $offset = ($page - 1) * $limit;
+                $showDeleted = isset($_GET['show_deleted']) && $_GET['show_deleted'] === 'true';
 
                 $sql_from = "FROM pedidos p LEFT JOIN clientes c ON p.cliente_id = c.id WHERE 1=1";
+                if (!$showDeleted) {
+                    $sql_from .= " AND p.deleted_at IS NULL";
+                }
                 $params = [];
 
                 // Apply filters
@@ -98,7 +102,8 @@ try {
                     p.estado_pago AS paymentStatus,
                     p.estado_envio AS shippingStatus,
                     p.direccion_envio AS shippingAddress,
-                    p.notas_envio AS shippingNotes
+                    p.notas_envio AS shippingNotes,
+                    p.deleted_at
                 ";
                 $dataSql = "SELECT $select_fields " . $sql_from;
                 $dataSql .= " ORDER BY p.fecha_creacion DESC";
@@ -114,6 +119,19 @@ try {
 
         case 'POST':
             $input = json_decode(file_get_contents('php://input'), true);
+
+            // Handle Restore Action
+            if (isset($input['action']) && $input['action'] === 'restore') {
+                $orderId = $input['id'] ?? null;
+                if (!$orderId) {
+                    json_response(false, [], 'ID de pedido no proporcionado para restaurar.');
+                }
+                $stmt = $pdo->prepare("UPDATE pedidos SET deleted_at = NULL WHERE id = ?");
+                $stmt->execute([$orderId]);
+                json_response(true, [], 'Pedido restaurado exitosamente.');
+                return;
+            }
+
             $pdo->beginTransaction();
             try {
                 // Generate a 10-digit random reference number
@@ -226,36 +244,11 @@ try {
         case 'DELETE':
             $input = json_decode(file_get_contents('php://input'), true);
             $orderId = (int)$input['id']; // Assuming ID is passed in body for DELETE
-            $pdo->beginTransaction();
-            try {
-                // First, restore inventory from products before deleting them
-                $stmt_get_products = $pdo->prepare("SELECT producto_id, cantidad FROM detalle_pedido WHERE pedido_id = ?");
-                $stmt_get_products->execute([$orderId]);
-                $products = $stmt_get_products->fetchAll(PDO::FETCH_ASSOC);
 
-                $stmt_restore_stock = $pdo->prepare("UPDATE productos SET stock = stock + ? WHERE id = ?");
-                foreach ($products as $product) {
-                    // Return quantities to inventory
-                    $stmt_restore_stock->execute([
-                        $product['cantidad'],
-                        $product['producto_id']
-                    ]);
-                }
-
-                // Delete products first due to foreign key constraints
-                $stmt_delete_products = $pdo->prepare("DELETE FROM detalle_pedido WHERE pedido_id = ?");
-                $stmt_delete_products->execute([$orderId]);
-
-                // Then delete the order
-                $stmt_delete_order = $pdo->prepare("DELETE FROM pedidos WHERE id = ?");
-                $stmt_delete_order->execute([$orderId]);
-
-                $pdo->commit();
-                json_response(true, [], 'Pedido eliminado exitosamente.');
-            } catch (PDOException $e) {
-                $pdo->rollBack();
-                json_response(false, [], 'Error al eliminar pedido: ' . $e->getMessage());
-            }
+            // Soft delete
+            $stmt = $pdo->prepare("UPDATE pedidos SET deleted_at = NOW() WHERE id = ?");
+            $stmt->execute([$orderId]);
+            json_response(true, [], 'Pedido eliminado exitosamente.');
             break;
 
         default:
