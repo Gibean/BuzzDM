@@ -13,7 +13,7 @@
             min-height: 100vh;
             background-color: var(--buzz-dark-bg);
         }
-        
+
         .login-form-section {
             background-color: var(--buzz-card-bg);
             display: flex;
@@ -21,7 +21,7 @@
             justify-content: center;
             min-height: 100vh;
         }
-        
+
         .login-image-section {
             background: linear-gradient(45deg, var(--buzz-dark-bg) 0%, #1a1f28 50%, var(--buzz-dark-bg) 100%);
             display: flex;
@@ -31,18 +31,18 @@
             position: relative;
             overflow: hidden;
         }
-        
+
         .login-pattern {
             position: absolute;
             width: 100%;
             height: 100%;
             opacity: 0.1;
-            background-image: 
+            background-image:
                 radial-gradient(circle at 25% 25%, var(--buzz-primary-color) 2px, transparent 2px),
                 radial-gradient(circle at 75% 75%, var(--buzz-primary-color) 2px, transparent 2px);
             background-size: 50px 50px;
         }
-        
+
         .login-logo {
             font-family: var(--font-primary);
             font-size: 3rem;
@@ -60,17 +60,17 @@
             width: 300px;
             margin-bottom: 0.2rem;
         }
-        
+
         .login-form {
             width: 100%;
             max-width: 400px;
             padding: 2rem;
         }
-        
+
         .form-group {
             margin-bottom: 1.5rem;
         }
-        
+
         .form-label {
             color: var(--buzz-text-color);
             font-family: var(--font-monospace);
@@ -78,7 +78,7 @@
             margin-bottom: 0.5rem;
             display: block;
         }
-        
+
         .login-btn {
             width: 100%;
             padding: 0.75rem;
@@ -87,7 +87,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .alert-buzz {
             background-color: rgba(220, 53, 69, 0.1);
             border: 1px solid var(--buzz-danger);
@@ -113,13 +113,13 @@
                         <!-- <span>BUZZ</span> -->
                     </div>
                     <!--<h2 class="text-center mb-4 font-mono text-muted">DATA MANAGER</h2>-->
-                    
+
                     <!-- Contenedor para la alerta de login -->
                     <div id="loginAlert" class="alert-buzz" style="display: none;">
                         <i class="fas fa-exclamation-triangle"></i>
                         <span id="loginAlertText"></span>
                     </div>
-                    
+
                     <form id="loginForm" method="POST" action="">
                         <div class="form-group">
                             <label for="email" class="form-label">
@@ -127,27 +127,27 @@
                             </label>
                             <input type="email" class="form-control form-control-buzz" id="email" name="email" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="password" class="form-label">
                                 <i class="fas fa-lock"></i> Contraseña
                             </label>
                             <input type="password" class="form-control form-control-buzz" id="password" name="password" required>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-buzz login-btn">
                             <i class="fas fa-sign-in-alt"></i> Acceder al Sistema
                         </button>
                     </form>
-                    
+
                     <div class="text-center mt-4">
-                        <a href="#" class="text-primary" style="text-decoration: none; font-family: var(--font-monospace);">
+                        <a href="forgot_password.php" class="text-primary" style="text-decoration: none; font-family: var(--font-monospace);">
                             ¿Olvidaste tu contraseña?
                         </a>
                     </div>
                 </div>
             </div>
-            
+
             <!--                     -->
             <!-- Imagen patron       -->
             <!--                     -->
