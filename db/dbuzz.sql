@@ -16,10 +16,12 @@
 
 
 -- Volcando estructura de base de datos para dbuzz
+DROP DATABASE IF EXISTS `dbuzz`;
 CREATE DATABASE IF NOT EXISTS `dbuzz` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 USE `dbuzz`;
 
 -- Volcando estructura para tabla dbuzz.backups
+DROP TABLE IF EXISTS `backups`;
 CREATE TABLE IF NOT EXISTS `backups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `archivo` varchar(255) NOT NULL,
@@ -33,16 +35,18 @@ CREATE TABLE IF NOT EXISTS `backups` (
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.categorias
+DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE IF NOT EXISTS `categorias` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.clientes
+DROP TABLE IF EXISTS `clientes`;
 CREATE TABLE IF NOT EXISTS `clientes` (
   `id` varchar(50) NOT NULL,
   `nombre` varchar(150) NOT NULL,
@@ -58,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.detalle_pedido
+DROP TABLE IF EXISTS `detalle_pedido`;
 CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pedido_id` int(10) unsigned NOT NULL,
@@ -70,11 +75,12 @@ CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   KEY `producto_id` (`producto_id`),
   CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.empresa
+DROP TABLE IF EXISTS `empresa`;
 CREATE TABLE IF NOT EXISTS `empresa` (
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
   `tipo_rif` varchar(10) NOT NULL DEFAULT 'J',
@@ -88,11 +94,12 @@ CREATE TABLE IF NOT EXISTS `empresa` (
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `logo_svg` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.importaciones
+DROP TABLE IF EXISTS `importaciones`;
 CREATE TABLE IF NOT EXISTS `importaciones` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
@@ -104,26 +111,28 @@ CREATE TABLE IF NOT EXISTS `importaciones` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `importaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.logs
+DROP TABLE IF EXISTS `logs`;
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
   `accion` varchar(255) NOT NULL,
   `detalles` text DEFAULT NULL,
   `fecha` timestamp NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
+  PRIMARY KEY (`id`) USING BTREE,
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.logs_login
+DROP TABLE IF EXISTS `logs_login`;
 CREATE TABLE IF NOT EXISTS `logs_login` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
@@ -133,11 +142,81 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- La exportación de datos fue deseleccionada.
+
+-- Volcando estructura para tabla dbuzz.marcas
+DROP TABLE IF EXISTS `marcas`;
+CREATE TABLE IF NOT EXISTS `marcas` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text DEFAULT NULL,
+  `sitio_web` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- La exportación de datos fue deseleccionada.
+
+-- Volcando estructura para tabla dbuzz.movimientos_inventario
+DROP TABLE IF EXISTS `movimientos_inventario`;
+CREATE TABLE IF NOT EXISTS `movimientos_inventario` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `producto_id` int(20) unsigned NOT NULL,
+  `usuario_id` int(20) unsigned DEFAULT NULL,
+  `tipo_movimiento` enum('entrada','salida','ajuste_positivo','ajuste_negativo') NOT NULL,
+  `cantidad` int(11) unsigned NOT NULL,
+  `justificacion` varchar(255) DEFAULT NULL,
+  `stock_anterior` int(11) NOT NULL,
+  `stock_actual` int(11) NOT NULL,
+  `fecha` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `producto_id` (`producto_id`),
+  KEY `usuario_id` (`usuario_id`),
+  CONSTRAINT `fk_movimientos_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_movimientos_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- La exportación de datos fue deseleccionada.
+
+-- Volcando estructura para tabla dbuzz.password_recovery
+DROP TABLE IF EXISTS `password_recovery`;
+CREATE TABLE IF NOT EXISTS `password_recovery` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(20) unsigned NOT NULL,
+  `token` varchar(64) NOT NULL,
+  `expiracion` timestamp NOT NULL,
+  `usado` tinyint(1) NOT NULL DEFAULT 0,
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `expiracion` (`expiracion`),
+  CONSTRAINT `password_recovery_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- La exportación de datos fue deseleccionada.
+
+-- Volcando estructura para tabla dbuzz.password_reset_tokens
+DROP TABLE IF EXISTS `password_reset_tokens`;
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(10) unsigned NOT NULL,
+  `token` char(64) NOT NULL,
+  `expiracion` timestamp NOT NULL,
+  `usado` tinyint(1) NOT NULL DEFAULT 0,
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `expiracion` (`expiracion`),
+  CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.pedidos
+DROP TABLE IF EXISTS `pedidos`;
 CREATE TABLE IF NOT EXISTS `pedidos` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cliente_id` varchar(50) DEFAULT NULL,
@@ -151,6 +230,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   `creado_por` int(10) unsigned DEFAULT NULL,
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `tracking_number` varchar(50) DEFAULT NULL,
+  `estimated_delivery_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `creado_por` (`creado_por`),
   KEY `fecha_creacion` (`fecha_creacion`),
@@ -158,11 +238,12 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   KEY `pedidos_ibfk_1` (`cliente_id`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.productos
+DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `sku` varchar(80) NOT NULL,
@@ -175,17 +256,40 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `creado_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `categoria` int(11) DEFAULT NULL,
+  `marca_id` int(11) DEFAULT NULL,
+  `proveedor_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `nombre` (`nombre`),
   KEY `sku_2` (`sku`),
   KEY `fk_productos_categoria` (`categoria`),
-  CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  KEY `fk_productos_marca` (`marca_id`),
+  KEY `fk_productos_proveedor` (`proveedor_id`),
+  CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- La exportación de datos fue deseleccionada.
+
+-- Volcando estructura para tabla dbuzz.proveedores
+DROP TABLE IF EXISTS `proveedores`;
+CREATE TABLE IF NOT EXISTS `proveedores` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(150) NOT NULL,
+  `contacto_nombre` varchar(150) DEFAULT NULL,
+  `email` varchar(150) DEFAULT NULL,
+  `telefono` varchar(50) DEFAULT NULL,
+  `direccion` text DEFAULT NULL,
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `nombre` (`nombre`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.sesiones_api
+DROP TABLE IF EXISTS `sesiones_api`;
 CREATE TABLE IF NOT EXISTS `sesiones_api` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned NOT NULL,
@@ -197,11 +301,12 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para tabla dbuzz.usuarios
+DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(120) NOT NULL,
@@ -214,11 +319,12 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `intentos_fallidos` int(11) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
 -- Volcando estructura para vista dbuzz.v_inventario
+DROP VIEW IF EXISTS `v_inventario`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_inventario` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -233,6 +339,7 @@ CREATE TABLE `v_inventario` (
 );
 
 -- Volcando estructura para vista dbuzz.v_low_stock
+DROP VIEW IF EXISTS `v_low_stock`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_low_stock` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -249,6 +356,7 @@ CREATE TABLE `v_low_stock` (
 );
 
 -- Volcando estructura para vista dbuzz.v_op_backup
+DROP VIEW IF EXISTS `v_op_backup`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_op_backup` (
 	`registro_id` INT(10) UNSIGNED NOT NULL,
@@ -258,6 +366,7 @@ CREATE TABLE `v_op_backup` (
 );
 
 -- Volcando estructura para vista dbuzz.v_op_import
+DROP VIEW IF EXISTS `v_op_import`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_op_import` (
 	`registro_id` INT(10) UNSIGNED NOT NULL,
@@ -268,6 +377,7 @@ CREATE TABLE `v_op_import` (
 );
 
 -- Volcando estructura para vista dbuzz.v_pedidos_pendientes
+DROP VIEW IF EXISTS `v_pedidos_pendientes`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_pedidos_pendientes` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -285,6 +395,7 @@ CREATE TABLE `v_pedidos_pendientes` (
 );
 
 -- Volcando estructura para vista dbuzz.v_rotacion_inventario
+DROP VIEW IF EXISTS `v_rotacion_inventario`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_rotacion_inventario` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -298,6 +409,7 @@ CREATE TABLE `v_rotacion_inventario` (
 );
 
 -- Volcando estructura para vista dbuzz.v_top5_down
+DROP VIEW IF EXISTS `v_top5_down`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_top5_down` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -310,6 +422,7 @@ CREATE TABLE `v_top5_down` (
 );
 
 -- Volcando estructura para vista dbuzz.v_top5_up
+DROP VIEW IF EXISTS `v_top5_up`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_top5_up` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -319,6 +432,7 @@ CREATE TABLE `v_top5_up` (
 );
 
 -- Volcando estructura para disparador dbuzz.trg_log_backup
+DROP TRIGGER IF EXISTS `trg_log_backup`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_log_backup
@@ -328,7 +442,7 @@ BEGIN
     INSERT INTO logs (accion, detalles, fecha)
     VALUES (
         'Backup realizado',
-        CONCAT('Archivo: ', NEW.archivo, ' | Tamaño: ', 
+        CONCAT('Archivo: ', NEW.archivo, ' | Tamaño: ',
                FORMAT(NEW.tamaño_bytes/1048576, 2), ' MB'),
         NEW.fecha
     );
@@ -337,6 +451,7 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_log_importacion
+DROP TRIGGER IF EXISTS `trg_log_importacion`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_log_importacion
@@ -368,19 +483,19 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_inventario` AS SELECT
     COUNT(d.id) AS veces_vendido,
     SUM(d.cantidad) AS total_vendido,
     SUM(d.cantidad * d.precio_unitario) AS ingresos_totales
-FROM 
+FROM
     productos p
-LEFT JOIN 
+LEFT JOIN
     detalle_pedido d ON p.id = d.producto_id
-GROUP BY 
+GROUP BY
     p.id
-ORDER BY 
+ORDER BY
     total_vendido DESC 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_low_stock`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_low_stock` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_low_stock` AS SELECT
     p.id,
     p.sku,
     p.nombre,
@@ -392,21 +507,21 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_low_stock` AS SELECT
     p.creado_at,
     p.actualizado_at,
     (p.stock <= p.min_stock) AS bajo_minimo
-FROM 
+FROM
     productos p
-WHERE 
+WHERE
     p.stock <= p.min_stock
     AND p.estado != 'agotado'
-ORDER BY 
+ORDER BY
     p.stock ASC 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_op_backup`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS SELECT
     id AS registro_id,
     'Backup realizado' AS operacion,
-    CONCAT('Archivo: ', archivo, ' | Tamaño: ', 
+    CONCAT('Archivo: ', archivo, ' | Tamaño: ',
            FORMAT(tamaño_bytes/1048576, 2), ' MB') AS detalles,
     fecha
 FROM backups
@@ -415,7 +530,7 @@ ORDER BY fecha DESC
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_op_import`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS SELECT
     i.id AS registro_id,
     'Importación CSV' AS operacion,
     CONCAT('Archivo: ', i.archivo_nombre, ' | Estado: ', i.estado) AS detalles,
@@ -429,7 +544,7 @@ ORDER BY i.fecha DESC
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_pedidos_pendientes`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS SELECT
     ped.id,
     ped.referencia,
     ped.fecha_creacion,
@@ -442,22 +557,22 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS S
     c.nombre AS cliente_nombre,
     c.email AS cliente_email,
     u.nombre AS creado_por_nombre
-FROM 
+FROM
     pedidos ped
-JOIN 
+JOIN
     clientes c ON ped.cliente_id = c.id
-LEFT JOIN 
+LEFT JOIN
     usuarios u ON ped.creado_por = u.id
-WHERE 
+WHERE
     ped.estado_pago = 'no_pagado'
     OR ped.estado_envio IN ('pendiente', 'enviado')
-ORDER BY 
+ORDER BY
     ped.fecha_creacion DESC 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_rotacion_inventario`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS SELECT
     p.id,
     p.sku,
     p.nombre,
@@ -465,24 +580,24 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS 
     p.min_stock,
     IFNULL(SUM(d.cantidad), 0) AS total_vendido,
     ROUND(IFNULL(SUM(d.cantidad), 0) / GREATEST(p.stock, 1) * 100, 2) AS porcentaje_rotacion,
-    CASE 
+    CASE
         WHEN p.stock <= p.min_stock THEN 'CRÍTICO'
         WHEN IFNULL(SUM(d.cantidad), 0) = 0 THEN 'ESTANCADO'
-        ELSE 'NORMAL' 
+        ELSE 'NORMAL'
     END AS estado_rotacion
-FROM 
+FROM
     productos p
-LEFT JOIN 
+LEFT JOIN
     detalle_pedido d ON p.id = d.producto_id
-GROUP BY 
+GROUP BY
     p.id
-ORDER BY 
+ORDER BY
     porcentaje_rotacion ASC 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_top5_down`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_down` AS SELECT 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_down` AS SELECT
     p.id,
     p.sku,
     p.nombre,
@@ -490,11 +605,11 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_down` AS SELECT
     p.precio,
     p.stock,
     p.estado
-FROM 
+FROM
     productos p
-WHERE 
+WHERE
     p.id NOT IN (SELECT DISTINCT producto_id FROM detalle_pedido)
-ORDER BY 
+ORDER BY
     p.nombre 
 ;
 
