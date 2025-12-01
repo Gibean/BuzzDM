@@ -132,7 +132,12 @@
                             <label for="password" class="form-label">
                                 <i class="fas fa-lock"></i> Contraseña
                             </label>
-                            <input type="password" class="form-control form-control-buzz" id="password" name="password" required>
+                            <div style="position: relative;">
+                                <input type="password" class="form-control form-control-buzz" id="password" name="password" required style="padding-right: 45px;">
+                                <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--buzz-text-muted); cursor: pointer; padding: 5px; transition: color 0.3s ease;" aria-label="Toggle password visibility">
+                                    <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                                </button>
+                            </div>
                         </div>
 
                         <button type="submit" class="btn btn-buzz login-btn">
@@ -167,5 +172,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/login.js"></script>
+    <script>
+        // Password visibility toggle
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Toggle icon
+            if (type === 'text') {
+                togglePasswordIcon.classList.remove('fa-eye');
+                togglePasswordIcon.classList.add('fa-eye-slash');
+            } else {
+                togglePasswordIcon.classList.remove('fa-eye-slash');
+                togglePasswordIcon.classList.add('fa-eye');
+            }
+        });
+
+        // Change icon color on hover
+        togglePassword.addEventListener('mouseenter', function() {
+            this.style.color = 'var(--buzz-primary-color)';
+        });
+        togglePassword.addEventListener('mouseleave', function() {
+            this.style.color = 'var(--buzz-text-muted)';
+        });
+    </script>
 </body>
 </html>

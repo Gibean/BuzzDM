@@ -9,47 +9,162 @@ require_once 'php/sidebar.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual de Usuario - Buzz</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <title>Manual de Usuario - BUZZ Data Manager</title>
+    <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
-    .accordion-button:not(.collapsed) {
-        color: var(--bs-white);
-        background-color: var(--bs-primary);
+    .manual-header {
+        background: linear-gradient(135deg, var(--buzz-dark-bg) 0%, var(--buzz-card-bg) 100%);
+        border-bottom: 2px solid var(--buzz-primary-color);
+        padding: 2rem;
+        border-radius: 8px 8px 0 0;
     }
 
-    .accordion-button:focus {
+    .search-box {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+    .search-box input {
+        padding-left: 3rem;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--buzz-text-muted);
+        pointer-events: none;
+    }
+
+    .accordion-item {
+        background-color: var(--buzz-card-bg);
+        border: 1px solid var(--buzz-border-color);
+        margin-bottom: 0.5rem;
+        border-radius: 4px !important;
+        overflow: hidden;
+    }
+
+    .accordion-button {
+        background-color: var(--buzz-card-bg);
+        color: var(--buzz-text-color);
+        font-family: var(--font-primary);
+        font-weight: 600;
+        border: none;
+        padding: 1.25rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .accordion-button:not(.collapsed) {
+        background-color: var(--buzz-primary-color);
+        color: var(--buzz-dark-bg);
         box-shadow: none;
     }
 
-    .list-group-item {
+    .accordion-button:hover {
+        background-color: var(--buzz-primary-color);
+        color: var(--buzz-dark-bg);
+    }
+
+    .accordion-button:focus {
+        box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2);
+        border-color: var(--buzz-primary-color);
+    }
+
+    .accordion-button::after {
+        filter: brightness(0) invert(1);
+    }
+
+    .accordion-button:not(.collapsed)::after {
+        filter: brightness(0);
+    }
+
+    .accordion-body {
+        background-color: var(--buzz-card-bg);
+        color: var(--buzz-text-color);
+        padding: 1.5rem;
+        border-top: 1px solid var(--buzz-border-color);
+    }
+
+    .manual-list-item {
+        background-color: transparent;
         border: none;
+        border-left: 3px solid var(--buzz-primary-color);
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.5rem;
+        color: var(--buzz-text-color);
+        font-family: var(--font-monospace);
+        transition: all 0.3s ease;
+    }
+
+    .manual-list-item:hover {
+        background-color: rgba(255, 160, 0, 0.1);
+        border-left-color: var(--buzz-primary-color);
+        transform: translateX(5px);
+    }
+
+    .manual-list-item i {
+        color: var(--buzz-primary-color);
+        margin-right: 0.75rem;
+        width: 20px;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem;
+        color: var(--buzz-text-muted);
+    }
+
+    .no-results i {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
     }
     </style>
 </head>
 
 <body>
     <main class="main-content">
-        <div class="container-fluid">
-            <div class="card">
-                <div class="card-header">
-                    <h1 class="card-title"><i class="bi bi-book-half me-2"></i>Manual de usuario</h1>
-                </div>
-                <div class="card-body">
-                    <p class="lead">Bienvenido al manual de usuario de Buzz. Aquí encontrará una guía detallada sobre
-                        cómo utilizar todas las características y funciones del sistema.</p>
-                    <p>Haga clic en las diferentes secciones a continuación para expandir y ver la información de cada
-                        módulo.</p>
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="font-primary mb-0">MANUAL DE USUARIO</h1>
+                <span class="text-muted ms-2 font-mono">/ GUÍA INTERACTIVA</span>
+            </div>
+        </nav>
 
-                    <div class="accordion" id="manualAccordion">
+        <div class="buzz-card">
+            <div class="manual-header">
+                <h2 class="font-primary text-primary mb-3">
+                    <i class="fas fa-book-open me-2"></i>Bienvenido al Manual de BUZZ Data Manager
+                </h2>
+                <p class="font-mono text-muted mb-0">
+                    Guía completa para utilizar todas las funcionalidades del sistema de gestión
+                </p>
+            </div>
+
+            <div class="p-4">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control form-control-buzz" id="manualSearch"
+                           placeholder="Buscar en el manual... (ej: productos, clientes, importar)">
+                </div>
+
+                <!-- Accordion Container -->
+                <div class="accordion" id="manualAccordion">
 
                         <!-- Sección Dashboard -->
                         <div class="accordion-item">
                             <h2 class="accordion-header" id="headingOne">
                                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    <i class="bi bi-speedometer2 me-2"></i>Dashboard
+                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
                                 </button>
                             </h2>
                             <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
@@ -58,17 +173,17 @@ require_once 'php/sidebar.php';
                                     <p>El <strong>Dashboard</strong> es la pantalla principal al iniciar sesión. Ofrece
                                         una vista general del estado de su negocio a través de varias tarjetas y
                                         gráficos.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i
-                                                class="bi bi-graph-up-arrow me-2"></i><strong>Gráfico de
+                                    <ul class="list-unstyled">
+                                        <li class="manual-list-item"><i
+                                                class="fas fa-chart-line me-2"></i><strong>Gráfico de
                                                 Ventas:</strong> Muestra las tendencias de ventas a lo largo del tiempo.
                                         </li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-pie-chart-fill me-2"></i><strong>Ventas por
+                                        <li class="manual-list-item"><i
+                                                class="fas fa-chart-pie me-2"></i><strong>Ventas por
                                                 Estado:</strong> Un gráfico circular que desglosa los pedidos según su
                                             estado actual (ej. Pendiente, Completado, Cancelado).</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-bar-chart-line-fill me-2"></i><strong>Estadísticas
+                                        <li class="manual-list-item"><i
+                                                class="fas fa-chart-bar me-2"></i><strong>Estadísticas
                                                 Clave:</strong> Tarjetas con métricas importantes como total de ventas,
                                             número de clientes y cantidad de pedidos.</li>
                                     </ul>
@@ -223,11 +338,69 @@ require_once 'php/sidebar.php';
 
                     </div>
                 </div>
+
+                <!-- No Results Message -->
+                <div id="noResults" class="no-results" style="display: none;">
+                    <i class="fas fa-search"></i>
+                    <p class="font-mono">No se encontraron resultados para su búsqueda</p>
+                    <small class="text-muted">Intente con otros términos de búsqueda</small>
+                </div>
             </div>
         </div>
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/common.js"></script>
+    <script>
+        // Search functionality for manual
+        const searchInput = document.getElementById('manualSearch');
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        const noResults = document.getElementById('noResults');
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            let visibleCount = 0;
+
+            accordionItems.forEach(item => {
+                const button = item.querySelector('.accordion-button');
+                const body = item.querySelector('.accordion-body');
+                const buttonText = button.textContent.toLowerCase();
+                const bodyText = body.textContent.toLowerCase();
+
+                // Check if search term is in title or content
+                if (searchTerm === '' || buttonText.includes(searchTerm) || bodyText.includes(searchTerm)) {
+                    item.style.display = '';
+                    visibleCount++;
+
+                    // If searching and found, expand the section
+                    if (searchTerm !== '' && (buttonText.includes(searchTerm) || bodyText.includes(searchTerm))) {
+                        const collapse = item.querySelector('.accordion-collapse');
+                        if (!collapse.classList.contains('show')) {
+                            button.click();
+                        }
+                    }
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Show/hide no results message
+            if (visibleCount === 0 && searchTerm !== '') {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        });
+
+        // Smooth scroll for better UX
+        document.querySelectorAll('.accordion-button').forEach(button => {
+            button.addEventListener('click', function() {
+                setTimeout(() => {
+                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 350);
+            });
+        });
+    </script>
 </body>
 
 </html>
