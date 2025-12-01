@@ -56,7 +56,7 @@ try {
 
         if ($id) {
             // Update
-            $sql = "UPDATE productos SET sku = ?, nombre = ?, description = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
+            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
             json_response(true, [], 'Producto actualizado exitosamente.');
@@ -69,7 +69,7 @@ try {
                 json_response(false, [], 'El SKU ya existe.');
             }
 
-            $sql = "INSERT INTO productos (sku, nombre, description, precio, stock, min_stock, estado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado]);
             json_response(true, [], 'Producto creado exitosamente.');
@@ -97,7 +97,7 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
-        $sql = "UPDATE productos SET sku = ?, nombre = ?, description = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
+        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
         json_response(true, [], 'Producto actualizado exitosamente.');
@@ -121,7 +121,7 @@ try {
     elseif ($method === 'GET') {
         if (isset($_GET['id'])) {
             // Fetch single product
-            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, description, precio as price, stock, min_stock, estado as status, deleted_at FROM productos WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at FROM productos WHERE id = ?");
             $stmt->execute([$_GET['id']]);
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -167,7 +167,7 @@ try {
             }
 
             if ($search) {
-                $whereClauses[] = "(sku LIKE ? OR nombre LIKE ? OR description LIKE ?)";
+                $whereClauses[] = "(sku LIKE ? OR nombre LIKE ? OR descripcion LIKE ?)";
                 $searchTerm = "%$search%";
                 $params[] = $searchTerm;
                 $params[] = $searchTerm;
@@ -188,7 +188,7 @@ try {
             $total = $stmt->fetchColumn();
 
             // Fetch data
-            $sql = "SELECT id, sku, nombre as name, description, precio as price, stock, min_stock, estado as status, deleted_at
+            $sql = "SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at
                     FROM productos
                     WHERE $whereSql
                     ORDER BY $sortBy $sortOrder
