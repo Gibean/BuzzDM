@@ -56,7 +56,7 @@ try {
 
         if ($id) {
             // Update
-            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
+            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
             json_response(true, [], 'Producto actualizado exitosamente.');
@@ -69,7 +69,7 @@ try {
                 json_response(false, [], 'El SKU ya existe.');
             }
 
-            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, creado_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
             $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado]);
             json_response(true, [], 'Producto creado exitosamente.');
@@ -97,7 +97,7 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
-        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, updated_at = NOW() WHERE id = ?";
+        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
         json_response(true, [], 'Producto actualizado exitosamente.');
@@ -137,13 +137,13 @@ try {
             $offset = ($page - 1) * $limit;
             $search = $_GET['search'] ?? '';
             $status = $_GET['status'] ?? '';
-            $sortBy = $_GET['sortBy'] ?? 'created_at';
+            $sortBy = $_GET['sortBy'] ?? 'creado_at';
             $sortOrder = $_GET['sortOrder'] ?? 'DESC';
             $showDeleted = isset($_GET['show_deleted']) && $_GET['show_deleted'] === 'true';
 
             // Allowed sort columns
-            $allowedSorts = ['sku', 'nombre', 'precio', 'stock', 'created_at'];
-            if (!in_array($sortBy, $allowedSorts)) $sortBy = 'created_at';
+            $allowedSorts = ['sku', 'nombre', 'precio', 'stock', 'creado_at'];
+            if (!in_array($sortBy, $allowedSorts)) $sortBy = 'creado_at';
             if ($sortBy === 'name') $sortBy = 'nombre';
             if ($sortBy === 'price') $sortBy = 'precio';
 
