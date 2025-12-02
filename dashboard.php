@@ -58,11 +58,6 @@ try {
                 <h1 class="font-primary mb-0">CENTRO DE COMANDO</h1>
                 <span class="text-muted ms-2 font-mono">/ DASHBOARD</span>
             </div>
-            <div class="d-flex align-items-center">
-                <span class="text-muted font-mono me-3">ÚLTIMA ACTUALIZACIÓN: <span id="lastUpdate"></span></span>
-                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
-                <span class="text-success font-mono ms-2">SISTEMA ONLINE</span>
-            </div>
         </nav>
 
 
@@ -161,6 +156,9 @@ try {
                 </div>
             </div>
         </div>
+
+        <!-- System Footer -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
