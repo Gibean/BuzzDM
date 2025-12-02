@@ -36,6 +36,7 @@
                         <i class="fas fa-list-alt"></i> Logs de Sesión
                     </button>
                 </li>
+
                 <li class="nav-item">
                     <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="settings">
                         <i class="fas fa-cog"></i> Configuración
@@ -171,6 +172,7 @@
                 </div>
             </div>
         </div>
+
 
     <!--   Reports Tab  -->
         <div class="tab-content" id="reportsTab" style="display: none;">
@@ -453,6 +455,13 @@
                         <select class="form-control form-control-buzz" id="userRole">
                             <option value="user">Usuario</option>
                             <option value="admin">Administrador</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Estado</label>
+                        <select class="form-control form-control-buzz" id="userStatus">
+                            <option value="activo">Activo</option>
+                            <option value="inactivo">Inactivo</option>
                         </select>
                     </div>
                 </div>

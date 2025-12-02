@@ -6,11 +6,6 @@
   let currentTab = "users"
   let currentUserId = null
 
-  function formatDateTime(dateString) {
-    const date = new Date(dateString)
-    return date.toLocaleString()
-  }
-
   document.addEventListener("DOMContentLoaded", () => {
     initAdmin()
     setupEventListeners()
