@@ -82,12 +82,12 @@
       })
     }
 
-    // Reports Tab Logic
+    // Reports Tab Logic - Multiple Selection Support
     const reportOptions = document.querySelectorAll(".report-option")
     const generateReportBtn = document.getElementById("generateReportBtn")
     const adminPasswordInput = document.getElementById("adminPasswordReport")
     const reportError = document.getElementById("reportError")
-    let selectedReportType = null
+    let selectedReportTypes = [] // Changed to array for multiple selections
 
     if (
       reportOptions.length > 0 &&
@@ -95,21 +95,75 @@
       adminPasswordInput &&
       reportError
     ) {
+      console.log("Report button logic initialized:", {
+        reportOptionsCount: reportOptions.length,
+        hasButton: !!generateReportBtn,
+        hasPasswordInput: !!adminPasswordInput
+      });
+
+      // Function to check if button should be enabled
+      function checkReportButtonState() {
+        const shouldEnable = selectedReportTypes.length > 0 && adminPasswordInput.value.trim() !== "";
+        console.log("Checking button state:", {
+          selectedReportTypes,
+          passwordLength: adminPasswordInput.value.length,
+          shouldEnable
+        });
+
+        if (shouldEnable) {
+          generateReportBtn.disabled = false;
+          // Update button text to show count
+          const count = selectedReportTypes.length;
+          generateReportBtn.innerHTML = `<i class="fas fa-download"></i> Generar ${count} Reporte${count > 1 ? 's' : ''}`;
+        } else {
+          generateReportBtn.disabled = true;
+          generateReportBtn.innerHTML = '<i class="fas fa-download"></i> Generar Reporte';
+        }
+      }
+
+      // Toggle selection on click
       reportOptions.forEach((option) => {
         option.addEventListener("click", () => {
-          reportOptions.forEach((opt) => opt.classList.remove("selected-buzz"))
-          option.classList.add("selected-buzz")
-          selectedReportType = option.dataset.reportType
-          generateReportBtn.disabled = false
+          const reportType = option.dataset.reportType
+
+          // Toggle selection
+          if (option.classList.contains("selected-buzz")) {
+            // Deselect
+            option.classList.remove("selected-buzz")
+            selectedReportTypes = selectedReportTypes.filter(type => type !== reportType)
+          } else {
+            // Select
+            option.classList.add("selected-buzz")
+            selectedReportTypes.push(reportType)
+          }
+
+          console.log("Selected report types:", selectedReportTypes);
+          checkReportButtonState()
           reportError.textContent = ""
         })
+      })
+
+      // Enable button when password is typed (multiple events for reliability)
+      adminPasswordInput.addEventListener("input", () => {
+        console.log("Password input changed");
+        checkReportButtonState()
+      })
+
+      adminPasswordInput.addEventListener("keyup", () => {
+        console.log("Password keyup event");
+        checkReportButtonState()
+      })
+
+      adminPasswordInput.addEventListener("change", () => {
+        console.log("Password change event");
+        checkReportButtonState()
       })
 
       generateReportBtn.addEventListener("click", () => {
         const password = adminPasswordInput.value
 
-        if (!selectedReportType) {
-          reportError.textContent = "Por favor, seleccione un tipo de reporte."
+        if (selectedReportTypes.length === 0) {
+          reportError.textContent = "Por favor, seleccione al menos un tipo de reporte."
           return
         }
 
@@ -119,33 +173,59 @@
           return
         }
 
+        const count = selectedReportTypes.length;
         generateReportBtn.innerHTML =
-          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...'
+          `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando ${count} reporte${count > 1 ? 's' : ''}...`
         generateReportBtn.disabled = true
 
-        const reportUrl = `php/reports.php?tipo=${selectedReportType}&password=${encodeURIComponent(password)}`
-        const newWindow = window.open(reportUrl, "_blank")
+        // Open each report in a new tab
+        selectedReportTypes.forEach((reportType) => {
+          const reportUrl = `php/reports.php?tipo=${reportType}&password=${encodeURIComponent(password)}`
+          window.open(reportUrl, "_blank")
+        })
 
-        if (newWindow) {
-          const checkWindowClosed = setInterval(() => {
-            if (newWindow.closed) {
-              clearInterval(checkWindowClosed)
-              resetReportButton()
-            }
-          }, 1000)
-        } else {
+        // Reset after a short delay
+        setTimeout(() => {
           resetReportButton()
-        }
+        }, 2000)
       })
 
       function resetReportButton() {
         generateReportBtn.innerHTML =
           '<i class="fas fa-download"></i> Generar Reporte'
-        generateReportBtn.disabled = false
+        generateReportBtn.disabled = true
         adminPasswordInput.value = ""
         reportOptions.forEach((opt) => opt.classList.remove("selected-buzz"))
-        selectedReportType = null
+        selectedReportTypes = []
         reportError.textContent = ""
+      }
+
+      // Password visibility toggle for admin report password
+      const toggleAdminPasswordReport = document.getElementById("toggleAdminPasswordReport")
+      const toggleAdminPasswordReportIcon = document.getElementById("toggleAdminPasswordReportIcon")
+
+      if (toggleAdminPasswordReport && toggleAdminPasswordReportIcon) {
+        toggleAdminPasswordReport.addEventListener("click", function () {
+          const type = adminPasswordInput.getAttribute("type") === "password" ? "text" : "password"
+          adminPasswordInput.setAttribute("type", type)
+
+          // Toggle icon
+          if (type === "text") {
+            toggleAdminPasswordReportIcon.classList.remove("fa-eye")
+            toggleAdminPasswordReportIcon.classList.add("fa-eye-slash")
+          } else {
+            toggleAdminPasswordReportIcon.classList.remove("fa-eye-slash")
+            toggleAdminPasswordReportIcon.classList.add("fa-eye")
+          }
+        })
+
+        // Change icon color on hover
+        toggleAdminPasswordReport.addEventListener("mouseenter", function () {
+          this.style.color = "var(--buzz-primary-color)"
+        })
+        toggleAdminPasswordReport.addEventListener("mouseleave", function () {
+          this.style.color = "var(--buzz-text-muted)"
+        })
       }
     }
 
@@ -283,7 +363,7 @@
               user.ultimo_acceso ? formatDateTime(user.ultimo_acceso) : "N/A"
             }</td>
             <td>
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editUser(${
+                <button class="btn-action btn-edit me-1" onclick="editUser(${
                   user.id
                 })" title="Editar">
                     <i class="fas fa-edit"></i>
@@ -292,7 +372,7 @@
                 ${
                   user.id !== 1
                     ? `
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${user.id})" title="Eliminar">
+                    <button class="btn-action btn-delete" onclick="deleteUser(${user.id})" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </button>
                 `
@@ -332,9 +412,13 @@
   const LOGS_PER_PAGE = 10
 
   async function loadLogs(page = 1) {
-    const logSearch = document.getElementById("logSearch").value
-    const logDateFrom = document.getElementById("logDateFrom").value
-    const logDateTo = document.getElementById("logDateTo").value
+    const logSearchEl = document.getElementById("logSearch")
+    const logDateFromEl = document.getElementById("logDateFrom")
+    const logDateToEl = document.getElementById("logDateTo")
+
+    const logSearch = logSearchEl ? logSearchEl.value : ''
+    const logDateFrom = logDateFromEl ? logDateFromEl.value : ''
+    const logDateTo = logDateToEl ? logDateToEl.value : ''
 
     let queryParams = `page=${page}&limit=${LOGS_PER_PAGE}`
     if (logSearch) queryParams += `&search=${logSearch}`
@@ -361,12 +445,18 @@
 
   function updatePaginationControls(pagination) {
       const paginationContainer = document.getElementById('logsPagination')
-      const infoText = document.getElementById('logsPaginationInfo')
+      const infoText = document.getElementById('logsInfoText')
       const prevBtn = document.getElementById('logsPrevPage')
       const nextBtn = document.getElementById('logsNextPage')
       const currentPageSpan = document.getElementById('logsCurrentPage')
 
       if (!paginationContainer || !pagination) return
+
+      // Check if all required elements exist
+      if (!infoText || !prevBtn || !nextBtn || !currentPageSpan) {
+          console.warn('Pagination elements not found')
+          return
+      }
 
       if (pagination.total_records > 0) {
           paginationContainer.style.display = 'flex'
@@ -382,9 +472,6 @@
           nextBtn.disabled = !pagination.has_next
 
           currentLogPage = pagination.current_page
-
-          // Update event listeners (remove old ones first to avoid duplicates if not handled elsewhere)
-          // A better approach is to set them up once in setupEventListeners, but here we can just update state
       } else {
           paginationContainer.style.display = 'none'
       }
@@ -427,26 +514,247 @@
     return "secondary"
   }
 
-  function loadBackups() {
-    console.log("Loading backups...")
-  }
+  async function loadBackups() {
+    const tableBody = document.getElementById("backupsTable")
+    if (!tableBody) return
 
-  function createBackup() {
-    console.log("Creating backup...")
-  }
+    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando backups...</td></tr>'
 
-  function downloadBackup(backupId) {
-    showToast("Descarga de backup iniciada", "info")
-  }
+    try {
+      const data = await fetchJSON("php/backups.php")
 
-  function deleteBackup(backupId) {
-    if (confirm("¿Eliminar este backup?")) {
-      showToast("Backup eliminado (simulado)", "success")
+      if (!data.success) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
+        showToast("Error al cargar backups", "error")
+        return
+      }
+
+      backups = data.backups
+
+      if (backups.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay backups creados</td></tr>'
+        return
+      }
+
+      // Render backups table
+      tableBody.innerHTML = backups.map(backup => {
+        const fecha = new Date(backup.fecha).toLocaleString('es-ES')
+        const tamanioMB = (backup.tamaño_bytes / 1048576).toFixed(2)
+
+        // Determine tipo badge color
+        const tipoBadgeClass = backup.tipo === 'manual' ? 'badge-primary' : 'badge-info'
+
+        // Determine estado badge color
+        let estadoBadgeClass = 'badge-secondary'
+        if (backup.estado === 'completado') estadoBadgeClass = 'badge-success'
+        else if (backup.estado === 'error') estadoBadgeClass = 'badge-danger'
+        else if (backup.estado === 'en_proceso') estadoBadgeClass = 'badge-warning'
+
+        return `
+          <tr>
+            <td class="font-mono">${fecha}</td>
+            <td>
+              <span class="badge ${tipoBadgeClass}">
+                ${backup.tipo}
+              </span>
+            </td>
+            <td class="font-mono">${tamanioMB} MB</td>
+            <td>
+              <span class="badge ${estadoBadgeClass}">
+                ${backup.estado}
+              </span>
+            </td>
+            <td>
+              ${backup.estado === 'completado' ? `
+                <button class="btn-action btn-restore me-1" onclick="restoreBackup(${backup.id}, '${backup.archivo}')" title="Restaurar Base de Datos" style="color: var(--buzz-warning);">
+                  <i class="fas fa-undo"></i>
+                </button>
+                <button class="btn-action btn-download me-1" onclick="downloadBackup(${backup.id})" title="Descargar">
+                  <i class="fas fa-download"></i>
+                </button>
+                <button class="btn-action btn-delete" onclick="deleteBackup(${backup.id}, '${backup.archivo}')" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              ` : '-'}
+            </td>
+          </tr>
+        `
+      }).join('')
+
+    } catch (error) {
+      console.error("Error loading backups:", error)
+      tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
+      showToast("Error al cargar backups", "error")
     }
+  }
+
+  async function createBackup() {
+    const createBtn = document.querySelector('button[onclick="createBackup()"]')
+    if (createBtn) {
+      createBtn.disabled = true
+      createBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Creando...'
+    }
+
+    try {
+      const data = await fetchJSON("php/backups.php?action=create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      })
+
+      if (data.success) {
+        showToast(`Backup creado: ${data.backup.tamaño_mb} MB (${data.backup.duracion_ms}ms)`, "success")
+        loadBackups() // Reload backups list
+      } else {
+        showToast(data.error || "Error al crear backup", "error")
+        console.error("Backup error:", data)
+      }
+
+    } catch (error) {
+      console.error("Error creating backup:", error)
+      showToast("Error al crear backup", "error")
+    } finally {
+      if (createBtn) {
+        createBtn.disabled = false
+        createBtn.innerHTML = '<i class="fas fa-download"></i> Crear Backup'
+      }
+    }
+  }
+
+  async function downloadBackup(backupId) {
+    showToast("Iniciando descarga...", "info")
+
+    try {
+      const response = await fetch("php/backups.php?action=download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: backupId })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al descargar backup")
+      }
+
+      // Get filename from header or use default
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = `backup_${backupId}.sql`
+      if (contentDisposition) {
+        const matches = /filename="([^"]+)"/.exec(contentDisposition)
+        if (matches) filename = matches[1]
+      }
+
+      // Download file
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      showToast("Backup descargado exitosamente", "success")
+
+    } catch (error) {
+      console.error("Error downloading backup:", error)
+      showToast("Error al descargar backup", "error")
+    }
+  }
+
+  async function deleteBackup(backupId, filename) {
+    showModal({
+      title: "Confirmar Eliminación",
+      message: `¿Está seguro de que desea eliminar el backup "${filename}"?\n\nEsta acción no se puede deshacer.`,
+      type: "confirm",
+      onConfirm: async () => {
+        try {
+          const data = await fetchJSON("php/backups.php", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: backupId })
+          })
+
+          if (data.success) {
+            showToast("Backup eliminado exitosamente", "success")
+            loadBackups() // Reload backups list
+          } else {
+            showToast(data.error || "Error al eliminar backup", "error")
+          }
+
+        } catch (error) {
+          console.error("Error deleting backup:", error)
+          showToast("Error al eliminar backup", "error")
+        }
+      }
+    })
+  }
+
+  async function restoreBackup(backupId, filename) {
+    showModal({
+      title: "⚠️ ADVERTENCIA DE RESTAURACIÓN",
+      message: `¿Está seguro de que desea restaurar la base de datos desde "${filename}"?\n\nESTO SOBREESCRIBIRÁ SU BASE DE DATOS ACTUAL.\n\nTodos los datos actuales se perderán y serán reemplazados por los de este backup.`,
+      type: "confirm",
+      timer: 5,
+      onConfirm: async () => {
+        // Show loading state
+        showToast("Iniciando restauración... Por favor espere.", "info", 5000)
+
+        try {
+          const data = await fetchJSON("php/backups.php?action=restore", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: backupId })
+          })
+
+          if (data.success) {
+            showModal({
+                title: "Restauración Exitosa",
+                message: `La base de datos ha sido restaurada correctamente.\nDuración: ${data.duracion_ms}ms`,
+                type: "success"
+            })
+            loadBackups() // Reload list to show logs if any
+          } else {
+            showModal({
+                title: "Error de Restauración",
+                message: data.error || "Error al restaurar la base de datos",
+                type: "error"
+            })
+          }
+
+        } catch (error) {
+          console.error("Error restoring backup:", error)
+          showModal({
+              title: "Error Crítico",
+              message: "Error de red o servidor al intentar restaurar.",
+              type: "error"
+          })
+        }
+      }
+    })
   }
 
   function filterLogs() {
     loadLogs()
+  }
+
+  function clearLogsFilters() {
+    const logSearchEl = document.getElementById("logSearch");
+    const logDateFromEl = document.getElementById("logDateFrom");
+    const logDateToEl = document.getElementById("logDateTo");
+
+    if (logSearchEl) logSearchEl.value = '';
+    if (logDateFromEl) logDateFromEl.value = '';
+    if (logDateToEl) logDateToEl.value = '';
+    loadLogs(1);
   }
 
   function openUserModal(user = null) {
@@ -769,7 +1077,9 @@
   window.downloadBackup = downloadBackup
   window.deleteBackup = deleteBackup
   window.createBackup = createBackup
+  window.restoreBackup = restoreBackup
   window.filterLogs = filterLogs
+  window.clearLogsFilters = clearLogsFilters
   window.openUserModal = openUserModal
   window.closeUserModal = closeUserModal
 })()

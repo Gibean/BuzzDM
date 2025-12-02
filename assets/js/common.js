@@ -111,7 +111,7 @@ function showToast(message, type = 'info', duration = 3000) {
  * @param {function} [options.onConfirm] - Callback if the confirm button is clicked.
  * @param {function} [options.onCancel] - Callback if the cancel button is clicked.
  */
-function showModal({ title, message, type = "info", onConfirm, onCancel }) {
+function showModal({ title, message, type = "info", onConfirm, onCancel, timer }) {
   let overlay = document.getElementById("modal-overlay")
   if (!overlay) {
     // Create the modal structure if it doesn't exist
@@ -147,6 +147,29 @@ function showModal({ title, message, type = "info", onConfirm, onCancel }) {
     const confirmBtn = document.createElement("button")
     confirmBtn.className = "btn btn-buzz"
     confirmBtn.textContent = "Confirmar"
+
+    // Timer Logic
+    if (timer && typeof timer === 'number') {
+        confirmBtn.disabled = true;
+        let timeLeft = timer;
+        const originalText = confirmBtn.textContent;
+        confirmBtn.textContent = `${originalText} (${timeLeft})`;
+
+        const timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = originalText;
+            } else {
+                confirmBtn.textContent = `${originalText} (${timeLeft})`;
+            }
+        }, 1000);
+
+        // Clear interval if modal is closed before timer ends (basic cleanup)
+        const oldOnclick = confirmBtn.onclick; // This is null here, but for safety
+    }
+
     confirmBtn.onclick = () => {
       if (onConfirm) onConfirm()
       hideModal()
