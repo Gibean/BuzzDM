@@ -107,6 +107,9 @@
                  Orders will be populated by JavaScript
             </div>
         </div>
+
+        <!-- System Footer -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <!-- Create Order Modal -->
