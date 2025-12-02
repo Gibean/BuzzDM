@@ -32,6 +32,8 @@ switch ($method) {
             handleCreateBackup($pdo, $_SESSION['usuario_id']);
         } elseif ($action === 'download') {
             handleDownloadBackup($pdo);
+        } elseif ($action === 'restore') {
+            handleRestoreBackup($pdo, $_SESSION['usuario_id']);
         } else {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Acción no especificada']);
@@ -86,7 +88,7 @@ function handleCreateBackup($pdo, $usuario_id) {
         }
 
         $fecha = date('Y-m-d_H-i-s');
-        $nombreArchivo = "backup_dbuzz_{$fecha}.sql";
+        $nombreArchivo = "dbuzzbackup_{$fecha}.sql";
         $rutaCompleta = $backupDir . $nombreArchivo;
 
         // Obtener configuración de base de datos desde db.php
@@ -283,6 +285,120 @@ function handleDeleteBackup($pdo) {
         error_log("Error deleting backup: " . $e->getMessage());
         http_response_code(500);
         echo json_encode(['success' => false, 'error' => 'Error al eliminar backup']);
+    }
+}
+/**
+ * Restore a backup
+ */
+function handleRestoreBackup($pdo, $usuario_id) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $backupId = $data['id'] ?? 0;
+
+    $inicio = microtime(true);
+
+    try {
+        // Obtener información del backup
+        $stmt = $pdo->prepare("SELECT archivo, ruta_archivo FROM backups WHERE id = ?");
+        $stmt->execute([$backupId]);
+        $backup = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$backup) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Backup no encontrado']);
+            return;
+        }
+
+        if (!file_exists($backup['ruta_archivo'])) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error' => 'Archivo de backup no encontrado en el servidor']);
+            return;
+        }
+
+        // Configuración de base de datos
+        $dbHost = 'localhost';
+        $dbUser = 'root';
+        $dbPass = '35128';
+        $dbName = 'dbuzz';
+
+        // Construir comando mysql para importar
+        $mysqlPath = 'c:\\xampp\\mysql\\bin\\mysql.exe';
+        $comando = sprintf(
+            '"%s" --user=%s --password=%s --host=%s %s < "%s" 2>&1',
+            $mysqlPath,
+            $dbUser,
+            $dbPass,
+            $dbHost,
+            $dbName,
+            $backup['ruta_archivo']
+        );
+
+        // Ejecutar restauración
+        // Crear archivo bat temporal para evitar problemas de redirección
+        $batFile = __DIR__ . '/temp_restore_' . uniqid() . '.bat';
+        $batContent = "@echo off\n" . $comando;
+        file_put_contents($batFile, $batContent);
+
+        exec($batFile, $output, $returnCode);
+
+        // Eliminar archivo temporal
+        unlink($batFile);
+
+        $duracion = round((microtime(true) - $inicio) * 1000); // ms
+
+        if ($returnCode === 0) {
+            // Registrar en logs
+            $stmt = $pdo->prepare("
+                INSERT INTO logs (usuario_id, accion, detalles)
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([
+                $usuario_id,
+                'Restauración de Backup',
+                json_encode([
+                    'archivo' => $backup['archivo'],
+                    'duracion_ms' => $duracion,
+                    'resultado' => 'Exitoso'
+                ])
+            ]);
+
+            echo json_encode([
+                'success' => true,
+                'message' => 'Base de datos restaurada exitosamente',
+                'duracion_ms' => $duracion
+            ]);
+        } else {
+            $errorMsg = implode("\n", $output);
+            error_log("Restore failed: $errorMsg");
+
+            // Registrar fallo en logs
+            $stmt = $pdo->prepare("
+                INSERT INTO logs (usuario_id, accion, detalles)
+                VALUES (?, ?, ?)
+            ");
+            $stmt->execute([
+                $usuario_id,
+                'Fallo Restauración Backup',
+                json_encode([
+                    'archivo' => $backup['archivo'],
+                    'error' => $errorMsg
+                ])
+            ]);
+
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'error' => 'Error al restaurar la base de datos',
+                'details' => $output
+            ]);
+        }
+
+    } catch (Exception $e) {
+        error_log("Restore error: " . $e->getMessage());
+        http_response_code(500);
+        echo json_encode([
+            'success' => false,
+            'error' => 'Error crítico al restaurar: ' . $e->getMessage()
+        ]);
     }
 }
 ?>
