@@ -38,7 +38,7 @@ CREATE TABLE `backups` (
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `backups` (
 
 LOCK TABLES `backups` WRITE;
 /*!40000 ALTER TABLE `backups` DISABLE KEYS */;
-INSERT INTO `backups` VALUES (4,'dbuzzbackup_2025-12-02_06-11-25.sql','C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-02_06-11-25.sql',68600,'2025-12-02 05:11:26','manual','completado','Backup creado exitosamente','{\"tablas_exportadas\":16,\"duracion_ms\":481,\"tamanio_mb\":0.07}',1);
+INSERT INTO `backups` VALUES (8,'dbuzzbackup_2025-12-02_08-06-53.sql','C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-02_08-06-53.sql',70848,'2025-12-02 07:06:54','manual','completado','Backup creado exitosamente','{\"tablas_exportadas\":14,\"duracion_ms\":521,\"tamanio_mb\":0.07}',1),(9,'dbuzzbackup_2025-12-02_08-08-01.sql','C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-02_08-08-01.sql',71423,'2025-12-02 07:08:01','manual','completado','Backup creado exitosamente','{\"tablas_exportadas\":14,\"duracion_ms\":493,\"tamanio_mb\":0.07}',1);
 /*!40000 ALTER TABLE `backups` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -129,7 +129,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES ('E-30003000','Juan Almeida','misogino.300@gmail.com','+34900 861 494','Municipio Santiago','Epale Juan Almeida misógino yo no conozco de puntas la única punta que conozco es esta… la punta de la teta porque como verás estoy amamantando desde la izquierda cómoda es bien depinga verdad?? hablar y criticar a los demás y como tú me hablabas de cacao yo no tengo cacao para ti tengo patadas y te patearé el culo donde te vea #TePateareElCuloDondeTeVea y no por lo que has dicho respecto al municipio Santiago de Mariño sino por meterte conmigo en mi condición de mujer',0,'2025-12-02 05:14:09',NULL),('V-30535128','Gisvel Aray','','+584128759068','Calle Luisa Caceres de Arismendi','<3',1,'2025-11-21 00:56:28',NULL);
+INSERT INTO `clientes` VALUES ('E-30003000','Juan Almeida','misogino.300@gmail.com','+34900 861 494','Municipio Santiago','Epale Juan Almeida misógino yo no conozco de puntas la única punta que conozco es esta… la punta de la teta porque como verás estoy amamantando desde la izquierda cómoda es bien depinga verdad?? hablar y criticar a los demás y como tú me hablabas de cacao yo no tengo cacao para ti tengo patadas y te patearé el culo donde te vea #TePateareElCuloDondeTeVea y no por lo que has dicho respecto al municipio Santiago de Mariño sino por meterte conmigo en mi condición de mujer',0,'2025-12-02 05:14:09',NULL),('V-30535128','Gisvel Aray','','+584128759068','Calle Luisa Caceres de Arismendi','<3',1,'2025-11-21 00:56:28',NULL),('V-99999999','Test Restore','test@restore.com','+581234567890','','',0,'2025-12-02 05:18:09','2025-12-02 05:20:58');
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -152,7 +152,7 @@ CREATE TABLE `detalle_pedido` (
   KEY `producto_id` (`producto_id`),
   CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -161,6 +161,7 @@ CREATE TABLE `detalle_pedido` (
 
 LOCK TABLES `detalle_pedido` WRITE;
 /*!40000 ALTER TABLE `detalle_pedido` DISABLE KEYS */;
+INSERT INTO `detalle_pedido` VALUES (2,1,1,1,10.00,10.00);
 /*!40000 ALTER TABLE `detalle_pedido` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,7 +273,7 @@ CREATE TABLE `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,7 +282,7 @@ CREATE TABLE `logs` (
 
 LOCK TABLES `logs` WRITE;
 /*!40000 ALTER TABLE `logs` DISABLE KEYS */;
-INSERT INTO `logs` VALUES (1,1,'Solicitud de recuperación de contraseña','Email: admin@buzz.com','2025-11-29 02:18:49'),(2,1,'Contraseña cambiada','Mediante recuperación de contraseña','2025-11-29 02:19:17'),(3,NULL,'Backup realizado','Archivo: backup_dbuzz_2025-12-02_05-54-21.sql | Tamaño: 0.06 MB','2025-12-02 04:54:22'),(4,1,'Backup Manual','{\"archivo\":\"backup_dbuzz_2025-12-02_05-54-21.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":770,\"tablas\":16}','2025-12-02 04:54:22'),(5,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-03-19.sql | Tamaño: 0.06 MB','2025-12-02 05:03:20'),(6,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-03-19.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":531,\"tablas\":16}','2025-12-02 05:03:20'),(7,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-04-28.sql | Tamaño: 0.07 MB','2025-12-02 05:04:43'),(8,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-04-28.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":15079,\"tablas\":16}','2025-12-02 05:04:43'),(9,1,'Restauración de Backup','{\"archivo\":\"dbuzzbackup_2025-12-02_06-07-56.sql\",\"duracion_ms\":800,\"resultado\":\"Exitoso\"}','2025-12-02 05:08:54'),(10,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-11-25.sql | Tamaño: 0.07 MB','2025-12-02 05:11:26'),(11,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-11-25.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":481,\"tablas\":16}','2025-12-02 05:11:26');
+INSERT INTO `logs` VALUES (1,1,'Solicitud de recuperación de contraseña','Email: admin@buzz.com','2025-11-29 02:18:49'),(2,1,'Contraseña cambiada','Mediante recuperación de contraseña','2025-11-29 02:19:17'),(3,NULL,'Backup realizado','Archivo: backup_dbuzz_2025-12-02_05-54-21.sql | Tamaño: 0.06 MB','2025-12-02 04:54:22'),(4,1,'Backup Manual','{\"archivo\":\"backup_dbuzz_2025-12-02_05-54-21.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":770,\"tablas\":16}','2025-12-02 04:54:22'),(5,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-03-19.sql | Tamaño: 0.06 MB','2025-12-02 05:03:20'),(6,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-03-19.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":531,\"tablas\":16}','2025-12-02 05:03:20'),(7,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-04-28.sql | Tamaño: 0.07 MB','2025-12-02 05:04:43'),(8,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-04-28.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":15079,\"tablas\":16}','2025-12-02 05:04:43'),(9,1,'Restauración de Backup','{\"archivo\":\"dbuzzbackup_2025-12-02_06-07-56.sql\",\"duracion_ms\":800,\"resultado\":\"Exitoso\"}','2025-12-02 05:08:54'),(10,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-11-25.sql | Tamaño: 0.07 MB','2025-12-02 05:11:26'),(11,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-11-25.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":481,\"tablas\":16}','2025-12-02 05:11:26'),(12,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-14-15.sql | Tamaño: 0.07 MB','2025-12-02 05:14:16'),(13,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-14-15.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":459,\"tablas\":15}','2025-12-02 05:14:16'),(14,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-01-41.sql | Tamaño: 0.07 MB','2025-12-02 07:01:42'),(15,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-01-41.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":766,\"tablas\":14}','2025-12-02 07:01:42'),(16,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-05-58.sql | Tamaño: 0.07 MB','2025-12-02 07:05:59'),(17,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-05-58.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":520,\"tablas\":14}','2025-12-02 07:05:59'),(18,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-06-53.sql | Tamaño: 0.07 MB','2025-12-02 07:06:54'),(19,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-06-53.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":521,\"tablas\":14}','2025-12-02 07:06:54'),(20,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-08-01.sql | Tamaño: 0.07 MB','2025-12-02 07:08:01'),(21,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-08-01.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":493,\"tablas\":14}','2025-12-02 07:08:01');
 /*!40000 ALTER TABLE `logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -466,7 +467,7 @@ CREATE TABLE `pedidos` (
   KEY `idx_pedidos_deleted_at` (`deleted_at`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -475,6 +476,7 @@ CREATE TABLE `pedidos` (
 
 LOCK TABLES `pedidos` WRITE;
 /*!40000 ALTER TABLE `pedidos` DISABLE KEYS */;
+INSERT INTO `pedidos` VALUES (1,'V-30535128','4633556592','2025-12-02 06:30:40',10.00,'pagado','pendiente','afeafe','sfaefd',NULL,'2025-12-02 06:54:56',NULL,NULL,NULL);
 /*!40000 ALTER TABLE `pedidos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -511,7 +513,7 @@ CREATE TABLE `productos` (
   CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -520,6 +522,7 @@ CREATE TABLE `productos` (
 
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
+INSERT INTO `productos` VALUES (1,'325324324234','blah','afesfaf',10.00,4,10,'activo','2025-12-02 06:29:28','2025-12-02 06:54:56',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -916,4 +919,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-02  1:14:16
+-- Dump completed on 2025-12-02  3:10:46
