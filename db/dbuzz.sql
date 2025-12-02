@@ -56,7 +56,9 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   `notas` text DEFAULT NULL,
   `vip` tinyint(1) DEFAULT 0,
   `creado_at` timestamp NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
@@ -231,11 +233,13 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `tracking_number` varchar(50) DEFAULT NULL,
   `estimated_delivery_date` date DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `creado_por` (`creado_por`),
   KEY `fecha_creacion` (`fecha_creacion`),
   KEY `estado_envio` (`estado_envio`),
   KEY `pedidos_ibfk_1` (`cliente_id`),
+  KEY `idx_deleted_at` (`deleted_at`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -255,6 +259,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `estado` enum('activo','stock_bajo','agotado') NOT NULL DEFAULT 'activo',
   `creado_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
   `categoria` int(11) DEFAULT NULL,
   `marca_id` int(11) DEFAULT NULL,
   `proveedor_id` int(11) DEFAULT NULL,
@@ -265,6 +270,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   KEY `fk_productos_categoria` (`categoria`),
   KEY `fk_productos_marca` (`marca_id`),
   KEY `fk_productos_proveedor` (`proveedor_id`),
+  KEY `idx_deleted_at` (`deleted_at`),
   CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -487,10 +493,12 @@ FROM
     productos p
 LEFT JOIN
     detalle_pedido d ON p.id = d.producto_id
+WHERE
+    p.deleted_at IS NULL
 GROUP BY
     p.id
 ORDER BY
-    total_vendido DESC 
+    total_vendido DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -512,8 +520,9 @@ FROM
 WHERE
     p.stock <= p.min_stock
     AND p.estado != 'agotado'
+    AND p.deleted_at IS NULL
 ORDER BY
-    p.stock ASC 
+    p.stock ASC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -525,7 +534,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS SELECT
            FORMAT(tamaño_bytes/1048576, 2), ' MB') AS detalles,
     fecha
 FROM backups
-ORDER BY fecha DESC 
+ORDER BY fecha DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -539,7 +548,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS SELECT
 FROM importaciones i
 LEFT JOIN usuarios u ON i.usuario_id = u.id
 WHERE i.tipo = 'csv'
-ORDER BY i.fecha DESC 
+ORDER BY i.fecha DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -564,10 +573,11 @@ JOIN
 LEFT JOIN
     usuarios u ON ped.creado_por = u.id
 WHERE
-    ped.estado_pago = 'no_pagado'
-    OR ped.estado_envio IN ('pendiente', 'enviado')
+    (ped.estado_pago = 'no_pagado' OR ped.estado_envio IN ('pendiente', 'enviado'))
+    AND ped.deleted_at IS NULL
+    AND c.deleted_at IS NULL
 ORDER BY
-    ped.fecha_creacion DESC 
+    ped.fecha_creacion DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -589,10 +599,12 @@ FROM
     productos p
 LEFT JOIN
     detalle_pedido d ON p.id = d.producto_id
+WHERE
+    p.deleted_at IS NULL
 GROUP BY
     p.id
 ORDER BY
-    porcentaje_rotacion ASC 
+    porcentaje_rotacion ASC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -609,8 +621,9 @@ FROM
     productos p
 WHERE
     p.id NOT IN (SELECT DISTINCT producto_id FROM detalle_pedido)
+    AND p.deleted_at IS NULL
 ORDER BY
-    p.nombre 
+    p.nombre
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -618,8 +631,9 @@ DROP TABLE IF EXISTS `v_top5_up`;
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_up` AS SELECT p.id, p.sku, p.nombre, SUM(d.cantidad) as total_vendido
 FROM detalle_pedido d
 JOIN productos p ON p.id = d.producto_id
+WHERE p.deleted_at IS NULL
 GROUP BY p.id
-ORDER BY total_vendido DESC 
+ORDER BY total_vendido DESC
 ;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
