@@ -4,7 +4,7 @@
     <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css?v=3">
 </head>
 <body>
      <!-- Sidebar  -->
@@ -228,7 +228,12 @@
                             <form id="reportGenerationForm">
                                 <div class="mb-3">
                                     <label for="adminPasswordReport" class="form-label text-muted">Contraseña de Administrador</label>
-                                    <input type="password" class="form-control form-control-buzz" id="adminPasswordReport" placeholder="Ingrese su contraseña" required autocomplete="current-password">
+                                    <div style="position: relative;">
+                                        <input type="password" class="form-control form-control-buzz" id="adminPasswordReport" placeholder="Ingrese su contraseña" required autocomplete="current-password" style="padding-right: 45px;">
+                                        <button type="button" id="toggleAdminPasswordReport" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--buzz-text-muted); cursor: pointer; padding: 5px; transition: color 0.3s ease;" aria-label="Toggle password visibility">
+                                            <i class="fas fa-eye" id="toggleAdminPasswordReportIcon"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <button type="button" class="btn btn-buzz w-100" id="generateReportBtn" disabled>
                                     <i class="fas fa-download"></i> Generar Reporte
@@ -349,74 +354,6 @@
                             </select>
                         </div>
                         <div class="mb-3">
-    <!--   Reports Tab  -->
-        <div class="tab-content" id="reportsTab" style="display: none;">
-            <div class="buzz-card">
-                <h5 class="font-primary text-primary mb-3">OBTENER REPORTES DE SISTEMA</h5>
-                <p class="text-muted mb-4">Para generar un reporte, seleccione el tipo y luego ingrese su contraseña de administrador.</p>
-
-                <div class="row">
-                    <!-- Report Selection -->
-                    <div class="col-md-8">
-                        <h6 class="font-primary text-primary mb-3">1. SELECCIONE EL TIPO DE REPORTE</h6>
-                        <div class="row g-3" id="reportOptionsContainer">
-                            <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_importaciones">
-                                    <i class="fas fa-file-import fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Importaciones</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_login">
-                                    <i class="fas fa-sign-in-alt fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Inicios de Sesión</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="pedidos">
-                                    <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Pedidos</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="clientes">
-                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Clientes</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="inventario">
-                                    <i class="fas fa-boxes fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Inventario</p>
-                                </div>
-                            </div>
-                             <div class="col-md-4 col-lg-3">
-                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_acciones">
-                                    <i class="fas fa-history fa-2x text-primary mb-2"></i>
-                                    <p class="mb-0 text-muted small">Acciones Sistema</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Password and Generate Button -->
-                    <div class="col-md-4">
-                        <h6 class="font-primary text-primary mb-3">2. CONFIRMAR Y GENERAR</h6>
-                        <div class="buzz-card p-3">
-                            <form id="reportGenerationForm">
-                                <div class="mb-3">
-                                    <label for="adminPasswordReport" class="form-label text-muted">Contraseña de Administrador</label>
-                                    <input type="password" class="form-control form-control-buzz" id="adminPasswordReport" placeholder="Ingrese su contraseña" required autocomplete="current-password">
-                                </div>
-                                <button type="button" class="btn btn-buzz w-100" id="generateReportBtn" disabled>
-                                    <i class="fas fa-download"></i> Generar Reporte
-                                </button>
-                                <p id="reportError" class="text-danger small mt-2"></p>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     <!--      Settings Tab  -->
         <div class="tab-content" id="settingsTab" style="display: none;">
@@ -535,6 +472,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js?v=2"></script>
-    <script src="assets/js/admin.js?v=2"></script>
+    <script src="assets/js/admin.js?v=5"></script>
 </body>
 </html>
