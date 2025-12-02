@@ -1,6 +1,6 @@
 // Customers management functionality
-let currentCustomerPage = 1; // If pagination is needed later
-const customersPerPage = 10; // If pagination is needed later
+let currentCustomerPage = 1 // If pagination is needed later
+const customersPerPage = 10 // If pagination is needed later
 
 // Main function to fetch and render customers
 async function fetchAndRenderCustomers() {
@@ -10,6 +10,9 @@ async function fetchAndRenderCustomers() {
   try {
     const searchInput = document.getElementById("customerSearchInput").value
     const typeFilter = document.getElementById("customerTypeFilter").value
+    const showDeleted = document.getElementById("showDeletedFilter")
+      ? document.getElementById("showDeletedFilter").checked
+      : false
 
     let url = `php/clientes_actions.php?page=${currentCustomerPage}&limit=${customersPerPage}`
     if (searchInput) {
@@ -17,6 +20,9 @@ async function fetchAndRenderCustomers() {
     }
     if (typeFilter) {
       url += `&type=${typeFilter}`
+    }
+    if (showDeleted) {
+      url += `&show_deleted=true`
     }
 
     const data = await fetchJSON(url)
@@ -60,38 +66,50 @@ function renderCustomers(customers) {
                 </thead>
                 <tbody>
                     ${customers
-                      .map(
-                        (customer) => `
-                        <tr>
-                            <td>${customer.id}</td>
-                            <td>${customer.nombre}</td>
-                            <td>${customer.email || "N/A"}</td>
-                            <td>${customer.telefono || "N/A"}</td>
-                            <td>${
-                              customer.vip == 1
-                                ? '<i class="fas fa-star text-warning"></i> Sí'
-                                : "No"
-                            }</td>
-                            <td>
-                                <button class="btn-action btn-view me-1" onclick="viewCustomerDetail('${
-                                  customer.id
-                                }')" title="Ver detalles">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn-action btn-edit me-1" onclick="editCustomer('${
-                                  customer.id
-                                }')" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn-action btn-delete" onclick="deleteCustomer('${
-                                  customer.id
-                                }')" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `
-                      )
+                      .map((customer) => {
+                        const isDeleted = customer.deleted_at !== null
+                        const deletedBadge = isDeleted
+                          ? '<span class="badge bg-danger ms-2">ELIMINADO</span>'
+                          : ""
+
+                        let actionButtons = ""
+                        if (isDeleted) {
+                          actionButtons = `
+                                  <button class="btn btn-outline-success btn-sm" onclick="restoreCustomer('${customer.id}')" title="Restaurar">
+                                      <i class="fas fa-trash-restore"></i>
+                                  </button>
+                              `
+                        } else {
+                          actionButtons = `
+                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${customer.id}')" title="Ver detalle">
+                                      <i class="fas fa-eye"></i>
+                                  </button>
+                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${customer.id}')" title="Editar">
+                                      <i class="fas fa-edit"></i>
+                                  </button>
+                                  <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${customer.id}')" title="Eliminar">
+                                      <i class="fas fa-trash"></i>
+                                  </button>
+                              `
+                        }
+
+                        return `
+                          <tr ${isDeleted ? 'class="table-danger"' : ""}>
+                              <td>${customer.id}${deletedBadge}</td>
+                              <td>${customer.nombre}</td>
+                              <td>${customer.email || "N/A"}</td>
+                              <td>${customer.telefono || "N/A"}</td>
+                              <td>${
+                                customer.vip == 1
+                                  ? '<i class="fas fa-star text-warning"></i> Sí'
+                                  : "No"
+                              }</td>
+                              <td>
+                                  ${actionButtons}
+                              </td>
+                          </tr>
+                      `
+                      })
                       .join("")}
                 </tbody>
             </table>
@@ -222,6 +240,45 @@ async function editCustomer(customerId) {
   }
 }
 
+async function deleteCustomer(customerId) {
+  if (
+    !confirm(`¿Estás seguro de que deseas eliminar el cliente ${customerId}?`)
+  ) {
+    return
+  }
+
+  try {
+    await fetchJSON(`php/clientes_actions.php?id=${customerId}`, {
+      method: "DELETE"
+    })
+    showToast("Cliente eliminado exitosamente.", "success")
+    fetchAndRenderCustomers() // Refresh list
+  } catch (error) {
+    console.error("Error deleting customer:", error)
+    showToast(`Error al eliminar cliente: ${error.message}`, "error")
+  }
+}
+
+async function restoreCustomer(customerId) {
+  try {
+    const response = await fetchJSON("php/clientes_actions.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "restore", id: customerId })
+    })
+
+    if (response.success) {
+      showToast("Cliente restaurado exitosamente.", "success")
+      fetchAndRenderCustomers()
+    } else {
+      showToast(`Error: ${response.message}`, "error")
+    }
+  } catch (error) {
+    console.error("Error restoring customer:", error)
+    showToast(`Error al restaurar cliente: ${error.message}`, "error")
+  }
+}
+
 async function setupCreateCustomerForm() {
   const form = document.getElementById("createCustomerForm")
 
@@ -282,16 +339,16 @@ async function setupCreateCustomerForm() {
 }
 
 // Clear filters function
-window.clearFilters = function() {
-  document.getElementById("customerSearchInput").value = '';
-  document.getElementById("customerTypeFilter").value = '';
-  const showDeletedFilter = document.getElementById("showDeletedFilter");
+window.clearFilters = function () {
+  document.getElementById("customerSearchInput").value = ""
+  document.getElementById("customerTypeFilter").value = ""
+  const showDeletedFilter = document.getElementById("showDeletedFilter")
   if (showDeletedFilter) {
-    showDeletedFilter.checked = false;
+    showDeletedFilter.checked = false
   }
-  currentCustomerPage = 1;
-  fetchAndRenderCustomers();
-};
+  currentCustomerPage = 1
+  fetchAndRenderCustomers()
+}
 
 // Event listeners for filters
 document
