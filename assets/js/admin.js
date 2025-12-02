@@ -566,6 +566,9 @@
             </td>
             <td>
               ${backup.estado === 'completado' ? `
+                <button class="btn-action btn-restore me-1" onclick="restoreBackup(${backup.id}, '${backup.archivo}')" title="Restaurar Base de Datos" style="color: var(--buzz-warning);">
+                  <i class="fas fa-undo"></i>
+                </button>
                 <button class="btn-action btn-download me-1" onclick="downloadBackup(${backup.id})" title="Descargar">
                   <i class="fas fa-download"></i>
                 </button>
@@ -688,6 +691,52 @@
         } catch (error) {
           console.error("Error deleting backup:", error)
           showToast("Error al eliminar backup", "error")
+        }
+      }
+    })
+  }
+
+  async function restoreBackup(backupId, filename) {
+    showModal({
+      title: "⚠️ ADVERTENCIA DE RESTAURACIÓN",
+      message: `¿Está seguro de que desea restaurar la base de datos desde "${filename}"?\n\nESTO SOBREESCRIBIRÁ SU BASE DE DATOS ACTUAL.\n\nTodos los datos actuales se perderán y serán reemplazados por los de este backup.`,
+      type: "confirm",
+      timer: 5,
+      onConfirm: async () => {
+        // Show loading state
+        showToast("Iniciando restauración... Por favor espere.", "info", 5000)
+
+        try {
+          const data = await fetchJSON("php/backups.php?action=restore", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: backupId })
+          })
+
+          if (data.success) {
+            showModal({
+                title: "Restauración Exitosa",
+                message: `La base de datos ha sido restaurada correctamente.\nDuración: ${data.duracion_ms}ms`,
+                type: "success"
+            })
+            loadBackups() // Reload list to show logs if any
+          } else {
+            showModal({
+                title: "Error de Restauración",
+                message: data.error || "Error al restaurar la base de datos",
+                type: "error"
+            })
+          }
+
+        } catch (error) {
+          console.error("Error restoring backup:", error)
+          showModal({
+              title: "Error Crítico",
+              message: "Error de red o servidor al intentar restaurar.",
+              type: "error"
+          })
         }
       }
     })
@@ -1028,6 +1077,7 @@
   window.downloadBackup = downloadBackup
   window.deleteBackup = deleteBackup
   window.createBackup = createBackup
+  window.restoreBackup = restoreBackup
   window.filterLogs = filterLogs
   window.clearLogsFilters = clearLogsFilters
   window.openUserModal = openUserModal
