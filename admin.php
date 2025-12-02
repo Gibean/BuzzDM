@@ -419,6 +419,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- System Footer -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
  <!--     User Modal  -->
