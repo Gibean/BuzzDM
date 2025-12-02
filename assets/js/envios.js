@@ -303,3 +303,11 @@ function formatCurrency(amount) {
 function showNotification(message, type) {
   alert(`${type.toUpperCase()}: ${message}`)
 }
+
+// Clear filters function
+window.clearFilters = function() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('sortBy').value = 'date';
+  filterShipments();
+};

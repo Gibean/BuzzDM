@@ -113,8 +113,9 @@
                     <thead>
                         <tr>
                             <th>Fecha</th>
-                            <th>Acción</th>
-                            <th>Detalles</th>
+                            <th>Tipo</th>
+                            <th>Archivo</th>
+                            <th>Estado</th>
                             <th>Usuario</th>
                         </tr>
                     </thead>
@@ -276,7 +277,7 @@
                                     <td>${result.processed} (${result.inserted} insertados, ${result.updated} actualizados, ${result.failed} errores)</td>
                                     <td><?php echo $_SESSION['user_email'] ?? 'N/A'; ?></td>
                                     <td>
-                                        ${result.errors.length > 0 ? 
+                                        ${result.errors.length > 0 ?
                                             `<button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#errorModal" data-errors='${JSON.stringify(result.errors)}'>
                                                 Ver Errores
                                             </button>` : '-'
@@ -334,7 +335,7 @@
 
         async function loadImportHistory() {
             const importHistoryTable = document.getElementById('importHistoryTable');
-            importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">Cargando historial...</td></tr>';
+            importHistoryTable.innerHTML = '<tr><td colspan="5" class="text-center">Cargando historial...</td></tr>';
 
             try {
                 const response = await fetch('php/get_import_history.php');
@@ -343,22 +344,51 @@
                 if (data.success && data.history.length > 0) {
                     importHistoryTable.innerHTML = '';
                     data.history.forEach(log => {
+                        // Extract type and status from the data
+                        const tipo = log.accion.replace('Importación: ', '');
+                        const archivo = log.detalles.split(' - Estado: ')[0];
+                        const estado = log.detalles.includes(' - Estado: ')
+                            ? log.detalles.split(' - Estado: ')[1]
+                            : 'N/A';
+
+                        // Determine badge colors for tipo
+                        let tipoBadgeClass = 'badge-primary';
+                        if (tipo.toLowerCase().includes('general')) tipoBadgeClass = 'badge-primary';
+                        else if (tipo.toLowerCase().includes('productos')) tipoBadgeClass = 'badge-warning';
+                        else if (tipo.toLowerCase().includes('clientes')) tipoBadgeClass = 'badge-success';
+                        else if (tipo.toLowerCase().includes('pedidos')) tipoBadgeClass = 'badge-info';
+
+                        // Determine badge colors for estado
+                        let estadoBadgeClass = 'badge-secondary';
+                        if (estado === 'procesado' || estado === 'completado') estadoBadgeClass = 'badge-success';
+                        else if (estado === 'pendiente') estadoBadgeClass = 'badge-warning';
+                        else if (estado === 'error' || estado === 'fallido') estadoBadgeClass = 'badge-danger';
+
                         const row = `
                             <tr>
-                                <td>${new Date(log.fecha).toLocaleString('es-ES')}</td>
-                                <td>${log.accion}</td>
-                                <td>${log.detalles}</td>
-                                <td>${log.usuario_nombre || 'Sistema'}</td>
+                                <td class="font-mono">${new Date(log.fecha).toLocaleString('es-ES')}</td>
+                                <td>
+                                    <span class="badge ${tipoBadgeClass}">
+                                        ${tipo}
+                                    </span>
+                                </td>
+                                <td class="font-mono">${archivo}</td>
+                                <td>
+                                    <span class="badge ${estadoBadgeClass}">
+                                        ${estado}
+                                    </span>
+                                </td>
+                                <td class="font-mono">${log.usuario_nombre || 'Sistema'}</td>
                             </tr>
                         `;
                         importHistoryTable.insertAdjacentHTML('beforeend', row);
                     });
                 } else {
-                    importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">No hay historial de importaciones o backups.</td></tr>';
+                    importHistoryTable.innerHTML = '<tr><td colspan="5" class="text-center">No hay historial de importaciones o backups.</td></tr>';
                 }
             } catch (error) {
                 console.error('Error al cargar el historial:', error);
-                importHistoryTable.innerHTML = '<tr><td colspan="4" class="text-center">Error al cargar el historial.</td></tr>';
+                importHistoryTable.innerHTML = '<tr><td colspan="5" class="text-center">Error al cargar el historial.</td></tr>';
             }
         }
 

@@ -72,8 +72,14 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
+                <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button class="btn btn-outline-buzz w-100" id="applyCustomerFilters">Aplicar Filtros</button>
+                </div>
+                <div class="col-md-1 mb-3">
+                    <label class="form-label text-muted">&nbsp;</label>
+                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -430,8 +436,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/common.js"></script>
-    <script src="assets/js/confirmation_modal.js"></script>
-    <script src="assets/js/clientes.js"></script>
+    <script src="assets/js/common.js?v=2"></script>
+    <script src="assets/js/confirmation_modal.js?v=2"></script>
+    <script src="assets/js/clientes.js?v=2"></script>
 </body>
 </html>
