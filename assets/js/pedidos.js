@@ -12,6 +12,7 @@ async function fetchAndRenderOrders() {
     const paymentFilter = document.getElementById("paymentFilter").value
     const dateFrom = document.getElementById("dateFrom").value
     const dateTo = document.getElementById("dateTo").value
+    const showDeleted = document.getElementById("showDeletedFilter") ? document.getElementById("showDeletedFilter").checked : false;
 
     let url = `php/pedidos_actions.php?page=${currentPage}&limit=${ordersPerPage}`
     if (searchInput) {
@@ -25,6 +26,9 @@ async function fetchAndRenderOrders() {
     }
     if (dateTo) {
       url += `&dateTo=${encodeURIComponent(dateTo)}`
+    }
+    if (showDeleted) {
+        url += `&show_deleted=true`
     }
 
     const data = await fetchJSON(url)
@@ -56,11 +60,48 @@ function renderOrders(orders) {
 
   ordersList.innerHTML = orders
     .map(
-      (order) => `
-        <div class="border border-secondary rounded mb-3 p-3 order-card">
+      (order) => {
+        const isDeleted = order.deleted_at !== null
+        const deletedClass = isDeleted ? "border-danger bg-light-danger" : ""
+        const deletedBadge = isDeleted ? '<span class="badge bg-danger ms-2">ELIMINADO</span>' : ""
+
+        let actionButtons = ''
+        if (isDeleted) {
+            actionButtons = `
+                <button class="btn btn-outline-success btn-sm" onclick="restoreOrder(${order.id})" title="Restaurar">
+                    <i class="fas fa-trash-restore"></i>
+                </button>
+            `
+        } else {
+            actionButtons = `
+                <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewOrderDetail(${
+                  order.id
+                })" title="Ver detalle">
+                    <i class="fas fa-eye"></i>
+                </button>
+                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editOrder(${
+                  order.id
+                })" title="Editar">
+                    <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-outline-buzz btn-sm me-1" onclick="toggleOrderProducts(this, ${
+                  order.id
+                })" title="Ver productos">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder(${
+                  order.id
+                })" title="Eliminar">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `
+        }
+
+        return `
+        <div class="border border-secondary rounded mb-3 p-3 order-card ${deletedClass}">
             <div class="row align-items-center">
                 <div class="col-md-2">
-                    <div class="font-mono text-primary">#${order.id}</div>
+                    <div class="font-mono text-primary">#${order.id} ${deletedBadge}</div>
                     <small class="text-muted">${formatDate(order.date)}</small>
                 </div>
                 <div class="col-md-3">
@@ -84,26 +125,7 @@ function renderOrders(orders) {
                     </span>
                 </div>
                 <div class="col-md-3 text-end">
-                    <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewOrderDetail(${
-                      order.id
-                    })" title="Ver detalle">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn btn-outline-buzz btn-sm me-1" onclick="editOrder(${
-                      order.id
-                    })" title="Editar">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-outline-buzz btn-sm me-1" onclick="toggleOrderProducts(this, ${
-                      order.id
-                    })" title="Ver productos">
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder(${
-                      order.id
-                    })" title="Eliminar">
-                        <i class="fas fa-trash"></i>
-                    </button>
+                    ${actionButtons}
                 </div>
             </div>
 
@@ -115,8 +137,50 @@ function renderOrders(orders) {
             </div>
         </div>
     `
+      }
     )
     .join("")
+}
+
+async function deleteOrder(orderId) {
+    showConfirmation(
+        "Eliminar Pedido",
+        `¿Estás seguro de que deseas eliminar el pedido #${orderId}? Esta acción no se puede deshacer.`,
+        async () => {
+            try {
+                await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" }
+                })
+                showToast("Pedido eliminado exitosamente.", "success")
+                fetchAndRenderOrders()
+            } catch (error) {
+                console.error("Error deleting order:", error)
+                showToast(`Error al eliminar pedido: ${error.message}`, "error")
+            }
+        }
+    )
+}
+
+async function restoreOrder(orderId) {
+    showConfirmation(
+        "Restaurar Pedido",
+        `¿Estás seguro de que deseas restaurar el pedido #${orderId}?`,
+        async () => {
+            try {
+                await fetchJSON(`php/pedidos_actions.php`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: 'restore', id: orderId })
+                })
+                showToast("Pedido restaurado exitosamente.", "success")
+                fetchAndRenderOrders()
+            } catch (error) {
+                console.error("Error restoring order:", error)
+                showToast(`Error al restaurar pedido: ${error.message}`, "error")
+            }
+        }
+    )
 }
 
 function updateStats(orders) {

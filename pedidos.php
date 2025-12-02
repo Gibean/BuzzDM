@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <!-- Sidebar -->
+     <!-- Sidebar  -->
     <?php require_once 'php/sidebar.php'; ?>
+
+     <!-- Main Content  -->
     <main class="main-content">
          <!-- Top Navbar  -->
         <nav class="top-navbar">
@@ -20,11 +22,11 @@
                 <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE PEDIDOS</h1>
-                <span class="text-muted ms-2 font-mono">/ ÓRDENES</span>
+                <h1 class="font-primary mb-0">PEDIDOS</h1>
+                <span class="text-muted ms-2 font-mono">/ GESTIÓN</span>
             </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openOrderModal()">
+            <div>
+                <button class="btn btn-buzz" id="newOrderBtn">
                     <i class="fas fa-plus"></i> Nuevo Pedido
                 </button>
             </div>
@@ -80,6 +82,15 @@
                 <div class="col-md-3 mb-3">
                     <label class="form-label text-muted">Fecha hasta</label>
                     <input type="date" class="form-control form-control-buzz" id="dateTo">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label text-muted">&nbsp;</label>
+                    <div class="form-check mt-2">
+                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                        <label class="form-check-label text-muted" for="showDeletedFilter">
+                            Ver eliminados
+                        </label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -281,6 +292,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/confirmation_modal.js"></script>
     <script src="assets/js/pedidos.js"></script>
 </body>
 </html>
