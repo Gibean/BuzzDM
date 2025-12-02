@@ -82,8 +82,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
               const actionsCell = row.insertCell()
               actionsCell.innerHTML = `
-                            <button class="btn btn-outline-buzz btn-sm me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
-                            <button class="btn btn-outline-danger btn-sm delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            <button class="btn-action btn-edit me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                            <button class="btn-action btn-delete delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
                         `
             })
           } else {
@@ -434,6 +434,19 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteProduct(deleteButton.dataset.id);
         }
     });
+
+    // Clear filters function
+    window.clearFilters = function() {
+        searchInput.value = '';
+        statusFilter.value = '';
+        sortBySelect.value = 'name';
+        const showDeletedFilter = document.getElementById('showDeletedFilter');
+        if (showDeletedFilter) {
+            showDeletedFilter.checked = false;
+        }
+        currentPage = 1;
+        fetchProducts();
+    };
 
     fetchProducts();
 });

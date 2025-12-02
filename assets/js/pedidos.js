@@ -996,6 +996,20 @@ async function deleteOrder(orderId) {
     });
 }
 
+// Clear filters function
+window.clearFilters = function() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('paymentFilter').value = '';
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  const showDeletedFilter = document.getElementById('showDeletedFilter');
+  if (showDeletedFilter) {
+    showDeletedFilter.checked = false;
+  }
+  currentPage = 1;
+  fetchAndRenderOrders();
+};
+
 // Initial load
 document.addEventListener("DOMContentLoaded", fetchAndRenderOrders);
 

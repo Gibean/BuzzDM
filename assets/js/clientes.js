@@ -73,212 +73,17 @@ function renderCustomers(customers) {
                                 : "No"
                             }</td>
                             <td>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${
+                                <button class="btn-action btn-view me-1" onclick="viewCustomerDetail('${
                                   customer.id
-                                }')" title="Ver detalle">
+                                }')" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${
+                                <button class="btn-action btn-edit me-1" onclick="editCustomer('${
                                   customer.id
                                 }')" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${
-                                  customer.id
-                                }')" title="Eliminar">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `
-                      )
-                      .join("")}
-                </tbody>
-            </table>
-        </div>
-    `
-  customersList.innerHTML = tableHtml
-  document.getElementById("totalCustomers").textContent = customers.length // Update total customers stat
-}
-
-async function fetchAndRenderFrequentCustomers() {
-  const frequentCustomersListContainer = document.getElementById(
-    "frequentCustomersList"
-  )
-  frequentCustomersListContainer.innerHTML = `<p class="text-muted">Cargando clientes frecuentes...</p>`
-  try {
-    const data = await fetchJSON(`php/clientes_actions.php?action=frequent`)
-    const frequentCustomers = data.data.frequentCustomers
-
-    if (frequentCustomers && frequentCustomers.length > 0) {
-      frequentCustomersListContainer.innerHTML = `
-                <ul class="list-group list-group-flush">
-                    ${frequentCustomers
-                      .map(
-                        (customer) => `
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            ${customer.nombre} <span class="badge bg-primary rounded-pill">${customer.total_orders} pedidos</span>
-                        </li>
-                    `
-                      )
-                      .join("")}
-                </ul>
-            `
-    } else {
-      frequentCustomersListContainer.innerHTML = `<p class="text-muted">No hay clientes frecuentes aún.</p>`
-    }
-  } catch (error) {
-    console.error("Error fetching frequent customers:", error)
-    frequentCustomersListContainer.innerHTML = `<p class="text-danger">Error al cargar clientes frecuentes: ${error.message}</p>`
-  }
-}
-
-async function viewCustomerDetail(customerId) {
-  try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
-    const customer = data.data.customer
-
-    if (customer) {
-      document.getElementById("viewCustomerId").textContent = customer.id
-      document.getElementById("viewCustomerName").textContent = customer.nombre
-      document.getElementById("viewCustomerEmail").textContent =
-        customer.email || "N/A"
-      document.getElementById("viewCustomerPhone").textContent =
-        customer.telefono || "N/A"
-      document.getElementById("viewCustomerAddress").textContent =
-        customer.direccion || "N/A"
-      document.getElementById("viewCustomerNotes").textContent =
-        customer.notas || "N/A"
-      document.getElementById("viewCustomerVip").textContent =
-        customer.vip == 1 ? "Sí" : "No"
-      document.getElementById("viewCustomerCreatedAt").textContent =
-        formatDateTime(customer.creado_at)
-
-      const viewModal = new bootstrap.Modal(
-        document.getElementById("viewCustomerModal")
-      )
-      viewModal.show()
-    } else {
-      showToast("Cliente no encontrado.", "error")
-    }
-  } catch (error) {
-    console.error("Error fetching customer details:", error)
-    showToast(`Error al cargar detalles del cliente: ${error.message}`, "error")
-  }
-}
-
-async function editCustomer(customerId) {
-  try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
-    const customer = data.data.customer
-
-    if (customer) {
-      document.getElementById("editCustomerId").textContent = customer.id // Display ID in modal title
-      document.getElementById("editCustomerIdHidden").value = customer.id // Hidden input for form submission
-      document.getElementById("editCustomerName").value = customer.nombre
-      document.getElementById("editCustomerEmail").value = customer.email
-      document.getElementById("editCustomerPhone").value = customer.telefono
-      document.getElementById("editCustomerAddress").value = customer.direccion
-      document.getElementById("editCustomerNotes").value = customer.notas
-      document.getElementById("editCustomerVip").checked = customer.vip == 1
-
-      const editModal = new bootstrap.Modal(
-        document.getElementById("editCustomerModal")
-      )
-      editModal.show()
-
-      document.getElementById("editCustomerForm").onsubmit = async (event) => {
-        event.preventDefault()
-        const updatedCustomer = {
-          id: document.getElementById("editCustomerIdHidden").value,
-          nombre: document.getElementById("editCustomerName").value,
-          email: document.getElementById("editCustomerEmail").value,
-          telefono: document.getElementById("editCustomerPhone").value,
-          direccion: document.getElementById("editCustomerAddress").value,
-          notas: document.getElementById("editCustomerNotes").value,
-          vip: document.getElementById("editCustomerVip").checked ? 1 : 0
-        }
-
-        try {
-          await fetchJSON(`php/clientes_actions.php?id=${updatedCustomer.id}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(updatedCustomer)
-          })
-          showToast("Cliente actualizado exitosamente.", "success")
-          editModal.hide()
-          fetchAndRenderCustomers() // Refresh list
-        } catch (error) {
-          console.error("Error updating customer:", error)
-          showToast(`Error al actualizar cliente: ${error.message}`, "error")
-        }
-      }
-    } else {
-      showToast("Cliente no encontrado para editar.", "error")
-    }
-  } catch (error) {
-    console.error("Error fetching customer for edit:", error)
-    showToast(`Error al cargar cliente para editar: ${error.message}`, "error")
-  }
-}
-
-async function setupCreateCustomerForm() {
-  const form = document.getElementById("createCustomerForm")
-
-function renderCustomers(customers) {
-  const customersList = document.getElementById("customersList")
-  customersList.innerHTML = "" // Clear previous content
-
-  if (!customers || customers.length === 0) {
-    customersList.innerHTML = `
-            <div class="text-center py-5">
-                <i class="fas fa-users text-muted" style="font-size: 3rem;"></i>
-                <h5 class="text-muted mt-3">No se encontraron clientes</h5>
-                <p class="text-muted">Intenta ajustar los filtros o crear un nuevo cliente</p>
-            </div>
-        `
-    return
-  }
-
-  const tableHtml = `
-                <div class="table-responsive">
-            <table class="table table-buzz">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Email</th>
-                        <th>Teléfono</th>
-                        <th>VIP</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${customers
-                      .map(
-                        (customer) => `
-                        <tr>
-                            <td>${customer.id}</td>
-                            <td>${customer.nombre}</td>
-                            <td>${customer.email || "N/A"}</td>
-                            <td>${customer.telefono || "N/A"}</td>
-                            <td>${
-                              customer.vip == 1
-                                ? '<i class="fas fa-star text-warning"></i> Sí'
-                                : "No"
-                            }</td>
-                            <td>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${
-                                  customer.id
-                                }')" title="Ver detalle">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${
-                                  customer.id
-                                }')" title="Editar">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${
+                                <button class="btn-action btn-delete" onclick="deleteCustomer('${
                                   customer.id
                                 }')" title="Eliminar">
                                     <i class="fas fa-trash"></i>
@@ -475,6 +280,18 @@ async function setupCreateCustomerForm() {
     }
   }
 }
+
+// Clear filters function
+window.clearFilters = function() {
+  document.getElementById("customerSearchInput").value = '';
+  document.getElementById("customerTypeFilter").value = '';
+  const showDeletedFilter = document.getElementById("showDeletedFilter");
+  if (showDeletedFilter) {
+    showDeletedFilter.checked = false;
+  }
+  currentCustomerPage = 1;
+  fetchAndRenderCustomers();
+};
 
 // Event listeners for filters
 document
