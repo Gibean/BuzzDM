@@ -127,22 +127,7 @@ try {
             </div>
 
         <div class="row">
-            <div class="col-lg-4 mb-4"> <!-- Activity Log -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">REGISTRO DE ACTIVIDAD</h5>
-                    <div id="activityLog" style="max-height: 300px; overflow-y: auto;">
-                        <ul class="list-unstyled">
-                            <?php if (!empty($activityLog)): ?>
-                                <?php foreach ($activityLog as $activity): ?>
-                                    <li class="font-mono text-muted mb-2" style="font-size: 0.8rem;"><?php echo htmlspecialchars($activity); ?></li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li class="text-muted">No hay actividad reciente.</li>
-                            <?php endif; ?>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+
             <div class="col-lg-4 mb-4"> <!-- Top Products -->
                 <div class="buzz-card">
                     <h5 class="font-primary text-primary mb-3">TOP 5 PRODUCTOS MÁS VENDIDOS</h5>

@@ -81,13 +81,13 @@ function renderCustomers(customers) {
                               `
                         } else {
                           actionButtons = `
-                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${customer.id}')" title="Ver detalle">
+                                  <button class="btn-action btn-view me-1" onclick="viewCustomerDetail('${customer.id}')" title="Ver detalle">
                                       <i class="fas fa-eye"></i>
                                   </button>
-                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${customer.id}')" title="Editar">
+                                  <button class="btn-action btn-edit me-1" onclick="editCustomer('${customer.id}')" title="Editar">
                                       <i class="fas fa-edit"></i>
                                   </button>
-                                  <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${customer.id}')" title="Eliminar">
+                                  <button class="btn-action btn-delete" onclick="deleteCustomer('${customer.id}')" title="Eliminar">
                                       <i class="fas fa-trash"></i>
                                   </button>
                               `

@@ -174,6 +174,7 @@ body {
   border-collapse: collapse;
   border-radius: 8px;
   overflow: hidden;
+  color: var(--buzz-text-color);
 }
 
 .table-buzz th,
@@ -181,13 +182,21 @@ body {
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid var(--buzz-border-color);
+  color: var(--buzz-text-color) !important;
+  background-color: var(--buzz-card-bg) !important;
 }
 
 .table-buzz th {
-  background-color: var(--buzz-dark-bg);
+  background-color: var(--buzz-dark-bg) !important;
   font-family: var(--font-primary);
   font-weight: 700;
   color: var(--buzz-primary-color) !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-buzz tbody tr:hover td {
+    background-color: rgba(255, 160, 0, 0.05) !important;
 }
 
 /* Badges */
@@ -632,8 +641,8 @@ input:-webkit-autofill:active {
 /* Uniform action buttons - borderless, same size */
 .btn-action {
   background: transparent;
-  border: none;
-  color: #1a1f28;
+  border: 1px solid var(--buzz-text-color);
+  color: var(--buzz-text-color);
   padding: 0.5rem;
   border-radius: 4px;
   cursor: pointer;
@@ -647,6 +656,8 @@ input:-webkit-autofill:active {
 
 .btn-action:hover {
   background: rgba(255, 160, 0, 0.1);
+  border-color: var(--buzz-primary-color);
+  color: var(--buzz-primary-color);
 }
 
 .btn-action i {
@@ -657,16 +668,19 @@ input:-webkit-autofill:active {
 .btn-action.btn-view:hover {
   color: #3498db;
   background: rgba(52, 152, 219, 0.1);
+  border-color: #3498db;
 }
 
 .btn-action.btn-edit:hover {
   color: #ffc107;
   background: rgba(255, 193, 7, 0.1);
+  border-color: #ffc107;
 }
 
 .btn-action.btn-delete:hover {
   color: #dc3545;
   background: rgba(220, 53, 69, 0.1);
+  border-color: #dc3545;
 }
 
 /* Mobile: slightly larger touch targets */
