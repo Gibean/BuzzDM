@@ -514,22 +514,183 @@
     return "secondary"
   }
 
-  function loadBackups() {
-    console.log("Loading backups...")
-  }
+  async function loadBackups() {
+    const tableBody = document.getElementById("backupsTable")
+    if (!tableBody) return
 
-  function createBackup() {
-    console.log("Creating backup...")
-  }
+    tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando backups...</td></tr>'
 
-  function downloadBackup(backupId) {
-    showToast("Descarga de backup iniciada", "info")
-  }
+    try {
+      const data = await fetchJSON("php/backups.php")
 
-  function deleteBackup(backupId) {
-    if (confirm("¿Eliminar este backup?")) {
-      showToast("Backup eliminado (simulado)", "success")
+      if (!data.success) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
+        showToast("Error al cargar backups", "error")
+        return
+      }
+
+      backups = data.backups
+
+      if (backups.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay backups creados</td></tr>'
+        return
+      }
+
+      // Render backups table
+      tableBody.innerHTML = backups.map(backup => {
+        const fecha = new Date(backup.fecha).toLocaleString('es-ES')
+        const tamanioMB = (backup.tamaño_bytes / 1048576).toFixed(2)
+
+        // Determine tipo badge color
+        const tipoBadgeClass = backup.tipo === 'manual' ? 'badge-primary' : 'badge-info'
+
+        // Determine estado badge color
+        let estadoBadgeClass = 'badge-secondary'
+        if (backup.estado === 'completado') estadoBadgeClass = 'badge-success'
+        else if (backup.estado === 'error') estadoBadgeClass = 'badge-danger'
+        else if (backup.estado === 'en_proceso') estadoBadgeClass = 'badge-warning'
+
+        return `
+          <tr>
+            <td class="font-mono">${fecha}</td>
+            <td>
+              <span class="badge ${tipoBadgeClass}">
+                ${backup.tipo}
+              </span>
+            </td>
+            <td class="font-mono">${tamanioMB} MB</td>
+            <td>
+              <span class="badge ${estadoBadgeClass}">
+                ${backup.estado}
+              </span>
+            </td>
+            <td>
+              ${backup.estado === 'completado' ? `
+                <button class="btn-action btn-download me-1" onclick="downloadBackup(${backup.id})" title="Descargar">
+                  <i class="fas fa-download"></i>
+                </button>
+                <button class="btn-action btn-delete" onclick="deleteBackup(${backup.id}, '${backup.archivo}')" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
+              ` : '-'}
+            </td>
+          </tr>
+        `
+      }).join('')
+
+    } catch (error) {
+      console.error("Error loading backups:", error)
+      tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
+      showToast("Error al cargar backups", "error")
     }
+  }
+
+  async function createBackup() {
+    const createBtn = document.querySelector('button[onclick="createBackup()"]')
+    if (createBtn) {
+      createBtn.disabled = true
+      createBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Creando...'
+    }
+
+    try {
+      const data = await fetchJSON("php/backups.php?action=create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({})
+      })
+
+      if (data.success) {
+        showToast(`Backup creado: ${data.backup.tamaño_mb} MB (${data.backup.duracion_ms}ms)`, "success")
+        loadBackups() // Reload backups list
+      } else {
+        showToast(data.error || "Error al crear backup", "error")
+        console.error("Backup error:", data)
+      }
+
+    } catch (error) {
+      console.error("Error creating backup:", error)
+      showToast("Error al crear backup", "error")
+    } finally {
+      if (createBtn) {
+        createBtn.disabled = false
+        createBtn.innerHTML = '<i class="fas fa-download"></i> Crear Backup'
+      }
+    }
+  }
+
+  async function downloadBackup(backupId) {
+    showToast("Iniciando descarga...", "info")
+
+    try {
+      const response = await fetch("php/backups.php?action=download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ id: backupId })
+      })
+
+      if (!response.ok) {
+        throw new Error("Error al descargar backup")
+      }
+
+      // Get filename from header or use default
+      const contentDisposition = response.headers.get('Content-Disposition')
+      let filename = `backup_${backupId}.sql`
+      if (contentDisposition) {
+        const matches = /filename="([^"]+)"/.exec(contentDisposition)
+        if (matches) filename = matches[1]
+      }
+
+      // Download file
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+
+      showToast("Backup descargado exitosamente", "success")
+
+    } catch (error) {
+      console.error("Error downloading backup:", error)
+      showToast("Error al descargar backup", "error")
+    }
+  }
+
+  async function deleteBackup(backupId, filename) {
+    showModal({
+      title: "Confirmar Eliminación",
+      message: `¿Está seguro de que desea eliminar el backup "${filename}"?\n\nEsta acción no se puede deshacer.`,
+      type: "confirm",
+      onConfirm: async () => {
+        try {
+          const data = await fetchJSON("php/backups.php", {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ id: backupId })
+          })
+
+          if (data.success) {
+            showToast("Backup eliminado exitosamente", "success")
+            loadBackups() // Reload backups list
+          } else {
+            showToast(data.error || "Error al eliminar backup", "error")
+          }
+
+        } catch (error) {
+          console.error("Error deleting backup:", error)
+          showToast("Error al eliminar backup", "error")
+        }
+      }
+    })
   }
 
   function filterLogs() {

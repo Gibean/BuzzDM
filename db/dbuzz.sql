@@ -24,12 +24,20 @@ USE `dbuzz`;
 DROP TABLE IF EXISTS `backups`;
 CREATE TABLE IF NOT EXISTS `backups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `archivo` varchar(255) NOT NULL,
-  `tamaño_bytes` bigint(20) DEFAULT NULL,
+  `archivo` varchar(255) NOT NULL COMMENT 'Nombre del archivo de backup',
+  `ruta_archivo` varchar(500) DEFAULT NULL COMMENT 'Ruta completa del archivo',
+  `tamaño_bytes` bigint(20) DEFAULT NULL COMMENT 'Tamaño del archivo en bytes',
   `fecha` timestamp NULL DEFAULT current_timestamp(),
-  `tipo` varchar(50) DEFAULT NULL,
-  `estado` varchar(50) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `tipo` enum('manual','automatico') DEFAULT 'manual' COMMENT 'Tipo de backup: manual o automático',
+  `estado` enum('completado','error','en_proceso') DEFAULT 'completado' COMMENT 'Estado del backup',
+  `resultado` varchar(500) DEFAULT NULL COMMENT 'Mensaje de resultado',
+  `detalles` text DEFAULT NULL COMMENT 'Detalles en formato JSON: tablas, duración, etc.',
+  `usuario_id` int(10) unsigned DEFAULT NULL COMMENT 'Usuario que creó el backup manual',
+  PRIMARY KEY (`id`),
+  KEY `fecha` (`fecha`),
+  KEY `tipo` (`tipo`),
+  KEY `FK_backups_usuarios` (`usuario_id`),
+  CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
@@ -490,7 +498,7 @@ LEFT JOIN
 GROUP BY
     p.id
 ORDER BY
-    total_vendido DESC 
+    total_vendido DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -513,7 +521,7 @@ WHERE
     p.stock <= p.min_stock
     AND p.estado != 'agotado'
 ORDER BY
-    p.stock ASC 
+    p.stock ASC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -525,7 +533,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS SELECT
            FORMAT(tamaño_bytes/1048576, 2), ' MB') AS detalles,
     fecha
 FROM backups
-ORDER BY fecha DESC 
+ORDER BY fecha DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -539,7 +547,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS SELECT
 FROM importaciones i
 LEFT JOIN usuarios u ON i.usuario_id = u.id
 WHERE i.tipo = 'csv'
-ORDER BY i.fecha DESC 
+ORDER BY i.fecha DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -567,7 +575,7 @@ WHERE
     ped.estado_pago = 'no_pagado'
     OR ped.estado_envio IN ('pendiente', 'enviado')
 ORDER BY
-    ped.fecha_creacion DESC 
+    ped.fecha_creacion DESC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -592,7 +600,7 @@ LEFT JOIN
 GROUP BY
     p.id
 ORDER BY
-    porcentaje_rotacion ASC 
+    porcentaje_rotacion ASC
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -610,7 +618,7 @@ FROM
 WHERE
     p.id NOT IN (SELECT DISTINCT producto_id FROM detalle_pedido)
 ORDER BY
-    p.nombre 
+    p.nombre
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -619,7 +627,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_up` AS SELECT p.id,
 FROM detalle_pedido d
 JOIN productos p ON p.id = d.producto_id
 GROUP BY p.id
-ORDER BY total_vendido DESC 
+ORDER BY total_vendido DESC
 ;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

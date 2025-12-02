@@ -18,7 +18,8 @@ $api_scripts = [
     'process_import.php',
     'settings_actions.php',
     'logs.php',
-    'users.php'
+    'users.php',
+    'backups.php'
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -107,6 +108,7 @@ $allowed_pages = [
         'company_settings.php',
         'company_settings_actions.php',
         'backup.php',
+        'backups.php',
         'logs.php',
         'api_sales_chart.php',
         'clientes_actions.php',
