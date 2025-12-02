@@ -14,6 +14,20 @@ try {
     // Initialize PDO connection
     $pdo = getDbConnection();
 
+    // Verify Admin Password
+    $password = isset($_GET['password']) ? $_GET['password'] : '';
+    if (empty($password)) {
+        die("<h1>Acceso Denegado</h1><p>Se requiere contraseña de administrador.</p>");
+    }
+
+    $stmtAuth = $pdo->prepare("SELECT password FROM usuarios WHERE id = ?");
+    $stmtAuth->execute([$_SESSION['usuario_id']]);
+    $user = $stmtAuth->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user || !password_verify($password, $user['password'])) {
+        die("<h1>Acceso Denegado</h1><p>Contraseña incorrecta.</p>");
+    }
+
     // Configuración de DomPDF
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);

@@ -123,7 +123,7 @@
           '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...'
         generateReportBtn.disabled = true
 
-        const reportUrl = `php/reports.php?tipo=${selectedReportType}`
+        const reportUrl = `php/reports.php?tipo=${selectedReportType}&password=${encodeURIComponent(password)}`
         const newWindow = window.open(reportUrl, "_blank")
 
         if (newWindow) {
@@ -151,7 +151,22 @@
 
     const logFilterButton = document.querySelector("#logsTab button")
     if (logFilterButton) {
-      logFilterButton.addEventListener("click", filterLogs)
+      logFilterButton.addEventListener("click", () => loadLogs(1))
+    }
+
+    const prevLogBtn = document.getElementById('logsPrevPage')
+    const nextLogBtn = document.getElementById('logsNextPage')
+
+    if (prevLogBtn) {
+        prevLogBtn.addEventListener('click', () => {
+            if (currentLogPage > 1) loadLogs(currentLogPage - 1)
+        })
+    }
+
+    if (nextLogBtn) {
+        nextLogBtn.addEventListener('click', () => {
+            loadLogs(currentLogPage + 1)
+        })
     }
   }
 
@@ -312,29 +327,77 @@
     document.getElementById("adminUsers").textContent = admins
   }
 
-  async function loadLogs() {
+  // Pagination State
+  let currentLogPage = 1
+  const LOGS_PER_PAGE = 10
+
+  async function loadLogs(page = 1) {
     const logSearch = document.getElementById("logSearch").value
     const logDateFrom = document.getElementById("logDateFrom").value
     const logDateTo = document.getElementById("logDateTo").value
 
-    let queryParams = ""
+    let queryParams = `page=${page}&limit=${LOGS_PER_PAGE}`
     if (logSearch) queryParams += `&search=${logSearch}`
     if (logDateFrom) queryParams += `&dateFrom=${logDateFrom}`
     if (logDateTo) queryParams += `&dateTo=${logDateTo}`
 
     try {
-      const data = await fetchJSON(`php/logs.php?${queryParams}`)
-      logs = data
-      renderLogs()
+      const response = await fetchJSON(`php/logs.php?${queryParams}`)
+
+      // Handle both old format (array) and new format (object with data & pagination)
+      if (Array.isArray(response)) {
+          logs = response
+          renderLogs()
+      } else {
+          logs = response.data
+          renderLogs()
+          updatePaginationControls(response.pagination)
+      }
     } catch (error) {
       console.error("Error al cargar logs:", error)
       showToast("Error al cargar logs.", "error")
     }
   }
 
+  function updatePaginationControls(pagination) {
+      const paginationContainer = document.getElementById('logsPagination')
+      const infoText = document.getElementById('logsPaginationInfo')
+      const prevBtn = document.getElementById('logsPrevPage')
+      const nextBtn = document.getElementById('logsNextPage')
+      const currentPageSpan = document.getElementById('logsCurrentPage')
+
+      if (!paginationContainer || !pagination) return
+
+      if (pagination.total_records > 0) {
+          paginationContainer.style.display = 'flex'
+          paginationContainer.style.setProperty('display', 'flex', 'important')
+
+          const start = (pagination.current_page - 1) * pagination.per_page + 1
+          const end = Math.min(pagination.current_page * pagination.per_page, pagination.total_records)
+
+          infoText.textContent = `Mostrando ${start}-${end} de ${pagination.total_records} registros`
+          currentPageSpan.textContent = `Página ${pagination.current_page}`
+
+          prevBtn.disabled = !pagination.has_prev
+          nextBtn.disabled = !pagination.has_next
+
+          currentLogPage = pagination.current_page
+
+          // Update event listeners (remove old ones first to avoid duplicates if not handled elsewhere)
+          // A better approach is to set them up once in setupEventListeners, but here we can just update state
+      } else {
+          paginationContainer.style.display = 'none'
+      }
+  }
+
   function renderLogs() {
     const tbody = document.getElementById("logsTable")
     if (!tbody) return
+
+    if (logs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No se encontraron registros</td></tr>'
+        return
+    }
 
     tbody.innerHTML = logs
       .map(
