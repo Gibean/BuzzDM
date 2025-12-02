@@ -1,13 +1,3 @@
-<?php
-require_once 'php/sesion.php';
-require_once 'php/db.php'; // Include db.php to access getCompanyData()
-
-$companyData = getCompanyData(); // Fetch company data
-
-?>
-<!DOCTYPE html>
-<html lang="es">
-<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUZZ Data Manager - Administración</title>
@@ -177,6 +167,134 @@ $companyData = getCompanyData(); // Fetch company data
                         <button class="btn btn-outline-buzz btn-sm" id="logsNextPage">
                             <i class="fas fa-chevron-right"></i>
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!--   Reports Tab  -->
+        <div class="tab-content" id="reportsTab" style="display: none;">
+            <div class="buzz-card">
+                <h5 class="font-primary text-primary mb-3">OBTENER REPORTES DE SISTEMA</h5>
+                <p class="text-muted mb-4">Para generar un reporte, seleccione el tipo y luego ingrese su contraseña de administrador.</p>
+
+                <div class="row">
+                    <!-- Report Selection -->
+                    <div class="col-md-8">
+                        <h6 class="font-primary text-primary mb-3">1. SELECCIONE EL TIPO DE REPORTE</h6>
+                        <div class="row g-3" id="reportOptionsContainer">
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_importaciones">
+                                    <i class="fas fa-file-import fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Importaciones</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_login">
+                                    <i class="fas fa-sign-in-alt fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Inicios de Sesión</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="pedidos">
+                                    <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Pedidos</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="clientes">
+                                    <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Clientes</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="inventario">
+                                    <i class="fas fa-boxes fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Inventario</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option" data-report-type="historial_acciones">
+                                    <i class="fas fa-history fa-2x text-primary mb-2"></i>
+                                    <p class="mb-0 text-muted small">Acciones Sistema</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Password and Generate Button -->
+                    <div class="col-md-4">
+                        <h6 class="font-primary text-primary mb-3">2. CONFIRMAR Y GENERAR</h6>
+                        <div class="buzz-card p-3">
+                            <form id="reportGenerationForm">
+                                <div class="mb-3">
+                                    <label for="adminPasswordReport" class="form-label text-muted">Contraseña de Administrador</label>
+                                    <input type="password" class="form-control form-control-buzz" id="adminPasswordReport" placeholder="Ingrese su contraseña" required autocomplete="current-password">
+                                </div>
+                                <button type="button" class="btn btn-buzz w-100" id="generateReportBtn" disabled>
+                                    <i class="fas fa-download"></i> Generar Reporte
+                                </button>
+                                <p id="reportError" class="text-danger small mt-2"></p>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!--   Settings Tab  -->
+        <div class="tab-content" id="settingsTab" style="display: none;">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="buzz-card">
+                        <h5 class="font-primary text-primary mb-3">TU EMPRESA</h5>
+                        <p class="text-muted mb-1"><strong>RIF / Cédula:</strong> <?php echo htmlspecialchars($companyData['rif'] ?? ''); ?></p>
+                        <p class="text-muted mb-1"><strong>Nombre de la Empresa:</strong> <?php echo htmlspecialchars($companyData['nombre'] ?? ''); ?></p>
+                        <p class="text-muted mb-1"><strong>Dirección:</strong> <?php echo htmlspecialchars($companyData['direccion'] ?? ''); ?></p>
+                        <p class="text-muted mb-1"><strong>Teléfono:</strong> <?php echo htmlspecialchars($companyData['telefono'] ?? ''); ?></p>
+                        <p class="text-muted mb-1"><strong>Email de Contacto:</strong> <?php echo htmlspecialchars($companyData['email'] ?? ''); ?></p>
+                        <div class="text-end mt-3">
+                            <a href="company_settings.php" class="btn btn-buzz">
+                                <i class="fas fa-edit"></i> Editar Datos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="buzz-card">
+                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN DE SEGURIDAD (PRONTO DISPONIBLE)</h5>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="twoFactor" checked disabled>
+                                <label class="form-check-label text-muted" for="twoFactor">
+                                    Autenticación de Dos Factores
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="sessionsTimeout" checked disabled>
+                                <label class="form-check-label text-muted" for="sessionsTimeout">
+                                    Timeout de Sesiones (30 min)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="loginNotifications" checked disabled>
+                                <label class="form-check-label text-muted" for="loginNotifications">
+                                    Notificaciones de Inicio de Sesión
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <div class="buzz-card">
+                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN GENERAL (PRONTO DISPONIBLE)</h5>
+                        <p class="text-muted mb-1"><strong>Zona Horaria:</strong> Caracas/Venezuela</p>
+                        <p class="text-muted mb-1"><strong>Moneda:</strong> USD ($)</p>
                     </div>
                 </div>
             </div>
