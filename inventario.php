@@ -65,10 +65,10 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-md-2 mb-3">
+                <div class="col-md-1 mb-3">
                     <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()">
-                        <i class="fas fa-times"></i> Limpiar
+                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
@@ -95,21 +95,19 @@
             </div>
 
              <!-- Pagination -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted font-mono">
-                    Mostrando <span id="showingFrom">1</span>-<span id="showingTo">10</span> de <span id="totalProducts">0</span> productos
+            <div id="productsPagination" class="d-flex justify-content-between align-items-center mt-3" style="display: none !important;">
+                <div>
+                    <span id="productsInfoText" class="text-muted"></span>
                 </div>
-                <nav>
-                    <ul class="pagination pagination-sm" id="pagination">
-                        <li class="page-item" id="prevPage">
-                            <a class="page-link" href="#" onclick="changePage(-1)">&laquo; Anterior</a>
-                        </li>
-                        <li class="page-item active"><span class="page-link" id="currentPage">1</span></li>
-                        <li class="page-item" id="nextPage">
-                            <a class="page-link" href="#" onclick="changePage(1)">Siguiente &raquo;</a>
-                        </li>
-                    </ul>
-                </nav>
+                <div class="d-flex gap-2 align-items-center">
+                    <button class="btn btn-outline-buzz btn-sm" id="productsPrevPage">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <span id="productsCurrentPage" class="text-muted"></span>
+                    <button class="btn btn-outline-buzz btn-sm" id="productsNextPage">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </main>
