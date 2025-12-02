@@ -1034,3 +1034,11 @@ document.getElementById('dateTo').addEventListener('change', () => {
     fetchAndRenderOrders();
 });
 
+document.getElementById('showDeletedFilter').addEventListener('change', () => {
+    currentPage = 1;
+    fetchAndRenderOrders();
+});
+
+// Event listener for "Nuevo Pedido" button
+document.getElementById('newOrderBtn').addEventListener('click', openOrderModal);
+
