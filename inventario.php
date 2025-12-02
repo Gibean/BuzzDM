@@ -95,19 +95,21 @@
             </div>
 
              <!-- Pagination -->
-            <div id="productsPagination" class="d-flex justify-content-between align-items-center mt-3" style="display: none !important;">
-                <div>
-                    <span id="productsInfoText" class="text-muted"></span>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="text-muted font-mono">
+                    Mostrando <span id="showingFrom">1</span>-<span id="showingTo">10</span> de <span id="totalProducts">0</span> productos
                 </div>
-                <div class="d-flex gap-2 align-items-center">
-                    <button class="btn btn-outline-buzz btn-sm" id="productsPrevPage">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <span id="productsCurrentPage" class="text-muted"></span>
-                    <button class="btn btn-outline-buzz btn-sm" id="productsNextPage">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
+                <nav>
+                    <ul class="pagination pagination-sm" id="pagination">
+                        <li class="page-item" id="prevPage">
+                            <a class="page-link" href="#" onclick="changePage(-1)">&laquo; Anterior</a>
+                        </li>
+                        <li class="page-item active"><span class="page-link" id="currentPage">1</span></li>
+                        <li class="page-item" id="nextPage">
+                            <a class="page-link" href="#" onclick="changePage(1)">Siguiente &raquo;</a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
         </div>
     </main>

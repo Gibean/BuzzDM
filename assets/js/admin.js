@@ -332,9 +332,13 @@
   const LOGS_PER_PAGE = 10
 
   async function loadLogs(page = 1) {
-    const logSearch = document.getElementById("logSearch").value
-    const logDateFrom = document.getElementById("logDateFrom").value
-    const logDateTo = document.getElementById("logDateTo").value
+    const logSearchEl = document.getElementById("logSearch")
+    const logDateFromEl = document.getElementById("logDateFrom")
+    const logDateToEl = document.getElementById("logDateTo")
+
+    const logSearch = logSearchEl ? logSearchEl.value : ''
+    const logDateFrom = logDateFromEl ? logDateFromEl.value : ''
+    const logDateTo = logDateToEl ? logDateToEl.value : ''
 
     let queryParams = `page=${page}&limit=${LOGS_PER_PAGE}`
     if (logSearch) queryParams += `&search=${logSearch}`
@@ -361,12 +365,18 @@
 
   function updatePaginationControls(pagination) {
       const paginationContainer = document.getElementById('logsPagination')
-      const infoText = document.getElementById('logsPaginationInfo')
+      const infoText = document.getElementById('logsInfoText')
       const prevBtn = document.getElementById('logsPrevPage')
       const nextBtn = document.getElementById('logsNextPage')
       const currentPageSpan = document.getElementById('logsCurrentPage')
 
       if (!paginationContainer || !pagination) return
+
+      // Check if all required elements exist
+      if (!infoText || !prevBtn || !nextBtn || !currentPageSpan) {
+          console.warn('Pagination elements not found')
+          return
+      }
 
       if (pagination.total_records > 0) {
           paginationContainer.style.display = 'flex'
@@ -382,9 +392,6 @@
           nextBtn.disabled = !pagination.has_next
 
           currentLogPage = pagination.current_page
-
-          // Update event listeners (remove old ones first to avoid duplicates if not handled elsewhere)
-          // A better approach is to set them up once in setupEventListeners, but here we can just update state
       } else {
           paginationContainer.style.display = 'none'
       }
@@ -447,6 +454,17 @@
 
   function filterLogs() {
     loadLogs()
+  }
+
+  function clearLogsFilters() {
+    const logSearchEl = document.getElementById("logSearch");
+    const logDateFromEl = document.getElementById("logDateFrom");
+    const logDateToEl = document.getElementById("logDateTo");
+
+    if (logSearchEl) logSearchEl.value = '';
+    if (logDateFromEl) logDateFromEl.value = '';
+    if (logDateToEl) logDateToEl.value = '';
+    loadLogs(1);
   }
 
   function openUserModal(user = null) {
@@ -770,6 +788,7 @@
   window.deleteBackup = deleteBackup
   window.createBackup = createBackup
   window.filterLogs = filterLogs
+  window.clearLogsFilters = clearLogsFilters
   window.openUserModal = openUserModal
   window.closeUserModal = closeUserModal
 })()

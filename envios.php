@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <!--  Sidebar (same as other pages) --> 
+    <!--  Sidebar (same as other pages) -->
     <?php require_once 'php/sidebar.php'; ?>
 
      <!-- Main Content  -->
@@ -71,7 +71,7 @@
                         <option value="entregado">Entregado</option>
                     </select>
                 </div>
-                <div class="col-md-4 mb-3">
+                <div class="col-md-3 mb-3">
                     <label class="form-label text-muted">Ordenar por</label>
                     <select class="form-control form-control-buzz" id="sortBy">
                         <option value="date">Fecha</option>
@@ -80,12 +80,18 @@
                         <option value="amount">Monto</option>
                     </select>
                 </div>
+                <div class="col-md-1 mb-3">
+                    <label class="form-label text-muted">&nbsp;</label>
+                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
             </div>
         </div>
 
          <!-- Shipments Cards  -->
         <div id="shipmentsContainer">
-             Shipments will be populated by JavaScript 
+             Shipments will be populated by JavaScript
         </div>
     </main>
 

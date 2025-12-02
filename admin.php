@@ -140,9 +140,14 @@ $companyData = getCompanyData(); // Fetch company data
                     <div class="col-md-3">
                         <input type="date" class="form-control form-control-buzz" id="logDateTo">
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <button class="btn btn-outline-buzz w-100" onclick="filterLogs()">
                             <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                    <div class="col-md-1">
+                        <button class="btn btn-outline-buzz w-100" onclick="clearLogsFilters()" title="Limpiar filtros">
+                            <i class="fas fa-times"></i>
                         </button>
                     </div>
                 </div>
@@ -160,6 +165,20 @@ $companyData = getCompanyData(); // Fetch company data
                              <!-- Logs will be populated by JavaScript  -->
                         </tbody>
                     </table>
+                </div>
+                <div id="logsPagination" class="d-flex justify-content-between align-items-center mt-3" style="display: none !important;">
+                    <div>
+                        <span id="logsInfoText" class="text-muted"></span>
+                    </div>
+                    <div class="d-flex gap-2 align-items-center">
+                        <button class="btn btn-outline-buzz btn-sm" id="logsPrevPage">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="logsCurrentPage" class="text-muted"></span>
+                        <button class="btn btn-outline-buzz btn-sm" id="logsNextPage">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -213,27 +232,12 @@ $companyData = getCompanyData(); // Fetch company data
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Retener backups</label>
-                            <select class="form-control form-control-buzz" id="backupRetention">
-                                <option value="7">7 días</option>
-                                <option value="30">30 días</option>
-                                <option value="90">90 días</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-outline-buzz w-100">
-                            <i class="fas fa-save"></i> Guardar Configuración
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
     <!--   Reports Tab  -->
         <div class="tab-content" id="reportsTab" style="display: none;">
             <div class="buzz-card">
                 <h5 class="font-primary text-primary mb-3">OBTENER REPORTES DE SISTEMA</h5>
                 <p class="text-muted mb-4">Para generar un reporte, seleccione el tipo y luego ingrese su contraseña de administrador.</p>
-                
+
                 <div class="row">
                     <!-- Report Selection -->
                     <div class="col-md-8">

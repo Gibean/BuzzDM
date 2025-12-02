@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sortBySelect = document.getElementById('sortBy');
 
     let currentPage = 1;
-    const productsPerPage = 15;
+    const productsPerPage = 10;
     let totalProducts = 0;
     const product_actions_url = 'php/product_actions.php';
 
@@ -93,13 +93,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
           updatePaginationInfo()
           renderPagination()
-          updateProductsPaginationControls({
-            total_records: data.total,
-            current_page: currentPage,
-            per_page: productsPerPage,
-            has_prev: currentPage > 1,
-            has_next: currentPage < Math.ceil(data.total / productsPerPage)
-          })
         } else {
           showToast("Error al cargar productos: " + data.message, "danger")
         }
@@ -163,62 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
         createPageItem("&raquo;", currentPage + 1, currentPage === totalPages)
       )
     }
-
-    function updateProductsPaginationControls(pagination) {
-      const paginationContainer = document.getElementById('productsPagination')
-      const infoText = document.getElementById('productsInfoText')
-      const prevBtn = document.getElementById('productsPrevPage')
-      const nextBtn = document.getElementById('productsNextPage')
-      const currentPageSpan = document.getElementById('productsCurrentPage')
-
-      if (!paginationContainer || !pagination) return
-      if (!infoText || !prevBtn || !nextBtn || !currentPageSpan) {
-        console.warn('Pagination elements not found')
-        return
-      }
-
-      if (pagination.total_records > 0) {
-        paginationContainer.style.display = 'flex'
-        paginationContainer.style.setProperty('display', 'flex', 'important')
-
-        const start = (pagination.current_page - 1) * pagination.per_page + 1
-        const end = Math.min(pagination.current_page * pagination.per_page, pagination.total_records)
-
-        infoText.textContent = `Mostrando ${start}-${end} de ${pagination.total_records} productos`
-        currentPageSpan.textContent = `Página ${pagination.current_page}`
-
-        prevBtn.disabled = !pagination.has_prev
-        nextBtn.disabled = !pagination.has_next
-
-        currentPage = pagination.current_page
-      } else {
-        paginationContainer.style.display = 'none'
-      }
-    }
-
-    // Setup pagination event listeners
-    const productsPrevBtn = document.getElementById('productsPrevPage')
-    const productsNextBtn = document.getElementById('productsNextPage')
-
-    if (productsPrevBtn) {
-      productsPrevBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-          currentPage--
-          fetchProducts()
-        }
-      })
-    }
-
-    if (productsNextBtn) {
-      productsNextBtn.addEventListener('click', () => {
-        const totalPages = Math.ceil(totalProducts / productsPerPage)
-        if (currentPage < totalPages) {
-          currentPage++
-          fetchProducts()
-        }
-      })
-    }
-
 
     window.openProductModal = function (product = null) {
       productForm.reset()
@@ -497,6 +434,19 @@ document.addEventListener('DOMContentLoaded', function() {
             deleteProduct(deleteButton.dataset.id);
         }
     });
+
+    // Clear filters function
+    window.clearFilters = function() {
+        searchInput.value = '';
+        statusFilter.value = '';
+        sortBySelect.value = 'name';
+        const showDeletedFilter = document.getElementById('showDeletedFilter');
+        if (showDeletedFilter) {
+            showDeletedFilter.checked = false;
+        }
+        currentPage = 1;
+        fetchProducts();
+    };
 
     fetchProducts();
 });
