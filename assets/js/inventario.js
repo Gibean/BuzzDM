@@ -424,12 +424,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (isDeleted) {
               actionsCell.innerHTML = `
-                                <button class="btn btn-outline-success btn-sm me-1" onclick="restoreProduct(${product.id})" title="Restaurar"><i class="fas fa-trash-restore"></i></button>
+                                <button class="btn-action btn-restore me-1" onclick="restoreProduct(${product.id})" title="Restaurar" style="color: var(--buzz-success);"><i class="fas fa-trash-restore"></i></button>
                             `
             } else {
               actionsCell.innerHTML = `
-                                <button class="btn btn-outline-buzz btn-sm me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-outline-danger btn-sm delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                <button class="btn-action btn-edit me-1 edit-product-btn" data-id="${product.id}" title="Editar"><i class="fas fa-edit"></i></button>
+                                <button class="btn-action btn-delete delete-product-btn" data-id="${product.id}" title="Eliminar"><i class="fas fa-trash"></i></button>
                             `
             }
           })
