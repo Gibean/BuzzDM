@@ -72,8 +72,14 @@
                         </label>
                     </div>
                 </div>
-                <div class="col-md-3 mb-3 d-flex align-items-end">
+                <div class="col-md-2 mb-3 d-flex align-items-end">
                     <button class="btn btn-outline-buzz w-100" id="applyCustomerFilters">Aplicar Filtros</button>
+                </div>
+                <div class="col-md-1 mb-3">
+                    <label class="form-label text-muted">&nbsp;</label>
+                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
         </div>
