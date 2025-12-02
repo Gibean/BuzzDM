@@ -283,7 +283,7 @@
               user.ultimo_acceso ? formatDateTime(user.ultimo_acceso) : "N/A"
             }</td>
             <td>
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editUser(${
+                <button class="btn-action btn-edit me-1" onclick="editUser(${
                   user.id
                 })" title="Editar">
                     <i class="fas fa-edit"></i>
@@ -292,7 +292,7 @@
                 ${
                   user.id !== 1
                     ? `
-                    <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${user.id})" title="Eliminar">
+                    <button class="btn-action btn-delete" onclick="deleteUser(${user.id})" title="Eliminar">
                         <i class="fas fa-trash"></i>
                     </button>
                 `
