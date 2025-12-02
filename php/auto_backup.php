@@ -30,7 +30,7 @@ try {
     }
 
     $fecha = date('Y-m-d_H-i-s');
-    $nombreArchivo = "backup_auto_dbuzz_{$fecha}.sql";
+    $nombreArchivo = "dbuzzbackup_{$fecha}.sql";
     $rutaCompleta = $backupDir . $nombreArchivo;
 
     // Configuración de base de datos
