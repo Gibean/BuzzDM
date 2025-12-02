@@ -595,3 +595,60 @@ input:-webkit-autofill:active {
   display: flex;
   align-items: center;
 }
+
+/* ============================================
+   ACTION BUTTONS FOR TABLES
+   ============================================ */
+
+/* Uniform action buttons - borderless, same size */
+.btn-action {
+  background: transparent;
+  border: none;
+  color: #1a1f28;
+  padding: 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-action:hover {
+  background: rgba(255, 160, 0, 0.1);
+}
+
+.btn-action i {
+  font-size: 0.9rem;
+}
+
+/* Color-coded hover states */
+.btn-action.btn-view:hover {
+  color: #3498db;
+  background: rgba(52, 152, 219, 0.1);
+}
+
+.btn-action.btn-edit:hover {
+  color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.btn-action.btn-delete:hover {
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* Mobile: slightly larger touch targets */
+@media (max-width: 768px) {
+  .btn-action {
+    width: 40px;
+    height: 40px;
+    padding: 0.6rem;
+  }
+
+  .btn-action i {
+    font-size: 1rem;
+  }
+}

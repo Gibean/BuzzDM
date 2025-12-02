@@ -65,32 +65,37 @@ try {
             </div>
         </nav>
 
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card fade-in">
-                    <span class="stats-number" id="totalProducts">0</span>
-                    <span class="stats-label">Productos Activos</span>
+
+        <!-- Statistics Section -->
+        <div class="buzz-card mb-4">
+            <div class="row">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-flex gap-2">
+                        <span class="text-muted">Productos Activos:</span>
+                        <span class="font-mono text-primary" id="totalProducts">0</span>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card fade-in">
-                    <span class="stats-number" id="totalOrders">0</span>
-                    <span class="stats-label">Pedidos Totales</span>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-flex gap-2">
+                        <span class="text-muted">Pedidos Totales:</span>
+                        <span class="font-mono text-success" id="totalOrders">0</span>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card fade-in">
-                    <span class="stats-number" id="pendingShipments">0</span>
-                    <span class="stats-label">Envíos Pendientes</span>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-flex gap-2">
+                        <span class="text-muted">Envíos Pendientes:</span>
+                        <span class="font-mono text-warning" id="pendingShipments">0</span>
+                    </div>
                 </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card fade-in">
-                    <span class="stats-number" id="monthlyRevenue">$0</span>
-                    <span class="stats-label">Ingresos del Mes</span>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="d-flex gap-2">
+                        <span class="text-muted">Ingresos del Mes:</span>
+                        <span class="font-mono text-primary" id="monthlyRevenue">$0</span>
+                    </div>
                 </div>
             </div>
         </div>
+
 
        <!---  Charts and Activity -->
         <div class="row">

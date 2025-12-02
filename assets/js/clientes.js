@@ -73,17 +73,17 @@ function renderCustomers(customers) {
                                 : "No"
                             }</td>
                             <td>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${
+                                <button class="btn-action btn-view me-1" onclick="viewCustomerDetail('${
                                   customer.id
-                                }')" title="Ver detalle">
+                                }')" title="Ver detalles">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${
+                                <button class="btn-action btn-edit me-1" onclick="editCustomer('${
                                   customer.id
                                 }')" title="Editar">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${
+                                <button class="btn-action btn-delete" onclick="deleteCustomer('${
                                   customer.id
                                 }')" title="Eliminar">
                                     <i class="fas fa-trash"></i>

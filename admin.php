@@ -66,60 +66,59 @@ $companyData = getCompanyData(); // Fetch company data
 
          <!-- Users Tab  -->
         <div class="tab-content" id="usersTab">
-            <div class="row mb-4">
-                <div class="col-md-8">
-                    <div class="buzz-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="font-primary text-primary mb-0">GESTIÓN DE USUARIOS</h5>
-                            <button class="btn btn-buzz" id="newUserBtn">
-                                <i class="fas fa-user-plus"></i> Nuevo Usuario
-                            </button>
-                        </div>
-                        <div class="table-responsive">
-                            <table class="table table-buzz">
-                                <thead>
-                                    <tr>
-                                        <th>Nombre</th>
-                                        <th>Email</th>
-                                        <th>Rol</th>
-                                        <th>Estado</th>
-                                        <th>Último Acceso</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="usersTable">
-                                     <!-- Users will be populated by JavaScript  -->
-                                </tbody>
-                            </table>
+            <!-- User Management Table - Full Width -->
+            <div class="buzz-card mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="font-primary text-primary mb-0">GESTIÓN DE USUARIOS</h5>
+                    <button class="btn btn-buzz" id="newUserBtn">
+                        <i class="fas fa-user-plus"></i> Nuevo Usuario
+                    </button>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-buzz">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Último Acceso</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                             <!-- Users will be populated by JavaScript  -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Statistics - Below Table -->
+            <div class="buzz-card">
+                <h6 class="font-primary text-primary mb-3">ESTADÍSTICAS DE USUARIOS</h6>
+                <div class="row">
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="d-flex gap-2">
+                            <span class="text-muted">Total Usuarios:</span>
+                            <span class="font-mono text-primary" id="totalUsers">0</span>
                         </div>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="buzz-card">
-                        <h6 class="font-primary text-primary mb-3">ESTADÍSTICAS DE USUARIOS</h6>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Total Usuarios:</span>
-                                <span class="font-mono text-primary" id="totalUsers">0</span>
-                            </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="d-flex gap-2">
+                            <span class="text-muted">Usuarios Activos:</span>
+                            <span class="font-mono text-success" id="activeUsers">0</span>
                         </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Usuarios Activos:</span>
-                                <span class="font-mono text-success" id="activeUsers">0</span>
-                            </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="d-flex gap-2">
+                            <span class="text-muted">Administradores:</span>
+                            <span class="font-mono text-warning" id="adminUsers">0</span>
                         </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Administradores:</span>
-                                <span class="font-mono text-warning" id="adminUsers">0</span>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between">
-                                <span class="text-muted">Sesiones Hoy:</span>
-                                <span class="font-mono text-primary" id="todaySessions">0</span>
-                            </div>
+                    </div>
+                    <div class="col-md-3 col-6 mb-3">
+                        <div class="d-flex gap-2">
+                            <span class="text-muted">Sesiones Hoy:</span>
+                            <span class="font-mono text-primary" id="todaySessions">0</span>
                         </div>
                     </div>
                 </div>
@@ -417,7 +416,7 @@ $companyData = getCompanyData(); // Fetch company data
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/common.js"></script>
-    <script src="assets/js/admin.js"></script>
+    <script src="assets/js/common.js?v=2"></script>
+    <script src="assets/js/admin.js?v=2"></script>
 </body>
 </html>
