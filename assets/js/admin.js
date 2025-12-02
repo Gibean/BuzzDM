@@ -82,12 +82,12 @@
       })
     }
 
-    // Reports Tab Logic
+    // Reports Tab Logic - Multiple Selection Support
     const reportOptions = document.querySelectorAll(".report-option")
     const generateReportBtn = document.getElementById("generateReportBtn")
     const adminPasswordInput = document.getElementById("adminPasswordReport")
     const reportError = document.getElementById("reportError")
-    let selectedReportType = null
+    let selectedReportTypes = [] // Changed to array for multiple selections
 
     if (
       reportOptions.length > 0 &&
@@ -95,21 +95,75 @@
       adminPasswordInput &&
       reportError
     ) {
+      console.log("Report button logic initialized:", {
+        reportOptionsCount: reportOptions.length,
+        hasButton: !!generateReportBtn,
+        hasPasswordInput: !!adminPasswordInput
+      });
+
+      // Function to check if button should be enabled
+      function checkReportButtonState() {
+        const shouldEnable = selectedReportTypes.length > 0 && adminPasswordInput.value.trim() !== "";
+        console.log("Checking button state:", {
+          selectedReportTypes,
+          passwordLength: adminPasswordInput.value.length,
+          shouldEnable
+        });
+
+        if (shouldEnable) {
+          generateReportBtn.disabled = false;
+          // Update button text to show count
+          const count = selectedReportTypes.length;
+          generateReportBtn.innerHTML = `<i class="fas fa-download"></i> Generar ${count} Reporte${count > 1 ? 's' : ''}`;
+        } else {
+          generateReportBtn.disabled = true;
+          generateReportBtn.innerHTML = '<i class="fas fa-download"></i> Generar Reporte';
+        }
+      }
+
+      // Toggle selection on click
       reportOptions.forEach((option) => {
         option.addEventListener("click", () => {
-          reportOptions.forEach((opt) => opt.classList.remove("selected-buzz"))
-          option.classList.add("selected-buzz")
-          selectedReportType = option.dataset.reportType
-          generateReportBtn.disabled = false
+          const reportType = option.dataset.reportType
+
+          // Toggle selection
+          if (option.classList.contains("selected-buzz")) {
+            // Deselect
+            option.classList.remove("selected-buzz")
+            selectedReportTypes = selectedReportTypes.filter(type => type !== reportType)
+          } else {
+            // Select
+            option.classList.add("selected-buzz")
+            selectedReportTypes.push(reportType)
+          }
+
+          console.log("Selected report types:", selectedReportTypes);
+          checkReportButtonState()
           reportError.textContent = ""
         })
+      })
+
+      // Enable button when password is typed (multiple events for reliability)
+      adminPasswordInput.addEventListener("input", () => {
+        console.log("Password input changed");
+        checkReportButtonState()
+      })
+
+      adminPasswordInput.addEventListener("keyup", () => {
+        console.log("Password keyup event");
+        checkReportButtonState()
+      })
+
+      adminPasswordInput.addEventListener("change", () => {
+        console.log("Password change event");
+        checkReportButtonState()
       })
 
       generateReportBtn.addEventListener("click", () => {
         const password = adminPasswordInput.value
 
-        if (!selectedReportType) {
-          reportError.textContent = "Por favor, seleccione un tipo de reporte."
+        if (selectedReportTypes.length === 0) {
+          reportError.textContent = "Por favor, seleccione al menos un tipo de reporte."
           return
         }
 
@@ -119,33 +173,59 @@
           return
         }
 
+        const count = selectedReportTypes.length;
         generateReportBtn.innerHTML =
-          '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando...'
+          `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando ${count} reporte${count > 1 ? 's' : ''}...`
         generateReportBtn.disabled = true
 
-        const reportUrl = `php/reports.php?tipo=${selectedReportType}&password=${encodeURIComponent(password)}`
-        const newWindow = window.open(reportUrl, "_blank")
+        // Open each report in a new tab
+        selectedReportTypes.forEach((reportType) => {
+          const reportUrl = `php/reports.php?tipo=${reportType}&password=${encodeURIComponent(password)}`
+          window.open(reportUrl, "_blank")
+        })
 
-        if (newWindow) {
-          const checkWindowClosed = setInterval(() => {
-            if (newWindow.closed) {
-              clearInterval(checkWindowClosed)
-              resetReportButton()
-            }
-          }, 1000)
-        } else {
+        // Reset after a short delay
+        setTimeout(() => {
           resetReportButton()
-        }
+        }, 2000)
       })
 
       function resetReportButton() {
         generateReportBtn.innerHTML =
           '<i class="fas fa-download"></i> Generar Reporte'
-        generateReportBtn.disabled = false
+        generateReportBtn.disabled = true
         adminPasswordInput.value = ""
         reportOptions.forEach((opt) => opt.classList.remove("selected-buzz"))
-        selectedReportType = null
+        selectedReportTypes = []
         reportError.textContent = ""
+      }
+
+      // Password visibility toggle for admin report password
+      const toggleAdminPasswordReport = document.getElementById("toggleAdminPasswordReport")
+      const toggleAdminPasswordReportIcon = document.getElementById("toggleAdminPasswordReportIcon")
+
+      if (toggleAdminPasswordReport && toggleAdminPasswordReportIcon) {
+        toggleAdminPasswordReport.addEventListener("click", function () {
+          const type = adminPasswordInput.getAttribute("type") === "password" ? "text" : "password"
+          adminPasswordInput.setAttribute("type", type)
+
+          // Toggle icon
+          if (type === "text") {
+            toggleAdminPasswordReportIcon.classList.remove("fa-eye")
+            toggleAdminPasswordReportIcon.classList.add("fa-eye-slash")
+          } else {
+            toggleAdminPasswordReportIcon.classList.remove("fa-eye-slash")
+            toggleAdminPasswordReportIcon.classList.add("fa-eye")
+          }
+        })
+
+        // Change icon color on hover
+        toggleAdminPasswordReport.addEventListener("mouseenter", function () {
+          this.style.color = "var(--buzz-primary-color)"
+        })
+        toggleAdminPasswordReport.addEventListener("mouseleave", function () {
+          this.style.color = "var(--buzz-text-muted)"
+        })
       }
     }
 

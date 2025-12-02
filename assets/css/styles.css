@@ -483,6 +483,7 @@ input:-webkit-autofill:active {
 .report-option {
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .report-option:hover {
@@ -501,6 +502,34 @@ input:-webkit-autofill:active {
 .report-option.selected i,
 .report-option.selected p {
   color: var(--buzz-dark-bg) !important;
+}
+
+/* Selected state for multi-select reports - Same as card hover with green check */
+.report-option.selected-buzz {
+  background-color: var(--buzz-dark-bg) !important;
+  border-color: var(--buzz-primary-color) !important;
+  box-shadow: 0 6px 15px rgba(255, 160, 0, 0.2) !important;
+}
+
+/* Green checkmark in top-right corner */
+.report-option.selected-buzz::after {
+  content: '\f058'; /* Font Awesome check-circle solid icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background-color: var(--buzz-success);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.4);
+  z-index: 10;
 }
 
 /* Override Bootstrap Modal for Dark Theme */
