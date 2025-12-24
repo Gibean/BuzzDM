@@ -15,8 +15,8 @@ define('SMTP_PASSWORD', 'omib pojl rlrs qchv'); // Contraseña o App Password
 define('MAIL_FROM_EMAIL', 'juan.luis9313@gmail.com');
 define('MAIL_FROM_NAME', 'BUZZ Data Manager');
 
-// URL base de la aplicación (sin / al final)
-define('APP_BASE_URL', 'http://localhost/BuzzDM');
+// URL del dominio de producción (sin / al final)
+define('PRODUCTION_DOMAIN', 'darkslategrey-duck-561917.hostingersite.com');
 
 /**
  * Función para obtener la configuración de PHPMailer
@@ -35,9 +35,42 @@ function getMailerConfig() {
 
 /**
  * Función para obtener la URL base de la aplicación
+ * Detecta automáticamente si está en localhost o producción
  */
 function getAppBaseUrl() {
-    return APP_BASE_URL;
+    // Detectar el protocolo (http o https)
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ||
+                 (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443))
+                 ? 'https://' : 'http://';
+
+    // Obtener el host
+    $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+
+    // Verificar si estamos en localhost
+    $isLocalhost = (
+        strpos($host, 'localhost') !== false ||
+        strpos($host, '127.0.0.1') !== false ||
+        strpos($host, '::1') !== false
+    );
+
+    if ($isLocalhost) {
+        // Entorno local - detectar el path del proyecto
+        $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+        $basePath = '';
+
+        // Extraer el path base (ej: /BuzzDM)
+        if (preg_match('/^(\/[^\/]+)/', $scriptName, $matches)) {
+            $basePath = $matches[1];
+        }
+
+        return $protocol . $host . $basePath;
+    } else {
+        // Entorno de producción - usar dominio configurado
+        // Determinar protocolo en producción (preferir https)
+        $productionProtocol = 'https://';
+
+        return $productionProtocol . PRODUCTION_DOMAIN;
+    }
 }
 ?>
 
