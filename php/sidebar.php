@@ -5,90 +5,111 @@ require_once 'sesion.php';
 $usuarioNombre = $_SESSION['usuario_nombre'] ?? 'Usuario';
 $usuarioRol = $_SESSION['usuario_rol'] ?? 'Invitado';
 
+// Definir el icono basado en el rol
+$userIcon = 'assets/img/ico_blue.png'; // Por defecto operador
+if ($usuarioRol === 'admin') {
+    $userIcon = 'assets/img/ico_yellow.png';
+} elseif ($usuarioRol === 'supervisor') {
+    $userIcon = 'assets/img/ico_gray.png';
+}
+
 $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
-<nav class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="d-flex align-items-center">
-            <img src="assets/img/logov1_long.png" alt="BUZZ Logo" class="sidebar-logo">
+<nav class="sidebar sidebar-enhanced" id="sidebar">
+    <div class="sidebar-header-enhanced">
+        <div class="logo-container">
+            <img src="assets/img/logov1_long.png" alt="BUZZ Logo" class="sidebar-logo-enhanced">
         </div>
     </div>
 
-    <div class="sidebar-nav">
+    <div class="sidebar-nav-enhanced">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>"
+                <a class="nav-link-enhanced <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>"
                     href="dashboard.php">
-                    <i class="fas fa-home"></i> Dashboard
+                    <i class="fas fa-home nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Dashboard</span>
                 </a>
             </li>
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
+                <a class="nav-link-enhanced <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
                     href="inventario.php">
-                    <i class="fas fa-box"></i> Inventario
+                    <i class="fas fa-box nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Inventario</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>" href="clientes.php">
-                    <i class="fas fa-users"></i> Clientes
+                <a class="nav-link-enhanced <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>" href="clientes.php">
+                    <i class="fas fa-users nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Clientes</span>
                 </a>
             </li>
             <?php endif; ?>
 
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>" href="pedidos.php">
-                    <i class="fas fa-shopping-cart"></i> Pedidos
+                <a class="nav-link-enhanced <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>" href="pedidos.php">
+                    <i class="fas fa-shopping-cart nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Pedidos</span>
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>" href="envios.php">
-                    <i class="fas fa-truck"></i> Envíos
+                <a class="nav-link-enhanced <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>" href="envios.php">
+                    <i class="fas fa-truck nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Envíos</span>
                 </a>
             </li>
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
+                <a class="nav-link-enhanced <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
                     href="importacion.php">
-                    <i class="fas fa-upload"></i> Importación
+                    <i class="fas fa-upload nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Importación</span>
                 </a>
             </li>
             <?php endif; ?>
 
             <?php if ($usuarioRol === 'admin'): ?>
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'admin.php' ? 'active' : ''; ?>" href="admin.php">
-                    <i class="fas fa-users-cog"></i> Administración
+                <a class="nav-link-enhanced <?php echo $currentPage === 'admin.php' ? 'active' : ''; ?>" href="admin.php">
+                    <i class="fas fa-users-cog nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Administración</span>
                 </a>
             </li>
             <?php endif; ?>
 
             <li class="nav-item">
-                <a class="nav-link <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>" href="about.php">
-                    <i class="fas fa-info-circle"></i> Acerca de
+                <a class="nav-link-enhanced <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>" href="about.php">
+                    <i class="fas fa-info-circle nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Acerca de</span>
                 </a>
             </li>
         </ul>
     </div>
 
-    <div class="mt-auto p-3 border-top border-secondary">
-        <div class="d-flex align-items-center">
-            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-2"
-                style="width: 40px; height: 40px;">
-                <i class="fas fa-user text-dark"></i>
+    <div class="sidebar-footer-enhanced">
+        <div class="user-profile-enhanced">
+            <div class="user-avatar-container">
+                <img src="<?php echo $userIcon; ?>" alt="User Icon" class="user-avatar-enhanced">
+                <div class="user-status-indicator"></div>
             </div>
-            <div>
-                <div class="font-mono" style="font-size: 0.9rem;" id="userName">
-                    <?php echo htmlspecialchars($usuarioNombre); ?></div>
-                <small class="text-muted" id="userRole"><?php echo htmlspecialchars($usuarioRol); ?></small>
+            <div class="user-info-enhanced">
+                <div class="user-name-enhanced" id="userName">
+                    <?php echo htmlspecialchars($usuarioNombre); ?>
+                </div>
+                <div class="user-role-enhanced" id="userRole">
+                    <i class="fas fa-shield-alt"></i>
+                    <?php echo htmlspecialchars(ucfirst($usuarioRol)); ?>
+                </div>
             </div>
         </div>
-        <form action="php/logout.php" method="POST" class="d-grid">
-            <button type="submit" class="btn btn-outline-buzz btn-sm">
-                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+        <form action="php/logout.php" method="POST" class="logout-form-enhanced">
+            <button type="submit" class="btn-logout-enhanced">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Cerrar Sesión</span>
             </button>
         </form>
     </div>

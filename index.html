@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUZZ Data Manager - Sistema de Gestión Empresarial</title>
+    <meta name="description" content="Sistema profesional de gestión empresarial para control de inventario, pedidos, clientes y reportes.">
+    <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/landing.css">
+</head>
+<body class="landing-page">
+
+    <!-- ============================================
+         HERO SECTION
+         ============================================ -->
+    <section class="hero-section" id="home">
+        <!-- Animated Hexagon Background -->
+        <canvas id="hexagonCanvas" class="hexagon-canvas"></canvas>
+
+        <!-- Hero Content -->
+        <div class="hero-content">
+            <img src="assets/img/logov1.png" alt="BUZZ Logo" class="hero-logo">
+
+            <h1 class="hero-title">SISTEMA DE GESTIÓN EMPRESARIAL</h1>
+
+            <p class="hero-subtitle">
+                Control total de inventario, pedidos y clientes en una plataforma profesional
+            </p>
+
+            <div class="hero-buttons">
+                <a href="login.php" class="btn-hero-primary">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </a>
+                <a href="#features" class="btn-hero-secondary">
+                    <i class="fas fa-info-circle"></i> Conocer Más
+                </a>
+            </div>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="scroll-indicator">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FEATURES SECTION
+         ============================================ -->
+    <section class="features-section" id="features">
+        <h2 class="section-title">Características Principales</h2>
+        <p class="section-subtitle">
+            Herramientas profesionales diseñadas para optimizar la gestión de tu negocio
+        </p>
+
+        <div class="features-grid">
+            <!-- Feature 1: Inventory -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h3 class="feature-title">Gestión de Inventario</h3>
+                <p class="feature-description">
+                    Control completo de productos, stock y movimientos con alertas automáticas de inventario bajo.
+                </p>
+            </div>
+
+            <!-- Feature 2: Orders -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3 class="feature-title">Procesamiento de Pedidos</h3>
+                <p class="feature-description">
+                    Sistema eficiente para gestionar pedidos, seguimiento de estados y control de entregas.
+                </p>
+            </div>
+
+            <!-- Feature 3: Clients -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Base de Clientes</h3>
+                <p class="feature-description">
+                    Administración centralizada de clientes con historial completo de transacciones.
+                </p>
+            </div>
+
+            <!-- Feature 4: Reports -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 class="feature-title">Reportes Avanzados</h3>
+                <p class="feature-description">
+                    Análisis detallados y reportes personalizables para toma de decisiones informadas.
+                </p>
+            </div>
+
+            <!-- Feature 5: Backups -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <h3 class="feature-title">Respaldos Automáticos</h3>
+                <p class="feature-description">
+                    Sistema de backups programados para garantizar la seguridad de tu información.
+                </p>
+            </div>
+
+            <!-- Feature 6: Security -->
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Seguridad Avanzada</h3>
+                <p class="feature-description">
+                    Control de acceso por roles, auditoría de acciones y protección de datos empresariales.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         STATS SECTION
+         ============================================ -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-target="100" data-suffix="%">0%</div>
+                <div class="stat-label">Confiabilidad</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number" data-target="24" data-suffix="/7">0/7</div>
+                <div class="stat-label">Disponibilidad</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-number" data-target="100" data-suffix="%">0%</div>
+                <div class="stat-label">Seguridad</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============================================
+         CTA SECTION
+         ============================================ -->
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2 class="cta-title">¿Listo para Optimizar tu Negocio?</h2>
+            <p class="cta-text">
+                Accede al sistema y descubre cómo BUZZ Data Manager puede transformar la gestión de tu empresa.
+            </p>
+            <a href="login.php" class="btn-hero-primary">
+                <i class="fas fa-rocket"></i> Comenzar Ahora
+            </a>
+        </div>
+    </section>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <p>&copy; 2025 BUZZ Data Manager. Sistema de Gestión Empresarial.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>

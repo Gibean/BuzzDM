@@ -24,21 +24,21 @@ USE `dbuzz`;
 DROP TABLE IF EXISTS `backups`;
 CREATE TABLE IF NOT EXISTS `backups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `archivo` varchar(255) NOT NULL COMMENT 'Nombre del archivo de backup',
+  `archivo` varchar(255) NOT NULL,
   `ruta_archivo` varchar(500) DEFAULT NULL COMMENT 'Ruta completa del archivo',
-  `tamaño_bytes` bigint(20) DEFAULT NULL COMMENT 'Tamaño del archivo en bytes',
+  `tamaño_bytes` bigint(20) DEFAULT NULL,
   `fecha` timestamp NULL DEFAULT current_timestamp(),
-  `tipo` enum('manual','automatico') DEFAULT 'manual' COMMENT 'Tipo de backup: manual o automático',
+  `tipo` enum('manual','automatico') DEFAULT 'manual' COMMENT 'Tipo de backup: manual o autom├ítico',
   `estado` enum('completado','error','en_proceso') DEFAULT 'completado' COMMENT 'Estado del backup',
   `resultado` varchar(500) DEFAULT NULL COMMENT 'Mensaje de resultado',
-  `detalles` text DEFAULT NULL COMMENT 'Detalles en formato JSON: tablas, duración, etc.',
-  `usuario_id` int(10) unsigned DEFAULT NULL COMMENT 'Usuario que creó el backup manual',
+  `detalles` text DEFAULT NULL COMMENT 'Detalles en formato JSON: tablas, duraci├│n, etc.',
+  `usuario_id` int(10) unsigned DEFAULT NULL COMMENT 'Usuario que cre├│ el backup manual',
   PRIMARY KEY (`id`),
+  KEY `FK_backups_usuarios` (`usuario_id`),
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
-  KEY `FK_backups_usuarios` (`usuario_id`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.backups: ~0 rows (aproximadamente)
 DELETE FROM `backups`;
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   `creado_at` timestamp NULL DEFAULT current_timestamp(),
   `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `idx_deleted_at` (`deleted_at`)
+  KEY `idx_clientes_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.clientes: ~1 rows (aproximadamente)
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.logs: ~0 rows (aproximadamente)
 DELETE FROM `logs`;
@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   KEY `fecha_creacion` (`fecha_creacion`),
   KEY `estado_envio` (`estado_envio`),
   KEY `pedidos_ibfk_1` (`cliente_id`),
-  KEY `idx_deleted_at` (`deleted_at`),
+  KEY `idx_pedidos_deleted_at` (`deleted_at`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -362,10 +362,10 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `estado` enum('activo','stock_bajo','agotado') NOT NULL DEFAULT 'activo',
   `creado_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
-  `deleted_at` timestamp NULL DEFAULT NULL,
   `categoria` int(11) DEFAULT NULL,
   `marca_id` int(11) DEFAULT NULL,
   `proveedor_id` int(11) DEFAULT NULL,
+  `deleted_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `sku` (`sku`),
   KEY `nombre` (`nombre`),
@@ -373,7 +373,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   KEY `fk_productos_categoria` (`categoria`),
   KEY `fk_productos_marca` (`marca_id`),
   KEY `fk_productos_proveedor` (`proveedor_id`),
-  KEY `idx_deleted_at` (`deleted_at`),
+  KEY `idx_productos_deleted_at` (`deleted_at`),
   CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -411,7 +411,7 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.sesiones_api: ~21 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
@@ -454,7 +454,7 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `intentos_fallidos` int(11) DEFAULT 0,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.usuarios: ~3 rows (aproximadamente)
 DELETE FROM `usuarios`;
@@ -613,161 +613,42 @@ SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_inventario`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_inventario` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.descripcion,
-    p.precio,
-    p.stock,
-    COUNT(d.id) AS veces_vendido,
-    SUM(d.cantidad) AS total_vendido,
-    SUM(d.cantidad * d.precio_unitario) AS ingresos_totales
-FROM
-    productos p
-LEFT JOIN
-    detalle_pedido d ON p.id = d.producto_id
-WHERE
-    p.deleted_at IS NULL
-GROUP BY
-    p.id
-ORDER BY
-    total_vendido DESC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_inventario` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`descripcion` AS `descripcion`,`p`.`precio` AS `precio`,`p`.`stock` AS `stock`,count(`d`.`id`) AS `veces_vendido`,sum(`d`.`cantidad`) AS `total_vendido`,sum(`d`.`cantidad` * `d`.`precio_unitario`) AS `ingresos_totales` from (`productos` `p` left join `detalle_pedido` `d` on(`p`.`id` = `d`.`producto_id`)) group by `p`.`id` order by sum(`d`.`cantidad`) desc 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_low_stock`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_low_stock` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.descripcion,
-    p.precio,
-    p.stock,
-    p.min_stock,
-    p.estado,
-    p.creado_at,
-    p.actualizado_at,
-    (p.stock <= p.min_stock) AS bajo_minimo
-FROM
-    productos p
-WHERE
-    p.stock <= p.min_stock
-    AND p.estado != 'agotado'
-    AND p.deleted_at IS NULL
-ORDER BY
-    p.stock ASC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_low_stock` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`descripcion` AS `descripcion`,`p`.`precio` AS `precio`,`p`.`stock` AS `stock`,`p`.`min_stock` AS `min_stock`,`p`.`estado` AS `estado`,`p`.`creado_at` AS `creado_at`,`p`.`actualizado_at` AS `actualizado_at`,`p`.`stock` <= `p`.`min_stock` AS `bajo_minimo` from `productos` `p` where `p`.`stock` <= `p`.`min_stock` and `p`.`estado` <> 'agotado' order by `p`.`stock` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_op_backup`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS SELECT
-    id AS registro_id,
-    'Backup realizado' AS operacion,
-    CONCAT('Archivo: ', archivo, ' | Tamaño: ',
-           FORMAT(tamaño_bytes/1048576, 2), ' MB') AS detalles,
-    fecha
-FROM backups
-ORDER BY fecha DESC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_backup` AS select `backups`.`id` AS `registro_id`,'Backup realizado' AS `operacion`,concat('Archivo: ',`backups`.`archivo`,' | Tamaño: ',format(`backups`.`tamaño_bytes` / 1048576,2),' MB') AS `detalles`,`backups`.`fecha` AS `fecha` from `backups` order by `backups`.`fecha` desc 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_op_import`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS SELECT
-    i.id AS registro_id,
-    'Importación CSV' AS operacion,
-    CONCAT('Archivo: ', i.archivo_nombre, ' | Estado: ', i.estado) AS detalles,
-    i.fecha,
-    u.nombre AS usuario
-FROM importaciones i
-LEFT JOIN usuarios u ON i.usuario_id = u.id
-WHERE i.tipo = 'csv'
-ORDER BY i.fecha DESC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_op_import` AS select `i`.`id` AS `registro_id`,'Importación CSV' AS `operacion`,concat('Archivo: ',`i`.`archivo_nombre`,' | Estado: ',`i`.`estado`) AS `detalles`,`i`.`fecha` AS `fecha`,`u`.`nombre` AS `usuario` from (`importaciones` `i` left join `usuarios` `u` on(`i`.`usuario_id` = `u`.`id`)) where `i`.`tipo` = 'csv' order by `i`.`fecha` desc 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_pedidos_pendientes`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS SELECT
-    ped.id,
-    ped.referencia,
-    ped.fecha_creacion,
-    ped.total,
-    ped.estado_pago,
-    ped.estado_envio,
-    ped.direccion_envio,
-    ped.notas_envio,
-    ped.actualizado_at,
-    c.nombre AS cliente_nombre,
-    c.email AS cliente_email,
-    u.nombre AS creado_por_nombre
-FROM
-    pedidos ped
-JOIN
-    clientes c ON ped.cliente_id = c.id
-LEFT JOIN
-    usuarios u ON ped.creado_por = u.id
-WHERE
-    (ped.estado_pago = 'no_pagado' OR ped.estado_envio IN ('pendiente', 'enviado'))
-    AND ped.deleted_at IS NULL
-    AND c.deleted_at IS NULL
-ORDER BY
-    ped.fecha_creacion DESC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS select `ped`.`id` AS `id`,`ped`.`referencia` AS `referencia`,`ped`.`fecha_creacion` AS `fecha_creacion`,`ped`.`total` AS `total`,`ped`.`estado_pago` AS `estado_pago`,`ped`.`estado_envio` AS `estado_envio`,`ped`.`direccion_envio` AS `direccion_envio`,`ped`.`notas_envio` AS `notas_envio`,`ped`.`actualizado_at` AS `actualizado_at`,`c`.`nombre` AS `cliente_nombre`,`c`.`email` AS `cliente_email`,`u`.`nombre` AS `creado_por_nombre` from ((`pedidos` `ped` join `clientes` `c` on(`ped`.`cliente_id` = `c`.`id`)) left join `usuarios` `u` on(`ped`.`creado_por` = `u`.`id`)) where `ped`.`estado_pago` = 'no_pagado' or `ped`.`estado_envio` in ('pendiente','enviado') order by `ped`.`fecha_creacion` desc 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_rotacion_inventario`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.stock,
-    p.min_stock,
-    IFNULL(SUM(d.cantidad), 0) AS total_vendido,
-    ROUND(IFNULL(SUM(d.cantidad), 0) / GREATEST(p.stock, 1) * 100, 2) AS porcentaje_rotacion,
-    CASE
-        WHEN p.stock <= p.min_stock THEN 'CRÍTICO'
-        WHEN IFNULL(SUM(d.cantidad), 0) = 0 THEN 'ESTANCADO'
-        ELSE 'NORMAL'
-    END AS estado_rotacion
-FROM
-    productos p
-LEFT JOIN
-    detalle_pedido d ON p.id = d.producto_id
-WHERE
-    p.deleted_at IS NULL
-GROUP BY
-    p.id
-ORDER BY
-    porcentaje_rotacion ASC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`stock` AS `stock`,`p`.`min_stock` AS `min_stock`,ifnull(sum(`d`.`cantidad`),0) AS `total_vendido`,round(ifnull(sum(`d`.`cantidad`),0) / greatest(`p`.`stock`,1) * 100,2) AS `porcentaje_rotacion`,case when `p`.`stock` <= `p`.`min_stock` then 'CRÍTICO' when ifnull(sum(`d`.`cantidad`),0) = 0 then 'ESTANCADO' else 'NORMAL' end AS `estado_rotacion` from (`productos` `p` left join `detalle_pedido` `d` on(`p`.`id` = `d`.`producto_id`)) group by `p`.`id` order by round(ifnull(sum(`d`.`cantidad`),0) / greatest(`p`.`stock`,1) * 100,2) 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_top5_down`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_down` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.descripcion,
-    p.precio,
-    p.stock,
-    p.estado
-FROM
-    productos p
-WHERE
-    p.id NOT IN (SELECT DISTINCT producto_id FROM detalle_pedido)
-    AND p.deleted_at IS NULL
-ORDER BY
-    p.nombre
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_down` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`descripcion` AS `descripcion`,`p`.`precio` AS `precio`,`p`.`stock` AS `stock`,`p`.`estado` AS `estado` from `productos` `p` where !(`p`.`id` in (select distinct `detalle_pedido`.`producto_id` from `detalle_pedido`)) order by `p`.`nombre` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_top5_up`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_up` AS SELECT p.id, p.sku, p.nombre, SUM(d.cantidad) as total_vendido
-FROM detalle_pedido d
-JOIN productos p ON p.id = d.producto_id
-WHERE p.deleted_at IS NULL
-GROUP BY p.id
-ORDER BY total_vendido DESC
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_top5_up` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,sum(`d`.`cantidad`) AS `total_vendido` from (`detalle_pedido` `d` join `productos` `p` on(`p`.`id` = `d`.`producto_id`)) group by `p`.`id` order by sum(`d`.`cantidad`) desc 
 ;
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;

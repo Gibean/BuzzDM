@@ -55,7 +55,23 @@ function formatDate(dateString) {
     return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+    });
+}
+
+/**
+ * Formats a date string into a more readable date and time format.
+ * @param {string} dateString The date string to format.
+ * @returns {string} The formatted date and time string.
+ */
+function formatDateTime(dateString) {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
     });
 }
 

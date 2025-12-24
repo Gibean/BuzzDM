@@ -6,11 +6,6 @@
   let currentTab = "users"
   let currentUserId = null
 
-  function formatDateTime(dateString) {
-    const date = new Date(dateString)
-    return date.toLocaleString()
-  }
-
   document.addEventListener("DOMContentLoaded", () => {
     initAdmin()
     setupEventListeners()
@@ -624,45 +619,13 @@
   }
 
   async function downloadBackup(backupId) {
-    showToast("Iniciando descarga...", "info")
-
     try {
-      const response = await fetch("php/backups.php?action=download", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ id: backupId })
-      })
-
-      if (!response.ok) {
-        throw new Error("Error al descargar backup")
-      }
-
-      // Get filename from header or use default
-      const contentDisposition = response.headers.get('Content-Disposition')
-      let filename = `backup_${backupId}.sql`
-      if (contentDisposition) {
-        const matches = /filename="([^"]+)"/.exec(contentDisposition)
-        if (matches) filename = matches[1]
-      }
-
-      // Download file
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = filename
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-
-      showToast("Backup descargado exitosamente", "success")
-
+      // Use direct link approach to preserve server filename
+      window.location.href = `php/backups.php?action=download&id=${backupId}`;
+      showToast("Descargando backup...", "success");
     } catch (error) {
-      console.error("Error downloading backup:", error)
-      showToast("Error al descargar backup", "error")
+      console.error("Error downloading backup:", error);
+      showToast("Error al descargar backup", "error");
     }
   }
 
@@ -779,7 +742,7 @@
 
     if (user) {
       currentUserId = user.id
-      userModalTitle.textContent = "Editar Usuario"
+      userModalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuario'
       document.getElementById("userName").value = user.nombre
       document.getElementById("userEmail").value = user.email
       document.getElementById("userRole").value = user.rol
@@ -788,7 +751,7 @@
       userPasswordConfirm.required = false
     } else {
       currentUserId = null
-      userModalTitle.textContent = "Nuevo Usuario"
+      userModalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Nuevo Usuario'
     }
     userModal.style.display = "block"
   }
