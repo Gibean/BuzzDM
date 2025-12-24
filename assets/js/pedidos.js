@@ -68,28 +68,28 @@ function renderOrders(orders) {
         let actionButtons = ''
         if (isDeleted) {
             actionButtons = `
-                <button class="btn btn-outline-success btn-sm" onclick="restoreOrder(${order.id})" title="Restaurar">
+                <button class="btn-action btn-restore" onclick="restoreOrder(${order.id})" title="Restaurar" style="color: var(--buzz-success); border-color: var(--buzz-success);">
                     <i class="fas fa-trash-restore"></i>
                 </button>
             `
         } else {
             actionButtons = `
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewOrderDetail(${
+                <button class="btn-action btn-view me-1" onclick="viewOrderDetail(${
                   order.id
                 })" title="Ver detalle">
                     <i class="fas fa-eye"></i>
                 </button>
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="editOrder(${
+                <button class="btn-action btn-edit me-1" onclick="editOrder(${
                   order.id
                 })" title="Editar">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="btn btn-outline-buzz btn-sm me-1" onclick="toggleOrderProducts(this, ${
+                <button class="btn-action me-1" onclick="toggleOrderProducts(this, ${
                   order.id
                 })" title="Ver productos">
                     <i class="fas fa-chevron-down"></i>
                 </button>
-                <button class="btn btn-outline-danger btn-sm" onclick="deleteOrder(${
+                <button class="btn-action btn-delete" onclick="deleteOrder(${
                   order.id
                 })" title="Eliminar">
                     <i class="fas fa-trash"></i>
@@ -420,7 +420,7 @@ async function editOrder(orderId) {
                         )}" readonly>
                     </div>
                     <div class="col-md-2 d-flex align-items-center">
-                        <button type="button" class="btn btn-outline-danger btn-sm remove-product-row"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn-action btn-delete remove-product-row"><i class="fas fa-trash"></i></button>
                     </div>
                 `
         editProductsContainer.appendChild(newRow)
@@ -776,7 +776,7 @@ async function openOrderModal() {
                 )}" readonly>
             </div>
             <div class="col-md-2 d-flex align-items-center">
-                <button type="button" class="btn btn-outline-danger btn-sm remove-product-row"><i class="fas fa-trash"></i></button>
+                <button type="button" class="btn-action btn-delete remove-product-row"><i class="fas fa-trash"></i></button>
             </div>
         `
     productsContainer.appendChild(newRow)

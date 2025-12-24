@@ -8,44 +8,46 @@ $response = ['success' => false, 'message' => '', 'history' => []];
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
-        // Query both the importaciones table and logs table for complete history
-        // First get from importaciones table (main source)
-        $queryImportaciones = "SELECT i.id, i.fecha as fecha,
-                                      CONCAT('Importación: ', i.tipo) as accion,
-                                      CONCAT(i.archivo_nombre, ' - Estado: ', i.estado) as detalles,
-                                      u.nombre as usuario_nombre
-                                FROM importaciones i
-                                LEFT JOIN usuarios u ON i.usuario_id = u.id
-                                ORDER BY i.fecha DESC";
+        // Query the importaciones table
+        $query = "SELECT i.id, i.fecha, i.tipo, i.archivo_nombre, i.estado, i.detalles, u.nombre as usuario_nombre
+                  FROM importaciones i
+                  LEFT JOIN usuarios u ON i.usuario_id = u.id
+                  ORDER BY i.fecha DESC
+                  LIMIT 50";
 
-        $stmtImportaciones = $pdo->prepare($queryImportaciones);
-        $stmtImportaciones->execute();
-        $resultsImportaciones = $stmtImportaciones->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare($query);
+        $stmt->execute();
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Also get from logs table for import-related actions
-        $queryLogs = "SELECT l.id, l.fecha, l.accion, l.detalles, u.nombre as usuario_nombre
-                      FROM logs l
-                      LEFT JOIN usuarios u ON l.usuario_id = u.id
-                      WHERE l.accion LIKE '%Importación%' OR l.accion LIKE '%import%' OR l.accion LIKE '%Backup%'
-                      ORDER BY l.fecha DESC";
+        $history = [];
+        foreach ($results as $row) {
+            $records = 0;
+            $errors = 0;
 
-        $stmtLogs = $pdo->prepare($queryLogs);
-        $stmtLogs->execute();
-        $resultsLogs = $stmtLogs->fetchAll(PDO::FETCH_ASSOC);
+            // Parse details JSON to get stats
+            $details = json_decode($row['detalles'], true);
+            if (is_array($details) && isset($details['results'])) {
+                foreach ($details['results'] as $sheetResult) {
+                    $records += ($sheetResult['inserted'] ?? 0) + ($sheetResult['updated'] ?? 0);
+                    $errors += ($sheetResult['failed'] ?? 0);
+                }
+            }
 
-        // Combine both results
-        $allResults = array_merge($resultsImportaciones, $resultsLogs);
-
-        // Sort by date descending
-        usort($allResults, function($a, $b) {
-            return strtotime($b['fecha']) - strtotime($a['fecha']);
-        });
-
-        // Limit to last 50
-        $allResults = array_slice($allResults, 0, 50);
+            $history[] = [
+                'id' => $row['id'],
+                'date' => $row['fecha'],
+                'type' => $row['tipo'],
+                'filename' => $row['archivo_nombre'],
+                'status' => $row['estado'],
+                'records' => $records,
+                'errors' => $errors,
+                'user' => $row['usuario_nombre'] ?? 'Desconocido',
+                'details' => $details // Keep full details if needed for view details
+            ];
+        }
 
         $response['success'] = true;
-        $response['history'] = $allResults;
+        $response['history'] = $history;
 
     } catch (Exception $e) {
         $response['message'] = 'Error al obtener el historial: ' . $e->getMessage();

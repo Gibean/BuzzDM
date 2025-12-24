@@ -81,13 +81,13 @@ function renderCustomers(customers) {
                               `
                         } else {
                           actionButtons = `
-                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="viewCustomerDetail('${customer.id}')" title="Ver detalle">
+                                  <button class="btn-action btn-view me-1" onclick="viewCustomerDetail('${customer.id}')" title="Ver detalle">
                                       <i class="fas fa-eye"></i>
                                   </button>
-                                  <button class="btn btn-outline-buzz btn-sm me-1" onclick="editCustomer('${customer.id}')" title="Editar">
+                                  <button class="btn-action btn-edit me-1" onclick="editCustomer('${customer.id}')" title="Editar">
                                       <i class="fas fa-edit"></i>
                                   </button>
-                                  <button class="btn btn-outline-danger btn-sm" onclick="deleteCustomer('${customer.id}')" title="Eliminar">
+                                  <button class="btn-action btn-delete" onclick="deleteCustomer('${customer.id}')" title="Eliminar">
                                       <i class="fas fa-trash"></i>
                                   </button>
                               `
@@ -129,19 +129,16 @@ async function fetchAndRenderFrequentCustomers() {
     const frequentCustomers = data.data.frequentCustomers
 
     if (frequentCustomers && frequentCustomers.length > 0) {
-      frequentCustomersListContainer.innerHTML = `
-                <ul class="list-group list-group-flush">
-                    ${frequentCustomers
-                      .map(
-                        (customer) => `
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            ${customer.nombre} <span class="badge bg-primary rounded-pill">${customer.total_orders} pedidos</span>
-                        </li>
-                    `
-                      )
-                      .join("")}
-                </ul>
-            `
+      frequentCustomersListContainer.innerHTML = frequentCustomers
+        .map(
+          (customer) => `
+            <div class="frequent-customer-item">
+                <span class="frequent-customer-name">${customer.nombre}</span>
+                <span class="frequent-customer-orders">${customer.total_orders} pedidos</span>
+            </div>
+        `
+        )
+        .join("")
     } else {
       frequentCustomersListContainer.innerHTML = `<p class="text-muted">No hay clientes frecuentes aún.</p>`
     }
@@ -172,10 +169,7 @@ async function viewCustomerDetail(customerId) {
       document.getElementById("viewCustomerCreatedAt").textContent =
         formatDateTime(customer.creado_at)
 
-      const viewModal = new bootstrap.Modal(
-        document.getElementById("viewCustomerModal")
-      )
-      viewModal.show()
+      openModal('viewCustomerModal')
     } else {
       showToast("Cliente no encontrado.", "error")
     }
@@ -191,8 +185,8 @@ async function editCustomer(customerId) {
     const customer = data.data.customer
 
     if (customer) {
-      document.getElementById("editCustomerId").textContent = customer.id // Display ID in modal title
-      document.getElementById("editCustomerIdHidden").value = customer.id // Hidden input for form submission
+      document.getElementById("editCustomerId").textContent = customer.id
+      document.getElementById("editCustomerIdHidden").value = customer.id
       document.getElementById("editCustomerName").value = customer.nombre
       document.getElementById("editCustomerEmail").value = customer.email
       document.getElementById("editCustomerPhone").value = customer.telefono
@@ -200,10 +194,7 @@ async function editCustomer(customerId) {
       document.getElementById("editCustomerNotes").value = customer.notas
       document.getElementById("editCustomerVip").checked = customer.vip == 1
 
-      const editModal = new bootstrap.Modal(
-        document.getElementById("editCustomerModal")
-      )
-      editModal.show()
+      openModal('editCustomerModal')
 
       document.getElementById("editCustomerForm").onsubmit = async (event) => {
         event.preventDefault()
@@ -224,8 +215,8 @@ async function editCustomer(customerId) {
             body: JSON.stringify(updatedCustomer)
           })
           showToast("Cliente actualizado exitosamente.", "success")
-          editModal.hide()
-          fetchAndRenderCustomers() // Refresh list
+          closeModal('editCustomerModal')
+          fetchAndRenderCustomers()
         } catch (error) {
           console.error("Error updating customer:", error)
           showToast(`Error al actualizar cliente: ${error.message}`, "error")
@@ -241,22 +232,23 @@ async function editCustomer(customerId) {
 }
 
 async function deleteCustomer(customerId) {
-  if (
-    !confirm(`¿Estás seguro de que deseas eliminar el cliente ${customerId}?`)
-  ) {
-    return
-  }
-
-  try {
-    await fetchJSON(`php/clientes_actions.php?id=${customerId}`, {
-      method: "DELETE"
-    })
-    showToast("Cliente eliminado exitosamente.", "success")
-    fetchAndRenderCustomers() // Refresh list
-  } catch (error) {
-    console.error("Error deleting customer:", error)
-    showToast(`Error al eliminar cliente: ${error.message}`, "error")
-  }
+  showModal({
+    title: "Confirmar Eliminación",
+    message: `¿Estás seguro de que deseas eliminar el cliente ${customerId}?`,
+    type: "confirm",
+    onConfirm: async () => {
+      try {
+        await fetchJSON(`php/clientes_actions.php?id=${customerId}`, {
+          method: "DELETE"
+        })
+        showToast("Cliente eliminado exitosamente.", "success")
+        fetchAndRenderCustomers() // Refresh list
+      } catch (error) {
+        console.error("Error deleting customer:", error)
+        showToast(`Error al eliminar cliente: ${error.message}`, "error")
+      }
+    }
+  })
 }
 
 async function restoreCustomer(customerId) {
@@ -316,17 +308,8 @@ async function setupCreateCustomerForm() {
 
       if (response.success) {
         showToast("Cliente creado exitosamente.", "success")
-
-        // Close modal
-        const createModal = bootstrap.Modal.getInstance(
-          document.getElementById("createCustomerModal")
-        )
-        createModal.hide()
-
-        // Reset form
+        closeModal('createCustomerModal')
         form.reset()
-
-        // Refresh customer list
         fetchAndRenderCustomers()
       } else {
         showToast(`Error: ${response.message}`, "error")

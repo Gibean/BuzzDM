@@ -5,6 +5,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css?v=3">
+    <link rel="stylesheet" href="assets/css/modal-enhanced.css">
+    <link rel="stylesheet" href="assets/css/toast.css">
 </head>
 <body>
      <!-- Sidebar  -->
@@ -36,6 +38,7 @@
                         <i class="fas fa-list-alt"></i> Logs de Sesión
                     </button>
                 </li>
+
                 <li class="nav-item">
                     <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="settings">
                         <i class="fas fa-cog"></i> Configuración
@@ -171,6 +174,7 @@
                 </div>
             </div>
         </div>
+
 
     <!--   Reports Tab  -->
         <div class="tab-content" id="reportsTab" style="display: none;">
@@ -417,51 +421,88 @@
                 </div>
             </div>
         </div>
+
+        <!-- System Footer -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
  <!--     User Modal  -->
     <div class="modal-buzz" id="userModal">
         <div class="modal-content-buzz">
             <div class="modal-header-buzz">
-                <h5 class="font-primary text-primary" id="userModalTitle">Nuevo Usuario</h5>
-                <span class="close-buzz" onclick="closeUserModal()">&times;</span>
+                <h5 class="font-primary text-primary" id="userModalTitle">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </h5>
+                <button class="close-buzz" onclick="closeUserModal()" aria-label="Cerrar">&times;</button>
             </div>
             <form id="userForm">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Nombre *</label>
-                        <input type="text" class="form-control form-control-buzz" id="userName" required>
+                <div class="modal-body-buzz">
+                    <!-- Basic Information Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Nombre *</label>
+                                <input type="text" class="form-control form-control-buzz" id="userName" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Email *</label>
+                                <input type="email" class="form-control form-control-buzz" id="userEmail" required autocomplete="email">
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Email *</label>
-                        <input type="email" class="form-control form-control-buzz" id="userEmail" required autocomplete="email">
+
+                    <!-- Security Section -->
+                    <div class="modal-section" id="userPasswordGroup">
+                        <div class="modal-section-title">
+                            <i class="fas fa-lock"></i> SEGURIDAD
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Contraseña *</label>
+                                <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Confirmar Contraseña *</label>
+                                <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permissions Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-user-shield"></i> PERMISOS Y ESTADO
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Rol</label>
+                                <select class="form-control form-control-buzz" id="userRole">
+                                    <option value="user">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Estado</label>
+                                <select class="form-control form-control-buzz" id="userStatus">
+                                    <option value="activo">Activo</option>
+                                    <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="userFormAlert" class="alert-buzz" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="userFormAlertText"></span>
                     </div>
                 </div>
-                <div class="row" id="userPasswordGroup">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Contraseña *</label>
-                        <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Confirmar Contraseña *</label>
-                        <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Rol</label>
-                        <select class="form-control form-control-buzz" id="userRole">
-                            <option value="user">Usuario</option>
-                            <option value="admin">Administrador</option>
-                        </select>
-                    </div>
-                </div>
-                <div id="userFormAlert" class="alert-buzz" style="display: none;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <span id="userFormAlertText"></span>
-                </div>
-                <div class="d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-outline-buzz" onclick="closeUserModal()">Cancelar</button>
+                <div class="modal-footer-buzz">
+                    <button type="button" class="btn btn-outline-buzz" onclick="closeUserModal()">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
                     <button type="submit" class="btn btn-buzz">
                         <i class="fas fa-save"></i> Guardar Usuario
                     </button>
@@ -471,6 +512,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/modal.js"></script>
+    <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js?v=4"></script>
     <script src="assets/js/admin.js?v=6"></script>
 </body>
