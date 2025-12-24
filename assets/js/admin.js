@@ -742,7 +742,7 @@
 
     if (user) {
       currentUserId = user.id
-      userModalTitle.textContent = "Editar Usuario"
+      userModalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuario'
       document.getElementById("userName").value = user.nombre
       document.getElementById("userEmail").value = user.email
       document.getElementById("userRole").value = user.rol
@@ -751,7 +751,7 @@
       userPasswordConfirm.required = false
     } else {
       currentUserId = null
-      userModalTitle.textContent = "Nuevo Usuario"
+      userModalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Nuevo Usuario'
     }
     userModal.style.display = "block"
   }

@@ -102,7 +102,7 @@ function renderShipments() {
                     </div>
                     ${
                       shipment.trackingNumber
-                        ? `<small class="font-mono text-primary">Tracking: ${shipment.trackingNumber}</small>`
+                        ? `<div class="tracking-badge mt-1"><i class="fas fa-barcode"></i> ${shipment.trackingNumber}</div>`
                         : ""
                     }
                 </div>
@@ -112,25 +112,26 @@ function renderShipments() {
             </div>
 
             ${
-              shipment.status !== "entregado"
+              shipment.status !== "recibido"
                 ? `
                 <div class="row mt-3 pt-3 border-top border-secondary">
                     <div class="col-md-6">
-                        <small class="text-muted">Entrega estimada: ${
+                        <small class="text-muted"><i class="fas fa-calendar-alt"></i> Entrega estimada: ${
                           shipment.estimatedDelivery
                             ? formatDate(shipment.estimatedDelivery)
                             : "N/A"
                         }</small>
                     </div>
-                    <div class="col-md-6 text-end">
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary" style="width: ${getProgressWidth(
+                    <div class="col-md-6">
+                        <div class="progress-buzz">
+                            <div class="progress-buzz-bar" style="width: ${getProgressWidth(
                               shipment.status
                             )}%"></div>
                         </div>
-                        <small class="text-muted">${getProgressText(
-                          shipment.status
-                        )}</small>
+                        <div class="progress-text">
+                            <i class="fas fa-truck"></i>
+                            <span>${getProgressText(shipment.status)}</span>
+                        </div>
                     </div>
                 </div>
             `
@@ -144,12 +145,12 @@ function renderShipments() {
 
 function getStatusBadge(status) {
   const badges = {
-    pendiente: '<span class="badge badge-warning">Pendiente</span>',
-    enviado: '<span class="badge badge-primary">Enviado</span>',
-    entregado: '<span class="badge badge-success">Entregado</span>'
+    pendiente: '<div class="status-badge status-pendiente"><i class="fas fa-clock"></i> Pendiente</div>',
+    enviado: '<div class="status-badge status-enviado"><i class="fas fa-shipping-fast"></i> Enviado</div>',
+    recibido: '<div class="status-badge status-entregado"><i class="fas fa-check-circle"></i> Entregado</div>'
   }
   return (
-    badges[status] || '<span class="badge badge-secondary">Desconocido</span>'
+    badges[status] || '<div class="status-badge"><i class="fas fa-question"></i> Desconocido</div>'
   )
 }
 
@@ -163,11 +164,11 @@ function getStatusActions(shipment) {
             `
     case "enviado":
       return `
-                <button class="btn btn-success btn-sm" onclick="updateShipmentStatus(${shipment.id}, 'entregado')">
+                <button class="btn btn-success btn-sm" onclick="updateShipmentStatus(${shipment.id}, 'recibido')">
                     <i class="fas fa-check"></i> Marcar Entregado
                 </button>
             `
-    case "entregado":
+    case "recibido":
       return `
                 <span class="text-success font-mono">
                     <i class="fas fa-check-circle"></i> Completado
@@ -182,7 +183,7 @@ function getProgressWidth(status) {
   const progress = {
     pendiente: 25,
     enviado: 75,
-    entregado: 100
+    recibido: 100
   }
   return progress[status] || 0
 }
@@ -191,7 +192,7 @@ function getProgressText(status) {
   const texts = {
     pendiente: "Preparando envío...",
     enviado: "En tránsito...",
-    entregado: "Entregado"
+    recibido: "Entregado"
   }
   return texts[status] || ""
 }
@@ -251,44 +252,49 @@ async function updateShipmentStatus(shipmentId, newStatus) {
       ? "¿Confirmar que el pedido ha sido enviado?"
       : "¿Confirmar que el pedido ha sido entregado?"
 
-  if (confirm(confirmMessage)) {
-    let trackingNumber = shipment.trackingNumber
-    if (newStatus === "enviado" && !trackingNumber) {
-      trackingNumber = "TRK" + Date.now().toString().slice(-9)
-    }
+  showModal({
+    title: "Confirmar Actualización",
+    message: confirmMessage,
+    type: "confirm",
+    onConfirm: async () => {
+      let trackingNumber = shipment.trackingNumber
+      if (newStatus === "enviado" && !trackingNumber) {
+        trackingNumber = "TRK" + Date.now().toString().slice(-9)
+      }
 
-    try {
-      const response = await fetchJSON(`php/envios_actions.php`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          id: shipmentId,
-          status: newStatus,
-          trackingNumber: trackingNumber
+      try {
+        const response = await fetchJSON(`php/envios_actions.php`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            id: shipmentId,
+            status: newStatus,
+            trackingNumber: trackingNumber
+          })
         })
-      })
 
-      if (response.success) {
-        showNotification("Estado de envío actualizado exitosamente.", "success")
-        // Update local data and re-render
-        shipment.status = newStatus
-        shipment.trackingNumber = trackingNumber
-        filterShipments() // Re-apply filters and re-render to reflect changes
-        updateStats()
-      } else {
-        showNotification(
-          `Error al actualizar estado de envío: ${response.message}`,
+        if (response.success) {
+          showToast("Estado de envío actualizado exitosamente.", "success")
+          // Update local data and re-render
+          shipment.status = newStatus
+          shipment.trackingNumber = trackingNumber
+          filterShipments() // Re-apply filters and re-render to reflect changes
+          updateStats()
+        } else {
+          showToast(
+            `Error al actualizar estado de envío: ${response.message}`,
+            "error"
+          )
+        }
+      } catch (error) {
+        console.error("Error updating shipment status:", error)
+        showToast(
+          `Error al actualizar estado de envío: ${error.message}`,
           "error"
         )
       }
-    } catch (error) {
-      console.error("Error updating shipment status:", error)
-      showNotification(
-        `Error al actualizar estado de envío: ${error.message}`,
-        "error"
-      )
     }
-  }
+  })
 }
 
 function formatDate(date) {
@@ -300,9 +306,7 @@ function formatCurrency(amount) {
   return amount.toLocaleString("es-ES", { style: "currency", currency: "EUR" })
 }
 
-function showNotification(message, type) {
-  alert(`${type.toUpperCase()}: ${message}`)
-}
+// Removed - using showToast from common.js
 
 // Clear filters function
 window.clearFilters = function() {

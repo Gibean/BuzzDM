@@ -9,66 +9,86 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <style>
-        .login-container {
+        body {
+            background: linear-gradient(135deg, #10141a 0%, #1a1f28 50%, #10141a 100%);
             min-height: 100vh;
-            background-color: var(--buzz-dark-bg);
-        }
-
-        .login-form-section {
-            background-color: var(--buzz-card-bg);
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-        }
-
-        .login-image-section {
-            background: linear-gradient(45deg, var(--buzz-dark-bg) 0%, #1a1f28 50%, var(--buzz-dark-bg) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+            font-family: var(--font-monospace);
             position: relative;
             overflow: hidden;
         }
 
-        .login-pattern {
-            position: absolute;
+        /* Subtle hexagon background */
+        .hexagon-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.1;
-            background-image:
-                radial-gradient(circle at 25% 25%, var(--buzz-primary-color) 2px, transparent 2px),
-                radial-gradient(circle at 75% 75%, var(--buzz-primary-color) 2px, transparent 2px);
-            background-size: 50px 50px;
+            opacity: 0.15;
+            z-index: 1;
+        }
+
+        /* Back to home button */
+        .back-home {
+            position: fixed;
+            top: 2rem;
+            left: 2rem;
+            z-index: 1000;
+        }
+
+        .back-home a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--buzz-text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .back-home a:hover {
+            color: var(--buzz-primary-color);
+            background-color: rgba(255, 160, 0, 0.05);
+        }
+
+        .back-home a i {
+            font-size: 0.85rem;
+        }
+
+        /* Login container */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 450px;
+            padding: 2rem;
         }
 
         .login-logo {
-            font-family: var(--font-primary);
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--buzz-primary-color);
             text-align: center;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 20px rgba(255, 160, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            margin-bottom: 3rem;
         }
 
         .login-logo img {
-            width: 300px;
-            margin-bottom: 0.2rem;
+            max-width: 350px;
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 0 15px rgba(255, 160, 0, 0.15));
         }
 
+        /* Form styling */
         .login-form {
             width: 100%;
-            max-width: 400px;
-            padding: 2rem;
         }
 
         .form-group {
             margin-bottom: 1.5rem;
+            position: relative;
         }
 
         .form-label {
@@ -76,129 +96,374 @@
             font-family: var(--font-monospace);
             font-weight: 500;
             margin-bottom: 0.5rem;
-            display: block;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        .login-btn {
+        .form-label i {
+            color: var(--buzz-primary-color);
+            font-size: 0.85rem;
+        }
+
+        .form-control {
+            background-color: rgba(16, 20, 26, 0.8);
+            border: 1px solid rgba(255, 160, 0, 0.2);
+            color: var(--buzz-text-color) !important;
+            padding: 0.9rem 1rem;
+            border-radius: 6px;
+            font-family: var(--font-monospace);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            background-color: rgba(16, 20, 26, 0.95);
+            border-color: var(--buzz-primary-color);
+            box-shadow: 0 0 0 3px rgba(255, 160, 0, 0.1);
+            color: var(--buzz-text-color) !important;
+            outline: none;
+        }
+
+        /* Password field with toggle */
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 3rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--buzz-text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: var(--buzz-primary-color);
+        }
+
+        /* Submit button */
+        .btn-login {
             width: 100%;
-            padding: 0.75rem;
-            font-size: 1.1rem;
-            font-weight: 700;
+            padding: 1rem;
+            background-color: var(--buzz-primary-color);
+            color: var(--buzz-dark-bg);
+            border: none;
+            border-radius: 6px;
+            font-family: var(--font-monospace);
+            font-weight: 600;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
         }
 
-        .alert-buzz {
+        .btn-login:hover {
+            background-color: #e6900a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 160, 0, 0.2);
+        }
+
+        .btn-login:active{
+            transform: translateY(0);
+        }
+
+        /* Alert */
+        .alert-login {
             background-color: rgba(220, 53, 69, 0.1);
-            border: 1px solid var(--buzz-danger);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            border-left: 4px solid var(--buzz-danger);
             color: var(--buzz-danger);
-            padding: 0.75rem;
-            border-radius: 4px;
-            margin-bottom: 1rem;
-            font-family: var(--font-monospace);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1.5rem;
             font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Forgot password link */
+        .forgot-password {
+            display: block;
+            text-align: center;
+            margin-top: 1.5rem;
+            color: var(--buzz-primary-color);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #e6900a;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .login-container {
+                padding: 1.5rem 1rem;
+            }
+
+            .login-logo {
+                margin-bottom: 2rem;
+            }
+
+            .login-logo img {
+                max-width: 280px;
+            }
+
+            .back-home {
+                top: 1rem;
+                left: 1rem;
+            }
+
+            .back-home a span {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid login-container">
-        <div class="row h-100">
-            <!--                     -->
-            <!-- Formulario de Login -->
-            <!--                     -->
-            <div class="col-lg-6 login-form-section">
-                <div class="login-form">
-                    <div class="login-logo">
-                        <img src="assets/img/logov1.png" alt="BUZZ Logo">
-                        <!-- <span>BUZZ</span> -->
-                    </div>
-                    <!--<h2 class="text-center mb-4 font-mono text-muted">DATA MANAGER</h2>-->
+    <!-- Hexagon Background Canvas -->
+    <canvas id="hexagonCanvas" class="hexagon-bg"></canvas>
 
-                    <!-- Contenedor para la alerta de login -->
-                    <div id="loginAlert" class="alert-buzz" style="display: none;">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <span id="loginAlertText"></span>
-                    </div>
-
-                    <form id="loginForm" method="POST" action="">
-                        <div class="form-group">
-                            <label for="email" class="form-label">
-                                <i class="fas fa-envelope"></i> Email
-                            </label>
-                            <input type="email" class="form-control form-control-buzz" id="email" name="email" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="password" class="form-label">
-                                <i class="fas fa-lock"></i> Contraseña
-                            </label>
-                            <div style="position: relative;">
-                                <input type="password" class="form-control form-control-buzz" id="password" name="password" required style="padding-right: 45px;">
-                                <button type="button" id="togglePassword" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--buzz-text-muted); cursor: pointer; padding: 5px; transition: color 0.3s ease;" aria-label="Toggle password visibility">
-                                    <i class="fas fa-eye" id="togglePasswordIcon"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <button type="submit" class="btn btn-buzz login-btn">
-                            <i class="fas fa-sign-in-alt"></i> Acceder al Sistema
-                        </button>
-                    </form>
-
-                    <div class="text-center mt-4">
-                        <a href="forgot_password.php" class="text-primary" style="text-decoration: none; font-family: var(--font-monospace);">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!--                     -->
-            <!-- Imagen patron       -->
-            <!--                     -->
-            <div class="col-lg-6 login-image-section d-none d-lg-flex">
-                <div class="login-pattern"></div>
-                <div class="text-center">
-                    <h1 class="font-primary" style="font-size: 4rem; color: var(--buzz-primary-color); opacity: 0.8;">
-                        SISTEMA DE<br>GESTIÓN
-                    </h1>
-                    <p class="font-mono text-muted" style="font-size: 1.2rem; margin-top: 2rem;">
-                        Control total de inventario y pedidos
-                    </p>
-                </div>
-            </div>
-        </div>
+    <!-- Back to Home Button -->
+    <div class="back-home">
+        <a href="index.html">
+            <i class="fas fa-arrow-left"></i>
+            <span>Inicio</span>
+        </a>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/login.js"></script>
-    <script>
-        // Password visibility toggle
-        const togglePassword = document.getElementById('togglePassword');
-        const passwordInput = document.getElementById('password');
-        const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+    <!-- Login Container -->
+    <div class="login-container">
+        <!-- Logo -->
+        <div class="login-logo">
+            <img src="assets/img/logov1.png" alt="BUZZ Logo">
+        </div>
 
-        togglePassword.addEventListener('click', function() {
+        <!-- Alert -->
+        <?php if (isset($_GET['error'])): ?>
+        <div class="alert-login">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>
+                <?php
+                    if ($_GET['error'] === 'invalid') {
+                        echo 'Credenciales inválidas. Por favor, verifica tu email y contraseña.';
+                    } else {
+                        echo 'Ha ocurrido un error. Por favor, intenta nuevamente.';
+                    }
+                ?>
+            </span>
+        </div>
+        <?php endif; ?>
+
+        <!-- Login Form -->
+        <form class="login-form" id="loginForm" method="POST">
+            <!-- Email Field -->
+            <div class="form-group">
+                <label for="email" class="form-label">
+                    <i class="fas fa-envelope"></i>
+                    Email
+                </label>
+                <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                >
+            </div>
+
+            <!-- Password Field -->
+            <div class="form-group">
+                <label for="password" class="form-label">
+                    <i class="fas fa-lock"></i>
+                    Contraseña
+                </label>
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        class="form-control"
+                        id="password"
+                        name="password"
+                        required
+                        autocomplete="current-password"
+                    >
+                    <button type="button" class="password-toggle" id="passwordToggle">
+                        <i class="fas fa-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Acceder al Sistema
+            </button>
+        </form>
+
+        <!-- Forgot Password Link -->
+        <a href="forgot_password.php" class="forgot-password">
+            ¿Olvidaste tu contraseña?
+        </a>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Hexagon canvas animation
+        const canvas = document.getElementById('hexagonCanvas');
+        const ctx = canvas.getContext('2d');
+        let hexagons = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        class Hexagon {
+            constructor(x, y, size) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.opacity = Math.random() * 0.25;
+                this.fadeDirection = Math.random() > 0.5 ? 1 : -1;
+                this.fadeSpeed = 0.001 + Math.random() * 0.002;
+            }
+
+            draw() {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const angle = (Math.PI / 3) * i;
+                    const x = this.x + this.size * Math.cos(angle);
+                    const y = this.y + this.size * Math.sin(angle);
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                }
+                ctx.closePath();
+                ctx.strokeStyle = `rgba(255, 160, 0, ${this.opacity})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            update() {
+                this.opacity += this.fadeSpeed * this.fadeDirection;
+                if (this.opacity > 0.25 || this.opacity < 0.05) {
+                    this.fadeDirection *= -1;
+                }
+                this.draw();
+            }
+        }
+
+        function createHexagons() {
+            hexagons = [];
+            const size = 25;
+            const spacing = size * 1.8;
+
+            for (let y = -size; y < canvas.height + size; y += spacing * 1.5) {
+                for (let x = -size; x < canvas.width + size; x += spacing * Math.sqrt(3)) {
+                    const offsetX = (y / (spacing * 1.5)) % 2 === 0 ? 0 : spacing * Math.sqrt(3) / 2;
+                    hexagons.push(new Hexagon(x + offsetX, y, size));
+                }
+            }
+        }
+
+        createHexagons();
+        window.addEventListener('resize', createHexagons);
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            hexagons.forEach(hex => hex.update());
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Password toggle
+        const passwordInput = document.getElementById('password');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        passwordToggle.addEventListener('click', function() {
             const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
             passwordInput.setAttribute('type', type);
 
-            // Toggle icon
             if (type === 'text') {
-                togglePasswordIcon.classList.remove('fa-eye');
-                togglePasswordIcon.classList.add('fa-eye-slash');
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
             } else {
-                togglePasswordIcon.classList.remove('fa-eye-slash');
-                togglePasswordIcon.classList.add('fa-eye');
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
             }
         });
 
-        // Change icon color on hover
-        togglePassword.addEventListener('mouseenter', function() {
-            this.style.color = 'var(--buzz-primary-color)';
-        });
-        togglePassword.addEventListener('mouseleave', function() {
-            this.style.color = 'var(--buzz-text-muted)';
-        });
+        // Login form submission
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.querySelector('.btn-login');
+
+        if (loginForm && loginButton) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Disable button and show loading state
+                loginButton.disabled = true;
+                const originalText = loginButton.innerHTML;
+                loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+
+                const formData = new FormData(loginForm);
+
+                try {
+                    const response = await fetch('php/login_guard.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Success - redirect to dashboard
+                        loginButton.innerHTML = '<i class="fas fa-check"></i> ¡Éxito!';
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 300);
+                    } else {
+                        // Error - show message and re-enable button
+                        alert(data.message);
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = originalText;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Ha ocurrido un error al intentar iniciar sesión. Por favor, intenta nuevamente.');
+                    loginButton.disabled = false;
+                    loginButton.innerHTML = originalText;
+                }
+
+                return false;
+            });
+
+            // Extra prevention
+            loginForm.onsubmit = () => false;
+        }
     </script>
 </body>
 </html>
