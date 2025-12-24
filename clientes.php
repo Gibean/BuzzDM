@@ -214,6 +214,70 @@
         </div>
     </div>
 
+    <!-- Edit Customer Modal -->
+    <div class="modal-buzz" id="editCustomerModal">
+        <div class="modal-content-buzz">
+            <div class="modal-header-buzz">
+                <h5 class="font-primary text-primary">
+                    <i class="fas fa-user-edit"></i> Editar Cliente #<span id="editCustomerId"></span>
+                </h5>
+                <button class="close-buzz" onclick="closeModal('editCustomerModal')" aria-label="Cerrar">&times;</button>
+            </div>
+            <form id="editCustomerForm">
+                <input type="hidden" id="editCustomerIdHidden">
+                <div class="modal-body-buzz">
+                    <!-- Basic Information Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Nombre *</label>
+                            <input type="text" class="form-control form-control-buzz" id="editCustomerName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Email</label>
+                            <input type="email" class="form-control form-control-buzz" id="editCustomerEmail">
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="editCustomerVip">
+                            <label class="form-check-label text-muted" for="editCustomerVip">
+                                <i class="fas fa-star text-warning"></i> Cliente VIP
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Contact Information Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-phone"></i> CONTACTO
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Teléfono *</label>
+                            <input type="text" class="form-control form-control-buzz" id="editCustomerPhone" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Dirección</label>
+                            <textarea class="form-control form-control-buzz" id="editCustomerAddress" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted">Notas</label>
+                            <textarea class="form-control form-control-buzz" id="editCustomerNotes" rows="2"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer-buzz">
+                    <button type="button" class="btn btn-outline-buzz" onclick="closeModal('editCustomerModal')">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-buzz">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/toast.js"></script>
