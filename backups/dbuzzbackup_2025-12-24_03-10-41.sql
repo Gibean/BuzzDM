@@ -38,7 +38,7 @@ CREATE TABLE `backups` (
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `backups` (
 
 LOCK TABLES `backups` WRITE;
 /*!40000 ALTER TABLE `backups` DISABLE KEYS */;
-INSERT INTO `backups` VALUES (4,'dbuzzbackup_2025-12-02_06-11-25.sql','C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-02_06-11-25.sql',68600,'2025-12-02 05:11:26','manual','completado','Backup creado exitosamente','{\"tablas_exportadas\":16,\"duracion_ms\":481,\"tamanio_mb\":0.07}',1);
+INSERT INTO `backups` VALUES (10,'dbuzzbackup_2025-12-02_08-10-45.sql','C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-02_08-10-45.sql',71968,'2025-12-02 07:10:46','manual','completado','Backup creado exitosamente','{\"tablas_exportadas\":14,\"duracion_ms\":615,\"tamanio_mb\":0.07}',1);
 /*!40000 ALTER TABLE `backups` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -129,7 +129,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES ('E-30003000','Juan Almeida','misogino.300@gmail.com','+34900 861 494','Municipio Santiago','Epale Juan Almeida misógino yo no conozco de puntas la única punta que conozco es esta… la punta de la teta porque como verás estoy amamantando desde la izquierda cómoda es bien depinga verdad?? hablar y criticar a los demás y como tú me hablabas de cacao yo no tengo cacao para ti tengo patadas y te patearé el culo donde te vea #TePateareElCuloDondeTeVea y no por lo que has dicho respecto al municipio Santiago de Mariño sino por meterte conmigo en mi condición de mujer',0,'2025-12-02 05:14:09',NULL),('V-30535128','Gisvel Aray','','+584128759068','Calle Luisa Caceres de Arismendi','<3',1,'2025-11-21 00:56:28',NULL);
+INSERT INTO `clientes` VALUES ('E-30003000','Juan Almeida','misogino.300@gmail.com','+34900 861 494','Municipio Santiago','Epale Juan Almeida misógino yo no conozco de puntas la única punta que conozco es esta… la punta de la teta porque como verás estoy amamantando desde la izquierda cómoda es bien depinga verdad?? hablar y criticar a los demás y como tú me hablabas de cacao yo no tengo cacao para ti tengo patadas y te patearé el culo donde te vea #TePateareElCuloDondeTeVea y no por lo que has dicho respecto al municipio Santiago de Mariño sino por meterte conmigo en mi condición de mujer',0,'2025-12-02 05:14:09','2025-12-24 01:57:50'),('V-30535128','Gisvel Aray','','+584128759068','Calle Luisa Caceres de Arismendi','<3',1,'2025-11-21 00:56:28',NULL),('V-99999999','Test Restore','test@restore.com','+581234567890','','',0,'2025-12-02 05:18:09','2025-12-02 05:20:58');
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -152,7 +152,7 @@ CREATE TABLE `detalle_pedido` (
   KEY `producto_id` (`producto_id`),
   CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -161,6 +161,7 @@ CREATE TABLE `detalle_pedido` (
 
 LOCK TABLES `detalle_pedido` WRITE;
 /*!40000 ALTER TABLE `detalle_pedido` DISABLE KEYS */;
+INSERT INTO `detalle_pedido` VALUES (2,1,1,1,10.00,10.00),(3,2,1,1,10.00,10.00);
 /*!40000 ALTER TABLE `detalle_pedido` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,7 +273,7 @@ CREATE TABLE `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -281,7 +282,7 @@ CREATE TABLE `logs` (
 
 LOCK TABLES `logs` WRITE;
 /*!40000 ALTER TABLE `logs` DISABLE KEYS */;
-INSERT INTO `logs` VALUES (1,1,'Solicitud de recuperación de contraseña','Email: admin@buzz.com','2025-11-29 02:18:49'),(2,1,'Contraseña cambiada','Mediante recuperación de contraseña','2025-11-29 02:19:17'),(3,NULL,'Backup realizado','Archivo: backup_dbuzz_2025-12-02_05-54-21.sql | Tamaño: 0.06 MB','2025-12-02 04:54:22'),(4,1,'Backup Manual','{\"archivo\":\"backup_dbuzz_2025-12-02_05-54-21.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":770,\"tablas\":16}','2025-12-02 04:54:22'),(5,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-03-19.sql | Tamaño: 0.06 MB','2025-12-02 05:03:20'),(6,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-03-19.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":531,\"tablas\":16}','2025-12-02 05:03:20'),(7,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-04-28.sql | Tamaño: 0.07 MB','2025-12-02 05:04:43'),(8,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-04-28.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":15079,\"tablas\":16}','2025-12-02 05:04:43'),(9,1,'Restauración de Backup','{\"archivo\":\"dbuzzbackup_2025-12-02_06-07-56.sql\",\"duracion_ms\":800,\"resultado\":\"Exitoso\"}','2025-12-02 05:08:54'),(10,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-11-25.sql | Tamaño: 0.07 MB','2025-12-02 05:11:26'),(11,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-11-25.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":481,\"tablas\":16}','2025-12-02 05:11:26');
+INSERT INTO `logs` VALUES (1,1,'Solicitud de recuperación de contraseña','Email: admin@buzz.com','2025-11-29 02:18:49'),(2,1,'Contraseña cambiada','Mediante recuperación de contraseña','2025-11-29 02:19:17'),(3,NULL,'Backup realizado','Archivo: backup_dbuzz_2025-12-02_05-54-21.sql | Tamaño: 0.06 MB','2025-12-02 04:54:22'),(4,1,'Backup Manual','{\"archivo\":\"backup_dbuzz_2025-12-02_05-54-21.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":770,\"tablas\":16}','2025-12-02 04:54:22'),(5,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-03-19.sql | Tamaño: 0.06 MB','2025-12-02 05:03:20'),(6,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-03-19.sql\",\"tamanio_mb\":0.06,\"duracion_ms\":531,\"tablas\":16}','2025-12-02 05:03:20'),(7,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-04-28.sql | Tamaño: 0.07 MB','2025-12-02 05:04:43'),(8,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-04-28.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":15079,\"tablas\":16}','2025-12-02 05:04:43'),(9,1,'Restauración de Backup','{\"archivo\":\"dbuzzbackup_2025-12-02_06-07-56.sql\",\"duracion_ms\":800,\"resultado\":\"Exitoso\"}','2025-12-02 05:08:54'),(10,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-11-25.sql | Tamaño: 0.07 MB','2025-12-02 05:11:26'),(11,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-11-25.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":481,\"tablas\":16}','2025-12-02 05:11:26'),(12,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_06-14-15.sql | Tamaño: 0.07 MB','2025-12-02 05:14:16'),(13,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_06-14-15.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":459,\"tablas\":15}','2025-12-02 05:14:16'),(14,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-01-41.sql | Tamaño: 0.07 MB','2025-12-02 07:01:42'),(15,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-01-41.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":766,\"tablas\":14}','2025-12-02 07:01:42'),(16,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-05-58.sql | Tamaño: 0.07 MB','2025-12-02 07:05:59'),(17,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-05-58.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":520,\"tablas\":14}','2025-12-02 07:05:59'),(18,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-06-53.sql | Tamaño: 0.07 MB','2025-12-02 07:06:54'),(19,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-06-53.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":521,\"tablas\":14}','2025-12-02 07:06:54'),(20,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-08-01.sql | Tamaño: 0.07 MB','2025-12-02 07:08:01'),(21,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-08-01.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":493,\"tablas\":14}','2025-12-02 07:08:01'),(22,NULL,'Backup realizado','Archivo: dbuzzbackup_2025-12-02_08-10-45.sql | Tamaño: 0.07 MB','2025-12-02 07:10:46'),(23,1,'Backup Manual','{\"archivo\":\"dbuzzbackup_2025-12-02_08-10-45.sql\",\"tamanio_mb\":0.07,\"duracion_ms\":615,\"tablas\":14}','2025-12-02 07:10:46');
 /*!40000 ALTER TABLE `logs` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -301,7 +302,7 @@ CREATE TABLE `logs_login` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -310,7 +311,7 @@ CREATE TABLE `logs_login` (
 
 LOCK TABLES `logs_login` WRITE;
 /*!40000 ALTER TABLE `logs_login` DISABLE KEYS */;
-INSERT INTO `logs_login` VALUES (1,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:43:12'),(2,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:14'),(3,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:15'),(4,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:15'),(5,1,'Exitoso','Inicio de sesión de admin','2025-11-30 19:55:01'),(6,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 20:40:09'),(7,1,'Exitoso','Inicio de sesión de admin','2025-11-30 20:40:11'),(8,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:16:10'),(9,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:16:12'),(10,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:16:14'),(11,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:31:30'),(12,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:31:31'),(13,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:39:12'),(14,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:39:16'),(15,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-12-02 01:38:20'),(16,1,'Exitoso','Inicio de sesión de admin','2025-12-02 01:39:23'),(17,1,'Exitoso','Inicio de sesión de admin','2025-12-02 02:34:27'),(18,1,'Exitoso','Inicio de sesión de admin','2025-12-02 03:01:51'),(19,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@example.com','2025-12-02 03:54:03'),(20,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@example.com','2025-12-02 03:56:19'),(21,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@admin.com','2025-12-02 04:00:55'),(22,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@admin.com','2025-12-02 04:01:07'),(23,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:02:31'),(24,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:04:53'),(25,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:07:09'),(26,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:10:30');
+INSERT INTO `logs_login` VALUES (1,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:43:12'),(2,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:14'),(3,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:15'),(4,NULL,'Denegado','Intento de inicio de sesión con email no existente: test@noexiste.com','2025-11-30 19:49:15'),(5,1,'Exitoso','Inicio de sesión de admin','2025-11-30 19:55:01'),(6,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 20:40:09'),(7,1,'Exitoso','Inicio de sesión de admin','2025-11-30 20:40:11'),(8,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:16:10'),(9,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:16:12'),(10,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:16:14'),(11,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:31:30'),(12,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:31:31'),(13,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-11-30 21:39:12'),(14,1,'Exitoso','Inicio de sesión de admin','2025-11-30 21:39:16'),(15,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-12-02 01:38:20'),(16,1,'Exitoso','Inicio de sesión de admin','2025-12-02 01:39:23'),(17,1,'Exitoso','Inicio de sesión de admin','2025-12-02 02:34:27'),(18,1,'Exitoso','Inicio de sesión de admin','2025-12-02 03:01:51'),(19,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@example.com','2025-12-02 03:54:03'),(20,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@example.com','2025-12-02 03:56:19'),(21,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@admin.com','2025-12-02 04:00:55'),(22,NULL,'Denegado','Intento de inicio de sesión con email no existente: admin@admin.com','2025-12-02 04:01:07'),(23,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:02:31'),(24,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:04:53'),(25,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:07:09'),(26,1,'Exitoso','Inicio de sesión de admin','2025-12-02 04:10:30'),(27,1,'Exitoso','Inicio de sesión de admin','2025-12-02 07:12:45'),(28,1,'Exitoso','Inicio de sesión de admin','2025-12-02 07:23:16'),(29,1,'Denegado','Intento de inicio de sesión con contraseña incorrecta','2025-12-23 22:11:03'),(30,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:12:48'),(31,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:36:08'),(32,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:49:01'),(33,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:51:45'),(34,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:51:59'),(35,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:53:28'),(36,1,'Exitoso','Inicio de sesión de admin','2025-12-23 22:54:10'),(37,1,'Exitoso','Inicio de sesión de admin','2025-12-24 01:19:57'),(38,37,'Exitoso','Inicio de sesión de operador','2025-12-24 01:21:41'),(39,1,'Exitoso','Inicio de sesión de admin','2025-12-24 01:35:50'),(40,1,'Exitoso','Inicio de sesión de admin','2025-12-24 01:59:21');
 /*!40000 ALTER TABLE `logs_login` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -466,7 +467,7 @@ CREATE TABLE `pedidos` (
   KEY `idx_pedidos_deleted_at` (`deleted_at`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -475,6 +476,7 @@ CREATE TABLE `pedidos` (
 
 LOCK TABLES `pedidos` WRITE;
 /*!40000 ALTER TABLE `pedidos` DISABLE KEYS */;
+INSERT INTO `pedidos` VALUES (1,'V-30535128','4633556592','2025-12-02 06:30:40',10.00,'pagado','enviado','afeafe','sfaefd',NULL,'2025-12-23 23:40:05','TRK533205664',NULL,NULL),(2,'V-30535128','5943381211','2025-10-02 07:35:28',10.00,'no_pagado','enviado','afeafe','safeasfesa',NULL,'2025-12-23 23:46:08','TRK533568569',NULL,NULL);
 /*!40000 ALTER TABLE `pedidos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -511,7 +513,7 @@ CREATE TABLE `productos` (
   CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -520,6 +522,7 @@ CREATE TABLE `productos` (
 
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
+INSERT INTO `productos` VALUES (1,'325324324234','blah','afesfaf',10.00,3,10,'activo','2025-12-02 06:29:28','2025-12-02 07:35:28',NULL,NULL,NULL,NULL);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -570,7 +573,7 @@ CREATE TABLE `sesiones_api` (
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -579,7 +582,7 @@ CREATE TABLE `sesiones_api` (
 
 LOCK TABLES `sesiones_api` WRITE;
 /*!40000 ALTER TABLE `sesiones_api` DISABLE KEYS */;
-INSERT INTO `sesiones_api` VALUES (24,1,'2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c','2025-11-29 15:15:36','2025-11-29 02:15:36'),(25,1,'a96a5e9527b24c5b34bdb87096c97d5363c3699e6c2c408129358becc8da0ce8','2025-11-29 15:19:37','2025-11-29 02:19:37'),(26,1,'36c9bb7c50be0ebaf493efb91be1e3839510be8d82f59745429f9a9a5c75c01b','2025-12-01 08:29:10','2025-11-30 19:29:10'),(27,1,'9fa8b502ffb5bec33e2a07741d0d8ef60633a455e93a9df62ed3e8615e673104','2025-12-01 08:55:01','2025-11-30 19:55:01'),(28,1,'55e593fcabeead3d74241170aca64e63fc1fe8cb4b0f73e04382a8b4d8269e6c','2025-12-01 09:40:11','2025-11-30 20:40:11'),(29,1,'df6572b52cb45dbf07511816048b4195f971400b1623b7f3ce00afbd992b521f','2025-12-01 10:16:14','2025-11-30 21:16:14'),(30,1,'41b5661a6cee2ec476a24d5b73a5a7454f8f3a8f980195819b162163914798af','2025-12-01 10:31:31','2025-11-30 21:31:31'),(31,1,'4e632767a6a363498e57886270f432bba108f81a9821647312c4c8a383bbef95','2025-12-01 10:39:16','2025-11-30 21:39:16'),(32,1,'0db331ff41c96615efa9ebb86de8528beed6cea8ee58dd3776965794827cf8cc','2025-12-02 14:39:23','2025-12-02 01:39:23'),(33,1,'4533fcf5e2577a372329f735bb373a06425398c6b8804356c8cd3795ab5261fb','2025-12-02 15:34:27','2025-12-02 02:34:27'),(34,1,'17278a17b2939bd41cfba3b6e3d24ff9e75d624cee96baf6fe055617646903d8','2025-12-02 16:01:51','2025-12-02 03:01:51'),(35,1,'0e2e4f2d2bad1e3f77048757b916f90d47877bad8348a3740515cb8c3a8e8ba0','2025-12-02 17:02:31','2025-12-02 04:02:31'),(36,1,'653bf563210c405b6bf8c4507b5ce6b66ace6e9bbe1b2fb21b2f259af76dcdc9','2025-12-02 17:04:53','2025-12-02 04:04:53'),(37,1,'37630fef1296bac2118d16d898cc9fed09c78e99a45d1725d6fabd53890c7fbb','2025-12-02 17:07:09','2025-12-02 04:07:09'),(38,1,'5c231789d443949d86e534e0099e99996480fa5a0bb60723581ae55693c6568e','2025-12-02 17:10:30','2025-12-02 04:10:30');
+INSERT INTO `sesiones_api` VALUES (24,1,'2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c','2025-11-29 15:15:36','2025-11-29 02:15:36'),(25,1,'a96a5e9527b24c5b34bdb87096c97d5363c3699e6c2c408129358becc8da0ce8','2025-11-29 15:19:37','2025-11-29 02:19:37'),(26,1,'36c9bb7c50be0ebaf493efb91be1e3839510be8d82f59745429f9a9a5c75c01b','2025-12-01 08:29:10','2025-11-30 19:29:10'),(27,1,'9fa8b502ffb5bec33e2a07741d0d8ef60633a455e93a9df62ed3e8615e673104','2025-12-01 08:55:01','2025-11-30 19:55:01'),(28,1,'55e593fcabeead3d74241170aca64e63fc1fe8cb4b0f73e04382a8b4d8269e6c','2025-12-01 09:40:11','2025-11-30 20:40:11'),(29,1,'df6572b52cb45dbf07511816048b4195f971400b1623b7f3ce00afbd992b521f','2025-12-01 10:16:14','2025-11-30 21:16:14'),(30,1,'41b5661a6cee2ec476a24d5b73a5a7454f8f3a8f980195819b162163914798af','2025-12-01 10:31:31','2025-11-30 21:31:31'),(31,1,'4e632767a6a363498e57886270f432bba108f81a9821647312c4c8a383bbef95','2025-12-01 10:39:16','2025-11-30 21:39:16'),(32,1,'0db331ff41c96615efa9ebb86de8528beed6cea8ee58dd3776965794827cf8cc','2025-12-02 14:39:23','2025-12-02 01:39:23'),(33,1,'4533fcf5e2577a372329f735bb373a06425398c6b8804356c8cd3795ab5261fb','2025-12-02 15:34:27','2025-12-02 02:34:27'),(34,1,'17278a17b2939bd41cfba3b6e3d24ff9e75d624cee96baf6fe055617646903d8','2025-12-02 16:01:51','2025-12-02 03:01:51'),(35,1,'0e2e4f2d2bad1e3f77048757b916f90d47877bad8348a3740515cb8c3a8e8ba0','2025-12-02 17:02:31','2025-12-02 04:02:31'),(36,1,'653bf563210c405b6bf8c4507b5ce6b66ace6e9bbe1b2fb21b2f259af76dcdc9','2025-12-02 17:04:53','2025-12-02 04:04:53'),(37,1,'37630fef1296bac2118d16d898cc9fed09c78e99a45d1725d6fabd53890c7fbb','2025-12-02 17:07:09','2025-12-02 04:07:09'),(38,1,'5c231789d443949d86e534e0099e99996480fa5a0bb60723581ae55693c6568e','2025-12-02 17:10:30','2025-12-02 04:10:30'),(39,1,'3074eb0b7f21da87657f313709fcd4bf1b29e4ccc252303acfddcde23428f490','2025-12-02 20:12:45','2025-12-02 07:12:45'),(40,1,'7eb3b35d3fb5a523252c7fa4608d52de27c9fc3345970039241467ec64b7c033','2025-12-02 20:23:16','2025-12-02 07:23:16'),(41,1,'1edfce51a72f273906b88b152bf9aa0545a2b5cca5a2f4898cdf91931d0e37ef','2025-12-24 11:12:48','2025-12-23 22:12:48'),(42,1,'59fe4ff9d3a141fd42830cb9b72e6927c7b4a5611cef346949fa2008748d856d','2025-12-24 11:36:08','2025-12-23 22:36:08'),(43,1,'6980869fe68b7c70680f6e93d2adefca72c6586a6420a1bb637d515465795cd0','2025-12-24 11:49:01','2025-12-23 22:49:01'),(44,1,'b5da6e0eaa25cd837794b721e6b9f3654d8c4f1a2fdcb55b8d5e81361d6bcc5f','2025-12-24 11:51:45','2025-12-23 22:51:45'),(45,1,'b1e3884e080444155ccb36295bafcef3035483d32bcb9e21de9870e210861f56','2025-12-24 11:51:59','2025-12-23 22:51:59'),(46,1,'155eda37b36e03f69c1e141ebdef78ed5c0247c5e1b5e5c4636f9c7d88087a2f','2025-12-24 11:53:28','2025-12-23 22:53:28'),(47,1,'2310bcc3c63203cd98952aa769e338c3d652ce1da416ef0eb8b1c01d504b498c','2025-12-24 11:54:10','2025-12-23 22:54:10'),(48,1,'f8f8d2be766a8b313f5012a1f5b4cd83c551ad7c24a5ff809117fcb48510e53b','2025-12-24 14:19:57','2025-12-24 01:19:57'),(49,37,'012af6b07c5375583011b5fb4930b916e5fb110203d440807f06366d105bc6de','2025-12-24 14:21:41','2025-12-24 01:21:41'),(50,1,'9163c5ea27512c198d8cfba8fcb954e504904eb2e72b63acbe26facfd37cccb3','2025-12-24 14:35:50','2025-12-24 01:35:50'),(51,1,'36ccb21e34252d87b2f7e3b66fe165f48c0c2fbe28d8f0abc98c5465482dc190','2025-12-24 14:59:21','2025-12-24 01:59:21');
 /*!40000 ALTER TABLE `sesiones_api` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -611,7 +614,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,'Givi','admin@buzz.com','$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G','admin','activo','2025-08-09 17:43:16','2025-12-02 01:39:23',0),(4,'Gisvel','gisvelaray@gmail.com','$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G','operador','activo','2025-11-30 18:13:22','2025-11-30 18:13:28',0),(36,'GiviSupervisor','supervisor@buzz.com','$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna','supervisor','activo','2025-08-14 01:32:53',NULL,0),(37,'GiviOperador','operador@buzz.com','$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC','operador','activo','2025-08-14 01:33:00',NULL,0),(63,'Juan Luis Chaurant','juanluischaurant@gmail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin','activo','2025-11-30 21:18:35',NULL,0);
+INSERT INTO `usuarios` VALUES (1,'Givi','admin@buzz.com','$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G','admin','activo','2025-08-09 17:43:16','2025-12-23 22:12:48',0),(4,'Gisvel','gisvelaray@gmail.com','$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G','operador','activo','2025-11-30 18:13:22','2025-11-30 18:13:28',0),(36,'GiviSupervisor','supervisor@buzz.com','$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna','supervisor','activo','2025-08-14 01:32:53',NULL,0),(37,'GiviOperador','operador@buzz.com','$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC','operador','activo','2025-08-14 01:33:00',NULL,0),(63,'Juan Luis Chaurant','juanluischaurant@gmail.com','$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi','admin','activo','2025-11-30 21:18:35',NULL,0);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -916,4 +919,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-02  1:14:16
+-- Dump completed on 2025-12-23 22:10:43

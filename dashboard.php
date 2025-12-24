@@ -41,6 +41,7 @@ try {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/dashboard-effects.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
@@ -58,40 +59,33 @@ try {
                 <h1 class="font-primary mb-0">CENTRO DE COMANDO</h1>
                 <span class="text-muted ms-2 font-mono">/ DASHBOARD</span>
             </div>
-            <div class="d-flex align-items-center">
-                <span class="text-muted font-mono me-3">ÚLTIMA ACTUALIZACIÓN: <span id="lastUpdate"></span></span>
-                <div class="bg-success rounded-circle" style="width: 10px; height: 10px;"></div>
-                <span class="text-success font-mono ms-2">SISTEMA ONLINE</span>
-            </div>
         </nav>
 
 
         <!-- Statistics Section -->
-        <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="d-flex gap-2">
-                        <span class="text-muted">Productos Activos:</span>
-                        <span class="font-mono text-primary" id="totalProducts">0</span>
-                    </div>
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
+                <div class="stats-card">
+                    <span class="stats-number" id="totalProducts">0</span>
+                    <span class="stats-label">Productos Activos</span>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="d-flex gap-2">
-                        <span class="text-muted">Pedidos Totales:</span>
-                        <span class="font-mono text-success" id="totalOrders">0</span>
-                    </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
+                <div class="stats-card">
+                    <span class="stats-number" id="totalOrders">0</span>
+                    <span class="stats-label">Pedidos Totales</span>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="d-flex gap-2">
-                        <span class="text-muted">Envíos Pendientes:</span>
-                        <span class="font-mono text-warning" id="pendingShipments">0</span>
-                    </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
+                <div class="stats-card">
+                    <span class="stats-number" id="pendingShipments">0</span>
+                    <span class="stats-label">Envíos Pendientes</span>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="d-flex gap-2">
-                        <span class="text-muted">Ingresos del Mes:</span>
-                        <span class="font-mono text-primary" id="monthlyRevenue">$0</span>
-                    </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
+                <div class="stats-card">
+                    <span class="stats-number" id="monthlyRevenue">$0</span>
+                    <span class="stats-label">Ingresos del Mes</span>
                 </div>
             </div>
         </div>
@@ -99,12 +93,12 @@ try {
 
        <!---  Charts and Activity -->
         <div class="row">
-            <div class="col-lg-8 mb-4">
-                <div class="buzz-card">
+            <div class="col-lg-8 mb-4 dashboard-item">
+                <div class="buzz-card chart-container">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="font-primary text-primary mb-0">ACTIVIDAD DE VENTAS</h5>
-                        <div class="d-flex align-items-center">
-                            <div class="bg-success rounded-circle me-2" style="width: 8px; height: 8px;"></div>
+                        <h5 class="font-primary text-primary mb-0 section-header">ACTIVIDAD DE VENTAS</h5>
+                        <div class="real-time-indicator">
+                            <div class="real-time-dot"></div>
                             <span class="font-mono text-muted" style="font-size: 0.8rem;">TIEMPO REAL</span>
                         </div>
                     </div>
@@ -114,9 +108,9 @@ try {
                 </div>
             </div>
 
-            <div class="col-lg-4 mb-4">
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">VENTAS POR ESTADO DE PAGO</h5>
+            <div class="col-lg-4 mb-4 dashboard-item">
+                <div class="buzz-card chart-container">
+                    <h5 class="font-primary text-primary mb-3 section-header">VENTAS POR ESTADO DE PAGO</h5>
                     <div style="position: relative; height: 320px;">
                         <canvas id="paymentStatusChart"></canvas>
                     </div>
@@ -127,25 +121,10 @@ try {
             </div>
 
         <div class="row">
-            <div class="col-lg-4 mb-4"> <!-- Activity Log -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">REGISTRO DE ACTIVIDAD</h5>
-                    <div id="activityLog" style="max-height: 300px; overflow-y: auto;">
-                        <ul class="list-unstyled">
-                            <?php if (!empty($activityLog)): ?>
-                                <?php foreach ($activityLog as $activity): ?>
-                                    <li class="font-mono text-muted mb-2" style="font-size: 0.8rem;"><?php echo htmlspecialchars($activity); ?></li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li class="text-muted">No hay actividad reciente.</li>
-                            <?php endif; ?>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-4 mb-4"> <!-- Top Products -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">TOP 5 PRODUCTOS MÁS VENDIDOS</h5>
+
+            <div class="col-lg-4 mb-4 dashboard-item"> <!-- Top Products -->
+                <div class="buzz-card tech-effect">
+                    <h5 class="font-primary text-primary mb-3 section-header">TOP 5 PRODUCTOS MÁS VENDIDOS</h5>
                     <div id="topProducts">
                         <ul class="list-unstyled">
                             <?php if (!empty($top5Products)): ?>
@@ -159,9 +138,9 @@ try {
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 mb-4"> <!-- Low Stock -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">PRODUCTOS CON STOCK BAJO</h5>
+            <div class="col-lg-4 mb-4 dashboard-item"> <!-- Low Stock -->
+                <div class="buzz-card tech-effect">
+                    <h5 class="font-primary text-primary mb-3 section-header">PRODUCTOS CON STOCK BAJO</h5>
                     <div id="lowStockProducts">
                         <ul class="list-unstyled">
                             <?php if (!empty($lowStockProducts)): ?>
@@ -176,6 +155,9 @@ try {
                 </div>
             </div>
         </div>
+
+        <!-- System Footer -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
