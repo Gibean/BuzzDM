@@ -124,7 +124,7 @@ async function handleFormSubmit(event) {
     const result = await response.json()
 
     if (result.success) {
-      showNotification("¡Importación exitosa! " + result.message, "success")
+      showToast("¡Importación exitosa! " + result.message, "success")
       document.getElementById("currentStatus").textContent = "Archivo procesado en el servidor."
       // Here you would typically get actual import progress/results from the server
       // For now, we'll simulate a successful import for history
@@ -149,7 +149,7 @@ async function handleFormSubmit(event) {
           }
         })
       }
-      showNotification("Importación fallida: " + errorMessage, "error")
+      showToast("Importación fallida: " + errorMessage, "error")
       addToImportHistory({
         date: new Date().toISOString(),
         type: formData.get("dataType"),
@@ -162,7 +162,7 @@ async function handleFormSubmit(event) {
     }
   } catch (error) {
     console.error("Error durante la importación:", error)
-    showNotification("Error de conexión o del servidor: " + error.message, "error")
+    showToast("Error de conexión o del servidor: " + error.message, "error")
     document.getElementById("currentStatus").textContent = "Error de conexión."
     addToImportHistory({
       date: new Date().toISOString(),
@@ -192,11 +192,11 @@ async function loadImportHistory() {
       console.log('Import history data:', importHistory);
       renderImportHistory();
     } else {
-      showNotification('Error al cargar el historial de importaciones: ' + result.message, 'error');
+      showToast('Error al cargar el historial de importaciones: ' + result.message, 'error');
     }
   } catch (error) {
     console.error('Error fetching import history:', error);
-    showNotification('Error de conexión al cargar el historial de importaciones.', 'error');
+    showToast('Error de conexión al cargar el historial de importaciones.', 'error');
   }
 }
 
@@ -223,7 +223,7 @@ function renderImportHistory() {
                 <button class="btn btn-outline-buzz btn-sm" onclick="viewImportDetails(${item.id})" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
-                ${ 
+                ${
                   item.status === "error"
                     ? `
                     <button class="btn btn-outline-warning btn-sm ms-1" onclick="retryImport(${item.id})" title="Reintentar">
@@ -277,20 +277,28 @@ function viewImportDetails(importId) {
   const importItem = importHistory.find((h) => h.id === importId)
   if (!importItem) return
 
-  alert(`Detalles de Importación #${importId}:
-    
+  showModal({
+    title: `Detalles de Importación #${importId}`,
+    message: `
 Fecha: ${formatDateTime(importItem.date)}
 Tipo: ${getTypeLabel(importItem.type)}
 Archivo: ${importItem.filename}
 Estado: ${importItem.status}
 Registros exitosos: ${importItem.records}
 Errores: ${importItem.errors}
-Usuario: ${importItem.user}`)
+Usuario: ${importItem.user}`,
+    type: "info"
+  })
 }
 
 function retryImport(importId) {
-  if (confirm("¿Deseas reintentar esta importación?")) {
-    showNotification("Funcionalidad de reintento no implementada en esta demo.", "info")
-  }
+  showModal({
+    title: "Reintentar Importación",
+    message: "¿Deseas reintentar esta importación?",
+    type: "confirm",
+    onConfirm: () => {
+      showToast("Funcionalidad de reintento no implementada en esta demo.", "info")
+    }
+  })
 }
 
