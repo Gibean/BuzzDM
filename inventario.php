@@ -15,7 +15,6 @@
 <body>
     <!-- Sidebar -->
     <?php require_once 'php/sidebar.php'; ?>
-     Main Content
     <main class="main-content">
        <!--  Top Navbar -->
         <nav class="top-navbar">

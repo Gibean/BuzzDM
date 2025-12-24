@@ -16,6 +16,43 @@
   --font-monospace: "Roboto Mono", monospace;
 }
 
+/* ============================================
+   CUSTOM SCROLLBARS - BUZZ THEME
+   ============================================ */
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 20px;
+  height: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--buzz-dark-bg);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--buzz-primary-color) 0%, #e6900a 100%);
+  border-radius: 10px;
+  border: 2px solid var(--buzz-dark-bg);
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ff8f00 0%, var(--buzz-primary-color) 100%);
+  box-shadow: 0 0 10px rgba(255, 160, 0, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--buzz-primary-color);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--buzz-primary-color) var(--buzz-dark-bg);
+}
+
 /* Reset y base */
 * {
   margin: 0;
@@ -604,7 +641,88 @@ input:-webkit-autofill:active {
   }
   .main-content {
     margin-left: 0;
+    padding: 0.5rem 1.5rem;
+  }
+
+  /* Reduce padding for cards on mobile */
+  .buzz-card {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Optimize table for mobile */
+  .table-buzz th,
+  .table-buzz td {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.8rem;
+  }
+
+  .table-buzz th {
+    font-size: 0.7rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* Make tables horizontally scrollable */
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Reduce button sizes on mobile */
+  .btn-buzz,
+  .btn-outline-buzz {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  /* Smaller action buttons in tables */
+  .btn-action {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  /* Reduce form control padding */
+  .form-control-buzz {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Smaller badges */
+  .badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.4rem;
+  }
+
+  /* Reduce modal padding */
+  .modal-content-buzz {
     padding: 1rem;
+    margin: 10% auto;
+  }
+
+  .modal-header-buzz {
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .modal-body-buzz {
+    padding: 0.5rem 0;
+  }
+
+  .modal-footer-buzz {
+    padding-top: 0.75rem;
+  }
+
+  /* Smaller stats cards */
+  .stats-card {
+    padding: 0.75rem;
+  }
+
+  .stats-number {
+    font-size: 1.5rem;
+  }
+
+  .stats-label {
+    font-size: 0.75rem;
   }
 }
 
