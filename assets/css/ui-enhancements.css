@@ -1,0 +1,249 @@
+/* ============================================
+   ENHANCED UI COMPONENTS
+   Custom styles for frequent customers and shipping status
+   ============================================ */
+
+/* Frequent Customers List - Enhanced Design */
+#frequentCustomersList {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#frequentCustomersList::-webkit-scrollbar {
+    width: 6px;
+}
+
+#frequentCustomersList::-webkit-scrollbar-track {
+    background: rgba(16, 20, 26, 0.5);
+}
+
+#frequentCustomersList::-webkit-scrollbar-thumb {
+    background: rgba(255, 160, 0, 0.3);
+    border-radius: 3px;
+}
+
+/* Frequent Customer Item */
+.frequent-customer-item {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: rgba(16, 20, 26, 0.4);
+    border-left: 3px solid var(--buzz-primary-color);
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.frequent-customer-item:hover {
+    background: rgba(16, 20, 26, 0.6);
+    border-left-color: var(--buzz-primary-color);
+}
+
+.frequent-customer-name {
+    font-family: var(--font-monospace);
+    color: var(--buzz-text-color);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.frequent-customer-orders {
+    font-family: var(--font-primary);
+    color: var(--buzz-primary-color);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Enhanced Status Badges */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: var(--font-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    border: 2px solid;
+}
+
+.status-badge i {
+    font-size: 1rem;
+}
+
+/* Pendiente - Warning/Yellow */
+.status-badge.status-pendiente {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+    border-color: rgba(255, 193, 7, 0.3);
+}
+
+.status-badge.status-pendiente i {
+    animation: pulse-warning 2s ease-in-out infinite;
+}
+
+/* Enviado - Info/Blue */
+.status-badge.status-enviado {
+    background: rgba(13, 202, 240, 0.15);
+    color: #0dcaf0;
+    border-color: rgba(13, 202, 240, 0.3);
+}
+
+.status-badge.status-enviado i {
+    animation: truck-move 1.5s ease-in-out infinite;
+}
+
+/* Entregado - Success/Green */
+.status-badge.status-entregado {
+    background: rgba(25, 135, 84, 0.15);
+    color: #198754;
+    border-color: rgba(25, 135, 84, 0.3);
+}
+
+/* Enhanced Progress Bar */
+.progress-buzz {
+    height: 8px;
+    background: rgba(16, 20, 26, 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 160, 0, 0.2);
+}
+
+.progress-buzz-bar {
+    height: 100%;
+    background: linear-gradient(90deg,
+        var(--buzz-primary-color),
+        rgba(255, 160, 0, 0.7)
+    );
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-buzz-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shimmer 2s infinite;
+}
+
+.progress-text {
+    font-family: var(--font-monospace);
+    font-size: 0.75rem;
+    color: var(--buzz-text-muted);
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.progress-text i {
+    color: var(--buzz-primary-color);
+}
+
+/* Animations */
+@keyframes pulse-warning {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes truck-move {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(3px);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* Shipment Card Enhancements */
+.shipment-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.shipment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(255, 160, 0, 0.1);
+}
+
+/* Status Icons */
+.status-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.status-icon.status-pendiente {
+    background: rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+.status-icon.status-enviado {
+    background: rgba(13, 202, 240, 0.2);
+    color: #0dcaf0;
+}
+
+.status-icon.status-entregado {
+    background: rgba(25, 135, 84, 0.2);
+    color: #198754;
+}
+
+/* Tracking Number Badge */
+.tracking-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 160, 0, 0.1);
+    border: 1px solid rgba(255, 160, 0, 0.3);
+    border-radius: 4px;
+    font-family: var(--font-monospace);
+    font-size: 0.8rem;
+    color: var(--buzz-primary-color);
+}
+
+.tracking-badge i {
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .status-badge {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .frequent-customer-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}
