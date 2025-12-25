@@ -9,7 +9,11 @@ ini_set('display_errors', 1);
 require_once 'sesion.php';
 require_once 'db.php';
 
-header('Content-Type: application/json');
+// Only set JSON header if not downloading a file
+$action = $_GET['action'] ?? '';
+if ($action !== 'download') {
+    header('Content-Type: application/json');
+}
 
 // Verify admin access
 if ($_SESSION['usuario_rol'] !== 'admin') {
@@ -23,7 +27,12 @@ $pdo = getDbConnection();
 
 switch ($method) {
     case 'GET':
-        handleGetBackups($pdo);
+        $action = $_GET['action'] ?? '';
+        if ($action === 'download') {
+            handleDownloadBackup($pdo);
+        } else {
+            handleGetBackups($pdo);
+        }
         break;
 
     case 'POST':
@@ -212,8 +221,14 @@ function handleCreateBackup($pdo, $usuario_id) {
  * Download a backup file
  */
 function handleDownloadBackup($pdo) {
-    $data = json_decode(file_get_contents('php://input'), true);
-    $backupId = $data['id'] ?? 0;
+    // Accept ID from GET parameter (for direct downloads) or JSON body (for API calls)
+    $backupId = $_GET['id'] ?? 0;
+
+    if ($backupId === 0) {
+        // Fallback to JSON body for backward compatibility
+        $data = json_decode(file_get_contents('php://input'), true);
+        $backupId = $data['id'] ?? 0;
+    }
 
     try {
         $stmt = $pdo->prepare("SELECT archivo, ruta_archivo FROM backups WHERE id = ?");

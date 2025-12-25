@@ -318,6 +318,57 @@ body {
   gap: 0.5rem;
 }
 
+/* Large status dot for backup status indicator */
+.status-dot-large {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--buzz-text-muted);
+  box-shadow: 0 0 10px currentColor;
+  transition: all 0.3s ease;
+}
+
+.status-dot-large.active {
+  background: var(--buzz-success);
+  box-shadow: 0 0 15px var(--buzz-success);
+  animation: pulse-status-large 2s ease-in-out infinite;
+}
+
+.status-dot-large.warning {
+  background: var(--buzz-warning);
+  box-shadow: 0 0 15px var(--buzz-warning);
+  animation: pulse-status-large 1.5s ease-in-out infinite;
+}
+
+.status-dot-large.inactive {
+  background: var(--buzz-danger);
+  box-shadow: 0 0 15px var(--buzz-danger);
+}
+
+@keyframes pulse-status-large {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Status label colors */
+.status-label-active {
+  color: var(--buzz-success) !important;
+}
+
+.status-label-warning {
+  color: var(--buzz-warning) !important;
+}
+
+.status-label-inactive {
+  color: var(--buzz-danger) !important;
+}
+
 .system-footer .status-dot {
   width: 8px;
   height: 8px;

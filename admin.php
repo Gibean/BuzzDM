@@ -311,13 +311,65 @@
 
        <!--   Backups Tab  -->
         <div class="tab-content" id="backupsTab" style="display: none;">
-            <div class="row">
-                <div class="col-md-8">
+            <!-- Auto-Backup Status Card - Responsive -->
+            <div class="row mb-3">
+                <div class="col-12">
                     <div class="buzz-card">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="font-primary text-primary mb-0">BACKUPS DE BASE DE DATOS</h5>
-                            <button class="btn btn-buzz" onclick="createBackup()">
-                                <i class="fas fa-download"></i> Crear Backup
+                        <div class="row align-items-center">
+                            <!-- Status Indicator -->
+                            <div class="col-12 col-md-4 mb-3 mb-md-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="status-dot-large" id="statusDot"></div>
+                                    <div>
+                                        <span class="font-primary" id="statusLabel">VERIFICANDO...</span>
+                                        <p class="text-muted mb-0 small" id="statusMessage">Cargando estado...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Stats - Responsive Grid -->
+                            <div class="col-12 col-md-5">
+                                <div class="row text-center text-md-start">
+                                    <div class="col-4">
+                                        <span class="text-muted small d-block">Último Auto</span>
+                                        <span class="font-mono small" id="lastAutoBackup">--</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted small d-block">Próximo</span>
+                                        <span class="font-mono small" id="nextAutoBackup">--</span>
+                                    </div>
+                                    <div class="col-4">
+                                        <span class="text-muted small d-block">Total</span>
+                                        <span class="font-mono text-primary" id="totalAutoBackups">--</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Toggle Switch -->
+                            <div class="col-12 col-md-3 mt-3 mt-md-0">
+                                <div class="d-flex align-items-center justify-content-center justify-content-md-end gap-2">
+                                    <span class="text-muted small">Auto-Backup</span>
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" id="autoBackupToggle" checked>
+                                        <label class="form-check-label visually-hidden" for="autoBackupToggle">
+                                            Activar backup automático
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Backups Table -->
+                <div class="col-lg-8 col-12 mb-3 mb-lg-0">
+                    <div class="buzz-card">
+                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center mb-3 gap-2">
+                            <h5 class="font-primary text-primary mb-0">HISTORIAL DE BACKUPS</h5>
+                            <button class="btn btn-buzz btn-sm" onclick="createBackup()">
+                                <i class="fas fa-plus"></i> Nuevo Backup
                             </button>
                         </div>
                         <div class="table-responsive">
@@ -338,26 +390,50 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
+
+                <!-- Info Panel -->
+                <div class="col-lg-4 col-12">
                     <div class="buzz-card">
-                        <h6 class="font-primary text-primary mb-3">CONFIGURACIÓN DE BACKUP</h6>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="autoBackup" checked>
-                                <label class="form-check-label text-muted" for="autoBackup">
-                                    Activar backup automático
-                                </label>
+                        <h6 class="font-primary text-primary mb-3">
+                            <i class="fas fa-cog"></i> CONFIGURACIÓN
+                        </h6>
+
+                        <!-- Auto Backup Toggle Info -->
+                        <div class="mb-3 p-2 rounded" style="background: rgba(255,160,0,0.1);">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="fas fa-robot text-primary"></i>
+                                <strong class="small">Sistema Fallback</strong>
                             </div>
+                            <p class="text-muted small mb-0">
+                                Si no hay backups en 24h, el sistema crea uno automáticamente cuando un admin visita la página.
+                            </p>
                         </div>
+
+                        <!-- Cron Info -->
                         <div class="mb-3">
-                            <label class="form-label text-muted">Frecuencia</label>
-                            <select class="form-control form-control-buzz" id="backupFrequency">
-                                <option value="daily">Diario</option>
-                                <option value="weekly">Semanal</option>
-                                <option value="monthly">Mensual</option>
-                            </select>
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="fas fa-clock text-primary"></i>
+                                <strong class="small">Cron Job (Hosting)</strong>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                Para mayor fiabilidad, configure un cron job en su hosting que ejecute <code class="small">auto_backup.php</code>
+                            </p>
                         </div>
-                        <div class="mb-3">
+
+                        <!-- Warning -->
+                        <div class="p-2 rounded" style="background: rgba(255,193,7,0.1);">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <i class="fas fa-exclamation-triangle text-warning"></i>
+                                <strong class="small text-warning">Restaurar</strong>
+                            </div>
+                            <p class="text-muted small mb-0">
+                                Sobrescribe todos los datos actuales. Acción irreversible.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     <!--      Settings Tab  -->
         <div class="tab-content" id="settingsTab" style="display: none;">
@@ -515,6 +591,6 @@
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js?v=4"></script>
-    <script src="assets/js/admin.js?v=6"></script>
+    <script src="assets/js/admin.js?v=7"></script>
 </body>
 </html>
