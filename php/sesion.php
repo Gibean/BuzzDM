@@ -19,7 +19,8 @@ $api_scripts = [
     'settings_actions.php',
     'logs.php',
     'users.php',
-    'backups.php'
+    'backups.php',
+    'backup_status.php'
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -109,6 +110,7 @@ $allowed_pages = [
         'company_settings_actions.php',
         'backup.php',
         'backups.php',
+        'backup_status.php',
         'logs.php',
         'api_sales_chart.php',
         'clientes_actions.php',
@@ -212,6 +214,13 @@ if (($current_page === 'inventario.php' || $current_page === 'importacion.php') 
         header('Location: dashboard.php');
         exit();
     }
+}
+
+// --- Automatic Backup Check (Poor Man's Cron) ---
+// Only run on page requests, not on API calls
+if (!$is_api_call && file_exists(__DIR__ . '/backup_check.php')) {
+    require_once __DIR__ . '/backup_check.php';
+    checkAndRunAutoBackup();
 }
 
 ?>
