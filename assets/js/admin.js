@@ -581,7 +581,124 @@
       tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
       showToast("Error al cargar backups", "error")
     }
+
+    // Also load auto-backup status
+    loadAutoBackupStatus()
   }
+
+  async function loadAutoBackupStatus() {
+    console.log('loadAutoBackupStatus: Starting...')
+
+    const statusDot = document.getElementById('statusDot')
+    const statusLabel = document.getElementById('statusLabel')
+    const statusMessage = document.getElementById('statusMessage')
+    const lastAutoBackup = document.getElementById('lastAutoBackup')
+    const nextAutoBackup = document.getElementById('nextAutoBackup')
+    const totalAutoBackups = document.getElementById('totalAutoBackups')
+
+    console.log('loadAutoBackupStatus: Elements found:', {
+      statusDot: !!statusDot,
+      statusLabel: !!statusLabel,
+      statusMessage: !!statusMessage
+    })
+
+    if (!statusDot || !statusLabel) {
+      console.error('loadAutoBackupStatus: Required elements not found!')
+      return
+    }
+
+    try {
+      console.log('loadAutoBackupStatus: Fetching data...')
+      const data = await fetchJSON('php/backup_status.php')
+      console.log('loadAutoBackupStatus: Data received:', data)
+
+      if (!data.success) {
+        console.error('loadAutoBackupStatus: Server returned error:', data.error)
+        statusLabel.textContent = 'ERROR'
+        statusLabel.className = 'font-primary status-label-inactive'
+        statusDot.className = 'status-dot-large inactive'
+        if (statusMessage) statusMessage.textContent = data.error || 'Error al verificar'
+        return
+      }
+
+      const autoBackup = data.autoBackup
+      console.log('loadAutoBackupStatus: Updating UI with:', autoBackup)
+
+      // Update status dot and label
+      statusDot.className = `status-dot-large ${autoBackup.status}`
+      statusLabel.textContent = autoBackup.statusLabel
+      statusLabel.className = `font-primary status-label-${autoBackup.status}`
+      if (statusMessage) statusMessage.textContent = autoBackup.message
+
+      // Update details
+      if (lastAutoBackup) {
+        lastAutoBackup.textContent = autoBackup.lastRunAgo || 'Nunca'
+      }
+      if (nextAutoBackup) {
+        nextAutoBackup.textContent = autoBackup.nextExpectedFormatted || '--'
+      }
+      if (totalAutoBackups) {
+        totalAutoBackups.textContent = autoBackup.totalAutoBackups
+      }
+
+      // Sync toggle state with server config
+      const autoBackupToggle = document.getElementById('autoBackupToggle')
+      if (autoBackupToggle && data.fallbackEnabled !== undefined) {
+        autoBackupToggle.checked = data.fallbackEnabled
+      }
+
+      console.log('loadAutoBackupStatus: UI updated successfully')
+
+    } catch (error) {
+      console.error('loadAutoBackupStatus: Exception caught:', error)
+      if (statusDot) statusDot.className = 'status-dot-large inactive'
+      if (statusLabel) {
+        statusLabel.textContent = 'ERROR'
+        statusLabel.className = 'font-primary status-label-inactive'
+      }
+      if (statusMessage) statusMessage.textContent = 'Error al verificar estado'
+    }
+  }
+
+  // Handle auto-backup toggle
+  function setupAutoBackupToggle() {
+    const toggle = document.getElementById('autoBackupToggle')
+    if (!toggle) return
+
+    toggle.addEventListener('change', async function() {
+      const enabled = this.checked
+
+      try {
+        const data = await fetchJSON('php/backup_status.php?action=toggle', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ enabled: enabled })
+        })
+
+        if (data.success) {
+          showToast(
+            enabled ? 'Backup automático activado' : 'Backup automático desactivado',
+            'success'
+          )
+        } else {
+          // Revert toggle
+          this.checked = !enabled
+          showToast(data.error || 'Error al cambiar configuración', 'error')
+        }
+
+      } catch (error) {
+        console.error('Error toggling auto-backup:', error)
+        // Revert toggle
+        this.checked = !enabled
+        showToast('Error al cambiar configuración', 'error')
+      }
+    })
+  }
+
+  // Initialize toggle when backups tab loads
+  document.addEventListener('DOMContentLoaded', () => {
+    setupAutoBackupToggle()
+  })
 
   async function createBackup() {
     const createBtn = document.querySelector('button[onclick="createBackup()"]')
