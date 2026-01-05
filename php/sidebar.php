@@ -34,7 +34,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <?php
-            $inventarioPages = ['inventario.php', 'cargos_existencias.php'];
+            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php'];
             $inventarioActive = in_array($currentPage, $inventarioPages);
             ?>
             <li class="nav-item nav-dropdown <?php echo $inventarioActive ? 'open' : ''; ?>">
@@ -54,6 +54,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
                            href="cargos_existencias.php">
                             <i class="fas fa-dolly"></i> Cargar Existencias
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'almacenes.php' ? 'active' : ''; ?>"
+                           href="almacenes.php">
+                            <i class="fas fa-warehouse"></i> Almacenes
                         </a>
                     </li>
                 </ul>
