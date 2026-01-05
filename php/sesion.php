@@ -120,8 +120,8 @@ $allowed_pages = [
         'search_api.php',
         'process_import.php',
         'manual.php',
-        'settings_actions.php'
-
+        'settings_actions.php',
+        'cargos_existencias.php'
 
     ],
     'supervisor' => [

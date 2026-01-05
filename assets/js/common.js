@@ -249,4 +249,25 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // --- Sidebar Dropdown Toggle ---
+    const dropdownToggles = document.querySelectorAll('.nav-dropdown-toggle');
+
+    dropdownToggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            const parent = this.closest('.nav-dropdown');
+
+            // Close other dropdowns
+            document.querySelectorAll('.nav-dropdown.open').forEach(dropdown => {
+                if (dropdown !== parent) {
+                    dropdown.classList.remove('open');
+                }
+            });
+
+            // Toggle current dropdown
+            parent.classList.toggle('open');
+        });
+    });
 });
+

@@ -10,6 +10,18 @@ document.addEventListener("DOMContentLoaded", function () {
   const productStock = document.getElementById("productStock")
   const productMinStock = document.getElementById("productMinStock")
   const productStatus = document.getElementById("productStatus")
+  // New attribute fields
+  const productMarca = document.getElementById("productMarca")
+  const productCategoria = document.getElementById("productCategoria")
+  const productProveedor = document.getElementById("productProveedor")
+  const productModelo = document.getElementById("productModelo")
+  const productColor = document.getElementById("productColor")
+  const productTamanio = document.getElementById("productTamanio")
+  const productMedidas = document.getElementById("productMedidas")
+  const productPeso = document.getElementById("productPeso")
+  const productMaterial = document.getElementById("productMaterial")
+  const productUnidadVenta = document.getElementById("productUnidadVenta")
+
   const productsTableBody = document.getElementById("productsTableBody")
   const paginationContainer = document.getElementById("pagination")
   const showingFromSpan = document.getElementById("showingFrom")
@@ -23,6 +35,12 @@ document.addEventListener("DOMContentLoaded", function () {
   const productsPerPage = 10
   let totalProducts = 0
   const product_actions_url = "php/product_actions.php"
+
+  // Catalogs cache
+  let catalogos = { marcas: [], categorias: [], proveedores: [] }
+
+  // Load catalogs on page load
+  cargarCatalogos()
 
   async function fetchProducts() {
     const search = searchInput.value
@@ -172,6 +190,18 @@ document.addEventListener("DOMContentLoaded", function () {
     productIdHidden.value = ""
     productSku.readOnly = !!product
 
+    // Reset new fields
+    if (productMarca) productMarca.value = ""
+    if (productCategoria) productCategoria.value = ""
+    if (productProveedor) productProveedor.value = ""
+    if (productModelo) productModelo.value = ""
+    if (productColor) productColor.value = ""
+    if (productTamanio) productTamanio.value = ""
+    if (productMedidas) productMedidas.value = ""
+    if (productPeso) productPeso.value = ""
+    if (productMaterial) productMaterial.value = ""
+    if (productUnidadVenta) productUnidadVenta.value = "UND"
+
     if (product) {
       modalTitle.textContent = "Editar Producto"
       productIdHidden.value = product.id
@@ -182,6 +212,17 @@ document.addEventListener("DOMContentLoaded", function () {
       productStock.value = product.stock
       productMinStock.value = product.min_stock || 10
       productStatus.value = product.status
+      // New fields
+      if (productMarca) productMarca.value = product.marca_id || ""
+      if (productCategoria) productCategoria.value = product.categoria || ""
+      if (productProveedor) productProveedor.value = product.proveedor_id || ""
+      if (productModelo) productModelo.value = product.modelo || ""
+      if (productColor) productColor.value = product.color || ""
+      if (productTamanio) productTamanio.value = product.tamanio || ""
+      if (productMedidas) productMedidas.value = product.medidas || ""
+      if (productPeso) productPeso.value = product.peso_kg || ""
+      if (productMaterial) productMaterial.value = product.material || ""
+      if (productUnidadVenta) productUnidadVenta.value = product.unidad_venta || "UND"
     } else {
       modalTitle.textContent = "Nuevo Producto"
     }
@@ -217,7 +258,18 @@ document.addEventListener("DOMContentLoaded", function () {
       price: parseFloat(productPrice.value),
       stock: parseInt(productStock.value),
       min_stock: parseInt(productMinStock.value),
-      status: productStatus.value
+      status: productStatus.value,
+      // New fields
+      marca_id: productMarca ? productMarca.value || null : null,
+      categoria: productCategoria ? productCategoria.value || null : null,
+      proveedor_id: productProveedor ? productProveedor.value || null : null,
+      modelo: productModelo ? productModelo.value.trim() || null : null,
+      color: productColor ? productColor.value.trim() || null : null,
+      tamanio: productTamanio ? productTamanio.value.trim() || null : null,
+      medidas: productMedidas ? productMedidas.value.trim() || null : null,
+      peso_kg: productPeso ? (parseFloat(productPeso.value) || null) : null,
+      material: productMaterial ? productMaterial.value.trim() || null : null,
+      unidad_venta: productUnidadVenta ? productUnidadVenta.value || "UND" : "UND"
     }
 
     // Validation for required fields
@@ -492,5 +544,47 @@ document.addEventListener("DOMContentLoaded", function () {
     fetchProducts()
   }
 
+  // =====================================================
+  // CARGAR CATÁLOGOS (Marcas, Categorías, Proveedores)
+  // =====================================================
+
+  async function cargarCatalogos() {
+    try {
+      const response = await fetch('php/catalogos_actions.php')
+      const data = await response.json()
+
+      if (data.success) {
+        catalogos = data.catalogos
+
+        // Llenar select de marcas
+        if (productMarca) {
+          productMarca.innerHTML = '<option value="">Seleccionar marca...</option>'
+          catalogos.marcas.forEach(m => {
+            productMarca.innerHTML += `<option value="${m.id}">${m.nombre}</option>`
+          })
+        }
+
+        // Llenar select de categorías
+        if (productCategoria) {
+          productCategoria.innerHTML = '<option value="">Sin categoría</option>'
+          catalogos.categorias.forEach(c => {
+            productCategoria.innerHTML += `<option value="${c.id}">${c.nombre}</option>`
+          })
+        }
+
+        // Llenar select de proveedores
+        if (productProveedor) {
+          productProveedor.innerHTML = '<option value="">Sin proveedor</option>'
+          catalogos.proveedores.forEach(p => {
+            productProveedor.innerHTML += `<option value="${p.id}">${p.nombre}</option>`
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Error cargando catálogos:', error)
+    }
+  }
+
   fetchProducts()
 })
+
