@@ -54,11 +54,23 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
+        // New attribute fields
+        $marca_id = !empty($input['marca_id']) ? intval($input['marca_id']) : null;
+        $categoria = !empty($input['categoria']) ? intval($input['categoria']) : null;
+        $proveedor_id = !empty($input['proveedor_id']) ? intval($input['proveedor_id']) : null;
+        $modelo = trim($input['modelo'] ?? '');
+        $color = trim($input['color'] ?? '');
+        $tamanio = trim($input['tamanio'] ?? '');
+        $medidas = trim($input['medidas'] ?? '');
+        $peso_kg = !empty($input['peso_kg']) ? floatval($input['peso_kg']) : null;
+        $material = trim($input['material'] ?? '');
+        $unidad_venta = trim($input['unidad_venta'] ?? '');
+
         if ($id) {
             // Update
-            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
+            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, marca_id = ?, categoria = ?, proveedor_id = ?, modelo = ?, color = ?, tamanio = ?, medidas = ?, peso_kg = ?, material = ?, unidad_venta = ?, actualizado_at = NOW() WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
+            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta, $id]);
             json_response(true, [], 'Producto actualizado exitosamente.');
         } else {
             // Create
@@ -69,9 +81,9 @@ try {
                 json_response(false, [], 'El SKU ya existe.');
             }
 
-            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, creado_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, marca_id, categoria, proveedor_id, modelo, color, tamanio, medidas, peso_kg, material, unidad_venta, creado_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado]);
+            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta]);
             json_response(true, [], 'Producto creado exitosamente.');
         }
     }
@@ -97,9 +109,21 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
-        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
+        // New attribute fields
+        $marca_id = !empty($input['marca_id']) ? intval($input['marca_id']) : null;
+        $categoria = !empty($input['categoria']) ? intval($input['categoria']) : null;
+        $proveedor_id = !empty($input['proveedor_id']) ? intval($input['proveedor_id']) : null;
+        $modelo = trim($input['modelo'] ?? '');
+        $color = trim($input['color'] ?? '');
+        $tamanio = trim($input['tamanio'] ?? '');
+        $medidas = trim($input['medidas'] ?? '');
+        $peso_kg = !empty($input['peso_kg']) ? floatval($input['peso_kg']) : null;
+        $material = trim($input['material'] ?? '');
+        $unidad_venta = trim($input['unidad_venta'] ?? '');
+
+        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, marca_id = ?, categoria = ?, proveedor_id = ?, modelo = ?, color = ?, tamanio = ?, medidas = ?, peso_kg = ?, material = ?, unidad_venta = ?, actualizado_at = NOW() WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
+        $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta, $id]);
         json_response(true, [], 'Producto actualizado exitosamente.');
     }
     // Handle DELETE requests (Soft Delete)
@@ -121,7 +145,7 @@ try {
     elseif ($method === 'GET') {
         if (isset($_GET['id'])) {
             // Fetch single product
-            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at FROM productos WHERE id = ?");
+            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, marca_id, categoria, proveedor_id, modelo, color, tamanio, medidas, peso_kg, material, unidad_venta, deleted_at FROM productos WHERE id = ?");
             $stmt->execute([$_GET['id']]);
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -188,7 +212,7 @@ try {
             $total = $stmt->fetchColumn();
 
             // Fetch data
-            $sql = "SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at
+            $sql = "SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, marca_id, categoria, proveedor_id, modelo, color, tamanio, medidas, peso_kg, material, unidad_venta, deleted_at
                     FROM productos
                     WHERE $whereSql
                     ORDER BY $sortBy $sortOrder
