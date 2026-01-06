@@ -20,7 +20,19 @@ $api_scripts = [
     'logs.php',
     'users.php',
     'backups.php',
-    'backup_status.php'
+    'backup_status.php',
+    // Phase 1 - Cargos de existencias
+    'cargos_actions.php',
+    'productos_search.php',
+    'proveedores_search.php',
+    // Phase 1.7 - Product types and kits
+    'catalogos_actions.php',
+    'kit_actions.php',
+    // Phase 2 - Multi-warehouse
+    'almacenes_actions.php',
+    'ubicaciones_actions.php',
+    // Proveedores
+    'proveedores_actions.php'
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -121,8 +133,18 @@ $allowed_pages = [
         'process_import.php',
         'manual.php',
         'settings_actions.php',
-        'cargos_existencias.php'
-
+        'cargos_existencias.php',
+        'almacenes.php',
+        // API scripts for inventory phases
+        'cargos_actions.php',
+        'productos_search.php',
+        'catalogos_actions.php',
+        'kit_actions.php',
+        'almacenes_actions.php',
+        'ubicaciones_actions.php',
+        // Proveedores
+        'proveedores.php',
+        'proveedores_actions.php'
     ],
     'supervisor' => [
         'dashboard.php',
@@ -155,7 +177,18 @@ $allowed_pages = [
         'product_actions.php',
         'search_api.php',
         'process_import.php',
-        'manual.php'
+        'manual.php',
+        // Phase 1 and 2 pages for supervisor
+        'cargos_existencias.php',
+        'almacenes.php',
+        'cargos_actions.php',
+        'productos_search.php',
+        'catalogos_actions.php',
+        'kit_actions.php',
+        'almacenes_actions.php',
+        'ubicaciones_actions.php',
+        'proveedores.php',
+        'proveedores_actions.php'
     ],
     'operador' => [
         'dashboard.php',

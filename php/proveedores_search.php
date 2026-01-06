@@ -18,7 +18,7 @@ if (strlen($query) < 2) {
 }
 
 try {
-    $pdo = getDBConnection();
+    $pdo = getDbConnection();
 
     $sql = "SELECT id, nombre, contacto_nombre, telefono
             FROM proveedores

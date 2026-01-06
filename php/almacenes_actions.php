@@ -18,7 +18,7 @@ function json_response($success, $data = [], $message = '') {
 }
 
 try {
-    $pdo = getDBConnection();
+    $pdo = getDbConnection();
     $method = $_SERVER['REQUEST_METHOD'];
 
     // GET - Listar almacenes o obtener uno específico
