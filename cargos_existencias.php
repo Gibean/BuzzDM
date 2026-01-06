@@ -143,13 +143,14 @@
                             </div>
                             <div class="col-md-3 mb-3">
                                 <label class="form-label text-muted">Concepto *</label>
-                                <select class="form-control form-control-buzz" id="cargoConcepto" required>
-                                    <option value="compra">Compra</option>
-                                    <option value="donacion">Donación</option>
-                                    <option value="ajuste_positivo">Ajuste Positivo</option>
-                                    <option value="devolucion_cliente">Devolución de Cliente</option>
-                                    <option value="inventario_inicial">Inventario Inicial</option>
-                                    <option value="otro">Otro</option>
+                                <select class="form-control form-control-buzz" id="cargoConcepto" required onchange="onConceptoChange()">
+                                    <option value="compra">📦 Compra a Proveedor</option>
+                                    <option value="transferencia">🔄 Transferencia entre Almacenes</option>
+                                    <option value="ajuste_positivo">➕ Ajuste Positivo</option>
+                                    <option value="inventario_inicial">📋 Inventario Inicial</option>
+                                    <option value="devolucion_cliente">↩️ Devolución de Cliente</option>
+                                    <option value="donacion">🎁 Donación Recibida</option>
+                                    <option value="otro">📝 Otro</option>
                                 </select>
                             </div>
                             <div class="col-md-3 mb-3" id="conceptoOtroContainer" style="display: none;">
@@ -160,7 +161,12 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Proveedor (opcional)</label>
+                                <label class="form-label text-muted">
+                                    Proveedor (opcional)
+                                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" onclick="abrirModalNuevoProveedor()" title="Agregar proveedor">
+                                        <i class="fas fa-plus-circle"></i> Nuevo
+                                    </button>
+                                </label>
                                 <div class="position-relative">
                                     <input type="text" class="form-control form-control-buzz" id="proveedorBusqueda"
                                            placeholder="Buscar proveedor..." autocomplete="off">
@@ -181,7 +187,15 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-12 mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Almacén Destino *</label>
+                                <select class="form-control form-control-buzz" id="cargoAlmacenId" required>
+                                    <option value="">Seleccionar almacén...</option>
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </select>
+                                <small class="text-muted font-mono">Almacén donde ingresará el stock</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Notas</label>
                                 <textarea class="form-control form-control-buzz" id="cargoNotas" rows="2"
                                           placeholder="Observaciones adicionales..."></textarea>
@@ -204,8 +218,6 @@
                             <div class="linea-col col-sku">SKU/Código</div>
                             <div class="linea-col col-nombre">Producto</div>
                             <div class="linea-col col-cantidad">Cantidad</div>
-                            <div class="linea-col col-costo">Costo Unit.</div>
-                            <div class="linea-col col-subtotal">Subtotal</div>
                             <div class="linea-col col-acciones"></div>
                         </div>
 
@@ -226,25 +238,18 @@
                 <div class="buzz-card mb-4">
                     <div class="card-body-buzz">
                         <div class="row align-items-center">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="resumen-item">
                                     <i class="fas fa-cubes"></i>
                                     <span class="resumen-label">Total Productos:</span>
                                     <span class="resumen-value" id="totalProductos">0</span>
                                 </div>
                             </div>
-                            <div class="col-md-4">
-                                <div class="resumen-item">
+                            <div class="col-md-6">
+                                <div class="resumen-item resumen-total">
                                     <i class="fas fa-layer-group"></i>
                                     <span class="resumen-label">Total Unidades:</span>
                                     <span class="resumen-value" id="totalUnidades">0</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="resumen-item resumen-total">
-                                    <i class="fas fa-dollar-sign"></i>
-                                    <span class="resumen-label">Valor Total:</span>
-                                    <span class="resumen-value" id="valorTotal">$0.00</span>
                                 </div>
                             </div>
                         </div>
@@ -323,6 +328,41 @@
                 </button>
                 <button type="button" class="btn btn-warning" onclick="ejecutarAnulacion()">
                     <i class="fas fa-ban"></i> Anular Cargo
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nuevo Proveedor (rápido) -->
+    <div id="modalNuevoProveedor" class="modal-buzz">
+        <div class="modal-content-buzz" style="max-width: 500px;">
+            <div class="modal-header-buzz">
+                <h5><i class="fas fa-truck"></i> Agregar Nuevo Proveedor</h5>
+                <button type="button" class="close-buzz" onclick="cerrarModalNuevoProveedor()">&times;</button>
+            </div>
+            <div class="modal-body-buzz">
+                <div class="mb-3">
+                    <label class="form-label text-muted">Nombre del Proveedor *</label>
+                    <input type="text" class="form-control form-control-buzz" id="nuevoProveedorNombre"
+                           placeholder="Ej: Distribuidora ABC" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">RIF/Identificación</label>
+                        <input type="text" class="form-control form-control-buzz" id="nuevoProveedorRif"
+                               placeholder="J-12345678-9">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Teléfono</label>
+                        <input type="text" class="form-control form-control-buzz" id="nuevoProveedorTelefono"
+                               placeholder="+58 412 1234567">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-buzz">
+                <button type="button" class="btn btn-outline-buzz" onclick="cerrarModalNuevoProveedor()">Cancelar</button>
+                <button type="button" class="btn btn-buzz" onclick="guardarNuevoProveedor()">
+                    <i class="fas fa-save"></i> Guardar
                 </button>
             </div>
         </div>

@@ -6,6 +6,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar
     inicializarFecha();
+    cargarAlmacenes();
     cargarCargos();
     configurarEventos();
 });
@@ -38,13 +39,9 @@ function configurarEventos() {
     document.getElementById('filterFechaDesde').addEventListener('change', cargarCargos);
     document.getElementById('filterFechaHasta').addEventListener('change', cargarCargos);
 
-    // Concepto "otro"
+    // Concepto change handler (también llamado desde onchange en HTML)
     document.getElementById('cargoConcepto').addEventListener('change', function() {
-        const container = document.getElementById('conceptoOtroContainer');
-        container.style.display = this.value === 'otro' ? 'block' : 'none';
-        if (this.value !== 'otro') {
-            document.getElementById('cargoConceptoOtro').value = '';
-        }
+        onConceptoChange();
     });
 
     // Búsqueda de proveedor
@@ -129,6 +126,9 @@ function limpiarFormulario() {
     lineaIndex = 0;
     actualizarTotales();
     inicializarFecha();
+    // Reset almacen selector
+    const almacenSelect = document.getElementById('cargoAlmacenId');
+    if (almacenSelect) almacenSelect.selectedIndex = 0;
 }
 
 // =====================================================
@@ -319,17 +319,6 @@ function agregarLineaProducto(producto = null) {
                        value="${producto?.cantidad || 1}"
                        placeholder="Cant.">
             </div>
-            <div class="linea-col col-costo">
-                <input type="number"
-                       class="form-control form-control-buzz costo-input"
-                       min="0"
-                       step="0.01"
-                       value="${producto?.costo || '0.00'}"
-                       placeholder="$0.00">
-            </div>
-            <div class="linea-col col-subtotal">
-                <span class="subtotal-display">$0.00</span>
-            </div>
             <div class="linea-col col-acciones">
                 <button type="button" class="btn-eliminar-linea" onclick="eliminarLinea('${lineaId}')">
                     <i class="fas fa-trash"></i>
@@ -477,36 +466,25 @@ function escapeHtml(text) {
 // CÁLCULOS
 // =====================================================
 
-function calcularSubtotal(lineaId) {
-    const linea = document.getElementById(lineaId);
-    if (!linea) return;
-
-    const cantidad = parseFloat(linea.querySelector('.cantidad-input').value) || 0;
-    const costo = parseFloat(linea.querySelector('.costo-input').value) || 0;
-    const subtotal = cantidad * costo;
-
-    linea.querySelector('.subtotal-display').textContent = formatearMoneda(subtotal);
+function actualizarLineaTotales(lineaId) {
+    // Solo actualiza los totales generales cuando cambia cantidad
     actualizarTotales();
 }
 
 function actualizarTotales() {
     let totalProductos = 0;
     let totalUnidades = 0;
-    let valorTotal = 0;
 
     document.querySelectorAll('.cargo-linea-row').forEach(linea => {
         if (linea.dataset.productoId) {
             totalProductos++;
             const cantidad = parseFloat(linea.querySelector('.cantidad-input').value) || 0;
-            const costo = parseFloat(linea.querySelector('.costo-input').value) || 0;
             totalUnidades += cantidad;
-            valorTotal += cantidad * costo;
         }
     });
 
     document.getElementById('totalProductos').textContent = totalProductos;
     document.getElementById('totalUnidades').textContent = totalUnidades;
-    document.getElementById('valorTotal').textContent = formatearMoneda(valorTotal);
 }
 
 // =====================================================
@@ -611,11 +589,18 @@ async function guardarCargo(confirmar) {
         concepto: concepto,
         concepto_otro: conceptoOtro,
         proveedor_id: document.getElementById('cargoProveedorId').value || null,
+        almacen_id: document.getElementById('cargoAlmacenId').value || null,
         referencia_externa: document.getElementById('cargoReferencia').value,
         notas: document.getElementById('cargoNotas').value,
         confirmar: confirmar,
         lineas: lineas
     };
+
+    // Validate almacen is selected
+    if (!data.almacen_id) {
+        showToast('Debes seleccionar un almacén destino', 'warning');
+        return;
+    }
 
     try {
         const url = data.id
@@ -704,6 +689,11 @@ function cargarFormularioDesdeData(cargo) {
 
     document.getElementById('cargoReferencia').value = cargo.referencia_externa || '';
     document.getElementById('cargoNotas').value = cargo.notas || '';
+
+    // Set almacen if exists
+    if (cargo.almacen_id) {
+        document.getElementById('cargoAlmacenId').value = cargo.almacen_id;
+    }
 
     // Cargar líneas
     document.getElementById('sinProductos').style.display = 'none';
@@ -924,5 +914,117 @@ async function ejecutarAnulacion() {
     } catch (error) {
         console.error('Error:', error);
         showToast('Error al anular el cargo', 'danger');
+    }
+}
+
+// =====================================================
+// CARGAR ALMACENES
+// =====================================================
+
+async function cargarAlmacenes() {
+    const select = document.getElementById('cargoAlmacenId');
+    if (!select) return;
+
+    try {
+        const response = await fetch('php/almacenes_actions.php');
+        const data = await response.json();
+
+        if (data.success && data.almacenes) {
+            select.innerHTML = '<option value="">Seleccionar almacén...</option>';
+            data.almacenes.forEach(almacen => {
+                select.innerHTML += `<option value="${almacen.id}">${almacen.nombre}${almacen.es_principal ? ' (Principal)' : ''}</option>`;
+            });
+
+            // Auto-select principal warehouse if there's only one or if there's a principal
+            const principal = data.almacenes.find(a => a.es_principal);
+            if (principal) {
+                select.value = principal.id;
+            }
+        }
+    } catch (error) {
+        console.error('Error cargando almacenes:', error);
+    }
+}
+
+// =====================================================
+// CONCEPTO CHANGE HANDLER
+// =====================================================
+
+function onConceptoChange() {
+    const concepto = document.getElementById('cargoConcepto').value;
+    const otroContainer = document.getElementById('conceptoOtroContainer');
+    const proveedorContainer = document.getElementById('proveedorBusqueda')?.closest('.col-md-6');
+
+    // Show/hide "otro" field
+    if (otroContainer) {
+        otroContainer.style.display = concepto === 'otro' ? 'block' : 'none';
+        if (concepto !== 'otro') {
+            document.getElementById('cargoConceptoOtro').value = '';
+        }
+    }
+
+    // Show/hide proveedor field based on concept
+    // Only show for "compra" (purchases)
+    if (proveedorContainer) {
+        if (concepto === 'compra') {
+            proveedorContainer.style.display = 'block';
+        } else {
+            proveedorContainer.style.display = 'none';
+            limpiarProveedor();
+        }
+    }
+}
+
+// =====================================================
+// MODAL NUEVO PROVEEDOR (Quick Add)
+// =====================================================
+
+function abrirModalNuevoProveedor() {
+    document.getElementById('nuevoProveedorNombre').value = '';
+    document.getElementById('nuevoProveedorRif').value = '';
+    document.getElementById('nuevoProveedorTelefono').value = '';
+    document.getElementById('modalNuevoProveedor').style.display = 'block';
+    document.getElementById('nuevoProveedorNombre').focus();
+}
+
+function cerrarModalNuevoProveedor() {
+    document.getElementById('modalNuevoProveedor').style.display = 'none';
+}
+
+async function guardarNuevoProveedor() {
+    const nombre = document.getElementById('nuevoProveedorNombre').value.trim();
+
+    if (!nombre) {
+        showToast('El nombre del proveedor es obligatorio', 'warning');
+        return;
+    }
+
+    const data = {
+        nombre: nombre,
+        rif: document.getElementById('nuevoProveedorRif').value.trim(),
+        telefono: document.getElementById('nuevoProveedorTelefono').value.trim()
+    };
+
+    try {
+        const response = await fetch('php/proveedores_actions.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Proveedor creado correctamente', 'success');
+            cerrarModalNuevoProveedor();
+
+            // Auto-select the new proveedor
+            seleccionarProveedor(result.id, nombre);
+        } else {
+            showToast('Error: ' + result.message, 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error al crear proveedor', 'danger');
     }
 }

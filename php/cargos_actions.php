@@ -25,7 +25,7 @@ if (!in_array($_SESSION['usuario_rol'], ['admin', 'supervisor'])) {
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
-$pdo = getDBConnection();
+$pdo = getDbConnection();
 
 try {
     switch ($method) {
@@ -204,12 +204,15 @@ function obtenerCargo($pdo, $id) {
                     WHEN 'confirmado' THEN 'Confirmado'
                     WHEN 'anulado' THEN 'Anulado'
                 END AS estado_texto,
+                c.almacen_id,
+                a.nombre AS almacen_nombre,
                 p.nombre AS proveedor_nombre,
                 u.nombre AS registrado_por_nombre,
                 uc.nombre AS confirmado_por_nombre,
                 ua.nombre AS anulado_por_nombre
             FROM cargos_existencias c
             LEFT JOIN proveedores p ON c.proveedor_id = p.id
+            LEFT JOIN almacenes a ON c.almacen_id = a.id
             LEFT JOIN usuarios u ON c.registrado_por = u.id
             LEFT JOIN usuarios uc ON c.confirmado_por = uc.id
             LEFT JOIN usuarios ua ON c.anulado_por = ua.id
@@ -258,18 +261,24 @@ function crearCargo($pdo, $data) {
     $pdo->beginTransaction();
 
     try {
-        // Generar código automático
-        $codigo = $pdo->query("SELECT fn_generar_codigo_cargo()")->fetchColumn();
+        // Generar código automático (sin depender de función SQL)
+        $year = date('Y');
+        $stmt = $pdo->prepare("SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 10) AS UNSIGNED)), 0) + 1 as next_num
+                               FROM cargos_existencias
+                               WHERE codigo LIKE ?");
+        $stmt->execute(["CGO-$year-%"]);
+        $nextNum = $stmt->fetchColumn();
+        $codigo = sprintf("CGO-%s-%04d", $year, $nextNum);
 
         // Determinar estado inicial
         $estado = ($data['confirmar'] ?? false) ? 'confirmado' : 'borrador';
 
         // Insertar encabezado
         $sql = "INSERT INTO cargos_existencias
-                (codigo, fecha, concepto, concepto_otro, proveedor_id,
+                (codigo, fecha, concepto, concepto_otro, proveedor_id, almacen_id,
                  referencia_externa, notas, registrado_por, estado)
                 VALUES
-                (:codigo, :fecha, :concepto, :concepto_otro, :proveedor_id,
+                (:codigo, :fecha, :concepto, :concepto_otro, :proveedor_id, :almacen_id,
                  :referencia, :notas, :usuario_id, :estado)";
 
         $stmt = $pdo->prepare($sql);
@@ -279,6 +288,7 @@ function crearCargo($pdo, $data) {
             ':concepto' => $data['concepto'],
             ':concepto_otro' => $data['concepto_otro'] ?? null,
             ':proveedor_id' => !empty($data['proveedor_id']) ? $data['proveedor_id'] : null,
+            ':almacen_id' => !empty($data['almacen_id']) ? $data['almacen_id'] : null,
             ':referencia' => $data['referencia_externa'] ?? null,
             ':notas' => $data['notas'] ?? null,
             ':usuario_id' => $_SESSION['usuario_id'],
@@ -343,6 +353,7 @@ function actualizarCargo($pdo, $id, $data) {
                     concepto = :concepto,
                     concepto_otro = :concepto_otro,
                     proveedor_id = :proveedor_id,
+                    almacen_id = :almacen_id,
                     referencia_externa = :referencia,
                     notas = :notas,
                     estado = :estado
@@ -354,6 +365,7 @@ function actualizarCargo($pdo, $id, $data) {
             ':concepto' => $data['concepto'],
             ':concepto_otro' => $data['concepto_otro'] ?? null,
             ':proveedor_id' => !empty($data['proveedor_id']) ? $data['proveedor_id'] : null,
+            ':almacen_id' => !empty($data['almacen_id']) ? $data['almacen_id'] : null,
             ':referencia' => $data['referencia_externa'] ?? null,
             ':notas' => $data['notas'] ?? null,
             ':estado' => $estado,
