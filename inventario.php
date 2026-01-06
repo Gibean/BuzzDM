@@ -152,6 +152,95 @@
                         </div>
                     </div>
 
+                    <!-- Product Type Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-cube"></i> TIPO DE PRODUCTO
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Tipo *</label>
+                                <select class="form-control form-control-buzz" id="productTipoProducto" onchange="onTipoProductoChange()">
+                                    <option value="fisico">📦 Producto Físico</option>
+                                    <option value="servicio">🔧 Servicio</option>
+                                    <option value="kit">📦📦 Kit / Combo</option>
+                                </select>
+                                <small class="text-muted font-mono" id="tipoProductoHint">Producto con inventario físico</small>
+                            </div>
+                            <div class="col-md-6 mb-3" id="kitTypeContainer" style="display: none;">
+                                <label class="form-label text-muted">Tipo de Kit</label>
+                                <select class="form-control form-control-buzz" id="productEsKitVirtual" onchange="onKitTypeChange()">
+                                    <option value="1">🔄 Kit Virtual (descuenta componentes)</option>
+                                    <option value="0">📦 Kit Pre-armado (stock propio)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Variant Section -->
+                        <div class="row" id="varianteSection" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="esVariante" onchange="onEsVarianteChange()">
+                                    <label class="form-check-label" for="esVariante">
+                                        Es variante de otro producto
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3" id="productoPadreContainer" style="display: none;">
+                                <label class="form-label text-muted">Producto Padre</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control form-control-buzz" id="productoPadreBusqueda"
+                                           placeholder="Buscar producto padre..." autocomplete="off">
+                                    <input type="hidden" id="productoPadreId">
+                                    <div id="productoPadreResultados" class="autocomplete-results"></div>
+                                </div>
+                                <div id="productoPadreSeleccionado" class="selected-item mt-2" style="display: none;">
+                                    <span class="selected-name"></span>
+                                    <button type="button" class="btn-clear" onclick="limpiarProductoPadre()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="varianteAtributoRow" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Atributo de Variante</label>
+                                <input type="text" class="form-control form-control-buzz" id="productVarianteAtributo"
+                                       placeholder="Ej: Talla M, Color Rojo">
+                                <small class="text-muted">Identifica esta variante</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kit Components Section (only for kits) -->
+                    <div class="modal-section" id="kitComponentesSection" style="display: none;">
+                        <div class="modal-section-title">
+                            <i class="fas fa-boxes"></i> COMPONENTES DEL KIT
+                            <button type="button" class="btn btn-sm btn-outline-buzz ms-3" onclick="agregarComponenteKit()">
+                                <i class="fas fa-plus"></i> Añadir
+                            </button>
+                        </div>
+                        <div id="kitComponentesContainer">
+                            <!-- Componentes se agregan dinámicamente -->
+                        </div>
+                        <div id="sinComponentes" class="text-center text-muted py-3">
+                            <i class="fas fa-puzzle-piece"></i> Añade productos para formar el kit
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="resumen-item">
+                                    <span class="text-muted">Stock Disponible del Kit:</span>
+                                    <span class="text-accent font-mono" id="stockKitCalculado">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="resumen-item">
+                                    <span class="text-muted">Costo Componentes:</span>
+                                    <span class="text-accent font-mono" id="costoComponentes">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Pricing & Stock Section -->
                     <div class="modal-section">
                         <div class="modal-section-title">

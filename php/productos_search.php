@@ -18,7 +18,7 @@ if (strlen($query) < 2) {
 }
 
 try {
-    $pdo = getDBConnection();
+    $pdo = getDbConnection();
 
     // Búsqueda por SKU exacto primero, luego por coincidencia parcial
     $sql = "SELECT id, sku, nombre, precio, stock

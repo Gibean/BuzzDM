@@ -18,13 +18,13 @@
 /* Modal Content Container */
 .modal-content-buzz {
     background: rgba(26, 31, 40, 0.98);
-    margin: 3% auto;
+    margin: 2% auto;
     padding: 0;
     border: 1px solid rgba(255, 160, 0, 0.2);
     border-radius: 12px;
-    width: 92%;
-    max-width: 700px;
-    max-height: 90vh;
+    width: 95%;
+    max-width: 900px;
+    max-height: 94vh;
     position: relative;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
     overflow: hidden;
@@ -98,7 +98,9 @@
 .modal-body-buzz {
     padding: 2rem;
     overflow-y: auto;
-    flex-grow: 1;
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: calc(94vh - 160px);
 }
 
 /* Custom scrollbar for modal body */

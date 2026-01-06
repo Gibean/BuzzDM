@@ -10,7 +10,7 @@ require_once 'db.php';
 header('Content-Type: application/json');
 
 try {
-    $pdo = getDBConnection();
+    $pdo = getDbConnection();
 
     // Obtener marcas
     $marcas = $pdo->query("SELECT id, nombre FROM marcas ORDER BY nombre")
