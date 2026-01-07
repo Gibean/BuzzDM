@@ -887,27 +887,513 @@ function crearCargo($pdo, $data) {
 
 ---
 
-# FASES SIGUIENTES (Resumen)
+# ESTADO ACTUAL DE IMPLEMENTACIÓN
 
-## Fase 2: Multi-Almacén
-- Tablas: `almacenes`, `ubicaciones`, `stock_ubicacion`
-- UI: Selector de almacén en cargos
-- Reportes por almacén
+> [!NOTE]
+> Actualizado: 2026-01-06
 
-## Fase 3: Gestión de Lotes
-- Tabla: `lotes`
-- UI: Asignar lote al cargar
-- Alertas de expiración
-
-## Fase 4: Transferencias y Conteos
-- Tablas: `transferencias`, `conteos_inventario`
-- UI: Módulos separados
-
-## Fase 5: Alertas y Reportes
-- Sistema de notificaciones
-- Kardex, rotación, valorización
+| Fase | Descripción | Estado |
+|------|-------------|--------|
+| Fase 1 | Sistema de Cargos de Existencias | ✅ **COMPLETADA** |
+| Fase 2 | Multi-Almacén | ✅ **COMPLETADA** |
+| Fase 3 | Gestión de Lotes | ⏳ Pendiente |
+| Fase 4 | Transferencias y Conteos | ⏳ Pendiente |
+| Fase 5 | Alertas y Reportes | ⚠️ Parcial |
 
 ---
 
-> [!NOTE]
-> Este plan se enfoca en la Fase 1 completa. Las fases siguientes se detallarán después de implementar y validar la Fase 1.
+# ANÁLISIS DE VIABILIDAD - FASES PENDIENTES
+
+## Contexto del Negocio
+
+BuzzDM es un sistema para **Librería/Papelería**. Los productos típicos incluyen:
+- Cuadernos, papel, archivadores (sin fecha de expiración)
+- Bolígrafos, lápices, marcadores (expiración lejana o ninguna)
+- Pegamentos, pinturas, acuarelas (pueden tener expiración)
+- Material de arte (generalmente sin expiración)
+
+---
+
+## Fase 3: Gestión de Lotes
+
+### Análisis de Viabilidad
+
+| Criterio | Evaluación |
+|----------|------------|
+| **Necesidad del negocio** | ⚠️ **BAJA** - Pocos productos de papelería tienen fechas de expiración críticas |
+| **Complejidad de implementación** | 🔴 **ALTA** - Requiere cambios significativos en flujo de cargos y ventas |
+| **Valor agregado** | ⚠️ **LIMITADO** - Solo útil para pegamentos, pinturas, algunos marcadores |
+| **Recomendación** | 📌 **OPCIONAL** - Implementar solo si hay productos con expiración frecuente |
+
+### Qué incluiría
+
+```sql
+-- Tabla de lotes
+CREATE TABLE lotes (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    producto_id INT UNSIGNED NOT NULL,
+    numero_lote VARCHAR(50) NOT NULL,
+    fecha_fabricacion DATE,
+    fecha_expiracion DATE,
+    cantidad_inicial INT UNSIGNED NOT NULL,
+    cantidad_actual INT UNSIGNED NOT NULL,
+    estado ENUM('activo', 'agotado', 'expirado') DEFAULT 'activo',
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+);
+```
+
+### Decisión Recomendada
+
+> [!WARNING]
+> **NO PRIORIZAR** esta fase a menos que el negocio maneje frecuentemente productos con fechas de expiración. La complejidad añadida no justifica el beneficio para una papelería típica.
+
+---
+
+## Fase 4: Transferencias y Conteos
+
+### Análisis de Viabilidad
+
+Esta fase se divide en dos módulos independientes:
+
+#### 4A: Transferencias entre Almacenes
+
+| Criterio | Evaluación |
+|----------|------------|
+| **Necesidad del negocio** | ⚠️ **BAJA actualmente** - Solo existe 1 almacén ("Almacén Principal") |
+| **Cuándo implementar** | Cuando se agreguen más almacenes/tiendas |
+| **Recomendación** | 📌 **POSPONER** hasta tener múltiples almacenes |
+
+#### 4B: Conteos de Inventario (Auditoría)
+
+| Criterio | Evaluación |
+|----------|------------|
+| **Necesidad del negocio** | ✅ **ALTA** - Todo negocio necesita verificar inventario físico vs sistema |
+| **Complejidad** | 🟡 **MEDIA** - Flujo bien definido |
+| **Valor agregado** | ✅ **ALTO** - Detecta pérdidas, errores, robos |
+| **Recomendación** | 🎯 **PRIORIDAD ALTA** |
+
+### Plan Detallado - Módulo de Conteos
+
+```mermaid
+flowchart TD
+    A[Crear nuevo conteo] --> B[Seleccionar almacén/ubicación]
+    B --> C[Sistema genera lista de productos]
+    C --> D[Usuario cuenta físicamente]
+    D --> E[Ingresa cantidades reales]
+    E --> F{¿Diferencias?}
+    F -->|Sí| G[Revisar discrepancias]
+    G --> H[Aprobar ajustes]
+    H --> I[Sistema ajusta stock]
+    F -->|No| J[Conteo completado]
+    I --> J
+```
+
+**Tablas necesarias:**
+
+```sql
+-- Encabezado de conteo
+CREATE TABLE conteos_inventario (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    codigo VARCHAR(20) NOT NULL UNIQUE,
+    almacen_id INT UNSIGNED,
+    fecha DATE NOT NULL,
+    estado ENUM('en_proceso', 'completado', 'cancelado') DEFAULT 'en_proceso',
+    realizado_por INT UNSIGNED NOT NULL,
+    aprobado_por INT UNSIGNED,
+    notas TEXT,
+    creado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (almacen_id) REFERENCES almacenes(id),
+    FOREIGN KEY (realizado_por) REFERENCES usuarios(id),
+    FOREIGN KEY (aprobado_por) REFERENCES usuarios(id)
+);
+
+-- Detalle de conteo por producto
+CREATE TABLE detalle_conteo (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    conteo_id INT UNSIGNED NOT NULL,
+    producto_id INT UNSIGNED NOT NULL,
+    stock_sistema INT NOT NULL,
+    stock_fisico INT,
+    diferencia INT GENERATED ALWAYS AS (stock_fisico - stock_sistema) STORED,
+    notas VARCHAR(255),
+    FOREIGN KEY (conteo_id) REFERENCES conteos_inventario(id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+);
+```
+
+**Archivos a crear:**
+- `conteos.php` - Vista principal
+- `assets/js/conteos.js` - Lógica frontend
+- `assets/css/conteos.css` - Estilos
+- `php/conteos_actions.php` - API backend
+
+---
+
+## Fase 5: Alertas y Reportes
+
+### Análisis de Viabilidad
+
+| Criterio | Evaluación |
+|----------|------------|
+| **Necesidad del negocio** | ✅ **MUY ALTA** - Información para toma de decisiones |
+| **Complejidad** | 🟢 **BAJA-MEDIA** - Principalmente vistas SQL y UI |
+| **Valor agregado** | ✅ **MUY ALTO** |
+| **Recomendación** | 🎯 **PRIORIDAD MÁXIMA** |
+
+### Estado Actual
+
+Ya existen estas vistas:
+- `v_low_stock` - Productos con stock bajo ✅
+- `v_rotacion_inventario` - Análisis de rotación ✅
+- `v_top5_up` - Productos más vendidos ✅
+- `v_top5_down` - Productos sin ventas ✅
+
+### Qué falta implementar
+
+#### 5A: Sistema de Alertas
+
+```sql
+-- Tabla de alertas del sistema
+CREATE TABLE alertas (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tipo ENUM('stock_bajo', 'stock_agotado', 'expiracion_proxima', 'conteo_pendiente') NOT NULL,
+    producto_id INT UNSIGNED,
+    mensaje VARCHAR(255) NOT NULL,
+    visto TINYINT(1) DEFAULT 0,
+    usuario_destino INT UNSIGNED,
+    creado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_destino) REFERENCES usuarios(id) ON DELETE CASCADE
+);
+```
+
+**Funcionalidad:**
+- Icono de campana en header con contador de alertas no leídas
+- Panel desplegable con lista de alertas
+- Generación automática cuando `stock <= min_stock`
+
+#### 5B: Reportes Avanzados
+
+| Reporte | Descripción | Prioridad |
+|---------|-------------|-----------|
+| **Kardex** | Historial de movimientos por producto | 🎯 Alta |
+| **Valorización** | Valor total del inventario | 🎯 Alta |
+| **Rotación** | Productos sin movimiento | ✅ Ya existe vista |
+| **Ventas por período** | Ingresos diarios/semanales/mensuales | 🎯 Alta |
+| **Productos más rentables** | Margen de ganancia | Media |
+
+---
+
+# ORDEN DE IMPLEMENTACIÓN RECOMENDADO
+
+```mermaid
+gantt
+    title Plan de Implementación - Fases Pendientes
+    dateFormat  YYYY-MM-DD
+    section Prioridad Alta
+    Fase 5A - Sistema de Alertas      :a1, 2026-01-07, 3d
+    Fase 5B - Reportes (Kardex)       :a2, after a1, 2d
+    Fase 4B - Conteos de Inventario   :a3, after a2, 5d
+    section Prioridad Baja
+    Fase 4A - Transferencias          :b1, after a3, 3d
+    Fase 3 - Lotes (opcional)         :b2, after b1, 5d
+```
+
+## Resumen de Prioridades
+
+| # | Módulo | Prioridad | Esfuerzo | Valor |
+|---|--------|-----------|----------|-------|
+| 1 | **Alertas de stock** | 🔴 Crítica | Bajo | Muy Alto |
+| 2 | **Reporte Kardex** | 🔴 Crítica | Medio | Muy Alto |
+| 3 | **Módulo de Notas** | 🔴 Crítica | Medio | Alto |
+| 4 | **Conteos de inventario** | 🟠 Alta | Medio | Alto |
+| 5 | **Fecha pedido configurable** | 🟠 Alta | Bajo | Medio |
+| 6 | **Protección FK en BD** | 🟠 Alta | Bajo | Alto |
+| 7 | **Email config en .env** | 🟡 Media | Bajo | Medio |
+| 8 | **Limpieza automática logs** | 🟡 Media | Bajo | Medio |
+| 9 | Valorización inventario | 🟡 Media | Bajo | Alto |
+| 10 | Transferencias | 🟢 Baja | Medio | Bajo |
+| 11 | Gestión de lotes | ⚪ Opcional | Alto | Bajo |
+
+---
+
+# NUEVOS MÓDULOS SOLICITADOS
+
+## Módulo de Notas (Block de Notas Avanzado)
+
+### Descripción
+
+Sistema para registrar consultas de clientes que aún no son pedidos formales. Útil para:
+- Clientes que preguntan por productos no disponibles
+- Consultas telefónicas que requieren seguimiento
+- Cotizaciones informales
+
+### Funcionalidades
+
+1. **Datos del contacto**: Nombre, teléfono, email (opcional)
+2. **Productos requeridos**:
+   - Buscar producto existente por código (autocomplete)
+   - Agregar texto libre para productos no existentes (WYSIWYG)
+3. **Estado**: Pendiente, En seguimiento, Resuelto, Cancelado
+4. **Fecha de seguimiento** (opcional)
+5. **Notas adicionales**
+
+### Modelo de Datos
+
+```sql
+CREATE TABLE notas_clientes (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    -- Datos del contacto
+    nombre_contacto VARCHAR(100) NOT NULL,
+    telefono VARCHAR(20),
+    email VARCHAR(100),
+
+    -- Contenido (WYSIWYG para productos no existentes)
+    contenido_html TEXT COMMENT 'Contenido enriquecido con WYSIWYG',
+
+    -- Estado y seguimiento
+    estado ENUM('pendiente', 'seguimiento', 'resuelto', 'cancelado') DEFAULT 'pendiente',
+    fecha_seguimiento DATE,
+
+    -- Auditoría
+    creado_por INT UNSIGNED NOT NULL,
+    creado_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    actualizado_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (creado_por) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Productos asociados a la nota (existentes en inventario)
+CREATE TABLE notas_productos (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nota_id INT UNSIGNED NOT NULL,
+    producto_id INT UNSIGNED NOT NULL,
+    cantidad INT UNSIGNED DEFAULT 1,
+    notas VARCHAR(255),
+
+    FOREIGN KEY (nota_id) REFERENCES notas_clientes(id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### Archivos a crear
+
+- `notas.php` - Vista principal
+- `assets/js/notas.js` - Lógica frontend con WYSIWYG
+- `assets/css/notas.css` - Estilos
+- `php/notas_actions.php` - API backend
+
+### Editor WYSIWYG recomendado
+
+- **Quill.js** (ligero, moderno) - https://quilljs.com/
+- O **TinyMCE** (más completo) - https://www.tiny.cloud/
+
+---
+
+## Fecha de Creación Configurable en Pedidos
+
+### Estado Actual
+
+La tabla `pedidos` ya tiene `fecha_creacion` con `DEFAULT current_timestamp()`.
+
+### Cambio Requerido
+
+Modificar el formulario de creación de pedidos para:
+1. Mostrar un campo de fecha con valor por defecto = hoy
+2. Permitir al usuario seleccionar otra fecha (para pedidos retroactivos)
+
+### Implementación
+
+**Frontend (pedidos.php o modal)**:
+```html
+<label for="fecha_pedido">Fecha del Pedido</label>
+<input type="datetime-local" id="fecha_pedido" name="fecha_creacion"
+       value="<?php echo date('Y-m-d\TH:i'); ?>" class="form-control form-control-buzz">
+```
+
+**Backend (pedidos_actions.php)**: Ya debería aceptar `fecha_creacion` en el INSERT.
+
+---
+
+# VERIFICACIÓN DE FUNCIONALIDADES EXISTENTES
+
+## ✅ Limpieza de Tokens de Sesión
+
+**EXISTE**: `php/cleanup_tokens.php`
+
+Funcionalidad:
+- Elimina tokens de `password_reset_tokens` expirados o usados
+- Registra la acción en `logs`
+
+**PENDIENTE**:
+- No hay limpieza automática de `sesiones_api` (tokens de login)
+- No hay limpieza automática de `logs_login` antiguos
+
+### Mejora Recomendada
+
+Crear script `cleanup_all.php` que limpie:
+```sql
+-- Tokens de password expirados
+DELETE FROM password_reset_tokens WHERE expiracion < NOW() OR usado = 1;
+
+-- Sesiones API expiradas (más de 30 días)
+DELETE FROM sesiones_api WHERE expiracion < DATE_SUB(NOW(), INTERVAL 30 DAY);
+
+-- Logs de login antiguos (más de 90 días)
+DELETE FROM logs_login WHERE fecha < DATE_SUB(NOW(), INTERVAL 90 DAY);
+
+-- Logs generales antiguos (más de 180 días)
+DELETE FROM logs WHERE fecha < DATE_SUB(NOW(), INTERVAL 180 DAY);
+```
+
+---
+
+## ⚠️ Email Config en Variables de Entorno
+
+**ESTADO ACTUAL**: Credenciales hardcodeadas en `php/email_config.php`
+
+```php
+// ACTUALMENTE (INSEGURO)
+define('SMTP_USERNAME', 'juan.luis9313@gmail.com');
+define('SMTP_PASSWORD', 'omib pojl rlrs qchv'); // ⚠️ Exposición de credenciales
+```
+
+### Migración Requerida
+
+**1. Añadir a `.env.example`:**
+```ini
+# Email Configuration
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=tls
+SMTP_USERNAME=
+SMTP_PASSWORD=
+SMTP_FROM_EMAIL=
+SMTP_FROM_NAME=BuzzDM
+```
+
+**2. Modificar `php/email_config.php`:**
+```php
+<?php
+// Cargar desde .env si disponible
+define('SMTP_HOST', $_ENV['SMTP_HOST'] ?? 'smtp.gmail.com');
+define('SMTP_PORT', $_ENV['SMTP_PORT'] ?? 587);
+define('SMTP_SECURE', $_ENV['SMTP_SECURE'] ?? 'tls');
+define('SMTP_USERNAME', $_ENV['SMTP_USERNAME'] ?? '');
+define('SMTP_PASSWORD', $_ENV['SMTP_PASSWORD'] ?? '');
+define('SMTP_FROM_EMAIL', $_ENV['SMTP_FROM_EMAIL'] ?? SMTP_USERNAME);
+define('SMTP_FROM_NAME', $_ENV['SMTP_FROM_NAME'] ?? 'BuzzDM');
+```
+
+---
+
+## ❌ Protección de Borrado en Base de Datos
+
+**ESTADO ACTUAL**: Las FK permiten borrado con `ON DELETE SET NULL`
+
+Ejemplo de `pedidos`:
+```sql
+CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`)
+    REFERENCES `clientes` (`id`) ON DELETE SET NULL  -- ⚠️ Permite borrar cliente
+```
+
+### Problema
+
+- Si se borra un cliente con pedidos, el `cliente_id` queda NULL
+- Se pierde la información del cliente en pedidos históricos
+- Lo mismo aplica para productos en `detalle_pedido`
+
+### Solución Recomendada
+
+Cambiar a `ON DELETE RESTRICT` para tablas críticas:
+
+```sql
+-- Script de migración: proteccion_borrado.sql
+
+-- 1. Proteger clientes (no borrar si tienen pedidos)
+ALTER TABLE pedidos
+    DROP FOREIGN KEY pedidos_ibfk_1;
+
+ALTER TABLE pedidos
+    ADD CONSTRAINT fk_pedido_cliente
+    FOREIGN KEY (cliente_id) REFERENCES clientes(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- 2. Proteger productos en detalle_pedido
+-- Primero verificar FK existente
+ALTER TABLE detalle_pedido
+    DROP FOREIGN KEY IF EXISTS detalle_pedido_ibfk_2;
+
+ALTER TABLE detalle_pedido
+    ADD CONSTRAINT fk_detalle_producto
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- 3. Proteger productos en detalle_cargo_existencias (ya tiene RESTRICT ✅)
+-- Ya está correcto: ON DELETE RESTRICT
+
+-- 4. Proteger productos en movimientos_inventario
+ALTER TABLE movimientos_inventario
+    DROP FOREIGN KEY IF EXISTS movimientos_inventario_ibfk_1;
+
+ALTER TABLE movimientos_inventario
+    ADD CONSTRAINT fk_mov_producto
+    FOREIGN KEY (producto_id) REFERENCES productos(id)
+    ON DELETE RESTRICT ON UPDATE CASCADE;
+```
+
+### Comportamiento después del cambio
+
+| Acción | Antes | Después |
+|--------|-------|---------|
+| Borrar cliente con pedidos | ✅ Permitido (cliente_id = NULL) | ❌ Error: "Cannot delete, foreign key constraint" |
+| Borrar producto con ventas | ✅ Permitido (producto_id = NULL) | ❌ Error: FK constraint |
+| Borrar producto sin ventas | ✅ Permitido | ✅ Permitido |
+
+### Alternativa: Soft Delete
+
+Si el sistema ya usa soft delete (`deleted_at`), asegurarse de que el código PHP use UPDATE en lugar de DELETE:
+
+```php
+// En lugar de:
+// $pdo->query("DELETE FROM clientes WHERE id = ?")
+
+// Usar:
+$pdo->query("UPDATE clientes SET deleted_at = NOW() WHERE id = ?")
+```
+
+---
+
+# ORDEN DE IMPLEMENTACIÓN ACTUALIZADO
+
+```mermaid
+gantt
+    title Plan de Implementación - Actualizado 2026-01-07
+    dateFormat  YYYY-MM-DD
+
+    section Seguridad (Prioridad)
+    Protección FK en BD          :a1, 2026-01-07, 1d
+    Email config en .env         :a2, after a1, 1d
+
+    section Funcionalidades Core
+    Fecha pedido configurable    :b1, after a2, 1d
+    Módulo de Notas              :b2, after b1, 3d
+    Alertas de stock             :b3, after b2, 2d
+
+    section Reportes
+    Reporte Kardex               :c1, after b3, 2d
+    Limpieza automática logs     :c2, after c1, 1d
+
+    section Inventario
+    Conteos de Inventario        :d1, after c2, 4d
+```
+
+---
+
+> [!TIP]
+> **Siguiente paso recomendado:**
+> 1. Ejecutar script de **protección FK** para asegurar integridad de datos
+> 2. Migrar **credenciales email** a `.env`
+> 3. Implementar **Módulo de Notas** como nueva funcionalidad de alto valor
+
+

@@ -86,6 +86,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </li>
 
             <li class="nav-item">
+                <a class="nav-link-enhanced <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>" href="todo.php">
+                    <i class="fas fa-tasks nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">To-Do Kanban</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
                 <a class="nav-link-enhanced <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>" href="envios.php">
                     <i class="fas fa-truck nav-icon-enhanced"></i>
                     <span class="nav-text-enhanced">Envíos</span>

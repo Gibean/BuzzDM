@@ -1,0 +1,917 @@
+/* Kanban Board Styles for BuzzDM */
+:root {
+    --kanban-column-bg: rgba(30, 35, 45, 0.5);
+    --kanban-card-bg: #2a3040;
+    --kanban-card-border: #3f475e;
+}
+
+.kanban-board {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: 1rem;
+    min-height: calc(100vh - 200px);
+    align-items: flex-start;
+}
+
+.kanban-column {
+    min-width: 300px;
+    max-width: 350px;
+    background: var(--kanban-column-bg);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 220px);
+    border: 1px solid var(--kanban-card-border);
+}
+
+.kanban-column-header {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--buzz-primary);
+}
+
+.kanban-column-title {
+    font-family: 'Black Ops One', cursive, system-ui;
+    font-size: 1.1rem;
+    margin: 0;
+    color: var(--buzz-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.kanban-cards-container {
+    padding: 0.75rem;
+    overflow-y: auto;
+    flex-grow: 1;
+    min-height: 100px;
+}
+
+.kanban-card {
+    background: var(--kanban-card-bg);
+    border: 1px solid var(--kanban-card-border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    cursor: grab;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.kanban-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--buzz-primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* Trello-like Labels */
+.kanban-card-labels {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.kanban-label {
+    height: 8px;
+    width: 40px;
+    border-radius: 4px;
+}
+
+.kanban-card-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: #f0f0f0;
+    display: block;
+    line-height: 1.3;
+}
+
+/* Indicators (Description, Checklist, Attachments) */
+.kanban-card-indicators {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    color: #888;
+    font-size: 0.75rem;
+}
+
+.indicator-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.indicator-item.completed {
+    color: var(--buzz-success);
+}
+
+.kanban-card-footer {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.add-card-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: transparent;
+    border: none;
+    color: #a0a0a0;
+    text-align: left;
+    border-radius: 0 0 12px 12px;
+    transition: all 0.2s;
+}
+
+.add-card-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+}
+
+/* Modal styles overrides for notes */
+.note-item-row {
+    background: rgba(255,255,255,0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.note-textarea {
+    min-height: 180px;
+    background: #1a1f28 !important;
+    color: #e0e0e0 !important;
+    border: 1px solid #3f475e !important;
+    padding: 12px;
+}
+
+.trello-modal-sidebar {
+    background: rgba(255,255,255,0.02);
+    border-left: 1px solid var(--kanban-card-border);
+    padding: 15px;
+}
+
+.trello-btn-ghost {
+    width: 100%;
+    text-align: left;
+    background: rgba(255,255,255,0.05);
+    border: none;
+    color: #ccc;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.trello-btn-ghost:hover {
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+/* Checklist Styles */
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.checklist-progress-container {
+    height: 8px;
+    background: #1e232d;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+.checklist-progress-bar {
+    height: 100%;
+    background: var(--buzz-primary);
+    transition: width 0.3s ease;
+}
+
+/* ============================================
+   ENHANCED LABELS & PICKERS - BUZZ THEME
+   ============================================ */
+
+/* Label Pills in Picker */
+.label-pill {
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-family: var(--font-monospace);
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: inline-block;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+.label-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.label-pill.selected {
+    border-color: var(--buzz-primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Picker Popups (Labels & Members) */
+#labelPicker,
+#memberPicker {
+    background: linear-gradient(145deg, #1a1f28 0%, #12161d 100%) !important;
+    border: 1px solid rgba(255, 160, 0, 0.3) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 160, 0, 0.1) !important;
+    padding: 1rem !important;
+}
+
+#labelPicker::before,
+#memberPicker::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--buzz-primary-color), transparent);
+}
+
+#labelPicker h6,
+#memberPicker h6 {
+    font-family: var(--font-primary);
+    color: var(--buzz-primary-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.15);
+}
+
+/* Member Picker Search Input */
+#memberSearch {
+    background: rgba(16, 20, 26, 0.8) !important;
+    border: 1px solid rgba(255, 160, 0, 0.2) !important;
+    font-family: var(--font-monospace);
+    transition: all 0.2s ease;
+}
+
+#memberSearch:focus {
+    border-color: var(--buzz-primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.15) !important;
+}
+
+/* Member Search Results */
+#memberSearchResults {
+    background: rgba(16, 20, 26, 0.9);
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
+
+#memberSearchResults .list-group-item,
+#memberSearchResults a {
+    background: transparent !important;
+    color: var(--buzz-text-color) !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.1) !important;
+    transition: all 0.15s ease;
+    font-family: var(--font-monospace);
+}
+
+#memberSearchResults .list-group-item:hover,
+#memberSearchResults a:hover {
+    background: rgba(255, 160, 0, 0.1) !important;
+    color: var(--buzz-primary-color) !important;
+}
+
+#memberSearchResults .list-group-item:last-child,
+#memberSearchResults a:last-child {
+    border-bottom: none !important;
+}
+
+/* Active Labels Display (in modal header) */
+#activeLabels .badge,
+#activeMembers .badge {
+    font-family: var(--font-monospace);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-transform: uppercase;
+}
+
+#activeMembers .badge {
+    background: rgba(255, 160, 0, 0.15) !important;
+    color: var(--buzz-primary-color) !important;
+    border-color: rgba(255, 160, 0, 0.3);
+}
+
+/* Product Search Results in Note Modal */
+.note-item-row .search-results {
+    background: linear-gradient(145deg, #1a1f28 0%, #12161d 100%);
+    border: 1px solid rgba(255, 160, 0, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.note-item-row .search-results .list-group-item {
+    background: transparent !important;
+    color: var(--buzz-text-color) !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.1) !important;
+    padding: 0.75rem 1rem;
+    transition: all 0.15s ease;
+}
+
+.note-item-row .search-results .list-group-item:hover {
+    background: rgba(255, 160, 0, 0.1) !important;
+}
+
+.note-item-row .search-results .list-group-item:last-child {
+    border-bottom: none !important;
+}
+
+.note-item-row .search-results .list-group-item strong {
+    color: var(--buzz-text-color);
+}
+
+/* Markdown Toolbar */
+.markdown-toolbar {
+    display: flex;
+    gap: 4px;
+    background: rgba(0,0,0,0.3);
+    padding: 4px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.markdown-toolbar .btn {
+    padding: 2px 8px;
+    font-size: 0.8rem;
+    color: #aaa;
+    border: none;
+    background: transparent;
+}
+
+.markdown-toolbar .btn:hover {
+    color: var(--buzz-primary-color);
+    background: rgba(255,160,0,0.1);
+}
+
+.modal-section-sidebar {
+    background: rgba(255,255,255,0.02);
+    border-left: 1px solid rgba(255,160,0,0.1);
+    padding: 1.5rem;
+}
+
+.modal-section-sidebar h6 {
+    color: var(--buzz-primary-color);
+    font-family: var(--font-primary);
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    letter-spacing: 1px;
+}
+
+/* Tools Bar Top - Enhanced */
+.modal-tools-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 1rem 1.5rem;
+    background: rgba(16, 20, 26, 0.7);
+    border-bottom: 1px solid rgba(255, 160, 0, 0.1);
+    align-items: center;
+}
+
+.modal-tools-top .btn-outline-buzz {
+    font-family: var(--font-monospace);
+    font-size: 0.85rem;
+    padding: 0.4rem 0.75rem;
+    border-color: rgba(255, 160, 0, 0.4);
+    transition: all 0.2s ease;
+}
+
+.modal-tools-top .btn-outline-buzz:hover {
+    background: rgba(255, 160, 0, 0.15);
+    border-color: var(--buzz-primary-color);
+    transform: translateY(-1px);
+}
+
+.modal-tools-top .btn-outline-buzz i {
+    color: var(--buzz-primary-color);
+}
+
+/* Dragging styles */
+.kanban-card.dragging {
+    opacity: 0.5;
+    background: var(--buzz-primary-dark);
+}
+
+/* Loading indicator for search */
+.search-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    color: var(--buzz-text-muted);
+    font-family: var(--font-monospace);
+    font-size: 0.85rem;
+}
+
+.search-loading i {
+    margin-right: 0.5rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   ENHANCED PICKER POPUPS
+   ============================================ */
+
+/* Base Picker Popup */
+.picker-popup {
+    background: linear-gradient(145deg, #1e232d 0%, #151920 100%);
+    border: 1px solid rgba(255, 160, 0, 0.25);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 160, 0, 0.08);
+    overflow: hidden;
+    animation: pickerFadeIn 0.15s ease-out;
+}
+
+.picker-popup.closing {
+    animation: pickerFadeOut 0.15s ease-in forwards;
+}
+
+@keyframes pickerFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pickerFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+/* Picker Header */
+.picker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    background: rgba(16, 20, 26, 0.6);
+    border-bottom: 1px solid rgba(255, 160, 0, 0.15);
+}
+
+.picker-header h6 {
+    margin: 0;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    color: var(--buzz-primary-color);
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+}
+
+.picker-close {
+    background: transparent;
+    border: none;
+    color: var(--buzz-text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+}
+
+.picker-close:hover {
+    color: var(--buzz-primary-color);
+    background: rgba(255, 160, 0, 0.1);
+}
+
+/* Picker Body */
+.picker-body {
+    padding: 0.75rem;
+}
+
+/* Picker Footer */
+.picker-footer {
+    padding: 0.5rem 1rem;
+    background: rgba(16, 20, 26, 0.4);
+    border-top: 1px solid rgba(255, 160, 0, 0.1);
+}
+
+/* Picker Section */
+.picker-section {
+    margin-bottom: 0.75rem;
+}
+
+.picker-section:last-child {
+    margin-bottom: 0;
+}
+
+.picker-section-label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--buzz-text-muted);
+    margin-bottom: 0.4rem;
+    font-family: var(--font-monospace);
+}
+
+/* Label Options in Picker */
+.label-option {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-bottom: 0.35rem;
+}
+
+.label-option:last-child {
+    margin-bottom: 0;
+}
+
+.label-option:hover {
+    background: rgba(255, 160, 0, 0.1);
+}
+
+.label-option.selected {
+    background: rgba(255, 160, 0, 0.15);
+}
+
+.label-checkbox {
+    color: var(--buzz-text-muted);
+    font-size: 0.9rem;
+}
+
+.label-option.selected .label-checkbox {
+    color: var(--buzz-primary-color);
+}
+
+.label-color-indicator {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+.label-name {
+    font-size: 0.85rem;
+    color: var(--buzz-text-color);
+    font-family: var(--font-monospace);
+}
+
+/* Active Label Badges (in modal header) */
+.active-label-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-monospace);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--buzz-text-color);
+}
+
+.active-label-badge .label-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.active-label-badge .label-remove {
+    background: transparent;
+    border: none;
+    color: var(--buzz-text-muted);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.25rem;
+    font-size: 0.65rem;
+    opacity: 0.6;
+    transition: all 0.15s ease;
+}
+
+.active-label-badge .label-remove:hover {
+    color: var(--buzz-danger);
+    opacity: 1;
+}
+
+/* Member Results in Picker */
+.member-results-list {
+    max-height: 180px;
+    overflow-y: auto;
+    margin-top: 0.5rem;
+}
+
+.member-result {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.member-result:hover {
+    background: rgba(255, 160, 0, 0.1);
+}
+
+.member-result.assigned {
+    background: rgba(255, 160, 0, 0.08);
+}
+
+.member-result .member-icon {
+    color: var(--buzz-text-muted);
+    font-size: 1rem;
+}
+
+.member-result .member-name {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--buzz-text-color);
+}
+
+.member-result .assign-check {
+    color: var(--buzz-success);
+    font-size: 0.8rem;
+}
+
+/* Assigned Members List */
+.assigned-members-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    min-height: 30px;
+}
+
+.assigned-member-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-monospace);
+    background: rgba(255, 160, 0, 0.15);
+    color: var(--buzz-primary-color);
+    border: 1px solid rgba(255, 160, 0, 0.3);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.assigned-member-chip:hover {
+    background: rgba(255, 160, 0, 0.25);
+}
+
+.assigned-member-chip .remove-icon {
+    font-size: 0.6rem;
+    opacity: 0.6;
+    margin-left: 0.2rem;
+}
+
+.assigned-member-chip:hover .remove-icon {
+    opacity: 1;
+    color: var(--buzz-danger);
+}
+
+/* Active Member Badges (in modal header) */
+.active-member-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-monospace);
+    background: rgba(255, 160, 0, 0.12);
+    color: var(--buzz-primary-color);
+    border: 1px solid rgba(255, 160, 0, 0.25);
+}
+
+.active-member-badge i {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.active-member-badge .member-remove {
+    background: transparent;
+    border: none;
+    color: var(--buzz-text-muted);
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.2rem;
+    font-size: 0.6rem;
+    opacity: 0.5;
+    transition: all 0.15s ease;
+}
+
+.active-member-badge .member-remove:hover {
+    color: var(--buzz-danger);
+    opacity: 1;
+}
+
+/* Search Input Wrapper */
+.search-input-wrapper {
+    position: relative;
+}
+
+.search-input-wrapper .search-icon {
+    position: absolute;
+    left: 0.7rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--buzz-text-muted);
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.search-input-wrapper input {
+    padding-left: 2rem !important;
+}
+
+/* Picker Counter Badge */
+.picker-counter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 0.35rem;
+    border-radius: 9px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: var(--buzz-primary-color);
+    color: var(--buzz-dark-bg);
+    margin-left: 0.4rem;
+}
+
+/* ============================================
+   MODAL SECTION ENHANCEMENTS
+   ============================================ */
+
+/* Section Headers */
+.col-md-8 h6.font-primary {
+    color: var(--buzz-primary-color);
+    font-size: 0.8rem;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(255, 160, 0, 0.2);
+}
+
+/* Labels for input fields */
+.modal-section-sidebar label.text-muted {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: var(--font-monospace);
+}
+
+/* Form inputs in sidebar */
+.modal-section-sidebar .form-control-buzz {
+    background: rgba(16, 20, 26, 0.6) !important;
+    border-color: rgba(255, 160, 0, 0.2) !important;
+    font-size: 0.9rem;
+}
+
+.modal-section-sidebar .form-control-buzz:focus {
+    border-color: var(--buzz-primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.15);
+}
+
+/* Section titles with icons */
+.col-md-8 .mb-5 > .d-flex > .d-flex i.text-muted {
+    color: var(--buzz-primary-color) !important;
+    opacity: 0.7;
+}
+
+/* Note textarea styling */
+.note-textarea::placeholder {
+    color: #6a7080 !important;
+}
+
+/* Title input styling */
+#noteTitle {
+    color: var(--buzz-text-color) !important;
+    font-family: var(--font-secondary);
+}
+
+#noteTitle::placeholder {
+    color: #6a7080 !important;
+    font-weight: 400;
+}
+
+/* Priority select styling */
+#notePriority {
+    background: rgba(16, 20, 26, 0.8) !important;
+    border-color: rgba(255, 160, 0, 0.3) !important;
+    color: var(--buzz-text-color) !important;
+    font-family: var(--font-monospace);
+    font-size: 0.85rem;
+}
+
+#notePriority:focus {
+    border-color: var(--buzz-primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.15);
+}
+
+/* Checklist items */
+.checklist-item input[type="checkbox"] {
+    accent-color: var(--buzz-primary-color);
+}
+
+.checklist-item input[type="text"] {
+    background: rgba(16, 20, 26, 0.5) !important;
+    border-color: rgba(255, 160, 0, 0.15) !important;
+}
+
+/* Attachment row styling */
+.note-item-row {
+    background: rgba(16, 20, 26, 0.4) !important;
+    border: 1px solid rgba(255, 160, 0, 0.1);
+}
+
+.note-item-row:hover {
+    border-color: rgba(255, 160, 0, 0.25);
+}
+
+/* ============================================
+   VIEW MODE STYLES
+   ============================================ */
+
+.view-mode .modal-content-buzz {
+    border-color: rgba(100, 150, 200, 0.3);
+}
+
+.view-mode .modal-header-buzz {
+    background: linear-gradient(135deg, rgba(30, 60, 90, 0.3) 0%, rgba(20, 40, 60, 0.3) 100%);
+}
+
+.view-mode .form-control,
+.view-mode .form-select,
+.view-mode textarea {
+    background: transparent !important;
+    border-color: transparent !important;
+    cursor: default !important;
+}
+
+.view-mode .note-textarea {
+    background: rgba(0, 0, 0, 0.15) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.view-mode #noteTitle {
+    font-size: 1.25rem !important;
+}
+
+.view-mode .modal-tools-top {
+    background: rgba(30, 60, 90, 0.2);
+    border-bottom-color: rgba(100, 150, 200, 0.15);
+}
+
+.view-mode .checklist-item {
+    opacity: 0.9;
+}
+
+.view-mode .checklist-item input[type="checkbox"] {
+    pointer-events: none;
+}
