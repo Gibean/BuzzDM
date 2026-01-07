@@ -301,7 +301,7 @@ function agregarLineaProducto(producto = null) {
             <div class="sku-container">
                 <input type="text"
                        class="form-control form-control-buzz sku-input"
-                       placeholder="Buscar SKU..."
+                       placeholder="BUSCAR SKU..."
                        value="${producto?.sku || ''}"
                        ${producto ? 'readonly' : ''}
                        autocomplete="off">
@@ -309,21 +309,24 @@ function agregarLineaProducto(producto = null) {
             </div>
             <div class="linea-col col-nombre">
                 <span class="nombre-display ${producto ? '' : 'placeholder'}">
-                    ${producto?.nombre || 'Selecciona un producto'}
+                    ${producto?.nombre || 'Selecciona un producto...'}
                 </span>
             </div>
             <div class="linea-col col-cantidad">
-                <input type="number"
-                       class="form-control form-control-buzz cantidad-input"
-                       min="1"
-                       value="${producto?.cantidad || 1}"
-                       placeholder="Cant.">
+                <div class="input-group input-group-sm">
+                    <input type="number"
+                           class="form-control form-control-buzz cantidad-input"
+                           min="1"
+                           value="${producto?.cantidad || 1}">
+                </div>
             </div>
             <div class="linea-col col-acciones">
-                <button type="button" class="btn-eliminar-linea" onclick="eliminarLinea('${lineaId}')">
-                    <i class="fas fa-trash"></i>
+                <button type="button" class="btn-eliminar-linea" onclick="eliminarLinea('${lineaId}')" title="Eliminar línea">
+                    <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
+            <!-- Campo oculto para mantener compatibilidad con el backend si es necesario -->
+            <input type="hidden" class="costo-input" value="${producto?.costo || 0}">
         </div>
     `;
 
@@ -348,11 +351,8 @@ function agregarLineaProducto(producto = null) {
         });
     }
 
-    // Calcular subtotal en cambios
-    cantidadInput.addEventListener('input', () => calcularSubtotal(lineaId));
-    costoInput.addEventListener('input', () => calcularSubtotal(lineaId));
-
-    calcularSubtotal(lineaId);
+    // Calcular totales en cambios
+    cantidadInput.addEventListener('input', () => actualizarTotales());
 
     // Focus en el input de SKU si es nueva línea
     if (!producto) {
@@ -449,7 +449,7 @@ function seleccionarProducto(lineaId, elemento) {
     // Cerrar autocomplete
     linea.querySelector('.autocomplete-results').classList.remove('show');
 
-    calcularSubtotal(lineaId);
+    actualizarTotales();
 
     // Focus en cantidad
     linea.querySelector('.cantidad-input').focus();

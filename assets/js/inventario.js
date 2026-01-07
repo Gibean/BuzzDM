@@ -41,6 +41,10 @@ document.addEventListener("DOMContentLoaded", function () {
   const totalProductsSpan = document.getElementById("totalProducts")
   const searchInput = document.getElementById("searchInput")
   const statusFilter = document.getElementById("statusFilter")
+  const marcaFilter = document.getElementById("marcaFilter")
+  const categoriaFilter = document.getElementById("categoriaFilter")
+  const modeloFilter = document.getElementById("modeloFilter")
+  const undFilter = document.getElementById("undFilter")
   const sortBySelect = document.getElementById("sortBy")
 
   let currentPage = 1
@@ -128,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
           })
         } else {
           productsTableBody.innerHTML =
-            '<tr><td colspan="7" class="text-center">No hay productos registrados.</td></tr>'
+            '<tr><td colspan="10" class="text-center">No hay productos registrados.</td></tr>'
         }
 
         updatePaginationInfo()
@@ -479,8 +483,60 @@ document.addEventListener("DOMContentLoaded", function () {
   if (showDeletedFilter) {
     showDeletedFilter.addEventListener("change", () => {
       currentPage = 1
+      updateActiveFiltersCount()
       fetchProducts()
     })
+  }
+
+  // New filter listeners
+  if (marcaFilter) marcaFilter.addEventListener("change", () => { currentPage = 1; updateActiveFiltersCount(); fetchProducts(); });
+  if (categoriaFilter) categoriaFilter.addEventListener("change", () => { currentPage = 1; updateActiveFiltersCount(); fetchProducts(); });
+  if (modeloFilter) modeloFilter.addEventListener("input", () => { currentPage = 1; updateActiveFiltersCount(); fetchProducts(); });
+  if (undFilter) undFilter.addEventListener("change", () => { currentPage = 1; updateActiveFiltersCount(); fetchProducts(); });
+
+  // Advanced filters toggle logic
+  const toggleBtn = document.getElementById("toggleAdvancedFilters")
+  const advancedCollapse = document.getElementById("advancedFiltersCollapse")
+  const activeBadge = document.getElementById("activeFiltersBadge")
+
+  if (toggleBtn && advancedCollapse) {
+    // Restore state from localStorage
+    const isAdvVisible = localStorage.getItem("advFiltersVisible") === "true"
+    if (isAdvVisible) {
+      advancedCollapse.classList.remove("d-none")
+      toggleBtn.classList.add("active")
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      const isHidden = advancedCollapse.classList.contains("d-none")
+      if (isHidden) {
+        advancedCollapse.classList.remove("d-none")
+        toggleBtn.classList.add("active")
+        localStorage.setItem("advFiltersVisible", "true")
+      } else {
+        advancedCollapse.classList.add("d-none")
+        toggleBtn.classList.remove("active")
+        localStorage.setItem("advFiltersVisible", "false")
+      }
+    })
+  }
+
+  // Function to update the active filters count (only for advanced filters)
+  function updateActiveFiltersCount() {
+    if (!activeBadge) return
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    if (marcaFilter && marcaFilter.value !== "") activeFilters++;
+    if (categoriaFilter && categoriaFilter.value !== "") activeFilters++;
+    if (modeloFilter && modeloFilter.value.trim() !== "") activeFilters++;
+    if (undFilter && undFilter.value !== "") activeFilters++;
+    if (sortBySelect && sortBySelect.value !== "name") activeFilters++;
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+    if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
+
+    activeBadge.textContent = activeFilters;
+    activeBadge.classList.toggle("d-none", activeFilters === 0);
   }
 
   // Update fetchProducts to include show_deleted
@@ -488,6 +544,10 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchProducts = async function () {
     const search = searchInput.value
     const status = statusFilter.value
+    const marcaId = marcaFilter ? marcaFilter.value : ""
+    const categoriaId = categoriaFilter ? categoriaFilter.value : ""
+    const modelo = modeloFilter ? modeloFilter.value : ""
+    const unidadVenta = undFilter ? undFilter.value : ""
     const sortBy = sortBySelect.value
     const showDeleted = document.getElementById("showDeletedFilter")
       ? document.getElementById("showDeletedFilter").checked
@@ -498,6 +558,10 @@ document.addEventListener("DOMContentLoaded", function () {
       limit: productsPerPage,
       search: search,
       status: status,
+      marca_id: marcaId,
+      categoria_id: categoriaId,
+      modelo: modelo,
+      unidad_venta: unidadVenta,
       sortBy: sortBy,
       sortOrder: "ASC"
     })
@@ -524,7 +588,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
             row.insertCell().textContent = product.sku
             row.insertCell().textContent = product.name
-            row.insertCell().textContent = product.description
+            row.insertCell().textContent = product.marca_nombre || '-'
+            row.insertCell().textContent = product.categoria_nombre || '-'
+            row.insertCell().textContent = product.modelo || '-'
+            row.insertCell().textContent = product.unidad_venta || 'UND'
             row.insertCell().textContent = parseFloat(product.price).toFixed(2)
             row.insertCell().textContent = product.stock
 
@@ -563,7 +630,7 @@ document.addEventListener("DOMContentLoaded", function () {
           })
         } else {
           productsTableBody.innerHTML =
-            '<tr><td colspan="7" class="text-center">No hay productos registrados.</td></tr>'
+            '<tr><td colspan="10" class="text-center">No hay productos registrados.</td></tr>'
         }
 
         updatePaginationInfo()
@@ -611,12 +678,17 @@ document.addEventListener("DOMContentLoaded", function () {
   window.clearProductFilters = function () {
     searchInput.value = ""
     statusFilter.value = ""
+    if (marcaFilter) marcaFilter.value = ""
+    if (categoriaFilter) categoriaFilter.value = ""
+    if (modeloFilter) modeloFilter.value = ""
+    if (undFilter) undFilter.value = ""
     sortBySelect.value = "name"
     const showDeletedFilter = document.getElementById("showDeletedFilter")
     if (showDeletedFilter) {
       showDeletedFilter.checked = false
     }
     currentPage = 1
+    updateActiveFiltersCount()
     fetchProducts()
   }
 
@@ -626,7 +698,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function cargarCatalogos() {
     try {
-      const response = await fetch('php/catalogos_actions.php')
+      const response = await fetch('php/catalogos_actions.php?type=resumen')
       const data = await response.json()
 
       if (data.success) {
@@ -638,6 +710,13 @@ document.addEventListener("DOMContentLoaded", function () {
           catalogos.marcas.forEach(m => {
             productMarca.innerHTML += `<option value="${m.id}">${m.nombre}</option>`
           })
+          // También llenar el filtro si existe
+          if (marcaFilter) {
+            marcaFilter.innerHTML = '<option value="">Todas las marcas</option>'
+            catalogos.marcas.forEach(m => {
+              marcaFilter.innerHTML += `<option value="${m.id}">${m.nombre}</option>`
+            })
+          }
         }
 
         // Llenar select de categorías
@@ -646,6 +725,13 @@ document.addEventListener("DOMContentLoaded", function () {
           catalogos.categorias.forEach(c => {
             productCategoria.innerHTML += `<option value="${c.id}">${c.nombre}</option>`
           })
+          // También llenar el filtro si existe
+          if (categoriaFilter) {
+            categoriaFilter.innerHTML = '<option value="">Todas las categorías</option>'
+            catalogos.categorias.forEach(c => {
+              categoriaFilter.innerHTML += `<option value="${c.id}">${c.nombre}</option>`
+            })
+          }
         }
 
         // Llenar select de proveedores
