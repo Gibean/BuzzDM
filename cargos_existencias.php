@@ -128,78 +128,91 @@
 
                 <!-- Información del Cargo -->
                 <div class="buzz-card mb-4">
-                    <div class="card-header-buzz">
-                        <i class="fas fa-file-alt"></i> INFORMACIÓN DEL CARGO
-                    </div>
-                    <div class="card-body-buzz">
-                        <div class="row">
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label text-muted">Código</label>
-                                <input type="text" class="form-control form-control-buzz" id="cargoCodigo"
-                                       readonly placeholder="Auto-generado">
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label text-muted">Fecha *</label>
-                                <input type="date" class="form-control form-control-buzz" id="cargoFecha" required>
-                            </div>
-                            <div class="col-md-3 mb-3">
-                                <label class="form-label text-muted">Concepto *</label>
-                                <select class="form-control form-control-buzz" id="cargoConcepto" required onchange="onConceptoChange()">
-                                    <option value="compra">📦 Compra a Proveedor</option>
-                                    <option value="transferencia">🔄 Transferencia entre Almacenes</option>
-                                    <option value="ajuste_positivo">➕ Ajuste Positivo</option>
-                                    <option value="inventario_inicial">📋 Inventario Inicial</option>
-                                    <option value="devolucion_cliente">↩️ Devolución de Cliente</option>
-                                    <option value="donacion">🎁 Donación Recibida</option>
-                                    <option value="otro">📝 Otro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 mb-3" id="conceptoOtroContainer" style="display: none;">
-                                <label class="form-label text-muted">Especificar *</label>
-                                <input type="text" class="form-control form-control-buzz" id="cargoConceptoOtro"
-                                       placeholder="Describir concepto">
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">
-                                    Proveedor (opcional)
-                                    <button type="button" class="btn btn-link btn-sm p-0 ms-2" onclick="abrirModalNuevoProveedor()" title="Agregar proveedor">
-                                        <i class="fas fa-plus-circle"></i> Nuevo
-                                    </button>
-                                </label>
-                                <div class="position-relative">
-                                    <input type="text" class="form-control form-control-buzz" id="proveedorBusqueda"
-                                           placeholder="Buscar proveedor..." autocomplete="off">
-                                    <input type="hidden" id="cargoProveedorId">
-                                    <div id="proveedorResultados" class="autocomplete-results"></div>
+                    <div class="card-body-buzz p-4">
+                        <div class="row g-4">
+                            <!-- Columna Izquierda: Identificación y Fecha -->
+                            <div class="col-lg-3">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">CÓDIGO</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-dark border-secondary text-primary"><i class="fas fa-hashtag"></i></span>
+                                        <input type="text" class="form-control form-control-buzz" id="cargoCodigo"
+                                               readonly tabindex="-1" style="pointer-events: none;" placeholder="Auto-generado">
+                                    </div>
                                 </div>
-                                <div id="proveedorSeleccionado" class="selected-item mt-2" style="display: none;">
-                                    <span class="selected-name"></span>
-                                    <button type="button" class="btn-clear" onclick="limpiarProveedor()">
-                                        <i class="fas fa-times"></i>
-                                    </button>
+                                <div class="mb-0">
+                                    <label class="form-label text-muted small fw-bold">FECHA *</label>
+                                    <input type="date" class="form-control form-control-buzz" id="cargoFecha" required>
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Referencia/Factura</label>
-                                <input type="text" class="form-control form-control-buzz" id="cargoReferencia"
-                                       placeholder="Número de factura, guía, etc.">
+
+                            <!-- Columna Central: Concepto y Almacén -->
+                            <div class="col-lg-5">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">CONCEPTO *</label>
+                                    <select class="form-control form-control-buzz" id="cargoConcepto" required onchange="onConceptoChange()">
+                                        <option value="compra">📦 Compra a Proveedor</option>
+                                        <option value="transferencia">🔄 Transferencia entre Almacenes</option>
+                                        <option value="ajuste_positivo">➕ Ajuste Positivo</option>
+                                        <option value="inventario_inicial">📋 Inventario Inicial</option>
+                                        <option value="devolucion_cliente">↩️ Devolución de Cliente</option>
+                                        <option value="donacion">🎁 Donación Recibida</option>
+                                        <option value="otro">📝 Otro</option>
+                                    </select>
+                                    <div id="conceptoOtroContainer" class="mt-2" style="display: none;">
+                                        <input type="text" class="form-control form-control-buzz" id="cargoConceptoOtro" placeholder="Especifique el concepto...">
+                                    </div>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label text-muted small fw-bold">ALMACÉN DE DESTINO *</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-dark border-secondary text-info"><i class="fas fa-warehouse"></i></span>
+                                        <select class="form-control form-control-buzz" id="cargoAlmacenId" required>
+                                            <option value="">Seleccionar almacén...</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Almacén Destino *</label>
-                                <select class="form-control form-control-buzz" id="cargoAlmacenId" required>
-                                    <option value="">Seleccionar almacén...</option>
-                                    <!-- Opciones cargadas dinámicamente -->
-                                </select>
-                                <small class="text-muted font-mono">Almacén donde ingresará el stock</small>
+
+                            <!-- Columna Derecha: Notas -->
+                            <div class="col-lg-4">
+                                <label class="form-label text-muted small fw-bold">NOTAS Y OBSERVACIONES</label>
+                                <textarea class="form-control form-control-buzz" id="cargoNotas" rows="4" placeholder="Detalles internos sobre este movimiento..."></textarea>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Notas</label>
-                                <textarea class="form-control form-control-buzz" id="cargoNotas" rows="2"
-                                          placeholder="Observaciones adicionales..."></textarea>
+
+                            <!-- Fila Inferior: Proveedor y Referencias (Sutil) -->
+                            <div class="col-12 mt-4 pt-3 border-top border-secondary border-opacity-25">
+                                <div class="row align-items-end">
+                                    <div class="col-md-6 mb-3 mb-md-0">
+                                        <label class="form-label text-muted small fw-bold">
+                                            PROVEEDOR (OPCIONAL)
+                                            <a href="javascript:void(0)" class="ms-2 text-primary text-decoration-none small" onclick="abrirModalNuevoProveedor()">
+                                                <i class="fas fa-plus-circle"></i> Nuevo
+                                            </a>
+                                        </label>
+                                        <div class="position-relative">
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-truck"></i></span>
+                                                <input type="text" class="form-control form-control-buzz" id="proveedorBusqueda" placeholder="Buscar proveedor..." autocomplete="off">
+                                            </div>
+                                            <input type="hidden" id="cargoProveedorId">
+                                            <div id="proveedorResultados" class="autocomplete-results"></div>
+                                        </div>
+                                        <div id="proveedorSeleccionado" class="selected-item mt-2" style="display: none;">
+                                            <span class="selected-name"></span>
+                                            <button type="button" class="btn-clear" onclick="limpiarProveedor()">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-muted small fw-bold">REFERENCIA / FACTURA</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-dark border-secondary text-muted"><i class="fas fa-receipt"></i></span>
+                                            <input type="text" class="form-control form-control-buzz" id="cargoReferencia" placeholder="Nº de factura, guía o código externo...">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -235,23 +248,23 @@
                     </div>
                 </div>
 
-                <!-- Resumen -->
-                <div class="buzz-card mb-4">
-                    <div class="card-body-buzz">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <div class="resumen-item">
-                                    <i class="fas fa-cubes"></i>
-                                    <span class="resumen-label">Total Productos:</span>
-                                    <span class="resumen-value" id="totalProductos">0</span>
-                                </div>
+                <!-- Sección de Totales (Stat Cards) -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="stat-card-buzz stat-primary">
+                            <div class="stat-icon"><i class="fas fa-boxes"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-label">TOTAL PRODUCTOS</div>
+                                <div class="stat-value" id="totalProductos">0</div>
                             </div>
-                            <div class="col-md-6">
-                                <div class="resumen-item resumen-total">
-                                    <i class="fas fa-layer-group"></i>
-                                    <span class="resumen-label">Total Unidades:</span>
-                                    <span class="resumen-value" id="totalUnidades">0</span>
-                                </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="stat-card-buzz stat-success">
+                            <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                            <div class="stat-content">
+                                <div class="stat-label">TOTAL UNIDADES</div>
+                                <div class="stat-value" id="totalUnidades">0</div>
                             </div>
                         </div>
                     </div>

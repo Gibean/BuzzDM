@@ -16,12 +16,10 @@
 
 
 -- Volcando estructura de base de datos para dbuzz
-DROP DATABASE IF EXISTS `dbuzz`;
 CREATE DATABASE IF NOT EXISTS `dbuzz` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci */;
 USE `dbuzz`;
 
 -- Volcando estructura para tabla dbuzz.almacenes
-DROP TABLE IF EXISTS `almacenes`;
 CREATE TABLE IF NOT EXISTS `almacenes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `codigo` varchar(20) NOT NULL COMMENT 'Ej: ALM-001, BOD-CEN, TDA-01',
@@ -41,15 +39,14 @@ CREATE TABLE IF NOT EXISTS `almacenes` (
   KEY `idx_tipo` (`tipo`),
   KEY `fk_almacen_responsable` (`responsable_id`),
   CONSTRAINT `fk_almacen_responsable` FOREIGN KEY (`responsable_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Almacenes/Bodegas/Tiendas del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Almacenes/Bodegas/Tiendas del sistema';
 
 -- Volcando datos para la tabla dbuzz.almacenes: ~1 rows (aproximadamente)
 DELETE FROM `almacenes`;
 INSERT INTO `almacenes` (`id`, `codigo`, `nombre`, `direccion`, `telefono`, `tipo`, `es_principal`, `activo`, `responsable_id`, `notas`, `creado_at`, `actualizado_at`) VALUES
-	(1, 'ALM-PRINCIPAL', 'Almacén Principal', NULL, NULL, 'almacen', 1, 1, NULL, NULL, '2026-01-05 18:09:00', NULL);
+	(1, 'ALM-PRINCIPAL', 'Almacén Principal', NULL, NULL, 'almacen', 1, 1, NULL, NULL, '2026-01-07 20:59:51', NULL);
 
 -- Volcando estructura para tabla dbuzz.backups
-DROP TABLE IF EXISTS `backups`;
 CREATE TABLE IF NOT EXISTS `backups` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `archivo` varchar(255) NOT NULL,
@@ -66,17 +63,14 @@ CREATE TABLE IF NOT EXISTS `backups` (
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.backups: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.backups: ~1 rows (aproximadamente)
 DELETE FROM `backups`;
 INSERT INTO `backups` (`id`, `archivo`, `ruta_archivo`, `tamaño_bytes`, `fecha`, `tipo`, `estado`, `resultado`, `detalles`, `usuario_id`) VALUES
-	(14, 'dbuzzbackup_2025-12-25_02-06-16.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-25_02-06-16.sql', 75226, '2025-12-25 01:06:17', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":13,"duracion_ms":1276,"tamanio_mb":0.07,"tipo_ejecucion":"http","metodo":"fallback"}', NULL),
-	(15, 'dbuzzbackup_2026-01-05_17-49-56.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-05_17-49-56.sql', 99431, '2026-01-05 16:49:58', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":10,"duracion_ms":1789,"tamanio_mb":0.09,"tipo_ejecucion":"http","metodo":"fallback"}', NULL),
-	(16, 'dbuzzbackup_2026-01-07_00-15-27.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-07_00-15-27.sql', 132626, '2026-01-06 23:15:30', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":11,"duracion_ms":2285,"tamanio_mb":0.13,"tipo_ejecucion":"http","metodo":"fallback"}', NULL);
+	(1, 'dbuzzbackup_2026-01-07_22-01-17.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-07_22-01-17.sql', 111228, '2026-01-07 21:01:20', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":2800,"tamanio_mb":0.11,"tipo_ejecucion":"http","metodo":"fallback"}', 1);
 
 -- Volcando estructura para tabla dbuzz.cargos_existencias
-DROP TABLE IF EXISTS `cargos_existencias`;
 CREATE TABLE IF NOT EXISTS `cargos_existencias` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `codigo` varchar(20) NOT NULL COMMENT 'Formato: CGO-YYYY-NNNN',
@@ -120,7 +114,6 @@ CREATE TABLE IF NOT EXISTS `cargos_existencias` (
 DELETE FROM `cargos_existencias`;
 
 -- Volcando estructura para tabla dbuzz.categorias
-DROP TABLE IF EXISTS `categorias`;
 CREATE TABLE IF NOT EXISTS `categorias` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -139,7 +132,6 @@ INSERT INTO `categorias` (`id`, `nombre`, `descripcion`) VALUES
 	(6, 'Cajas y archivadores', 'Archivadores, carpetas y organizadores');
 
 -- Volcando estructura para tabla dbuzz.clientes
-DROP TABLE IF EXISTS `clientes`;
 CREATE TABLE IF NOT EXISTS `clientes` (
   `id` varchar(50) NOT NULL,
   `nombre` varchar(150) NOT NULL,
@@ -154,18 +146,14 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   KEY `idx_clientes_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.clientes: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.clientes: ~3 rows (aproximadamente)
 DELETE FROM `clientes`;
 INSERT INTO `clientes` (`id`, `nombre`, `email`, `telefono`, `direccion`, `notas`, `vip`, `creado_at`, `deleted_at`) VALUES
-	('E-30003000', 'Juan Almeida', 'misogino.300@gmail.com', '+34900 861 494', 'Municipio Santiago', 'Epale Juan Almeida misógino yo no conozco de puntas la única punta que conozco es esta… la punta de la teta porque como verás estoy amamantando desde la izquierda cómoda es bien depinga verdad?? hablar y criticar a los demás y como tú me hablabas de cacao yo no tengo cacao para ti tengo patadas y te patearé el culo donde te vea #TePateareElCuloDondeTeVea y no por lo que has dicho respecto al municipio Santiago de Mariño sino por meterte conmigo en mi condición de mujer', 0, '2025-12-02 05:14:09', '2025-12-24 15:36:41'),
 	('V-10000001', 'María López', 'm.lopez@example.com', '+58 412 345 6789', 'Calle Comercio 123, Caracas', '', 0, '2025-12-01 13:00:00', NULL),
 	('V-10000002', 'José Pérez', 'j.perez@example.com', '+58 414 987 6543', 'Av. Bolívar 45, Valencia', 'Cliente frecuente', 1, '2025-11-20 15:30:00', NULL),
-	('V-10000003', 'Librería La esquina', 'contabilidad@laesquina.com', '+58 212 999 8888', 'C.C. Centro, Local 12', 'Mayorista', 0, '2025-10-05 18:22:00', NULL),
-	('V-30535128', 'Gisvel Aray', '', '+584128759068', 'Calle Luisa Caceres de Arismendi', '<3', 1, '2025-11-21 00:56:28', NULL),
-	('V-99999999', 'Test Restore', 'test@restore.com', '+581234567890', '', '', 0, '2025-12-02 05:18:09', '2025-12-02 05:20:58');
+	('V-10000003', 'Librería La esquina', 'contabilidad@laesquina.com', '+58 212 999 8888', 'C.C. Centro, Local 12', 'Mayorista', 0, '2025-10-05 18:22:00', NULL);
 
 -- Volcando estructura para tabla dbuzz.colores
-DROP TABLE IF EXISTS `colores`;
 CREATE TABLE IF NOT EXISTS `colores` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(50) NOT NULL,
@@ -193,7 +181,6 @@ INSERT INTO `colores` (`id`, `nombre`, `codigo_hex`) VALUES
 	(14, 'Multicolor', NULL);
 
 -- Volcando estructura para tabla dbuzz.configuraciones
-DROP TABLE IF EXISTS `configuraciones`;
 CREATE TABLE IF NOT EXISTS `configuraciones` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `clave` varchar(100) NOT NULL,
@@ -202,18 +189,17 @@ CREATE TABLE IF NOT EXISTS `configuraciones` (
   `fecha_actualizacion` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `clave` (`clave`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla dbuzz.configuraciones: ~4 rows (aproximadamente)
 DELETE FROM `configuraciones`;
 INSERT INTO `configuraciones` (`id`, `clave`, `valor`, `descripcion`, `fecha_actualizacion`) VALUES
 	(1, 'backup_fallback_enabled', '1', 'Habilitar sistema de backup automático fallback', '2025-12-25 01:04:32'),
-	(5, 'store_name', 'Librería El Estudiante', 'Nombre mostrado en factura y sitio', '2025-12-25 15:31:03'),
-	(6, 'currency', 'VES', 'Moneda del sistema', '2025-12-25 15:31:03'),
-	(7, 'tax_percent', '12.00', 'Porcentaje de IVA aplicado a ventas', '2025-12-25 15:31:03');
+	(8, 'store_name', 'Librería El Estudiante', 'Nombre mostrado en factura y sitio', '2026-01-07 21:01:09'),
+	(9, 'currency', 'VES', 'Moneda del sistema', '2026-01-07 21:01:09'),
+	(10, 'tax_percent', '12.00', 'Porcentaje de IVA aplicado a ventas', '2026-01-07 21:01:09');
 
 -- Volcando estructura para tabla dbuzz.detalle_cargo_existencias
-DROP TABLE IF EXISTS `detalle_cargo_existencias`;
 CREATE TABLE IF NOT EXISTS `detalle_cargo_existencias` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cargo_id` int(10) unsigned NOT NULL,
@@ -234,7 +220,6 @@ CREATE TABLE IF NOT EXISTS `detalle_cargo_existencias` (
 DELETE FROM `detalle_cargo_existencias`;
 
 -- Volcando estructura para tabla dbuzz.detalle_pedido
-DROP TABLE IF EXISTS `detalle_pedido`;
 CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `pedido_id` int(10) unsigned NOT NULL,
@@ -246,38 +231,35 @@ CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   KEY `pedido_id` (`pedido_id`),
   KEY `producto_id` (`producto_id`),
   KEY `idx_pedido_producto` (`pedido_id`,`producto_id`),
-  CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.detalle_pedido: ~22 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.detalle_pedido: ~21 rows (aproximadamente)
 DELETE FROM `detalle_pedido`;
 INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `precio_unitario`) VALUES
-	(3, 1, 1, 1, 10.00),
-	(9, 2, 2, 2, 2.50),
-	(10, 2, 4, 3, 1.20),
-	(11, 2, 8, 1, 1.10),
-	(12, 3, 5, 1, 8.50),
-	(13, 3, 7, 2, 0.80),
-	(14, 4, 11, 10, 6.50),
-	(15, 4, 2, 20, 2.50),
-	(16, 5, 4, 5, 1.20),
-	(17, 5, 6, 2, 3.75),
-	(18, 6, 3, 2, 5.00),
-	(19, 6, 7, 1, 0.80),
-	(20, 7, 9, 1, 15.00),
-	(21, 7, 8, 2, 1.10),
-	(22, 8, 12, 1, 22.00),
-	(23, 8, 5, 1, 8.50),
-	(24, 9, 10, 1, 4.25),
-	(25, 9, 2, 3, 2.50),
-	(26, 10, 4, 10, 1.20),
-	(27, 10, 13, 2, 2.00),
-	(28, 11, 3, 5, 5.00),
-	(29, 11, 11, 2, 6.50);
+	(1, 2, 2, 2, 2.50),
+	(2, 2, 4, 3, 1.20),
+	(3, 2, 8, 1, 1.10),
+	(4, 3, 5, 1, 8.50),
+	(5, 3, 7, 2, 0.80),
+	(6, 4, 11, 10, 6.50),
+	(7, 4, 2, 20, 2.50),
+	(8, 5, 4, 5, 1.20),
+	(9, 5, 6, 2, 3.75),
+	(10, 6, 3, 2, 5.00),
+	(11, 6, 7, 1, 0.80),
+	(12, 7, 9, 1, 15.00),
+	(13, 7, 8, 2, 1.10),
+	(14, 8, 12, 1, 22.00),
+	(15, 8, 5, 1, 8.50),
+	(16, 9, 10, 1, 4.25),
+	(17, 9, 2, 3, 2.50),
+	(18, 10, 4, 10, 1.20),
+	(19, 10, 13, 2, 2.00),
+	(20, 11, 3, 5, 5.00),
+	(21, 11, 11, 2, 6.50);
 
 -- Volcando estructura para tabla dbuzz.empresa
-DROP TABLE IF EXISTS `empresa`;
 CREATE TABLE IF NOT EXISTS `empresa` (
   `id` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,
   `tipo_rif` varchar(10) NOT NULL DEFAULT 'J',
@@ -296,10 +278,9 @@ CREATE TABLE IF NOT EXISTS `empresa` (
 -- Volcando datos para la tabla dbuzz.empresa: ~1 rows (aproximadamente)
 DELETE FROM `empresa`;
 INSERT INTO `empresa` (`id`, `tipo_rif`, `rif`, `nombre`, `logo_path`, `direccion`, `telefono`, `email`, `creado_at`, `actualizado_at`, `logo_svg`) VALUES
-	(1, 'J', 'J-12345678-9', 'Librería Papelería El Estudiante', NULL, 'Av. Principal 100, Caracas', '+58 212 555 0000', 'info@elestudiante.com', '2025-12-25 15:31:03', NULL, NULL);
+	(1, 'J', 'J-12345678-9', 'Librería Papelería El Estudiante', NULL, 'Av. Principal 100, Caracas', '+58 212 555 0000', 'info@elestudiante.com', '2026-01-07 21:01:09', NULL, NULL);
 
 -- Volcando estructura para función dbuzz.fn_generar_codigo_cargo
-DROP FUNCTION IF EXISTS `fn_generar_codigo_cargo`;
 DELIMITER //
 CREATE FUNCTION `fn_generar_codigo_cargo`() RETURNS varchar(20) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
     READS SQL DATA
@@ -325,7 +306,6 @@ END//
 DELIMITER ;
 
 -- Volcando estructura para función dbuzz.fn_stock_kit_virtual
-DROP FUNCTION IF EXISTS `fn_stock_kit_virtual`;
 DELIMITER //
 CREATE FUNCTION `fn_stock_kit_virtual`(p_kit_id INT UNSIGNED) RETURNS int(11)
     READS SQL DATA
@@ -379,7 +359,6 @@ END//
 DELIMITER ;
 
 -- Volcando estructura para tabla dbuzz.importaciones
-DROP TABLE IF EXISTS `importaciones`;
 CREATE TABLE IF NOT EXISTS `importaciones` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
@@ -391,22 +370,16 @@ CREATE TABLE IF NOT EXISTS `importaciones` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `importaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.importaciones: ~8 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.importaciones: ~3 rows (aproximadamente)
 DELETE FROM `importaciones`;
 INSERT INTO `importaciones` (`id`, `usuario_id`, `tipo`, `archivo_nombre`, `fecha`, `estado`, `detalles`) VALUES
-	(1, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 22:07:47', 'error', '{"Productos":{"status":"failed","message":"Importaci\\u00f3n de \'Productos\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 4: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 5: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 6: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 7: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 8: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 9: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 10: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 11: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 12: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 13: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 14: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 15: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 16: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 17: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 18: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 19: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 20: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 21: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 22: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 23: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 24: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 25: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 26: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 27: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'."]},"Clientes":{"status":"failed","message":"Importaci\\u00f3n de \'Clientes\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 4: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 5: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 6: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 7: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 8: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 9: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 10: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 11: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 12: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 13: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 14: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 15: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 16: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 17: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 18: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 19: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 20: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 21: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 22: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 23: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 24: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 25: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 26: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 27: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido."]}}'),
-	(2, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 22:07:47', 'error', '{"Productos":{"status":"failed","message":"Importaci\\u00f3n de \'Productos\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 4: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 5: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 6: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 7: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 8: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 9: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 10: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 11: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 12: El valor \'2\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 13: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 14: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 15: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 16: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 17: El valor \'4\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 18: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 19: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 20: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 21: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 22: El valor \'3\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 23: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 24: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 25: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 26: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'.","Fila 27: El valor \'1\' para \'categoria\' no existe en la tabla \'categorias\'."]},"Clientes":{"status":"failed","message":"Importaci\\u00f3n de \'Clientes\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 4: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 5: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 6: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 7: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 8: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 9: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 10: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 11: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 12: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 13: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 14: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 15: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 16: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 17: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 18: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 19: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 20: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 21: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 22: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 23: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 24: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 25: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 26: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 27: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido."]}}'),
-	(3, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 22:11:17', 'error', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":25,"updated":0,"failed":0,"errors":[]},"Clientes":{"status":"failed","message":"Importaci\\u00f3n de \'Clientes\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 4: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 5: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 6: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 7: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 8: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 9: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 10: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 11: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 12: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 13: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 14: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 15: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 16: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 17: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 18: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 19: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 20: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 21: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 22: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 23: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 24: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 25: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 26: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 27: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido."]}}'),
-	(4, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 22:11:17', 'error', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":0,"updated":25,"failed":0,"errors":[]},"Clientes":{"status":"failed","message":"Importaci\\u00f3n de \'Clientes\' fallida. Se encontraron errores.","processed":25,"inserted":0,"updated":0,"failed":25,"errors":["Fila 3: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 4: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 5: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 6: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 7: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 8: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 9: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 10: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 11: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 12: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 13: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 14: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 15: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 16: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 17: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 18: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 19: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 20: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 21: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 22: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 23: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 24: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 25: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 26: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido.","Fila 27: Columna \'CI\' (campo requerido: id) no encontrada en el archivo.; El campo \'id\' es requerido."]}}'),
-	(5, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 23:39:24', 'procesado', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":25,"updated":0,"failed":0,"errors":[]},"Clientes":{"status":"success","message":"Importaci\\u00f3n de \'Clientes\' completada exitosamente.","processed":25,"inserted":25,"updated":0,"failed":0,"errors":[],"messages":["Usuario \'laura.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: c7483d1ed2f468dc","Usuario \'carlos.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 1655dc2152002121","Usuario \'sofia.l@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 2d7e26b26152637c","Usuario \'miguel.g@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 128fa5e7f2027c83","Usuario \'elena.v@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 59cffbb6c192f532","Usuario \'andres.h@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: d0157d0cf549a93b","Usuario \'daniela.s@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 76f6ce738b8dd30f","Usuario \'ricardo.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 17d6ce4f3231b357","Usuario \'camila.f@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 66c191dccef7f035","Usuario \'javier.t@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 6263a2a65e768024","Usuario \'valentina.c@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: a03905da871c1b54","Usuario \'luis.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 5f4ee1fa722a7b9f","Usuario \'mariana.o@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: ad6eb20da6a65471","Usuario \'diego.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 0e725d16f0bb9147","Usuario \'isabella.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 9ca034dabb1f3f99","Usuario \'pedro.v@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: acb90565f0caa3e2","Usuario \'ana.j@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 203e374836947579","Usuario \'gabriel.s@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: e3ad77b0141a685f","Usuario \'lucia.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: a22051e99dd145e3","Usuario \'pablo.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 2a0a5937b19aae86","Usuario \'natalia.h@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: a5b5b78eab46fa6b","Usuario \'fernando.g@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: b2345d3dc52d39fd","Usuario \'carmen.f@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 7d4a4ae07311ad69","Usuario \'alejandro.d@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 02002faa208628a5","Usuario \'patricia.c@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 9b2fca23509294c2"]}}'),
-	(6, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-13 23:39:28', 'procesado', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":0,"updated":25,"failed":0,"errors":[]},"Clientes":{"status":"success","message":"Importaci\\u00f3n de \'Clientes\' completada exitosamente.","processed":25,"inserted":0,"updated":25,"failed":0,"errors":[]}}'),
-	(7, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-14 01:43:35', 'procesado', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":25,"updated":0,"failed":0,"errors":[]},"Clientes":{"status":"success","message":"Importaci\\u00f3n de \'Clientes\' completada exitosamente.","processed":25,"inserted":25,"updated":0,"failed":0,"errors":[],"messages":["Usuario \'laura.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: d3920f73202a5251","Usuario \'carlos.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: b59ca94455e4d25f","Usuario \'sofia.l@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: f2d64fe574c81acf","Usuario \'miguel.g@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 26663e7177c18acf","Usuario \'elena.v@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: dbb7e77c99b543e8","Usuario \'andres.h@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 18e42493816cb018","Usuario \'daniela.s@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 275ff56985f70e46","Usuario \'ricardo.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 7d6bc4a710d29f14","Usuario \'camila.f@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: ed7314d2a217e0eb","Usuario \'javier.t@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: d27b7a2a6b2a48f4","Usuario \'valentina.c@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: ee6dbcb1f43751b7","Usuario \'luis.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 9d7b573ab7f6e90f","Usuario \'mariana.o@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: e9b18c122a506151","Usuario \'diego.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 91b5c5a39e2edf1b","Usuario \'isabella.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: bd9843613ae3c1c3","Usuario \'pedro.v@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 8396f94382d8a5e7","Usuario \'ana.j@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 4e5bd2c31c409629","Usuario \'gabriel.s@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 571c3ca40d272cc2","Usuario \'lucia.m@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: aa665e8c558f3160","Usuario \'pablo.r@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: a9f9249620561c50","Usuario \'natalia.h@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 71326e217cfdb7c6","Usuario \'fernando.g@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 42f9f90c5e297ce9","Usuario \'carmen.f@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: c45acec4924ee81c","Usuario \'alejandro.d@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 4cfcca5e94244f79","Usuario \'patricia.c@example.com\' creado con rol \'operador\'. Contrase\\u00f1a temporal: 1cdb3a33f1e4344c"]}}'),
-	(8, 1, 'general', 'Importacion_Agosto.xlsx', '2025-08-14 01:43:38', 'procesado', '{"Productos":{"status":"success","message":"Importaci\\u00f3n de \'Productos\' completada exitosamente.","processed":25,"inserted":0,"updated":25,"failed":0,"errors":[]},"Clientes":{"status":"success","message":"Importaci\\u00f3n de \'Clientes\' completada exitosamente.","processed":25,"inserted":0,"updated":25,"failed":0,"errors":[]}}');
+	(1, 1, 'productos', 'Mock_Productos_Enero.xlsx', '2026-01-02 13:00:00', 'procesado', '{"registros":50,"insertados":45,"actualizados":5,"errores":0}'),
+	(2, 1, 'clientes', 'Mock_Clientes_Nuevos.xlsx', '2026-01-03 18:30:00', 'procesado', '{"registros":20,"insertados":20,"actualizados":0,"errores":0}'),
+	(3, 1, 'general', 'Mock_Inventario_Faltante.csv', '2026-01-05 14:15:00', 'error', '{"error":"Error en la columna SKU fila 12","mensaje":"El SKU LBR-9999 no es válido"}');
 
 -- Volcando estructura para tabla dbuzz.logs
-DROP TABLE IF EXISTS `logs`;
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
@@ -417,53 +390,15 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs: ~39 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs: ~2 rows (aproximadamente)
 DELETE FROM `logs`;
 INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
-	(1, 1, 'Solicitud de recuperación de contraseña', 'Email: admin@buzz.com', '2025-11-29 02:18:49'),
-	(2, 1, 'Contraseña cambiada', 'Mediante recuperación de contraseña', '2025-11-29 02:19:17'),
-	(3, NULL, 'Backup realizado', 'Archivo: backup_dbuzz_2025-12-02_05-54-21.sql | Tamaño: 0.06 MB', '2025-12-02 04:54:22'),
-	(4, 1, 'Backup Manual', '{"archivo":"backup_dbuzz_2025-12-02_05-54-21.sql","tamanio_mb":0.06,"duracion_ms":770,"tablas":16}', '2025-12-02 04:54:22'),
-	(5, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_06-03-19.sql | Tamaño: 0.06 MB', '2025-12-02 05:03:20'),
-	(6, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_06-03-19.sql","tamanio_mb":0.06,"duracion_ms":531,"tablas":16}', '2025-12-02 05:03:20'),
-	(7, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_06-04-28.sql | Tamaño: 0.07 MB', '2025-12-02 05:04:43'),
-	(8, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_06-04-28.sql","tamanio_mb":0.07,"duracion_ms":15079,"tablas":16}', '2025-12-02 05:04:43'),
-	(9, 1, 'Restauración de Backup', '{"archivo":"dbuzzbackup_2025-12-02_06-07-56.sql","duracion_ms":800,"resultado":"Exitoso"}', '2025-12-02 05:08:54'),
-	(10, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_06-11-25.sql | Tamaño: 0.07 MB', '2025-12-02 05:11:26'),
-	(11, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_06-11-25.sql","tamanio_mb":0.07,"duracion_ms":481,"tablas":16}', '2025-12-02 05:11:26'),
-	(12, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_06-14-15.sql | Tamaño: 0.07 MB', '2025-12-02 05:14:16'),
-	(13, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_06-14-15.sql","tamanio_mb":0.07,"duracion_ms":459,"tablas":15}', '2025-12-02 05:14:16'),
-	(14, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_08-01-41.sql | Tamaño: 0.07 MB', '2025-12-02 07:01:42'),
-	(15, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_08-01-41.sql","tamanio_mb":0.07,"duracion_ms":766,"tablas":14}', '2025-12-02 07:01:42'),
-	(16, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_08-05-58.sql | Tamaño: 0.07 MB', '2025-12-02 07:05:59'),
-	(17, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_08-05-58.sql","tamanio_mb":0.07,"duracion_ms":520,"tablas":14}', '2025-12-02 07:05:59'),
-	(18, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_08-06-53.sql | Tamaño: 0.07 MB', '2025-12-02 07:06:54'),
-	(19, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_08-06-53.sql","tamanio_mb":0.07,"duracion_ms":521,"tablas":14}', '2025-12-02 07:06:54'),
-	(20, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-02_08-08-01.sql | Tamaño: 0.07 MB', '2025-12-02 07:08:01'),
-	(21, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-02_08-08-01.sql","tamanio_mb":0.07,"duracion_ms":493,"tablas":14}', '2025-12-02 07:08:01'),
-	(22, 1, 'Restauración de Backup', '{"archivo":"dbuzzbackup_2025-12-02_08-10-45.sql","duracion_ms":1158,"resultado":"Exitoso"}', '2025-12-24 02:11:04'),
-	(23, 1, 'Restauración de Backup', '{"archivo":"dbuzzbackup_2025-12-24_16-29-00.sql","duracion_ms":1291,"resultado":"Exitoso"}', '2025-12-24 15:29:31'),
-	(24, 1, 'Restauración de Backup', '{"archivo":"dbuzzbackup_2025-12-24_23-08-48.sql","duracion_ms":894,"resultado":"Exitoso"}', '2025-12-24 22:09:13'),
-	(25, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-24_23-54-15.sql | Tamaño: 0.07 MB', '2025-12-24 22:54:17'),
-	(26, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2025-12-24_23-54-15.sql","tamanio_mb":0.07,"duracion_ms":1791,"tablas":13}', '2025-12-24 22:54:17'),
-	(27, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-25_01-25-25.sql | Tamaño: 0.07 MB', '2025-12-25 00:25:29'),
-	(28, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2025-12-25_01-25-25.sql","tamanio_mb":0.07,"duracion_ms":4550,"tablas":14,"metodo":"fallback"}', '2025-12-25 00:25:29'),
-	(29, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-25_01-30-29.sql | Tamaño: 0.07 MB', '2025-12-25 00:30:30'),
-	(30, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2025-12-25_01-30-29.sql","tamanio_mb":0.07,"duracion_ms":1186,"tablas":13,"metodo":"fallback"}', '2025-12-25 00:30:30'),
-	(31, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-25_01-49-40.sql | Tamaño: 0.07 MB', '2025-12-25 00:49:41'),
-	(32, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2025-12-25_01-49-40.sql","tamanio_mb":0.07,"duracion_ms":910,"tablas":13,"metodo":"fallback"}', '2025-12-25 00:49:41'),
-	(33, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2025-12-25_02-06-16.sql | Tamaño: 0.07 MB', '2025-12-25 01:06:17'),
-	(34, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2025-12-25_02-06-16.sql","tamanio_mb":0.07,"duracion_ms":1276,"tablas":13,"metodo":"fallback"}', '2025-12-25 01:06:17'),
-	(35, 1, 'Restauración de Backup', '{"archivo":"dbuzzbackup_2025-12-25_16-34-40.sql","duracion_ms":2214,"resultado":"Exitoso"}', '2025-12-25 15:34:50'),
-	(36, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-05_17-49-56.sql | Tamaño: 0.09 MB', '2026-01-05 16:49:58'),
-	(37, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2026-01-05_17-49-56.sql","tamanio_mb":0.09,"duracion_ms":1789,"tablas":10,"metodo":"fallback"}', '2026-01-05 16:49:58'),
-	(38, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-07_00-15-27.sql | Tamaño: 0.13 MB', '2026-01-06 23:15:30'),
-	(39, NULL, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2026-01-07_00-15-27.sql","tamanio_mb":0.13,"duracion_ms":2285,"tablas":11,"metodo":"fallback"}', '2026-01-06 23:15:30');
+	(1, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-07_22-01-17.sql | Tamaño: 0.11 MB', '2026-01-07 21:01:20'),
+	(2, 1, 'Backup Automático (Fallback)', '{"archivo":"dbuzzbackup_2026-01-07_22-01-17.sql","tamanio_mb":0.11,"duracion_ms":2800,"tablas":23,"metodo":"fallback"}', '2026-01-07 21:01:20');
 
 -- Volcando estructura para tabla dbuzz.logs_login
-DROP TABLE IF EXISTS `logs_login`;
 CREATE TABLE IF NOT EXISTS `logs_login` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned DEFAULT NULL,
@@ -474,65 +409,33 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `FK_logs_login_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs_login: ~51 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs_login: ~20 rows (aproximadamente)
 DELETE FROM `logs_login`;
 INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
-	(1, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:43:12'),
-	(2, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:49:14'),
-	(3, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:49:15'),
-	(4, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:49:15'),
-	(5, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-11-30 19:55:01'),
-	(6, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-11-30 20:40:09'),
-	(7, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-11-30 20:40:11'),
-	(8, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-11-30 21:16:10'),
-	(9, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-11-30 21:16:12'),
-	(10, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-11-30 21:16:14'),
-	(11, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-11-30 21:31:30'),
-	(12, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-11-30 21:31:31'),
-	(13, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-11-30 21:39:12'),
-	(14, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-11-30 21:39:16'),
-	(15, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2025-12-02 01:38:20'),
-	(16, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 01:39:23'),
-	(17, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 02:34:27'),
-	(18, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 03:01:51'),
-	(19, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin@example.com', '2025-12-02 03:54:03'),
-	(20, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin@example.com', '2025-12-02 03:56:19'),
-	(21, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin@admin.com', '2025-12-02 04:00:55'),
-	(22, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin@admin.com', '2025-12-02 04:01:07'),
-	(23, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 04:02:31'),
-	(24, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 04:04:53'),
-	(25, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 04:07:09'),
-	(26, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-02 04:10:30'),
-	(27, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-24 15:24:08'),
-	(28, 36, 'Exitoso', 'Inicio de sesión de supervisor', '2025-12-24 15:34:58'),
-	(29, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-24 20:45:00'),
-	(30, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-24 22:07:28'),
-	(31, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin@admin.com', '2025-12-25 00:23:35'),
-	(32, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-25 00:25:24'),
-	(33, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-25 12:56:24'),
-	(34, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-25 15:04:24'),
-	(35, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-25 15:33:54'),
-	(36, 1, 'Exitoso', 'Inicio de sesión de admin', '2025-12-25 15:43:21'),
-	(37, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-05 16:49:55'),
-	(38, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-05 17:33:35'),
-	(39, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-05 17:33:51'),
-	(40, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-05 20:43:26'),
-	(41, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-06 02:37:16'),
-	(42, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-06 02:37:24'),
-	(43, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-06 23:15:19'),
-	(44, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-06 23:15:26'),
-	(45, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-06 23:43:17'),
-	(46, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-06 23:52:17'),
-	(47, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:30:15'),
-	(48, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:37:28'),
-	(49, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:53:32'),
-	(50, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 03:06:34'),
-	(51, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 03:09:41');
+	(1, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 21:57:27'),
+	(2, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 21:58:11'),
+	(3, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 21:59:27'),
+	(4, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 22:01:35'),
+	(5, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 22:04:37'),
+	(6, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:29:47'),
+	(7, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:30:38'),
+	(8, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:31:49'),
+	(9, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:33:27'),
+	(10, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:33:54'),
+	(11, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:34:18'),
+	(12, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:34:33'),
+	(13, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:35:01'),
+	(14, 1, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:36:56'),
+	(15, 1, 'Denegado', 'Máximo intento de contraseña, usuario bloqueado', '2026-01-07 22:37:50'),
+	(16, 4, 'Denegado', 'Intento de inicio de sesión con contraseña incorrecta', '2026-01-07 22:38:15'),
+	(17, 1, 'Denegado', 'Intento de inicio de sesión con usuario bloqueado', '2026-01-07 22:42:57'),
+	(18, 1, 'Denegado', 'Intento de inicio de sesión con usuario bloqueado', '2026-01-07 22:43:48'),
+	(19, 1, 'Denegado', 'Intento de inicio de sesión con usuario bloqueado', '2026-01-07 22:43:58'),
+	(20, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 22:44:18');
 
 -- Volcando estructura para tabla dbuzz.marcas
-DROP TABLE IF EXISTS `marcas`;
 CREATE TABLE IF NOT EXISTS `marcas` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
@@ -552,7 +455,6 @@ INSERT INTO `marcas` (`id`, `nombre`, `descripcion`, `sitio_web`) VALUES
 	(6, 'Tombow', 'Material para pintura y acuarela', 'https://www.tombow.com');
 
 -- Volcando estructura para tabla dbuzz.materiales
-DROP TABLE IF EXISTS `materiales`;
 CREATE TABLE IF NOT EXISTS `materiales` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(100) NOT NULL,
@@ -579,7 +481,6 @@ INSERT INTO `materiales` (`id`, `nombre`) VALUES
 	(14, 'Silicona');
 
 -- Volcando estructura para tabla dbuzz.movimientos_inventario
-DROP TABLE IF EXISTS `movimientos_inventario`;
 CREATE TABLE IF NOT EXISTS `movimientos_inventario` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `producto_id` int(20) unsigned NOT NULL,
@@ -605,26 +506,117 @@ CREATE TABLE IF NOT EXISTS `movimientos_inventario` (
   CONSTRAINT `fk_mov_ubicacion` FOREIGN KEY (`ubicacion_id`) REFERENCES `ubicaciones` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_movimientos_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_movimientos_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla dbuzz.movimientos_inventario: ~12 rows (aproximadamente)
 DELETE FROM `movimientos_inventario`;
 INSERT INTO `movimientos_inventario` (`id`, `producto_id`, `usuario_id`, `tipo_movimiento`, `cantidad`, `justificacion`, `cargo_id`, `almacen_id`, `ubicacion_id`, `stock_anterior`, `stock_actual`, `fecha`) VALUES
-	(13, 2, 100, 'entrada', 120, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 120, '2025-12-25 14:00:00'),
-	(14, 3, 100, 'entrada', 60, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 60, '2025-12-25 14:01:00'),
-	(15, 4, 100, 'entrada', 200, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 200, '2025-12-25 14:02:00'),
-	(16, 5, 100, 'entrada', 40, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 40, '2025-12-25 14:03:00'),
-	(17, 6, 100, 'entrada', 150, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 150, '2025-12-25 14:04:00'),
-	(18, 7, 100, 'entrada', 300, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 300, '2025-12-25 14:05:00'),
-	(19, 8, 100, 'entrada', 80, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 80, '2025-12-25 14:06:00'),
-	(20, 9, 100, 'entrada', 25, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 25, '2025-12-25 14:07:00'),
-	(21, 10, 100, 'entrada', 10, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 10, '2025-12-25 14:08:00'),
-	(22, 11, 100, 'entrada', 50, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 50, '2025-12-25 14:09:00'),
-	(23, 12, 100, 'entrada', 15, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 15, '2025-12-25 14:10:00'),
-	(24, 13, 100, 'entrada', 0, 'Sin stock al momento del mock', NULL, NULL, NULL, 0, 0, '2025-12-25 14:11:00');
+	(1, 2, 100, 'entrada', 120, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 120, '2025-12-25 14:00:00'),
+	(2, 3, 100, 'entrada', 60, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 60, '2025-12-25 14:01:00'),
+	(3, 4, 100, 'entrada', 200, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 200, '2025-12-25 14:02:00'),
+	(4, 5, 100, 'entrada', 40, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 40, '2025-12-25 14:03:00'),
+	(5, 6, 100, 'entrada', 150, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 150, '2025-12-25 14:04:00'),
+	(6, 7, 100, 'entrada', 300, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 300, '2025-12-25 14:05:00'),
+	(7, 8, 100, 'entrada', 80, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 80, '2025-12-25 14:06:00'),
+	(8, 9, 100, 'entrada', 25, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 25, '2025-12-25 14:07:00'),
+	(9, 10, 100, 'entrada', 10, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 10, '2025-12-25 14:08:00'),
+	(10, 11, 100, 'entrada', 50, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 50, '2025-12-25 14:09:00'),
+	(11, 12, 100, 'entrada', 15, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 15, '2025-12-25 14:10:00'),
+	(12, 13, 100, 'entrada', 0, 'Sin stock al momento del mock', NULL, NULL, NULL, 0, 0, '2025-12-25 14:11:00');
+
+-- Volcando estructura para tabla dbuzz.notas_adjuntos
+CREATE TABLE IF NOT EXISTS `notas_adjuntos` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nota_id` int(10) unsigned NOT NULL,
+  `nombre` varchar(150) NOT NULL,
+  `url` text NOT NULL,
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `nota_id` (`nota_id`),
+  CONSTRAINT `notas_adjuntos_ibfk_1` FOREIGN KEY (`nota_id`) REFERENCES `notas_kanban` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Volcando datos para la tabla dbuzz.notas_adjuntos: ~2 rows (aproximadamente)
+DELETE FROM `notas_adjuntos`;
+INSERT INTO `notas_adjuntos` (`id`, `nota_id`, `nombre`, `url`, `creado_at`) VALUES
+	(1, 10, 'Requerimiento_Colegio.pdf', 'https://example.com/files/req_colegio_2026.pdf', '2026-01-07 21:01:09'),
+	(3, 11, 'Guia_Despacho_123.jpg', 'https://example.com/img/guia_123.jpg', '2026-01-07 22:19:12');
+
+-- Volcando estructura para tabla dbuzz.notas_checklists
+CREATE TABLE IF NOT EXISTS `notas_checklists` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nota_id` int(10) unsigned NOT NULL,
+  `tarea` varchar(255) NOT NULL,
+  `completada` tinyint(1) DEFAULT 0,
+  `orden` int(11) DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `nota_id` (`nota_id`),
+  CONSTRAINT `notas_checklists_ibfk_1` FOREIGN KEY (`nota_id`) REFERENCES `notas_kanban` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+
+-- Volcando datos para la tabla dbuzz.notas_checklists: ~5 rows (aproximadamente)
+DELETE FROM `notas_checklists`;
+INSERT INTO `notas_checklists` (`id`, `nota_id`, `tarea`, `completada`, `orden`) VALUES
+	(1, 10, 'Contar stock de resmas disponible', 1, 1),
+	(2, 10, 'Pedir cotización especial a Distribuidora Papel', 0, 2),
+	(3, 10, 'Enviar PDF al cliente', 0, 3),
+	(6, 11, 'Llamar a MRW', 1, 0),
+	(7, 11, 'Confirmar recepción con el cliente', 1, 1);
+
+-- Volcando estructura para tabla dbuzz.notas_items_inventario
+CREATE TABLE IF NOT EXISTS `notas_items_inventario` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `nota_id` int(10) unsigned NOT NULL,
+  `producto_id` int(10) unsigned NOT NULL,
+  `cantidad` int(10) unsigned DEFAULT 1,
+  PRIMARY KEY (`id`),
+  KEY `nota_id` (`nota_id`),
+  KEY `producto_id` (`producto_id`),
+  CONSTRAINT `notas_items_inventario_ibfk_1` FOREIGN KEY (`nota_id`) REFERENCES `notas_kanban` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `notas_items_inventario_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla dbuzz.notas_items_inventario: ~3 rows (aproximadamente)
+DELETE FROM `notas_items_inventario`;
+INSERT INTO `notas_items_inventario` (`id`, `nota_id`, `producto_id`, `cantidad`) VALUES
+	(1, 10, 11, 50),
+	(2, 10, 2, 100),
+	(3, 12, 4, 100);
+
+-- Volcando estructura para tabla dbuzz.notas_kanban
+CREATE TABLE IF NOT EXISTS `notas_kanban` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `titulo` varchar(150) NOT NULL COMMENT 'Título de la tarjeta',
+  `cliente_nombre` varchar(150) DEFAULT NULL COMMENT 'Nombre del cliente',
+  `telefono` varchar(20) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `contenido` text DEFAULT NULL COMMENT 'Descripción libre detallada',
+  `estado` enum('pendiente','seguimiento','resuelto','cancelado') NOT NULL DEFAULT 'pendiente',
+  `prioridad` enum('baja','media','alta') NOT NULL DEFAULT 'media',
+  `orden` int(11) DEFAULT 0 COMMENT 'Orden dentro de la misma columna',
+  `pedido_vinculado_id` int(10) unsigned DEFAULT NULL COMMENT 'Link opcional a un pedido real si se concreta',
+  `fecha_entrega` datetime DEFAULT NULL,
+  `etiquetas` varchar(255) DEFAULT NULL COMMENT 'JSON o lista separada por comas',
+  `miembros` text DEFAULT NULL COMMENT 'JSON de IDs de usuarios asignados',
+  `usuario_id` int(10) unsigned NOT NULL COMMENT 'Quién creó la nota',
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  KEY `pedido_vinculado_id` (`pedido_vinculado_id`),
+  KEY `idx_estado_orden` (`estado`,`orden`),
+  CONSTRAINT `notas_kanban_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `notas_kanban_ibfk_2` FOREIGN KEY (`pedido_vinculado_id`) REFERENCES `pedidos` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla dbuzz.notas_kanban: ~3 rows (aproximadamente)
+DELETE FROM `notas_kanban`;
+INSERT INTO `notas_kanban` (`id`, `titulo`, `cliente_nombre`, `telefono`, `email`, `contenido`, `estado`, `prioridad`, `orden`, `pedido_vinculado_id`, `fecha_entrega`, `etiquetas`, `miembros`, `usuario_id`, `creado_at`, `actualizado_at`) VALUES
+	(10, 'Presupuesto para Colegio San Ignacio', 'Colegio San Ignacio', NULL, NULL, 'Solicitan presupuesto de 50 resmas y 100 cuadernos para el inicio de clases.', 'pendiente', 'alta', 1, NULL, NULL, NULL, NULL, 1, '2026-01-07 12:30:00', NULL),
+	(11, 'Seguimiento de pedido V-10000002', 'José Pérez', '', '', 'El cliente llamó preguntando por su pedido de marcadores. Revisar con el transportista.', 'seguimiento', 'media', 1, NULL, NULL, '[]', NULL, 1, '2026-01-07 13:15:00', '2026-01-07 22:19:12'),
+	(12, 'Reabastecer stock de Pilot G2', NULL, NULL, NULL, 'Estamos quedando bajos en stock del Bolígrafo Pilot G2 negro. Contactar a Distribuidora Papel.', 'resuelto', 'baja', 1, NULL, NULL, NULL, NULL, 1, '2026-01-07 14:00:00', NULL);
 
 -- Volcando estructura para tabla dbuzz.password_reset_tokens
-DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned NOT NULL,
@@ -637,16 +629,12 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   KEY `usuario_id` (`usuario_id`),
   KEY `expiracion` (`expiracion`),
   CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla dbuzz.password_reset_tokens: ~2 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.password_reset_tokens: ~0 rows (aproximadamente)
 DELETE FROM `password_reset_tokens`;
-INSERT INTO `password_reset_tokens` (`id`, `usuario_id`, `token`, `expiracion`, `usado`, `creado_at`) VALUES
-	(1, 4, '225c2612cebf18e9a3f6ccab9c2b9fafd657b29f8acbf14f5c9806293e9863c0', '2025-12-01 00:13:38', 1, '2025-11-30 18:13:38'),
-	(2, 4, 'b13ab88f4462d972cb81b66e2fd60d06470bc9a21ddd72fd288cafa595836255', '2025-12-01 01:55:10', 0, '2025-11-30 19:55:10');
 
 -- Volcando estructura para tabla dbuzz.pedidos
-DROP TABLE IF EXISTS `pedidos`;
 CREATE TABLE IF NOT EXISTS `pedidos` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `cliente_id` varchar(50) DEFAULT NULL,
@@ -669,27 +657,25 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   KEY `pedidos_ibfk_1` (`cliente_id`),
   KEY `idx_pedidos_deleted_at` (`deleted_at`),
   KEY `idx_estado_pago` (`estado_pago`),
-  CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_pedido_cliente` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.pedidos: ~11 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.pedidos: ~10 rows (aproximadamente)
 DELETE FROM `pedidos`;
 INSERT INTO `pedidos` (`id`, `cliente_id`, `referencia`, `fecha_creacion`, `total`, `estado_pago`, `estado_envio`, `direccion_envio`, `notas_envio`, `creado_por`, `actualizado_at`, `tracking_number`, `estimated_delivery_date`, `deleted_at`) VALUES
-	(1, 'V-30535128', '4633556592', '2025-12-02 06:30:40', 10.00, 'pagado', 'pendiente', 'afeafe', 'sfaefd', NULL, '2025-12-24 22:08:12', 'TRK542867550', NULL, NULL),
-	(2, 'V-10000001', 'REF-LBR-0002', '2025-12-25 15:00:00', 9.70, 'pagado', 'enviado', 'Calle Comercio 123, Caracas', 'Entrega mañana', 100, '2025-12-25 15:34:22', 'TRK676862010', NULL, NULL),
-	(3, 'V-10000002', 'REF-LBR-0003', '2025-12-24 19:30:00', 10.10, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(4, 'V-10000003', 'REF-LBR-0004', '2025-10-05 14:15:00', 115.00, 'pagado', 'recibido', 'C.C. Centro, Local 12', 'Pedido mayorista', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(5, 'V-10000001', 'REF-LBR-0005', '2025-10-20 13:00:00', 13.50, 'pagado', 'enviado', 'Calle Comercio 123, Caracas', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(6, 'V-10000002', 'REF-LBR-0006', '2025-11-11 18:45:00', 10.80, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(7, 'V-10000001', 'REF-LBR-0007', '2025-11-25 20:10:00', 17.20, 'pagado', 'enviado', 'Calle Comercio 123, Caracas', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(8, 'V-10000003', 'REF-LBR-0008', '2025-12-01 16:00:00', 30.50, 'pagado', 'pendiente', 'C.C. Centro, Local 12', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(9, 'V-10000002', 'REF-LBR-0009', '2025-12-05 12:30:00', 11.75, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(10, 'V-10000001', 'REF-LBR-0010', '2025-12-10 22:20:00', 16.00, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
-	(11, 'V-10000003', 'REF-LBR-0011', '2025-12-20 13:05:00', 38.00, 'pagado', 'enviado', 'C.C. Centro, Local 12', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL);
+	(2, 'V-10000001', 'REF-LBR-0002', '2025-12-25 15:00:00', 9.70, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', 'Entrega mañana', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(3, 'V-10000002', 'REF-LBR-0003', '2025-12-24 19:30:00', 10.10, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(4, 'V-10000003', 'REF-LBR-0004', '2025-10-05 14:15:00', 115.00, 'pagado', 'recibido', 'C.C. Centro, Local 12', 'Pedido mayorista', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(5, 'V-10000001', 'REF-LBR-0005', '2025-10-20 13:00:00', 13.50, 'pagado', 'enviado', 'Calle Comercio 123, Caracas', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(6, 'V-10000002', 'REF-LBR-0006', '2025-11-11 18:45:00', 10.80, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(7, 'V-10000001', 'REF-LBR-0007', '2025-11-25 20:10:00', 17.20, 'pagado', 'enviado', 'Calle Comercio 123, Caracas', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(8, 'V-10000003', 'REF-LBR-0008', '2025-12-01 16:00:00', 30.50, 'pagado', 'pendiente', 'C.C. Centro, Local 12', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(9, 'V-10000002', 'REF-LBR-0009', '2025-12-05 12:30:00', 11.75, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(10, 'V-10000001', 'REF-LBR-0010', '2025-12-10 22:20:00', 16.00, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
+	(11, 'V-10000003', 'REF-LBR-0011', '2025-12-20 13:05:00', 38.00, 'pagado', 'enviado', 'C.C. Centro, Local 12', '', 100, '2026-01-07 21:01:09', NULL, NULL, NULL);
 
 -- Volcando estructura para tabla dbuzz.permisos_rol
-DROP TABLE IF EXISTS `permisos_rol`;
 CREATE TABLE IF NOT EXISTS `permisos_rol` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `rol` enum('admin','supervisor','operador') NOT NULL,
@@ -698,9 +684,9 @@ CREATE TABLE IF NOT EXISTS `permisos_rol` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_rol_pagina` (`rol`,`pagina`),
   KEY `idx_rol` (`rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Permisos de acceso por rol a páginas del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Permisos de acceso por rol a páginas del sistema';
 
--- Volcando datos para la tabla dbuzz.permisos_rol: ~93 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.permisos_rol: ~101 rows (aproximadamente)
 DELETE FROM `permisos_rol`;
 INSERT INTO `permisos_rol` (`id`, `rol`, `pagina`, `creado_at`) VALUES
 	(1, 'admin', 'dashboard.php', '2026-01-07 02:44:22'),
@@ -795,10 +781,17 @@ INSERT INTO `permisos_rol` (`id`, `rol`, `pagina`, `creado_at`) VALUES
 	(90, 'operador', 'search_api.php', '2026-01-07 02:44:23'),
 	(91, 'operador', 'api_sales_by_status_chart.php', '2026-01-07 02:44:23'),
 	(92, 'operador', 'envios_actions.php', '2026-01-07 02:44:23'),
-	(93, 'operador', 'product_actions.php', '2026-01-07 02:44:23');
+	(93, 'operador', 'product_actions.php', '2026-01-07 02:44:23'),
+	(94, 'admin', 'todo.php', '2026-01-07 03:49:24'),
+	(95, 'admin', 'notas_actions.php', '2026-01-07 03:49:24'),
+	(96, 'supervisor', 'todo.php', '2026-01-07 03:49:24'),
+	(97, 'supervisor', 'notas_actions.php', '2026-01-07 03:49:24'),
+	(98, 'operador', 'todo.php', '2026-01-07 03:49:24'),
+	(99, 'operador', 'notas_actions.php', '2026-01-07 03:49:24'),
+	(124, 'admin', 'catalogos.php', '2026-01-07 21:37:49'),
+	(125, 'supervisor', 'catalogos.php', '2026-01-07 21:37:49');
 
 -- Volcando estructura para tabla dbuzz.productos
-DROP TABLE IF EXISTS `productos`;
 CREATE TABLE IF NOT EXISTS `productos` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `sku` varchar(80) NOT NULL,
@@ -845,10 +838,9 @@ CREATE TABLE IF NOT EXISTS `productos` (
   CONSTRAINT `fk_productos_proveedor` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.productos: ~13 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.productos: ~12 rows (aproximadamente)
 DELETE FROM `productos`;
 INSERT INTO `productos` (`id`, `sku`, `nombre`, `descripcion`, `precio`, `costo_promedio`, `costo_ultimo`, `stock`, `min_stock`, `estado`, `tipo_producto`, `maneja_stock`, `creado_at`, `actualizado_at`, `categoria`, `marca_id`, `proveedor_id`, `modelo`, `color`, `tamanio`, `medidas`, `peso_kg`, `material`, `unidad_venta`, `cantidad_presentacion`, `deleted_at`, `producto_padre_id`, `es_kit_virtual`, `variante_atributo`) VALUES
-	(1, '325324324234', 'blah', 'afesfaf', 10.00, 0.0000, 0.0000, 4, 10, 'activo', 'fisico', 1, '2025-12-02 06:29:28', '2026-01-05 21:05:47', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, '2026-01-05 21:05:47', NULL, 0, NULL),
 	(2, 'LBR-0001', 'Cuaderno universitario 100 hojas', 'Cuaderno raya 100 hojas 21x27 cm', 2.50, 0.0000, 0.0000, 120, 20, 'activo', 'fisico', 1, '2025-12-25 14:00:00', NULL, 1, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
 	(3, 'LBR-0002', 'Cuaderno de dibujo A4 40 hojas', 'Papel para dibujo 120 g/m2, 40 hojas', 5.00, 0.0000, 0.0000, 60, 10, 'activo', 'fisico', 1, '2025-12-25 14:01:00', NULL, 4, 5, 3, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
 	(4, 'LBR-0003', 'Bolígrafo Pilot G2 negro', 'Bolígrafo punta 0.7 mm, tinta gel', 1.20, 0.0000, 0.0000, 200, 30, 'activo', 'fisico', 1, '2025-12-25 14:02:00', NULL, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
@@ -863,7 +855,6 @@ INSERT INTO `productos` (`id`, `sku`, `nombre`, `descripcion`, `precio`, `costo_
 	(13, 'LBR-0012', 'Marcador permanente negro', 'Marcador indeleble punta media', 2.00, 0.0000, 0.0000, 0, 10, 'agotado', 'fisico', 1, '2025-12-25 14:11:00', NULL, 1, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL);
 
 -- Volcando estructura para tabla dbuzz.producto_componentes
-DROP TABLE IF EXISTS `producto_componentes`;
 CREATE TABLE IF NOT EXISTS `producto_componentes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `kit_id` int(10) unsigned NOT NULL COMMENT 'Producto tipo kit',
@@ -883,7 +874,6 @@ CREATE TABLE IF NOT EXISTS `producto_componentes` (
 DELETE FROM `producto_componentes`;
 
 -- Volcando estructura para tabla dbuzz.proveedores
-DROP TABLE IF EXISTS `proveedores`;
 CREATE TABLE IF NOT EXISTS `proveedores` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `nombre` varchar(150) NOT NULL,
@@ -904,12 +894,11 @@ CREATE TABLE IF NOT EXISTS `proveedores` (
 -- Volcando datos para la tabla dbuzz.proveedores: ~3 rows (aproximadamente)
 DELETE FROM `proveedores`;
 INSERT INTO `proveedores` (`id`, `nombre`, `rif`, `contacto_nombre`, `email`, `telefono`, `direccion`, `notas`, `creado_at`, `actualizado_at`, `deleted_at`) VALUES
-	(1, 'Distribuidora Papel S.A.', NULL, 'María Pérez', 'ventas@distribuidora-papel.com', '+58 212 555 0101', 'Av. Comercio, Caracas', NULL, '2025-12-25 15:31:03', NULL, NULL),
-	(2, 'Importadora Útiles S.R.L.', NULL, 'Carlos Rojas', 'contacto@importutiles.com', '+58 241 555 0202', 'Zona Industrial, Valencia', NULL, '2025-12-25 15:31:03', NULL, NULL),
-	(3, 'ArtículosCreativos C.A.', NULL, 'Ana Gómez', 'info@articuloscreativos.com', '+58 261 555 0303', 'C.C. Arte, Maracay', NULL, '2025-12-25 15:31:03', NULL, NULL);
+	(1, 'Distribuidora Papel S.A.', NULL, 'María Pérez', 'ventas@distribuidora-papel.com', '+58 212 555 0101', 'Av. Comercio, Caracas', NULL, '2026-01-07 21:01:08', NULL, NULL),
+	(2, 'Importadora Útiles S.R.L.', NULL, 'Carlos Rojas', 'contacto@importutiles.com', '+58 241 555 0202', 'Zona Industrial, Valencia', NULL, '2026-01-07 21:01:08', NULL, NULL),
+	(3, 'ArtículosCreativos C.A.', NULL, 'Ana Gómez', 'info@articuloscreativos.com', '+58 261 555 0303', 'C.C. Arte, Maracay', NULL, '2026-01-07 21:01:08', NULL, NULL);
 
 -- Volcando estructura para tabla dbuzz.sesiones_api
-DROP TABLE IF EXISTS `sesiones_api`;
 CREATE TABLE IF NOT EXISTS `sesiones_api` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `usuario_id` int(10) unsigned NOT NULL,
@@ -921,9 +910,9 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.sesiones_api: ~36 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.sesiones_api: ~40 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
 INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_en`) VALUES
 	(24, 1, '2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c', '2025-11-29 15:15:36', '2025-11-29 02:15:36'),
@@ -961,10 +950,13 @@ INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_e
 	(56, 1, 'eb2b9052a6ac09a28e242566acb7b9e1de7f74ab56552b415f953fa609d8696c', '2026-01-07 13:37:28', '2026-01-07 00:37:28'),
 	(57, 1, '12a2a6b854d1ea73807cdb15f6486826547246fe8d11cb76f31b57fdfbe8b01c', '2026-01-07 13:53:32', '2026-01-07 00:53:32'),
 	(58, 1, 'b280ffc3828f7560a6ee0ee1c6a7859be9ad9dfabb8aba5f9b95e0b6475d9a86', '2026-01-07 16:06:34', '2026-01-07 03:06:34'),
-	(59, 1, '4f590296ba314fce3b3d27b4ee248c499b7a4c8da3647eeeaa6a79b72041a3bf', '2026-01-07 16:09:41', '2026-01-07 03:09:41');
+	(59, 1, '4f590296ba314fce3b3d27b4ee248c499b7a4c8da3647eeeaa6a79b72041a3bf', '2026-01-07 16:09:41', '2026-01-07 03:09:41'),
+	(60, 1, '6b32052243a2f7d0e01564f7a0aa2055ba952c8456a2958a8699562befcd78f0', '2026-01-08 06:46:44', '2026-01-07 17:46:44'),
+	(61, 1, 'a7b8826ed7c9d0ce194e824a35042e3f8d8482cc77ae7cf6df8a93c205fc1396', '2026-01-08 07:12:20', '2026-01-07 18:12:20'),
+	(62, 1, '71d76eea3cdcc60eb5a2ea8c64a87e95a2e99c51d4b798a909e8b4ec800deca6', '2026-01-08 07:43:21', '2026-01-07 18:43:21'),
+	(63, 1, '4d0863ca40f40d8ee23ff66f636464d656301cb9c9603e68458e9ee623a1a2fd', '2026-01-08 11:44:18', '2026-01-07 22:44:18');
 
 -- Volcando estructura para tabla dbuzz.stock_ubicacion
-DROP TABLE IF EXISTS `stock_ubicacion`;
 CREATE TABLE IF NOT EXISTS `stock_ubicacion` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `producto_id` int(10) unsigned NOT NULL,
@@ -1001,7 +993,6 @@ INSERT INTO `stock_ubicacion` (`id`, `producto_id`, `almacen_id`, `ubicacion_id`
 	(12, 12, 1, NULL, 15, 0, NULL, '2026-01-05 18:09:00');
 
 -- Volcando estructura para tabla dbuzz.tasas_cambio
-DROP TABLE IF EXISTS `tasas_cambio`;
 CREATE TABLE IF NOT EXISTS `tasas_cambio` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `tasa` decimal(18,4) NOT NULL COMMENT 'Valor de 1 USD en moneda local (VES)',
@@ -1020,7 +1011,6 @@ CREATE TABLE IF NOT EXISTS `tasas_cambio` (
 DELETE FROM `tasas_cambio`;
 
 -- Volcando estructura para tabla dbuzz.ubicaciones
-DROP TABLE IF EXISTS `ubicaciones`;
 CREATE TABLE IF NOT EXISTS `ubicaciones` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `almacen_id` int(10) unsigned NOT NULL,
@@ -1042,7 +1032,6 @@ CREATE TABLE IF NOT EXISTS `ubicaciones` (
 DELETE FROM `ubicaciones`;
 
 -- Volcando estructura para tabla dbuzz.usuarios
-DROP TABLE IF EXISTS `usuarios`;
 CREATE TABLE IF NOT EXISTS `usuarios` (
   `id` int(20) unsigned NOT NULL AUTO_INCREMENT,
   `nombre` varchar(120) NOT NULL,
@@ -1057,18 +1046,16 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.usuarios: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.usuarios: ~5 rows (aproximadamente)
 DELETE FROM `usuarios`;
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`, `estado`, `creado_at`, `actualizado_at`, `intentos_fallidos`) VALUES
-	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'admin', 'activo', '2025-08-09 17:43:16', '2026-01-06 23:15:26', 0),
-	(4, 'Gisvel', 'gisvelaray@gmail.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'operador', 'activo', '2025-11-30 18:13:22', '2025-11-30 18:13:28', 0),
+	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'admin', 'activo', '2025-08-09 17:43:16', '2026-01-07 22:44:08', 0),
+	(4, 'Gisvel', 'gisvelaray@gmail.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'operador', 'activo', '2025-11-30 18:13:22', '2026-01-07 22:43:30', 0),
 	(36, 'GiviSupervisor', 'supervisor@buzz.com', '$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna', 'supervisor', 'activo', '2025-08-14 01:32:53', NULL, 0),
 	(37, 'GiviOperador', 'operador@buzz.com', '$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC', 'operador', 'activo', '2025-08-14 01:33:00', NULL, 0),
-	(63, 'Juan Luis Chaurant', 'juanluischaurant@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'activo', '2025-11-30 21:18:35', NULL, 0),
-	(100, 'Operador Libreria', 'operador.libreria@example.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'operador', 'activo', '2025-12-01 12:00:00', NULL, 0);
+	(63, 'Juan Luis Chaurant', 'juanluischaurant@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'activo', '2025-11-30 21:18:35', NULL, 0);
 
 -- Volcando estructura para vista dbuzz.v_almacenes_resumen
-DROP VIEW IF EXISTS `v_almacenes_resumen`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_almacenes_resumen` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -1087,7 +1074,6 @@ CREATE TABLE `v_almacenes_resumen` (
 );
 
 -- Volcando estructura para vista dbuzz.v_cargos_detalle_completo
-DROP VIEW IF EXISTS `v_cargos_detalle_completo`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_cargos_detalle_completo` (
 	`cargo_id` INT(10) UNSIGNED NOT NULL,
@@ -1105,7 +1091,6 @@ CREATE TABLE `v_cargos_detalle_completo` (
 );
 
 -- Volcando estructura para vista dbuzz.v_cargos_resumen
-DROP VIEW IF EXISTS `v_cargos_resumen`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_cargos_resumen` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -1130,7 +1115,6 @@ CREATE TABLE `v_cargos_resumen` (
 );
 
 -- Volcando estructura para vista dbuzz.v_inventario
-DROP VIEW IF EXISTS `v_inventario`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_inventario` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1160,7 +1144,6 @@ CREATE TABLE `v_inventario` (
 );
 
 -- Volcando estructura para vista dbuzz.v_kit_componentes
-DROP VIEW IF EXISTS `v_kit_componentes`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_kit_componentes` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -1179,7 +1162,6 @@ CREATE TABLE `v_kit_componentes` (
 );
 
 -- Volcando estructura para vista dbuzz.v_low_stock
-DROP VIEW IF EXISTS `v_low_stock`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_low_stock` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1196,7 +1178,6 @@ CREATE TABLE `v_low_stock` (
 );
 
 -- Volcando estructura para vista dbuzz.v_op_backup
-DROP VIEW IF EXISTS `v_op_backup`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_op_backup` (
 	`registro_id` INT(10) UNSIGNED NOT NULL,
@@ -1206,7 +1187,6 @@ CREATE TABLE `v_op_backup` (
 );
 
 -- Volcando estructura para vista dbuzz.v_op_import
-DROP VIEW IF EXISTS `v_op_import`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_op_import` (
 	`registro_id` INT(10) UNSIGNED NOT NULL,
@@ -1217,7 +1197,6 @@ CREATE TABLE `v_op_import` (
 );
 
 -- Volcando estructura para vista dbuzz.v_pedidos_pendientes
-DROP VIEW IF EXISTS `v_pedidos_pendientes`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_pedidos_pendientes` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -1235,7 +1214,6 @@ CREATE TABLE `v_pedidos_pendientes` (
 );
 
 -- Volcando estructura para vista dbuzz.v_productos_completo
-DROP VIEW IF EXISTS `v_productos_completo`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_productos_completo` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1265,7 +1243,6 @@ CREATE TABLE `v_productos_completo` (
 );
 
 -- Volcando estructura para vista dbuzz.v_rotacion_inventario
-DROP VIEW IF EXISTS `v_rotacion_inventario`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_rotacion_inventario` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1279,7 +1256,6 @@ CREATE TABLE `v_rotacion_inventario` (
 );
 
 -- Volcando estructura para vista dbuzz.v_stock_detallado
-DROP VIEW IF EXISTS `v_stock_detallado`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_stock_detallado` (
 	`id` INT(10) UNSIGNED NOT NULL,
@@ -1299,7 +1275,6 @@ CREATE TABLE `v_stock_detallado` (
 );
 
 -- Volcando estructura para vista dbuzz.v_stock_por_almacen
-DROP VIEW IF EXISTS `v_stock_por_almacen`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_stock_por_almacen` (
 	`almacen_id` INT(10) UNSIGNED NOT NULL,
@@ -1313,7 +1288,6 @@ CREATE TABLE `v_stock_por_almacen` (
 );
 
 -- Volcando estructura para vista dbuzz.v_tasa_hoy
-DROP VIEW IF EXISTS `v_tasa_hoy`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_tasa_hoy` (
 	`tasa_actual` DECIMAL(18,4) NULL,
@@ -1322,7 +1296,6 @@ CREATE TABLE `v_tasa_hoy` (
 );
 
 -- Volcando estructura para vista dbuzz.v_top5_down
-DROP VIEW IF EXISTS `v_top5_down`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_top5_down` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1335,7 +1308,6 @@ CREATE TABLE `v_top5_down` (
 );
 
 -- Volcando estructura para vista dbuzz.v_top5_up
-DROP VIEW IF EXISTS `v_top5_up`;
 -- Creando tabla temporal para superar errores de dependencia de VIEW
 CREATE TABLE `v_top5_up` (
 	`id` INT(20) UNSIGNED NOT NULL,
@@ -1345,7 +1317,6 @@ CREATE TABLE `v_top5_up` (
 );
 
 -- Volcando estructura para disparador dbuzz.trg_auto_maneja_stock
-DROP TRIGGER IF EXISTS `trg_auto_maneja_stock`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_auto_maneja_stock
@@ -1357,14 +1328,13 @@ BEGIN
         SET NEW.stock = 0;
     ELSEIF NEW.tipo_producto = 'kit' AND NEW.es_kit_virtual = TRUE THEN
         SET NEW.maneja_stock = FALSE;
-        -- Stock se calcula dinámicamente
+        
     END IF;
 END//
 DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_auto_maneja_stock_update
-DROP TRIGGER IF EXISTS `trg_auto_maneja_stock_update`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_auto_maneja_stock_update
@@ -1382,17 +1352,16 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_cargo_anulado
-DROP TRIGGER IF EXISTS `trg_cargo_anulado`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER `trg_cargo_anulado`
 AFTER UPDATE ON `cargos_existencias`
 FOR EACH ROW
 BEGIN
-    -- Solo cuando cambia de 'confirmado' a 'anulado'
+    
     IF NEW.estado = 'anulado' AND OLD.estado = 'confirmado' THEN
 
-        -- Revertir stock de cada producto
+        
         UPDATE productos p
         INNER JOIN detalle_cargo_existencias d ON p.id = d.producto_id
         SET
@@ -1400,7 +1369,7 @@ BEGIN
             p.actualizado_at = NOW()
         WHERE d.cargo_id = NEW.id;
 
-        -- Registrar movimientos de inventario (reversión)
+        
         INSERT INTO movimientos_inventario
             (producto_id, usuario_id, tipo_movimiento, cantidad,
              justificacion, stock_anterior, stock_actual, cargo_id, fecha)
@@ -1426,17 +1395,16 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_cargo_confirmado
-DROP TRIGGER IF EXISTS `trg_cargo_confirmado`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER `trg_cargo_confirmado`
 AFTER UPDATE ON `cargos_existencias`
 FOR EACH ROW
 BEGIN
-    -- Solo cuando cambia de 'borrador' a 'confirmado'
+    
     IF NEW.estado = 'confirmado' AND OLD.estado = 'borrador' THEN
 
-        -- Actualizar stock de cada producto en el cargo
+        
         UPDATE productos p
         INNER JOIN detalle_cargo_existencias d ON p.id = d.producto_id
         SET
@@ -1445,7 +1413,7 @@ BEGIN
             p.actualizado_at = NOW()
         WHERE d.cargo_id = NEW.id;
 
-        -- Registrar movimientos de inventario para cada producto
+        
         INSERT INTO movimientos_inventario
             (producto_id, usuario_id, tipo_movimiento, cantidad,
              justificacion, stock_anterior, stock_actual, cargo_id, fecha)
@@ -1476,7 +1444,6 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_log_backup
-DROP TRIGGER IF EXISTS `trg_log_backup`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_log_backup
@@ -1495,7 +1462,6 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_log_importacion
-DROP TRIGGER IF EXISTS `trg_log_importacion`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_log_importacion
@@ -1516,7 +1482,6 @@ DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Volcando estructura para disparador dbuzz.trg_validar_componente_kit
-DROP TRIGGER IF EXISTS `trg_validar_componente_kit`;
 SET @OLDTMP_SQL_MODE=@@SQL_MODE, SQL_MODE='STRICT_TRANS_TABLES,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
 DELIMITER //
 CREATE TRIGGER trg_validar_componente_kit
@@ -1525,14 +1490,14 @@ FOR EACH ROW
 BEGIN
     DECLARE v_tipo VARCHAR(20);
 
-    -- Verificar que el kit sea realmente un kit
+    
     SELECT tipo_producto INTO v_tipo FROM productos WHERE id = NEW.kit_id;
     IF v_tipo != 'kit' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El producto padre debe ser de tipo kit';
     END IF;
 
-    -- Evitar que un kit sea componente de sí mismo
+    
     IF NEW.kit_id = NEW.componente_id THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Un kit no puede ser componente de sí mismo';
@@ -1543,145 +1508,27 @@ SET SQL_MODE=@OLDTMP_SQL_MODE;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_almacenes_resumen`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_almacenes_resumen` AS SELECT
-    a.id,
-    a.codigo,
-    a.nombre,
-    a.tipo,
-    a.es_principal,
-    a.activo,
-    a.direccion,
-    a.telefono,
-    u.nombre AS responsable_nombre,
-    (SELECT COUNT(*) FROM ubicaciones WHERE almacen_id = a.id AND activo = 1) AS total_ubicaciones,
-    (SELECT COUNT(DISTINCT producto_id) FROM stock_ubicacion WHERE almacen_id = a.id AND cantidad > 0) AS productos_en_stock,
-    (SELECT COALESCE(SUM(cantidad), 0) FROM stock_ubicacion WHERE almacen_id = a.id) AS unidades_totales,
-    a.creado_at
-FROM almacenes a
-LEFT JOIN usuarios u ON a.responsable_id = u.id
-ORDER BY a.es_principal DESC, a.nombre 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_almacenes_resumen` AS select `a`.`id` AS `id`,`a`.`codigo` AS `codigo`,`a`.`nombre` AS `nombre`,`a`.`tipo` AS `tipo`,`a`.`es_principal` AS `es_principal`,`a`.`activo` AS `activo`,`a`.`direccion` AS `direccion`,`a`.`telefono` AS `telefono`,`u`.`nombre` AS `responsable_nombre`,(select count(0) from `ubicaciones` where `ubicaciones`.`almacen_id` = `a`.`id` and `ubicaciones`.`activo` = 1) AS `total_ubicaciones`,(select count(distinct `stock_ubicacion`.`producto_id`) from `stock_ubicacion` where `stock_ubicacion`.`almacen_id` = `a`.`id` and `stock_ubicacion`.`cantidad` > 0) AS `productos_en_stock`,(select coalesce(sum(`stock_ubicacion`.`cantidad`),0) from `stock_ubicacion` where `stock_ubicacion`.`almacen_id` = `a`.`id`) AS `unidades_totales`,`a`.`creado_at` AS `creado_at` from (`almacenes` `a` left join `usuarios` `u` on(`a`.`responsable_id` = `u`.`id`)) order by `a`.`es_principal` desc,`a`.`nombre` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_cargos_detalle_completo`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_cargos_detalle_completo` AS SELECT
-    c.id AS cargo_id,
-    c.codigo AS cargo_codigo,
-    c.fecha AS cargo_fecha,
-    c.estado AS cargo_estado,
-    d.id AS detalle_id,
-    d.producto_id,
-    pr.sku AS producto_sku,
-    pr.nombre AS producto_nombre,
-    d.cantidad,
-    d.costo_unitario,
-    d.subtotal,
-    d.notas AS detalle_notas
-FROM cargos_existencias c
-INNER JOIN detalle_cargo_existencias d ON c.id = d.cargo_id
-INNER JOIN productos pr ON d.producto_id = pr.id
-ORDER BY c.id DESC, d.id ASC 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_cargos_detalle_completo` AS select `c`.`id` AS `cargo_id`,`c`.`codigo` AS `cargo_codigo`,`c`.`fecha` AS `cargo_fecha`,`c`.`estado` AS `cargo_estado`,`d`.`id` AS `detalle_id`,`d`.`producto_id` AS `producto_id`,`pr`.`sku` AS `producto_sku`,`pr`.`nombre` AS `producto_nombre`,`d`.`cantidad` AS `cantidad`,`d`.`costo_unitario` AS `costo_unitario`,`d`.`subtotal` AS `subtotal`,`d`.`notas` AS `detalle_notas` from ((`cargos_existencias` `c` join `detalle_cargo_existencias` `d` on(`c`.`id` = `d`.`cargo_id`)) join `productos` `pr` on(`d`.`producto_id` = `pr`.`id`)) order by `c`.`id` desc,`d`.`id` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_cargos_resumen`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_cargos_resumen` AS SELECT
-    c.id,
-    c.codigo,
-    c.fecha,
-    c.concepto,
-    CASE c.concepto
-        WHEN 'compra' THEN 'Compra'
-        WHEN 'donacion' THEN 'Donación'
-        WHEN 'ajuste_positivo' THEN 'Ajuste Positivo'
-        WHEN 'devolucion_cliente' THEN 'Devolución Cliente'
-        WHEN 'inventario_inicial' THEN 'Inventario Inicial'
-        WHEN 'otro' THEN COALESCE(c.concepto_otro, 'Otro')
-    END AS concepto_texto,
-    p.nombre AS proveedor_nombre,
-    c.referencia_externa,
-    c.total_productos,
-    c.total_unidades,
-    c.valor_total,
-    c.estado,
-    CASE c.estado
-        WHEN 'borrador' THEN 'Borrador'
-        WHEN 'confirmado' THEN 'Confirmado'
-        WHEN 'anulado' THEN 'Anulado'
-    END AS estado_texto,
-    u.nombre AS registrado_por_nombre,
-    c.creado_at,
-    uc.nombre AS confirmado_por_nombre,
-    c.fecha_confirmacion,
-    ua.nombre AS anulado_por_nombre,
-    c.fecha_anulacion,
-    c.motivo_anulacion
-FROM cargos_existencias c
-LEFT JOIN proveedores p ON c.proveedor_id = p.id
-LEFT JOIN usuarios u ON c.registrado_por = u.id
-LEFT JOIN usuarios uc ON c.confirmado_por = uc.id
-LEFT JOIN usuarios ua ON c.anulado_por = ua.id
-ORDER BY c.creado_at DESC 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_cargos_resumen` AS select `c`.`id` AS `id`,`c`.`codigo` AS `codigo`,`c`.`fecha` AS `fecha`,`c`.`concepto` AS `concepto`,case `c`.`concepto` when 'compra' then 'Compra' when 'donacion' then 'Donación' when 'ajuste_positivo' then 'Ajuste Positivo' when 'devolucion_cliente' then 'Devolución Cliente' when 'inventario_inicial' then 'Inventario Inicial' when 'otro' then coalesce(`c`.`concepto_otro`,'Otro') end AS `concepto_texto`,`p`.`nombre` AS `proveedor_nombre`,`c`.`referencia_externa` AS `referencia_externa`,`c`.`total_productos` AS `total_productos`,`c`.`total_unidades` AS `total_unidades`,`c`.`valor_total` AS `valor_total`,`c`.`estado` AS `estado`,case `c`.`estado` when 'borrador' then 'Borrador' when 'confirmado' then 'Confirmado' when 'anulado' then 'Anulado' end AS `estado_texto`,`u`.`nombre` AS `registrado_por_nombre`,`c`.`creado_at` AS `creado_at`,`uc`.`nombre` AS `confirmado_por_nombre`,`c`.`fecha_confirmacion` AS `fecha_confirmacion`,`ua`.`nombre` AS `anulado_por_nombre`,`c`.`fecha_anulacion` AS `fecha_anulacion`,`c`.`motivo_anulacion` AS `motivo_anulacion` from ((((`cargos_existencias` `c` left join `proveedores` `p` on(`c`.`proveedor_id` = `p`.`id`)) left join `usuarios` `u` on(`c`.`registrado_por` = `u`.`id`)) left join `usuarios` `uc` on(`c`.`confirmado_por` = `uc`.`id`)) left join `usuarios` `ua` on(`c`.`anulado_por` = `ua`.`id`)) order by `c`.`creado_at` desc 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_inventario`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_inventario` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.descripcion,
-    p.precio,
-    p.costo_promedio,
-    p.costo_ultimo,
-    p.stock,
-    p.min_stock,
-    p.estado,
-    c.nombre AS categoria_nombre,
-    m.nombre AS marca_nombre,
-    pr.nombre AS proveedor_nombre,
-    p.modelo,
-    p.color,
-    p.tamanio,
-    p.medidas,
-    p.peso_kg,
-    p.material,
-    p.unidad_venta,
-    p.cantidad_presentacion,
-    p.creado_at,
-    p.actualizado_at,
-    p.deleted_at
-FROM productos p
-LEFT JOIN categorias c ON p.categoria = c.id
-LEFT JOIN marcas m ON p.marca_id = m.id
-LEFT JOIN proveedores pr ON p.proveedor_id = pr.id
-WHERE p.deleted_at IS NULL 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_inventario` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`descripcion` AS `descripcion`,`p`.`precio` AS `precio`,`p`.`costo_promedio` AS `costo_promedio`,`p`.`costo_ultimo` AS `costo_ultimo`,`p`.`stock` AS `stock`,`p`.`min_stock` AS `min_stock`,`p`.`estado` AS `estado`,`c`.`nombre` AS `categoria_nombre`,`m`.`nombre` AS `marca_nombre`,`pr`.`nombre` AS `proveedor_nombre`,`p`.`modelo` AS `modelo`,`p`.`color` AS `color`,`p`.`tamanio` AS `tamanio`,`p`.`medidas` AS `medidas`,`p`.`peso_kg` AS `peso_kg`,`p`.`material` AS `material`,`p`.`unidad_venta` AS `unidad_venta`,`p`.`cantidad_presentacion` AS `cantidad_presentacion`,`p`.`creado_at` AS `creado_at`,`p`.`actualizado_at` AS `actualizado_at`,`p`.`deleted_at` AS `deleted_at` from (((`productos` `p` left join `categorias` `c` on(`p`.`categoria` = `c`.`id`)) left join `marcas` `m` on(`p`.`marca_id` = `m`.`id`)) left join `proveedores` `pr` on(`p`.`proveedor_id` = `pr`.`id`)) where `p`.`deleted_at` is null 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_kit_componentes`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_kit_componentes` AS SELECT
-    pc.id,
-    pc.kit_id,
-    pk.sku AS kit_sku,
-    pk.nombre AS kit_nombre,
-    pc.componente_id,
-    p.sku AS componente_sku,
-    p.nombre AS componente_nombre,
-    p.tipo_producto AS componente_tipo,
-    pc.cantidad,
-    p.precio AS componente_precio,
-    CASE
-        WHEN p.tipo_producto = 'kit' AND p.es_kit_virtual THEN fn_stock_kit_virtual(p.id)
-        WHEN p.tipo_producto = 'servicio' THEN 999999
-        ELSE p.stock
-    END AS componente_stock,
-    pc.cantidad * p.precio AS subtotal,
-    pc.orden
-FROM producto_componentes pc
-INNER JOIN productos p ON p.id = pc.componente_id
-INNER JOIN productos pk ON pk.id = pc.kit_id
-ORDER BY pc.kit_id, pc.orden, pc.id 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_kit_componentes` AS select `pc`.`id` AS `id`,`pc`.`kit_id` AS `kit_id`,`pk`.`sku` AS `kit_sku`,`pk`.`nombre` AS `kit_nombre`,`pc`.`componente_id` AS `componente_id`,`p`.`sku` AS `componente_sku`,`p`.`nombre` AS `componente_nombre`,`p`.`tipo_producto` AS `componente_tipo`,`pc`.`cantidad` AS `cantidad`,`p`.`precio` AS `componente_precio`,case when `p`.`tipo_producto` = 'kit' and `p`.`es_kit_virtual` <> 0 then `fn_stock_kit_virtual`(`p`.`id`) when `p`.`tipo_producto` = 'servicio' then 999999 else `p`.`stock` end AS `componente_stock`,`pc`.`cantidad` * `p`.`precio` AS `subtotal`,`pc`.`orden` AS `orden` from ((`producto_componentes` `pc` join `productos` `p` on(`p`.`id` = `pc`.`componente_id`)) join `productos` `pk` on(`pk`.`id` = `pc`.`kit_id`)) order by `pc`.`kit_id`,`pc`.`orden`,`pc`.`id` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -1706,39 +1553,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_pedidos_pendientes` AS s
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_productos_completo`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_productos_completo` AS SELECT
-    p.id,
-    p.sku,
-    p.nombre,
-    p.descripcion,
-    p.precio,
-    p.tipo_producto,
-    p.maneja_stock,
-    p.es_kit_virtual,
-    p.variante_atributo,
-    p.producto_padre_id,
-    pp.nombre AS producto_padre_nombre,
-    pp.sku AS producto_padre_sku,
-    CASE
-        WHEN p.tipo_producto = 'kit' AND p.es_kit_virtual THEN fn_stock_kit_virtual(p.id)
-        WHEN p.tipo_producto = 'servicio' THEN NULL
-        ELSE p.stock
-    END AS stock_efectivo,
-    p.stock AS stock_fisico,
-    p.min_stock,
-    p.estado,
-    p.marca_id,
-    m.nombre AS marca_nombre,
-    p.categoria,
-    c.nombre AS categoria_nombre,
-    (SELECT COUNT(*) FROM productos v WHERE v.producto_padre_id = p.id) AS total_variantes,
-    (SELECT COUNT(*) FROM producto_componentes pc WHERE pc.kit_id = p.id) AS total_componentes,
-    p.creado_at,
-    p.deleted_at
-FROM productos p
-LEFT JOIN productos pp ON pp.id = p.producto_padre_id
-LEFT JOIN marcas m ON m.id = p.marca_id
-LEFT JOIN categorias c ON c.id = p.categoria 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_productos_completo` AS select `p`.`id` AS `id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `nombre`,`p`.`descripcion` AS `descripcion`,`p`.`precio` AS `precio`,`p`.`tipo_producto` AS `tipo_producto`,`p`.`maneja_stock` AS `maneja_stock`,`p`.`es_kit_virtual` AS `es_kit_virtual`,`p`.`variante_atributo` AS `variante_atributo`,`p`.`producto_padre_id` AS `producto_padre_id`,`pp`.`nombre` AS `producto_padre_nombre`,`pp`.`sku` AS `producto_padre_sku`,case when `p`.`tipo_producto` = 'kit' and `p`.`es_kit_virtual` <> 0 then `fn_stock_kit_virtual`(`p`.`id`) when `p`.`tipo_producto` = 'servicio' then NULL else `p`.`stock` end AS `stock_efectivo`,`p`.`stock` AS `stock_fisico`,`p`.`min_stock` AS `min_stock`,`p`.`estado` AS `estado`,`p`.`marca_id` AS `marca_id`,`m`.`nombre` AS `marca_nombre`,`p`.`categoria` AS `categoria`,`c`.`nombre` AS `categoria_nombre`,(select count(0) from `productos` `v` where `v`.`producto_padre_id` = `p`.`id`) AS `total_variantes`,(select count(0) from `producto_componentes` `pc` where `pc`.`kit_id` = `p`.`id`) AS `total_componentes`,`p`.`creado_at` AS `creado_at`,`p`.`deleted_at` AS `deleted_at` from (((`productos` `p` left join `productos` `pp` on(`pp`.`id` = `p`.`producto_padre_id`)) left join `marcas` `m` on(`m`.`id` = `p`.`marca_id`)) left join `categorias` `c` on(`c`.`id` = `p`.`categoria`)) 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
@@ -1748,69 +1563,17 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_rotacion_inventario` AS 
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_stock_detallado`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_stock_detallado` AS SELECT
-    su.id,
-    a.id AS almacen_id,
-    a.codigo AS almacen_codigo,
-    a.nombre AS almacen_nombre,
-    u.id AS ubicacion_id,
-    u.codigo AS ubicacion_codigo,
-    CONCAT(COALESCE(u.pasillo, ''), '-', COALESCE(u.estante, ''), '-', COALESCE(u.nivel, '')) AS ubicacion_full,
-    p.id AS producto_id,
-    p.sku,
-    p.nombre AS producto_nombre,
-    su.cantidad,
-    su.stock_minimo,
-    su.stock_maximo,
-    CASE
-        WHEN su.cantidad <= su.stock_minimo THEN 'bajo'
-        WHEN su.stock_maximo IS NOT NULL AND su.cantidad >= su.stock_maximo THEN 'lleno'
-        ELSE 'normal'
-    END AS estado_stock
-FROM stock_ubicacion su
-INNER JOIN almacenes a ON a.id = su.almacen_id
-INNER JOIN productos p ON p.id = su.producto_id
-LEFT JOIN ubicaciones u ON u.id = su.ubicacion_id
-WHERE a.activo = 1 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_stock_detallado` AS select `su`.`id` AS `id`,`a`.`id` AS `almacen_id`,`a`.`codigo` AS `almacen_codigo`,`a`.`nombre` AS `almacen_nombre`,`u`.`id` AS `ubicacion_id`,`u`.`codigo` AS `ubicacion_codigo`,concat(coalesce(`u`.`pasillo`,''),'-',coalesce(`u`.`estante`,''),'-',coalesce(`u`.`nivel`,'')) AS `ubicacion_full`,`p`.`id` AS `producto_id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `producto_nombre`,`su`.`cantidad` AS `cantidad`,`su`.`stock_minimo` AS `stock_minimo`,`su`.`stock_maximo` AS `stock_maximo`,case when `su`.`cantidad` <= `su`.`stock_minimo` then 'bajo' when `su`.`stock_maximo` is not null and `su`.`cantidad` >= `su`.`stock_maximo` then 'lleno' else 'normal' end AS `estado_stock` from (((`stock_ubicacion` `su` join `almacenes` `a` on(`a`.`id` = `su`.`almacen_id`)) join `productos` `p` on(`p`.`id` = `su`.`producto_id`)) left join `ubicaciones` `u` on(`u`.`id` = `su`.`ubicacion_id`)) where `a`.`activo` = 1 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_stock_por_almacen`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_stock_por_almacen` AS SELECT
-    a.id AS almacen_id,
-    a.codigo AS almacen_codigo,
-    a.nombre AS almacen_nombre,
-    p.id AS producto_id,
-    p.sku,
-    p.nombre AS producto_nombre,
-    COALESCE(SUM(su.cantidad), 0) AS stock_almacen,
-    COUNT(DISTINCT su.ubicacion_id) AS num_ubicaciones
-FROM almacenes a
-CROSS JOIN productos p
-LEFT JOIN stock_ubicacion su ON su.almacen_id = a.id AND su.producto_id = p.id
-WHERE a.activo = 1 AND p.deleted_at IS NULL
-GROUP BY a.id, p.id
-ORDER BY a.nombre, p.nombre 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_stock_por_almacen` AS select `a`.`id` AS `almacen_id`,`a`.`codigo` AS `almacen_codigo`,`a`.`nombre` AS `almacen_nombre`,`p`.`id` AS `producto_id`,`p`.`sku` AS `sku`,`p`.`nombre` AS `producto_nombre`,coalesce(sum(`su`.`cantidad`),0) AS `stock_almacen`,count(distinct `su`.`ubicacion_id`) AS `num_ubicaciones` from ((`almacenes` `a` join `productos` `p`) left join `stock_ubicacion` `su` on(`su`.`almacen_id` = `a`.`id` and `su`.`producto_id` = `p`.`id`)) where `a`.`activo` = 1 and `p`.`deleted_at` is null group by `a`.`id`,`p`.`id` order by `a`.`nombre`,`p`.`nombre` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_tasa_hoy`;
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_tasa_hoy` AS SELECT
-    COALESCE(
-        (SELECT tasa FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
-        (SELECT tasa FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
-        1
-    ) AS tasa_actual,
-    COALESCE(
-        (SELECT fecha FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
-        (SELECT fecha FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
-        CURDATE()
-    ) AS fecha_tasa,
-    COALESCE(
-        (SELECT fuente FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
-        (SELECT fuente FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
-        'no_configurada'
-    ) AS fuente 
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_tasa_hoy` AS select coalesce((select `tasas_cambio`.`tasa` from `tasas_cambio` where `tasas_cambio`.`fecha` = curdate() limit 1),(select `tasas_cambio`.`tasa` from `tasas_cambio` where `tasas_cambio`.`fecha` < curdate() order by `tasas_cambio`.`fecha` desc limit 1),1) AS `tasa_actual`,coalesce((select `tasas_cambio`.`fecha` from `tasas_cambio` where `tasas_cambio`.`fecha` = curdate() limit 1),(select `tasas_cambio`.`fecha` from `tasas_cambio` where `tasas_cambio`.`fecha` < curdate() order by `tasas_cambio`.`fecha` desc limit 1),curdate()) AS `fecha_tasa`,coalesce((select `tasas_cambio`.`fuente` from `tasas_cambio` where `tasas_cambio`.`fecha` = curdate() limit 1),(select `tasas_cambio`.`fuente` from `tasas_cambio` where `tasas_cambio`.`fecha` < curdate() order by `tasas_cambio`.`fecha` desc limit 1),'no_configurada') AS `fuente` 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW

@@ -520,14 +520,20 @@
                         <div class="modal-section-title">
                             <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Nombre *</label>
-                                <input type="text" class="form-control form-control-buzz" id="userName" required>
+                                <label class="form-label">Nombre *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="userName" required>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Email *</label>
-                                <input type="email" class="form-control form-control-buzz" id="userEmail" required autocomplete="email">
+                                <label class="form-label">Email *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                    <input type="email" class="form-control form-control-buzz" id="userEmail" required autocomplete="email">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -537,14 +543,20 @@
                         <div class="modal-section-title">
                             <i class="fas fa-lock"></i> SEGURIDAD
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Contraseña *</label>
-                                <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password">
+                                <label class="form-label">Contraseña *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                    <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password">
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Confirmar Contraseña *</label>
-                                <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password">
+                                <label class="form-label">Confirmar Contraseña *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-check-double"></i></span>
+                                    <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -554,20 +566,26 @@
                         <div class="modal-section-title">
                             <i class="fas fa-user-shield"></i> PERMISOS Y ESTADO
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Rol</label>
-                                <select class="form-control form-control-buzz" id="userRole">
-                                    <option value="user">Usuario</option>
-                                    <option value="admin">Administrador</option>
-                                </select>
+                                <label class="form-label">Rol</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
+                                    <select class="form-control form-control-buzz" id="userRole">
+                                        <option value="user">Usuario</option>
+                                        <option value="admin">Administrador</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Estado</label>
-                                <select class="form-control form-control-buzz" id="userStatus">
-                                    <option value="activo">Activo</option>
-                                    <option value="inactivo">Inactivo</option>
-                                </select>
+                                <label class="form-label">Estado</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-toggle-on"></i></span>
+                                    <select class="form-control form-control-buzz" id="userStatus">
+                                        <option value="activo">Activo</option>
+                                        <option value="inactivo">Inactivo</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -579,10 +597,10 @@
                 </div>
                 <div class="modal-footer-buzz">
                     <button type="button" class="btn btn-outline-buzz" onclick="closeUserModal()">
-                        <i class="fas fa-times"></i> Cancelar
+                        <i class="fas fa-times me-2"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-buzz">
-                        <i class="fas fa-save"></i> Guardar Usuario
+                        <i class="fas fa-save me-2"></i>Guardar Usuario
                     </button>
                 </div>
             </form>

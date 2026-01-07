@@ -111,10 +111,11 @@
                         <div class="modal-section-title">
                             <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">ID Cliente *</label>
+                                <label class="form-label">ID Cliente *</label>
                                 <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
                                     <select class="form-select form-control-buzz" id="createCustomerIdType" style="max-width: 80px;" required>
                                         <option value="V">V</option>
                                         <option value="E">E</option>
@@ -126,15 +127,21 @@
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Nombre *</label>
-                                <input type="text" class="form-control form-control-buzz" id="createCustomerName" required>
+                                <label class="form-label">Nombre *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="createCustomerName" required>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Email</label>
-                            <input type="email" class="form-control form-control-buzz" id="createCustomerEmail">
+                            <label class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control form-control-buzz" id="createCustomerEmail">
+                            </div>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" value="1" id="createCustomerVip">
                             <label class="form-check-label text-muted" for="createCustomerVip">
                                 <i class="fas fa-star text-warning"></i> Cliente VIP
@@ -147,38 +154,50 @@
                         <div class="modal-section-title">
                             <i class="fas fa-phone"></i> CONTACTO
                         </div>
-                        <div class="row mb-3">
+                        <div class="row mb-3 g-3">
                             <div class="col-md-4">
-                                <label class="form-label text-muted">Código País</label>
-                                <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode" required>
-                                    <option value="+58">Venezuela (+58)</option>
-                                    <option value="+1">USA/Canada (+1)</option>
-                                    <option value="+57">Colombia (+57)</option>
-                                    <option value="+54">Argentina (+54)</option>
-                                    <option value="+34">España (+34)</option>
-                                </select>
+                                <label class="form-label">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode" required>
+                                        <option value="+58">+58</option>
+                                        <option value="+1">+1</option>
+                                        <option value="+57">+57</option>
+                                        <option value="+54">+54</option>
+                                        <option value="+34">+34</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-8">
-                                <label class="form-label text-muted">Teléfono *</label>
-                                <input type="text" class="form-control form-control-buzz" id="createCustomerPhone" required>
+                                <label class="form-label">Teléfono *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="createCustomerPhone" required>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Dirección</label>
-                            <textarea class="form-control form-control-buzz" id="createCustomerAddress" rows="2"></textarea>
+                            <label class="form-label">Dirección</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-map-marker-alt"></i></span>
+                                <textarea class="form-control form-control-buzz" id="createCustomerAddress" rows="2"></textarea>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Notas</label>
-                            <textarea class="form-control form-control-buzz" id="createCustomerNotes" rows="2"></textarea>
+                            <label class="form-label">Notas</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-sticky-note"></i></span>
+                                <textarea class="form-control form-control-buzz" id="createCustomerNotes" rows="2"></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer-buzz">
                     <button type="button" class="btn btn-outline-buzz" onclick="closeModal('createCustomerModal')">
-                        <i class="fas fa-times"></i> Cancelar
+                        <i class="fas fa-times me-2"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-buzz">
-                        <i class="fas fa-save"></i> Guardar Cliente
+                        <i class="fas fa-save me-2"></i>Guardar Cliente
                     </button>
                 </div>
             </form>
@@ -232,14 +251,20 @@
                             <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Nombre *</label>
-                            <input type="text" class="form-control form-control-buzz" id="editCustomerName" required>
+                            <label class="form-label">Nombre *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                <input type="text" class="form-control form-control-buzz" id="editCustomerName" required>
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Email</label>
-                            <input type="email" class="form-control form-control-buzz" id="editCustomerEmail">
+                            <label class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control form-control-buzz" id="editCustomerEmail">
+                            </div>
                         </div>
-                        <div class="form-check">
+                        <div class="form-check mt-3">
                             <input class="form-check-input" type="checkbox" value="1" id="editCustomerVip">
                             <label class="form-check-label text-muted" for="editCustomerVip">
                                 <i class="fas fa-star text-warning"></i> Cliente VIP
@@ -268,10 +293,10 @@
                 </div>
                 <div class="modal-footer-buzz">
                     <button type="button" class="btn btn-outline-buzz" onclick="closeModal('editCustomerModal')">
-                        <i class="fas fa-times"></i> Cancelar
+                        <i class="fas fa-times me-2"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-buzz">
-                        <i class="fas fa-save"></i> Guardar Cambios
+                        <i class="fas fa-save me-2"></i>Guardar Cambios
                     </button>
                 </div>
             </form>

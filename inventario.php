@@ -34,12 +34,17 @@
         </nav>
 
        <!-- Filters -->
-        <div class="buzz-card mb-4">
+        <div class="buzz-card mb-4 pb-3"> <!-- Added padding for better distribution -->
             <div class="filter-wrapper">
+                <!-- Main Filter Row (Always Visible) -->
                 <div class="filter-group filter-search">
                     <label class="text-muted">Buscar producto</label>
-                    <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="SKU, nombre o descripción...">
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="SKU, nombre o descripción...">
+                        <i class="fas fa-search position-absolute end-0 top-50 translate-middle-y me-3 text-muted"></i>
+                    </div>
                 </div>
+
                 <div class="filter-group filter-select">
                     <label class="text-muted">Estado</label>
                     <select class="form-control form-control-buzz" id="statusFilter">
@@ -49,25 +54,70 @@
                         <option value="agotado">Agotado</option>
                     </select>
                 </div>
-                <div class="filter-group filter-select">
-                    <label class="text-muted">Ordenar por</label>
-                    <select class="form-control form-control-buzz" id="sortBy">
-                        <option value="name">Nombre</option>
-                        <option value="sku">SKU</option>
-                        <option value="stock">Stock</option>
-                        <option value="price">Precio</option>
-                    </select>
-                </div>
-                <div class="filter-group filter-checkbox">
-                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                    <label class="form-check-label text-muted" for="showDeletedFilter">
-                        Ver eliminados
-                    </label>
-                </div>
+
                 <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                        <i class="fas fa-filter"></i>
+                        <span class="btn-text">Filtros Avanzados</span>
+                        <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                    </button>
                     <button class="btn btn-outline-buzz btn-filter-action" onclick="clearProductFilters()" title="Limpiar filtros">
                         <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
+                </div>
+            </div>
+
+            <!-- Advanced Filters (Collapsible) -->
+            <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                <hr class="border-secondary opacity-25">
+                <div class="filter-wrapper">
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Marca</label>
+                        <select class="form-control form-control-buzz" id="marcaFilter">
+                            <option value="">Todas las marcas</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Categoría</label>
+                        <select class="form-control form-control-buzz" id="categoriaFilter">
+                            <option value="">Todas las categorías</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-search" style="flex: 1 1 120px;">
+                        <label class="text-muted">Modelo</label>
+                        <input type="text" class="form-control form-control-buzz" id="modeloFilter" placeholder="Ej: G2 Pro...">
+                    </div>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">UND</label>
+                        <select class="form-control form-control-buzz" id="undFilter">
+                            <option value="">Todas</option>
+                            <option value="UND">UND</option>
+                            <option value="KG">KG</option>
+                            <option value="LT">LT</option>
+                            <option value="MT">MT</option>
+                            <option value="M2">M2</option>
+                            <option value="PACK">PACK</option>
+                            <option value="CAJA">CAJA</option>
+                            <option value="PAR">PAR</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Ordenar por</label>
+                        <select class="form-control form-control-buzz" id="sortBy">
+                            <option value="name">Nombre</option>
+                            <option value="sku">SKU</option>
+                            <option value="stock">Stock</option>
+                            <option value="price">Precio</option>
+                        </select>
+                    </div>
+                    <div class="filter-group filter-checkbox pt-4">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                            <label class="form-check-label text-muted" for="showDeletedFilter">
+                                Ver eliminados
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -80,7 +130,10 @@
                         <tr>
                             <th>SKU</th>
                             <th>Nombre</th>
-                            <th>Descripción</th>
+                            <th>Marca</th>
+                            <th>Categoría</th>
+                            <th>Modelo</th>
+                            <th title="Unidad de Venta">UND</th>
                             <th>Precio</th>
                             <th>Stock</th>
                             <th>Estado</th>
@@ -133,19 +186,28 @@
                         <div class="modal-section-title">
                             <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">SKU *</label>
-                                <input type="text" class="form-control form-control-buzz" id="productSku" required>
+                                <label class="form-label">SKU *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="productSku" required>
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Nombre *</label>
-                                <input type="text" class="form-control form-control-buzz" id="productName" required>
+                                <label class="form-label">Nombre *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="productName" required>
+                                </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted">Descripción</label>
-                            <textarea class="form-control form-control-buzz" id="productDescription" rows="3"></textarea>
+                            <label class="form-label">Descripción</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-align-left"></i></span>
+                                <textarea class="form-control form-control-buzz" id="productDescription" rows="3" placeholder="Detalles del producto..."></textarea>
+                            </div>
                         </div>
                     </div>
 
@@ -243,17 +305,20 @@
                         <div class="modal-section-title">
                             <i class="fas fa-dollar-sign"></i> PRECIO & STOCK
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Precio Unitario *</label>
+                                <label class="form-label">Precio Unitario *</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark text-muted border-buzz">$</span>
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
                                     <input type="number" class="form-control form-control-buzz" id="productPrice" step="0.01" min="0" required>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Stock Actual *</label>
-                                <input type="number" class="form-control form-control-buzz" id="productStock" min="0" required>
+                                <label class="form-label">Stock Actual *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-boxes"></i></span>
+                                    <input type="number" class="form-control form-control-buzz" id="productStock" min="0" required>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -361,10 +426,10 @@
                 </div>
                 <div class="modal-footer-buzz">
                     <button type="button" class="btn btn-outline-buzz" onclick="closeProductModal()">
-                        <i class="fas fa-times"></i> Cancelar
+                        <i class="fas fa-times me-2"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-buzz">
-                        <i class="fas fa-save"></i> Guardar Producto
+                        <i class="fas fa-save me-2"></i>Guardar Producto
                     </button>
                 </div>
             </form>
