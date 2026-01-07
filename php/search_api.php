@@ -6,7 +6,8 @@ header('Content-Type: application/json');
 $action = $_GET['action'] ?? '';
 $query = $_GET['query'] ?? '';
 
-if (empty($action) || empty($query)) {
+// Allow empty query for search_users (loads all users)
+if (empty($action) || (empty($query) && $action !== 'search_users')) {
     echo json_encode(['success' => false, 'message' => 'Acción o consulta no especificada.']);
     exit;
 }
@@ -14,7 +15,7 @@ if (empty($action) || empty($query)) {
 $conn = getDbConnection();
 
 switch ($action) {
-    
+
 
     case 'search_clients':
         try {
@@ -37,6 +38,24 @@ switch ($action) {
             echo json_encode(['success' => true, 'products' => $products]);
         } catch (PDOException $e) {
             echo json_encode(['success' => false, 'message' => 'Error al buscar productos: ' . $e->getMessage()]);
+        }
+        break;
+
+    case 'search_users':
+        try {
+            // Allow loading all users if query is short or empty
+            if (strlen($query) < 1) {
+                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios LIMIT 10");
+                $stmt->execute();
+            } else {
+                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios WHERE nombre LIKE ? LIMIT 10");
+                $searchTerm = '%' . $query . '%';
+                $stmt->execute([$searchTerm]);
+            }
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            echo json_encode(['success' => true, 'users' => $users]);
+        } catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Error al buscar usuarios: ' . $e->getMessage()]);
         }
         break;
 

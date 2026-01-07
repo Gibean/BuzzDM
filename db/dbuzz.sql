@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `backups` (
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.backups: ~3 rows (aproximadamente)
 DELETE FROM `backups`;
@@ -245,6 +245,7 @@ CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   PRIMARY KEY (`id`),
   KEY `pedido_id` (`pedido_id`),
   KEY `producto_id` (`producto_id`),
+  KEY `idx_pedido_producto` (`pedido_id`,`producto_id`),
   CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `detalle_pedido_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -416,7 +417,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.logs: ~39 rows (aproximadamente)
 DELETE FROM `logs`;
@@ -471,10 +472,11 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   `fecha` timestamp NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
-  KEY `fecha` (`fecha`)
-) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+  KEY `fecha` (`fecha`),
+  CONSTRAINT `FK_logs_login_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs_login: ~49 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs_login: ~51 rows (aproximadamente)
 DELETE FROM `logs_login`;
 INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:43:12'),
@@ -525,7 +527,9 @@ INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VAL
 	(46, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-06 23:52:17'),
 	(47, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:30:15'),
 	(48, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:37:28'),
-	(49, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:53:32');
+	(49, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 00:53:32'),
+	(50, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 03:06:34'),
+	(51, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 03:09:41');
 
 -- Volcando estructura para tabla dbuzz.marcas
 DROP TABLE IF EXISTS `marcas`;
@@ -595,6 +599,7 @@ CREATE TABLE IF NOT EXISTS `movimientos_inventario` (
   KEY `fk_mov_cargo` (`cargo_id`),
   KEY `fk_mov_almacen` (`almacen_id`),
   KEY `fk_mov_ubicacion` (`ubicacion_id`),
+  KEY `idx_tipo_movimiento` (`tipo_movimiento`),
   CONSTRAINT `fk_mov_almacen` FOREIGN KEY (`almacen_id`) REFERENCES `almacenes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_mov_cargo` FOREIGN KEY (`cargo_id`) REFERENCES `cargos_existencias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_mov_ubicacion` FOREIGN KEY (`ubicacion_id`) REFERENCES `ubicaciones` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -617,25 +622,6 @@ INSERT INTO `movimientos_inventario` (`id`, `producto_id`, `usuario_id`, `tipo_m
 	(22, 11, 100, 'entrada', 50, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 50, '2025-12-25 14:09:00'),
 	(23, 12, 100, 'entrada', 15, 'Ingreso inicial de stock', NULL, NULL, NULL, 0, 15, '2025-12-25 14:10:00'),
 	(24, 13, 100, 'entrada', 0, 'Sin stock al momento del mock', NULL, NULL, NULL, 0, 0, '2025-12-25 14:11:00');
-
--- Volcando estructura para tabla dbuzz.password_recovery
-DROP TABLE IF EXISTS `password_recovery`;
-CREATE TABLE IF NOT EXISTS `password_recovery` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `usuario_id` int(20) unsigned NOT NULL,
-  `token` varchar(64) NOT NULL,
-  `expiracion` timestamp NOT NULL,
-  `usado` tinyint(1) NOT NULL DEFAULT 0,
-  `creado_at` timestamp NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `token` (`token`),
-  KEY `usuario_id` (`usuario_id`),
-  KEY `expiracion` (`expiracion`),
-  CONSTRAINT `password_recovery_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Volcando datos para la tabla dbuzz.password_recovery: ~0 rows (aproximadamente)
-DELETE FROM `password_recovery`;
 
 -- Volcando estructura para tabla dbuzz.password_reset_tokens
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -682,6 +668,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   KEY `estado_envio` (`estado_envio`),
   KEY `pedidos_ibfk_1` (`cliente_id`),
   KEY `idx_pedidos_deleted_at` (`deleted_at`),
+  KEY `idx_estado_pago` (`estado_pago`),
   CONSTRAINT `pedidos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -700,6 +687,115 @@ INSERT INTO `pedidos` (`id`, `cliente_id`, `referencia`, `fecha_creacion`, `tota
 	(9, 'V-10000002', 'REF-LBR-0009', '2025-12-05 12:30:00', 11.75, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
 	(10, 'V-10000001', 'REF-LBR-0010', '2025-12-10 22:20:00', 16.00, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL),
 	(11, 'V-10000003', 'REF-LBR-0011', '2025-12-20 13:05:00', 38.00, 'pagado', 'enviado', 'C.C. Centro, Local 12', '', 100, '2025-12-25 15:31:03', NULL, NULL, NULL);
+
+-- Volcando estructura para tabla dbuzz.permisos_rol
+DROP TABLE IF EXISTS `permisos_rol`;
+CREATE TABLE IF NOT EXISTS `permisos_rol` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `rol` enum('admin','supervisor','operador') NOT NULL,
+  `pagina` varchar(100) NOT NULL COMMENT 'Nombre del archivo PHP permitido',
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_rol_pagina` (`rol`,`pagina`),
+  KEY `idx_rol` (`rol`)
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Permisos de acceso por rol a páginas del sistema';
+
+-- Volcando datos para la tabla dbuzz.permisos_rol: ~93 rows (aproximadamente)
+DELETE FROM `permisos_rol`;
+INSERT INTO `permisos_rol` (`id`, `rol`, `pagina`, `creado_at`) VALUES
+	(1, 'admin', 'dashboard.php', '2026-01-07 02:44:22'),
+	(2, 'admin', 'pedidos.php', '2026-01-07 02:44:22'),
+	(3, 'admin', 'envios.php', '2026-01-07 02:44:22'),
+	(4, 'admin', 'inventario.php', '2026-01-07 02:44:22'),
+	(5, 'admin', 'importacion.php', '2026-01-07 02:44:22'),
+	(6, 'admin', 'admin.php', '2026-01-07 02:44:22'),
+	(7, 'admin', 'about.php', '2026-01-07 02:44:22'),
+	(8, 'admin', 'manual.php', '2026-01-07 02:44:22'),
+	(9, 'admin', 'login.php', '2026-01-07 02:44:22'),
+	(10, 'admin', 'logout.php', '2026-01-07 02:44:22'),
+	(11, 'admin', 'api_sales_chart.php', '2026-01-07 02:44:22'),
+	(12, 'admin', 'create_admin.php', '2026-01-07 02:44:22'),
+	(13, 'admin', 'get_import_history.php', '2026-01-07 02:44:22'),
+	(14, 'admin', 'product_actions.php', '2026-01-07 02:44:22'),
+	(15, 'admin', 'users.php', '2026-01-07 02:44:22'),
+	(16, 'admin', 'sesion.php', '2026-01-07 02:44:22'),
+	(17, 'admin', 'db.php', '2026-01-07 02:44:22'),
+	(18, 'admin', 'sidebar.php', '2026-01-07 02:44:22'),
+	(19, 'admin', 'reports.php', '2026-01-07 02:44:22'),
+	(20, 'admin', 'pedidos_actions.php', '2026-01-07 02:44:22'),
+	(21, 'admin', 'search_api.php', '2026-01-07 02:44:22'),
+	(22, 'admin', 'clientes.php', '2026-01-07 02:44:22'),
+	(23, 'admin', 'clientes_actions.php', '2026-01-07 02:44:22'),
+	(24, 'admin', 'api_sales_by_status_chart.php', '2026-01-07 02:44:22'),
+	(25, 'admin', 'envios_actions.php', '2026-01-07 02:44:22'),
+	(26, 'admin', 'company_settings.php', '2026-01-07 02:44:22'),
+	(27, 'admin', 'company_settings_actions.php', '2026-01-07 02:44:22'),
+	(28, 'admin', 'backup.php', '2026-01-07 02:44:22'),
+	(29, 'admin', 'backups.php', '2026-01-07 02:44:22'),
+	(30, 'admin', 'backup_status.php', '2026-01-07 02:44:22'),
+	(31, 'admin', 'logs.php', '2026-01-07 02:44:22'),
+	(32, 'admin', 'process_import.php', '2026-01-07 02:44:22'),
+	(33, 'admin', 'settings_actions.php', '2026-01-07 02:44:22'),
+	(34, 'admin', 'cargos_existencias.php', '2026-01-07 02:44:22'),
+	(35, 'admin', 'almacenes.php', '2026-01-07 02:44:22'),
+	(36, 'admin', 'cargos_actions.php', '2026-01-07 02:44:22'),
+	(37, 'admin', 'productos_search.php', '2026-01-07 02:44:22'),
+	(38, 'admin', 'catalogos_actions.php', '2026-01-07 02:44:22'),
+	(39, 'admin', 'kit_actions.php', '2026-01-07 02:44:22'),
+	(40, 'admin', 'almacenes_actions.php', '2026-01-07 02:44:22'),
+	(41, 'admin', 'ubicaciones_actions.php', '2026-01-07 02:44:22'),
+	(42, 'admin', 'proveedores.php', '2026-01-07 02:44:22'),
+	(43, 'admin', 'proveedores_actions.php', '2026-01-07 02:44:22'),
+	(44, 'supervisor', 'dashboard.php', '2026-01-07 02:44:23'),
+	(45, 'supervisor', 'pedidos.php', '2026-01-07 02:44:23'),
+	(46, 'supervisor', 'envios.php', '2026-01-07 02:44:23'),
+	(47, 'supervisor', 'inventario.php', '2026-01-07 02:44:23'),
+	(48, 'supervisor', 'importacion.php', '2026-01-07 02:44:23'),
+	(49, 'supervisor', 'about.php', '2026-01-07 02:44:23'),
+	(50, 'supervisor', 'manual.php', '2026-01-07 02:44:23'),
+	(51, 'supervisor', 'login.php', '2026-01-07 02:44:23'),
+	(52, 'supervisor', 'logout.php', '2026-01-07 02:44:23'),
+	(53, 'supervisor', 'api_sales_chart.php', '2026-01-07 02:44:23'),
+	(54, 'supervisor', 'get_import_history.php', '2026-01-07 02:44:23'),
+	(55, 'supervisor', 'product_actions.php', '2026-01-07 02:44:23'),
+	(56, 'supervisor', 'users.php', '2026-01-07 02:44:23'),
+	(57, 'supervisor', 'sesion.php', '2026-01-07 02:44:23'),
+	(58, 'supervisor', 'db.php', '2026-01-07 02:44:23'),
+	(59, 'supervisor', 'sidebar.php', '2026-01-07 02:44:23'),
+	(60, 'supervisor', 'reports.php', '2026-01-07 02:44:23'),
+	(61, 'supervisor', 'pedidos_actions.php', '2026-01-07 02:44:23'),
+	(62, 'supervisor', 'search_api.php', '2026-01-07 02:44:23'),
+	(63, 'supervisor', 'clientes.php', '2026-01-07 02:44:23'),
+	(64, 'supervisor', 'clientes_actions.php', '2026-01-07 02:44:23'),
+	(65, 'supervisor', 'api_sales_by_status_chart.php', '2026-01-07 02:44:23'),
+	(66, 'supervisor', 'envios_actions.php', '2026-01-07 02:44:23'),
+	(67, 'supervisor', 'process_import.php', '2026-01-07 02:44:23'),
+	(68, 'supervisor', 'cargos_existencias.php', '2026-01-07 02:44:23'),
+	(69, 'supervisor', 'almacenes.php', '2026-01-07 02:44:23'),
+	(70, 'supervisor', 'cargos_actions.php', '2026-01-07 02:44:23'),
+	(71, 'supervisor', 'productos_search.php', '2026-01-07 02:44:23'),
+	(72, 'supervisor', 'catalogos_actions.php', '2026-01-07 02:44:23'),
+	(73, 'supervisor', 'kit_actions.php', '2026-01-07 02:44:23'),
+	(74, 'supervisor', 'almacenes_actions.php', '2026-01-07 02:44:23'),
+	(75, 'supervisor', 'ubicaciones_actions.php', '2026-01-07 02:44:23'),
+	(76, 'supervisor', 'proveedores.php', '2026-01-07 02:44:23'),
+	(77, 'supervisor', 'proveedores_actions.php', '2026-01-07 02:44:23'),
+	(78, 'operador', 'dashboard.php', '2026-01-07 02:44:23'),
+	(79, 'operador', 'pedidos.php', '2026-01-07 02:44:23'),
+	(80, 'operador', 'envios.php', '2026-01-07 02:44:23'),
+	(81, 'operador', 'about.php', '2026-01-07 02:44:23'),
+	(82, 'operador', 'manual.php', '2026-01-07 02:44:23'),
+	(83, 'operador', 'login.php', '2026-01-07 02:44:23'),
+	(84, 'operador', 'logout.php', '2026-01-07 02:44:23'),
+	(85, 'operador', 'api_sales_chart.php', '2026-01-07 02:44:23'),
+	(86, 'operador', 'sesion.php', '2026-01-07 02:44:23'),
+	(87, 'operador', 'db.php', '2026-01-07 02:44:23'),
+	(88, 'operador', 'sidebar.php', '2026-01-07 02:44:23'),
+	(89, 'operador', 'pedidos_actions.php', '2026-01-07 02:44:23'),
+	(90, 'operador', 'search_api.php', '2026-01-07 02:44:23'),
+	(91, 'operador', 'api_sales_by_status_chart.php', '2026-01-07 02:44:23'),
+	(92, 'operador', 'envios_actions.php', '2026-01-07 02:44:23'),
+	(93, 'operador', 'product_actions.php', '2026-01-07 02:44:23');
 
 -- Volcando estructura para tabla dbuzz.productos
 DROP TABLE IF EXISTS `productos`;
@@ -742,6 +838,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   KEY `fk_productos_proveedor` (`proveedor_id`),
   KEY `idx_productos_deleted_at` (`deleted_at`),
   KEY `idx_producto_padre` (`producto_padre_id`),
+  KEY `idx_estado` (`estado`),
   CONSTRAINT `fk_producto_padre` FOREIGN KEY (`producto_padre_id`) REFERENCES `productos` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_productos_categoria` FOREIGN KEY (`categoria`) REFERENCES `categorias` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_productos_marca` FOREIGN KEY (`marca_id`) REFERENCES `marcas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
@@ -824,9 +921,9 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.sesiones_api: ~34 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.sesiones_api: ~36 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
 INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_en`) VALUES
 	(24, 1, '2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c', '2025-11-29 15:15:36', '2025-11-29 02:15:36'),
@@ -862,7 +959,9 @@ INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_e
 	(54, 1, 'f8a228ca9344d9a46a8336f4f8d3152e9961ac6db2f59d29514df848f977386d', '2026-01-07 12:52:17', '2026-01-06 23:52:17'),
 	(55, 1, 'b1d670b84c1cbe75e922bf009798211f29ca83411207300e6c75b1fd7cacb7b2', '2026-01-07 13:30:15', '2026-01-07 00:30:15'),
 	(56, 1, 'eb2b9052a6ac09a28e242566acb7b9e1de7f74ab56552b415f953fa609d8696c', '2026-01-07 13:37:28', '2026-01-07 00:37:28'),
-	(57, 1, '12a2a6b854d1ea73807cdb15f6486826547246fe8d11cb76f31b57fdfbe8b01c', '2026-01-07 13:53:32', '2026-01-07 00:53:32');
+	(57, 1, '12a2a6b854d1ea73807cdb15f6486826547246fe8d11cb76f31b57fdfbe8b01c', '2026-01-07 13:53:32', '2026-01-07 00:53:32'),
+	(58, 1, 'b280ffc3828f7560a6ee0ee1c6a7859be9ad9dfabb8aba5f9b95e0b6475d9a86', '2026-01-07 16:06:34', '2026-01-07 03:06:34'),
+	(59, 1, '4f590296ba314fce3b3d27b4ee248c499b7a4c8da3647eeeaa6a79b72041a3bf', '2026-01-07 16:09:41', '2026-01-07 03:09:41');
 
 -- Volcando estructura para tabla dbuzz.stock_ubicacion
 DROP TABLE IF EXISTS `stock_ubicacion`;
@@ -885,7 +984,7 @@ CREATE TABLE IF NOT EXISTS `stock_ubicacion` (
   CONSTRAINT `fk_stock_ubicacion` FOREIGN KEY (`ubicacion_id`) REFERENCES `ubicaciones` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Stock de productos por ubicación';
 
--- Volcando datos para la tabla dbuzz.stock_ubicacion: ~58 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.stock_ubicacion: ~12 rows (aproximadamente)
 DELETE FROM `stock_ubicacion`;
 INSERT INTO `stock_ubicacion` (`id`, `producto_id`, `almacen_id`, `ubicacion_id`, `cantidad`, `stock_minimo`, `stock_maximo`, `actualizado_at`) VALUES
 	(1, 1, 1, NULL, 4, 0, NULL, '2026-01-05 18:09:00'),
@@ -899,53 +998,26 @@ INSERT INTO `stock_ubicacion` (`id`, `producto_id`, `almacen_id`, `ubicacion_id`
 	(9, 9, 1, NULL, 25, 0, NULL, '2026-01-05 18:09:00'),
 	(10, 10, 1, NULL, 10, 0, NULL, '2026-01-05 18:09:00'),
 	(11, 11, 1, NULL, 50, 0, NULL, '2026-01-05 18:09:00'),
-	(12, 12, 1, NULL, 15, 0, NULL, '2026-01-05 18:09:00'),
-	(16, 1, 1, NULL, 4, 0, NULL, '2026-01-05 18:15:32'),
-	(17, 2, 1, NULL, 120, 0, NULL, '2026-01-05 18:15:32'),
-	(18, 3, 1, NULL, 60, 0, NULL, '2026-01-05 18:15:32'),
-	(19, 4, 1, NULL, 200, 0, NULL, '2026-01-05 18:15:32'),
-	(20, 5, 1, NULL, 40, 0, NULL, '2026-01-05 18:15:32'),
-	(21, 6, 1, NULL, 150, 0, NULL, '2026-01-05 18:15:32'),
-	(22, 7, 1, NULL, 300, 0, NULL, '2026-01-05 18:15:32'),
-	(23, 8, 1, NULL, 80, 0, NULL, '2026-01-05 18:15:32'),
-	(24, 9, 1, NULL, 25, 0, NULL, '2026-01-05 18:15:32'),
-	(25, 10, 1, NULL, 10, 0, NULL, '2026-01-05 18:15:32'),
-	(26, 11, 1, NULL, 50, 0, NULL, '2026-01-05 18:15:32'),
-	(27, 12, 1, NULL, 15, 0, NULL, '2026-01-05 18:15:32'),
-	(31, 1, 1, NULL, 4, 0, NULL, '2026-01-05 19:14:57'),
-	(32, 2, 1, NULL, 120, 0, NULL, '2026-01-05 19:14:57'),
-	(33, 3, 1, NULL, 60, 0, NULL, '2026-01-05 19:14:57'),
-	(34, 4, 1, NULL, 200, 0, NULL, '2026-01-05 19:14:57'),
-	(35, 5, 1, NULL, 40, 0, NULL, '2026-01-05 19:14:57'),
-	(36, 6, 1, NULL, 150, 0, NULL, '2026-01-05 19:14:57'),
-	(37, 7, 1, NULL, 300, 0, NULL, '2026-01-05 19:14:57'),
-	(38, 8, 1, NULL, 80, 0, NULL, '2026-01-05 19:14:57'),
-	(39, 9, 1, NULL, 25, 0, NULL, '2026-01-05 19:14:57'),
-	(40, 10, 1, NULL, 10, 0, NULL, '2026-01-05 19:14:57'),
-	(41, 11, 1, NULL, 50, 0, NULL, '2026-01-05 19:14:57'),
-	(42, 12, 1, NULL, 15, 0, NULL, '2026-01-05 19:14:57'),
-	(43, 2, 1, NULL, 120, 0, NULL, '2026-01-05 21:52:11'),
-	(44, 3, 1, NULL, 60, 0, NULL, '2026-01-05 21:52:11'),
-	(45, 4, 1, NULL, 200, 0, NULL, '2026-01-05 21:52:11'),
-	(46, 5, 1, NULL, 40, 0, NULL, '2026-01-05 21:52:11'),
-	(47, 6, 1, NULL, 150, 0, NULL, '2026-01-05 21:52:11'),
-	(48, 7, 1, NULL, 300, 0, NULL, '2026-01-05 21:52:11'),
-	(49, 8, 1, NULL, 80, 0, NULL, '2026-01-05 21:52:11'),
-	(50, 9, 1, NULL, 25, 0, NULL, '2026-01-05 21:52:11'),
-	(51, 10, 1, NULL, 10, 0, NULL, '2026-01-05 21:52:11'),
-	(52, 11, 1, NULL, 50, 0, NULL, '2026-01-05 21:52:11'),
-	(53, 12, 1, NULL, 15, 0, NULL, '2026-01-05 21:52:11'),
-	(58, 2, 1, NULL, 120, 0, NULL, '2026-01-06 02:42:16'),
-	(59, 3, 1, NULL, 60, 0, NULL, '2026-01-06 02:42:16'),
-	(60, 4, 1, NULL, 200, 0, NULL, '2026-01-06 02:42:16'),
-	(61, 5, 1, NULL, 40, 0, NULL, '2026-01-06 02:42:16'),
-	(62, 6, 1, NULL, 150, 0, NULL, '2026-01-06 02:42:16'),
-	(63, 7, 1, NULL, 300, 0, NULL, '2026-01-06 02:42:16'),
-	(64, 8, 1, NULL, 80, 0, NULL, '2026-01-06 02:42:16'),
-	(65, 9, 1, NULL, 25, 0, NULL, '2026-01-06 02:42:16'),
-	(66, 10, 1, NULL, 10, 0, NULL, '2026-01-06 02:42:16'),
-	(67, 11, 1, NULL, 50, 0, NULL, '2026-01-06 02:42:16'),
-	(68, 12, 1, NULL, 15, 0, NULL, '2026-01-06 02:42:16');
+	(12, 12, 1, NULL, 15, 0, NULL, '2026-01-05 18:09:00');
+
+-- Volcando estructura para tabla dbuzz.tasas_cambio
+DROP TABLE IF EXISTS `tasas_cambio`;
+CREATE TABLE IF NOT EXISTS `tasas_cambio` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tasa` decimal(18,4) NOT NULL COMMENT 'Valor de 1 USD en moneda local (VES)',
+  `fuente` varchar(50) DEFAULT 'manual' COMMENT 'Fuente: manual, bcv, paralelo, etc.',
+  `fecha` date NOT NULL COMMENT 'Fecha para la cual aplica esta tasa',
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  `usuario_id` int(10) unsigned DEFAULT NULL COMMENT 'Usuario que registró la tasa',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_fecha` (`fecha`),
+  KEY `idx_fecha` (`fecha`),
+  KEY `FK_tasa_usuario` (`usuario_id`),
+  CONSTRAINT `FK_tasa_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tasa de cambio diaria USD para referencia de precios';
+
+-- Volcando datos para la tabla dbuzz.tasas_cambio: ~0 rows (aproximadamente)
+DELETE FROM `tasas_cambio`;
 
 -- Volcando estructura para tabla dbuzz.ubicaciones
 DROP TABLE IF EXISTS `ubicaciones`;
@@ -1238,6 +1310,15 @@ CREATE TABLE `v_stock_por_almacen` (
 	`producto_nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
 	`stock_almacen` DECIMAL(32,0) NULL,
 	`num_ubicaciones` BIGINT(21) NOT NULL
+);
+
+-- Volcando estructura para vista dbuzz.v_tasa_hoy
+DROP VIEW IF EXISTS `v_tasa_hoy`;
+-- Creando tabla temporal para superar errores de dependencia de VIEW
+CREATE TABLE `v_tasa_hoy` (
+	`tasa_actual` DECIMAL(18,4) NULL,
+	`fecha_tasa` DATE NULL,
+	`fuente` VARCHAR(1) NULL COLLATE 'utf8mb4_unicode_ci'
 );
 
 -- Volcando estructura para vista dbuzz.v_top5_down
@@ -1710,6 +1791,26 @@ LEFT JOIN stock_ubicacion su ON su.almacen_id = a.id AND su.producto_id = p.id
 WHERE a.activo = 1 AND p.deleted_at IS NULL
 GROUP BY a.id, p.id
 ORDER BY a.nombre, p.nombre 
+;
+
+-- Eliminando tabla temporal y crear estructura final de VIEW
+DROP TABLE IF EXISTS `v_tasa_hoy`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_tasa_hoy` AS SELECT
+    COALESCE(
+        (SELECT tasa FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
+        (SELECT tasa FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
+        1
+    ) AS tasa_actual,
+    COALESCE(
+        (SELECT fecha FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
+        (SELECT fecha FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
+        CURDATE()
+    ) AS fecha_tasa,
+    COALESCE(
+        (SELECT fuente FROM tasas_cambio WHERE fecha = CURDATE() LIMIT 1),
+        (SELECT fuente FROM tasas_cambio WHERE fecha < CURDATE() ORDER BY fecha DESC LIMIT 1),
+        'no_configurada'
+    ) AS fuente 
 ;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
