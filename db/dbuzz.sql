@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `backups` (
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.backups: ~2 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.backups: ~3 rows (aproximadamente)
 DELETE FROM `backups`;
 INSERT INTO `backups` (`id`, `archivo`, `ruta_archivo`, `tamaño_bytes`, `fecha`, `tipo`, `estado`, `resultado`, `detalles`, `usuario_id`) VALUES
 	(14, 'dbuzzbackup_2025-12-25_02-06-16.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2025-12-25_02-06-16.sql', 75226, '2025-12-25 01:06:17', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":13,"duracion_ms":1276,"tamanio_mb":0.07,"tipo_ejecucion":"http","metodo":"fallback"}', NULL),
@@ -418,7 +418,7 @@ CREATE TABLE IF NOT EXISTS `logs` (
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs: ~37 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs: ~39 rows (aproximadamente)
 DELETE FROM `logs`;
 INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, 1, 'Solicitud de recuperación de contraseña', 'Email: admin@buzz.com', '2025-11-29 02:18:49'),
@@ -474,7 +474,7 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   KEY `fecha` (`fecha`)
 ) ENGINE=InnoDB AUTO_INCREMENT=43 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs_login: ~42 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs_login: ~49 rows (aproximadamente)
 DELETE FROM `logs_login`;
 INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: test@noexiste.com', '2025-11-30 19:43:12'),
@@ -826,7 +826,7 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.sesiones_api: ~28 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.sesiones_api: ~34 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
 INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_en`) VALUES
 	(24, 1, '2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c', '2025-11-29 15:15:36', '2025-11-29 02:15:36'),

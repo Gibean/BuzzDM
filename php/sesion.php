@@ -90,132 +90,72 @@ if (isset($_SESSION['usuario_id'])) {
 
 // --- Lógica de Control de Acceso Basada en Roles ---
 
-// Definir las páginas permitidas para cada rol
-$allowed_pages = [
-    'admin' => [
-        'dashboard.php',
-        'pedidos.php',
-        'envios.php',
-        'inventario.php',
-        'importacion.php',
-        'admin.php',
-        'about.php',
-        'manual.php',
-        'login.php',
-        'logout.php',
-        'api_sales_chart.php',
-        'create_admin.php',
-        'get_import_history.php',
-        'product_actions.php',
-        'users.php',
-        'sesion.php',
-        'db.php',
-        'sidebar.php',
-        'reports.php',
-        'pedidos_actions.php',
-        'search_api.php',
-        'clientes.php',
-        'clientes_actions.php',
-        'api_sales_by_status_chart.php',
-        'envios_actions.php',
-        'company_settings.php',
-        'company_settings_actions.php',
-        'backup.php',
-        'backups.php',
-        'backup_status.php',
-        'logs.php',
-        'api_sales_chart.php',
-        'clientes_actions.php',
-        'get_import_history.php',
-        'pedidos_actions.php',
-        'product_actions.php',
-        'search_api.php',
-        'process_import.php',
-        'manual.php',
-        'settings_actions.php',
-        'cargos_existencias.php',
-        'almacenes.php',
-        // API scripts for inventory phases
-        'cargos_actions.php',
-        'productos_search.php',
-        'catalogos_actions.php',
-        'kit_actions.php',
-        'almacenes_actions.php',
-        'ubicaciones_actions.php',
-        // Proveedores
-        'proveedores.php',
-        'proveedores_actions.php'
-    ],
-    'supervisor' => [
-        'dashboard.php',
-        'pedidos.php',
-        'envios.php',
-        'inventario.php',
-        'importacion.php',
-        'about.php',
-        'manual.php',
-        'login.php',
-        'logout.php',
-        'api_sales_chart.php',
-        'get_import_history.php',
-        'product_actions.php',
-        'users.php',
-        'sesion.php',
-        'db.php',
-        'sidebar.php',
-        'reports.php',
-        'pedidos_actions.php',
-        'search_api.php',
-        'clientes.php',
-        'clientes_actions.php',
-        'api_sales_by_status_chart.php',
-        'envios_actions.php',
-        'api_sales_chart.php',
-        'clientes_actions.php',
-        'get_import_history.php',
-        'pedidos_actions.php',
-        'product_actions.php',
-        'search_api.php',
-        'process_import.php',
-        'manual.php',
-        // Phase 1 and 2 pages for supervisor
-        'cargos_existencias.php',
-        'almacenes.php',
-        'cargos_actions.php',
-        'productos_search.php',
-        'catalogos_actions.php',
-        'kit_actions.php',
-        'almacenes_actions.php',
-        'ubicaciones_actions.php',
-        'proveedores.php',
-        'proveedores_actions.php'
-    ],
-    'operador' => [
-        'dashboard.php',
-        'pedidos.php',
-        'envios.php',
-        'about.php',
-        'manual.php',
-        'login.php',
-        'logout.php',
-        'api_sales_chart.php',
-        'sesion.php',
-        'db.php',
-        'sidebar.php',
-        'pedidos_actions.php',
-        'search_api.php',
-        'api_sales_by_status_chart.php',
-        'envios_actions.php',
-        'pedidos_actions.php',
-        'product_actions.php',
-        'search_api.php',
-        'manual.php'
-
-    ]
-];
+/**
+ * Get permissions from database for a specific role
+ * Falls back to static array if database table is empty
+ *
+ * @param PDO $pdo Database connection
+ * @param string $rol User role
+ * @return array List of allowed page names
+ */
+function getPermisosFromDB($pdo, $rol) {
+    try {
+        $stmt = $pdo->prepare("SELECT pagina FROM permisos_rol WHERE rol = ?");
+        $stmt->execute([$rol]);
+        $permisos = array_column($stmt->fetchAll(), 'pagina');
+        return $permisos;
+    } catch (PDOException $e) {
+        // Table might not exist yet, return empty to trigger fallback
+        error_log('Error fetching permissions: ' . $e->getMessage());
+        return [];
+    }
+}
 
 // Obtener el rol del usuario de la sesión
 $user_role = $_SESSION['usuario_rol'] ?? 'guest';
+
+// Try to get permissions from database first
+$db_permissions = getPermisosFromDB($pdo, $user_role);
+
+// Fallback: Static array for when database is not yet migrated
+$fallback_pages = [
+    'admin' => [
+        'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
+        'admin.php', 'about.php', 'manual.php', 'login.php', 'logout.php',
+        'api_sales_chart.php', 'create_admin.php', 'get_import_history.php', 'product_actions.php',
+        'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'pedidos_actions.php',
+        'search_api.php', 'clientes.php', 'clientes_actions.php', 'api_sales_by_status_chart.php',
+        'envios_actions.php', 'company_settings.php', 'company_settings_actions.php', 'backup.php',
+        'backups.php', 'backup_status.php', 'logs.php', 'process_import.php', 'settings_actions.php',
+        'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php', 'productos_search.php',
+        'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
+        'proveedores.php', 'proveedores_actions.php'
+    ],
+    'supervisor' => [
+        'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
+        'about.php', 'manual.php', 'login.php', 'logout.php', 'api_sales_chart.php',
+        'get_import_history.php', 'product_actions.php', 'users.php', 'sesion.php', 'db.php',
+        'sidebar.php', 'reports.php', 'pedidos_actions.php', 'search_api.php', 'clientes.php',
+        'clientes_actions.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
+        'process_import.php', 'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php',
+        'productos_search.php', 'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php',
+        'ubicaciones_actions.php', 'proveedores.php', 'proveedores_actions.php'
+    ],
+    'operador' => [
+        'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
+        'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
+        'pedidos_actions.php', 'search_api.php', 'api_sales_by_status_chart.php',
+        'envios_actions.php', 'product_actions.php'
+    ]
+];
+
+// Use database permissions if available, otherwise use fallback
+if (!empty($db_permissions)) {
+    $allowed_pages = [$user_role => $db_permissions];
+} else {
+    $allowed_pages = $fallback_pages;
+}
+
 
 // Verificar si la página actual está permitida para el rol del usuario
 if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_pages[$user_role])) {
