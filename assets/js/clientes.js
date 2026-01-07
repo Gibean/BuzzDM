@@ -116,7 +116,7 @@ function renderCustomers(customers) {
         </div>
     `
   customersList.innerHTML = tableHtml
-  document.getElementById("totalCustomers").textContent = customers.length // Update total customers stat
+  document.getElementById("totalCustomersNum").textContent = customers.length // Update total customers stat
 }
 
 async function fetchAndRenderFrequentCustomers() {

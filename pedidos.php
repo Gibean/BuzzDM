@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
      <!-- Sidebar  -->
@@ -64,40 +65,36 @@
 
         <!--  Filters  -->
         <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Buscar pedido</label>
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar pedido</label>
                     <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID, cliente...">
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Estado de pago</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Estado de pago</label>
                     <select class="form-control form-control-buzz" id="paymentFilter">
                         <option value="">Todos</option>
                         <option value="pagado">Pagado</option>
                         <option value="no-pagado">No Pagado</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Fecha desde</label>
+                <div class="filter-group filter-date">
+                    <label class="text-muted">Fecha desde</label>
                     <input type="date" class="form-control form-control-buzz" id="dateFrom">
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Fecha hasta</label>
+                <div class="filter-group filter-date">
+                    <label class="text-muted">Fecha hasta</label>
                     <input type="date" class="form-control form-control-buzz" id="dateTo">
                 </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                        <label class="form-check-label text-muted" for="showDeletedFilter">
-                            Ver eliminados
-                        </label>
-                    </div>
+                <div class="filter-group filter-checkbox">
+                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                    <label class="form-check-label text-muted" for="showDeletedFilter">
+                        Ver eliminados
+                    </label>
                 </div>
-                <div class="col-md-1 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i>
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>

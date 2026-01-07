@@ -22,6 +22,7 @@ const ModalUtils = {
         }, 50);
 
         // Prevent body scroll
+        document.body.classList.add('modal-open');
         document.body.style.overflow = 'hidden';
     },
 
@@ -36,8 +37,12 @@ const ModalUtils = {
         // Remove event listeners
         this.removeModalEventListeners(modalId);
 
-        // Restore body scroll
-        document.body.style.overflow = '';
+        // Restore body scroll (only if no other modals are open)
+        const openModals = document.querySelectorAll('.modal-buzz[style*="flex"]');
+        if (openModals.length === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+        }
 
         // Execute callback if provided
         if (callback && typeof callback === 'function') {

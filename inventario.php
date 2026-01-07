@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -32,15 +33,15 @@
             </div>
         </nav>
 
-       <!--  Filters -->
+       <!-- Filters -->
         <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label text-muted">Buscar producto</label>
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar producto</label>
                     <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="SKU, nombre o descripción...">
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Estado</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Estado</label>
                     <select class="form-control form-control-buzz" id="statusFilter">
                         <option value="">Todos los estados</option>
                         <option value="activo">Activo</option>
@@ -48,8 +49,8 @@
                         <option value="agotado">Agotado</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Ordenar por</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Ordenar por</label>
                     <select class="form-control form-control-buzz" id="sortBy">
                         <option value="name">Nombre</option>
                         <option value="sku">SKU</option>
@@ -57,19 +58,15 @@
                         <option value="price">Precio</option>
                     </select>
                 </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                        <label class="form-check-label text-muted" for="showDeletedFilter">
-                            Ver eliminados
-                        </label>
-                    </div>
+                <div class="filter-group filter-checkbox">
+                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                    <label class="form-check-label text-muted" for="showDeletedFilter">
+                        Ver eliminados
+                    </label>
                 </div>
-                <div class="col-md-1 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearProductFilters()">
-                        <i class="fas fa-times"></i> Limpiar
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearProductFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>
@@ -152,6 +149,95 @@
                         </div>
                     </div>
 
+                    <!-- Product Type Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-cube"></i> TIPO DE PRODUCTO
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Tipo *</label>
+                                <select class="form-control form-control-buzz" id="productTipoProducto" onchange="onTipoProductoChange()">
+                                    <option value="fisico">📦 Producto Físico</option>
+                                    <option value="servicio">🔧 Servicio</option>
+                                    <option value="kit">📦📦 Kit / Combo</option>
+                                </select>
+                                <small class="text-muted font-mono" id="tipoProductoHint">Producto con inventario físico</small>
+                            </div>
+                            <div class="col-md-6 mb-3" id="kitTypeContainer" style="display: none;">
+                                <label class="form-label text-muted">Tipo de Kit</label>
+                                <select class="form-control form-control-buzz" id="productEsKitVirtual" onchange="onKitTypeChange()">
+                                    <option value="1">🔄 Kit Virtual (descuenta componentes)</option>
+                                    <option value="0">📦 Kit Pre-armado (stock propio)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!-- Variant Section -->
+                        <div class="row" id="varianteSection" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="esVariante" onchange="onEsVarianteChange()">
+                                    <label class="form-check-label" for="esVariante">
+                                        Es variante de otro producto
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3" id="productoPadreContainer" style="display: none;">
+                                <label class="form-label text-muted">Producto Padre</label>
+                                <div class="position-relative">
+                                    <input type="text" class="form-control form-control-buzz" id="productoPadreBusqueda"
+                                           placeholder="Buscar producto padre..." autocomplete="off">
+                                    <input type="hidden" id="productoPadreId">
+                                    <div id="productoPadreResultados" class="autocomplete-results"></div>
+                                </div>
+                                <div id="productoPadreSeleccionado" class="selected-item mt-2" style="display: none;">
+                                    <span class="selected-name"></span>
+                                    <button type="button" class="btn-clear" onclick="limpiarProductoPadre()">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="varianteAtributoRow" style="display: none;">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Atributo de Variante</label>
+                                <input type="text" class="form-control form-control-buzz" id="productVarianteAtributo"
+                                       placeholder="Ej: Talla M, Color Rojo">
+                                <small class="text-muted">Identifica esta variante</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kit Components Section (only for kits) -->
+                    <div class="modal-section" id="kitComponentesSection" style="display: none;">
+                        <div class="modal-section-title">
+                            <i class="fas fa-boxes"></i> COMPONENTES DEL KIT
+                            <button type="button" class="btn btn-sm btn-outline-buzz ms-3" onclick="agregarComponenteKit()">
+                                <i class="fas fa-plus"></i> Añadir
+                            </button>
+                        </div>
+                        <div id="kitComponentesContainer">
+                            <!-- Componentes se agregan dinámicamente -->
+                        </div>
+                        <div id="sinComponentes" class="text-center text-muted py-3">
+                            <i class="fas fa-puzzle-piece"></i> Añade productos para formar el kit
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="resumen-item">
+                                    <span class="text-muted">Stock Disponible del Kit:</span>
+                                    <span class="text-accent font-mono" id="stockKitCalculado">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="resumen-item">
+                                    <span class="text-muted">Costo Componentes:</span>
+                                    <span class="text-accent font-mono" id="costoComponentes">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Pricing & Stock Section -->
                     <div class="modal-section">
                         <div class="modal-section-title">
@@ -161,7 +247,7 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Precio Unitario *</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-dark text-muted border-buzz">€</span>
+                                    <span class="input-group-text bg-dark text-muted border-buzz">$</span>
                                     <input type="number" class="form-control form-control-buzz" id="productPrice" step="0.01" min="0" required>
                                 </div>
                             </div>
@@ -181,6 +267,93 @@
                                 <select class="form-control form-control-buzz" id="productStatus">
                                     <option value="activo">Activo</option>
                                     <option value="inactivo">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Categorization Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-tags"></i> CATEGORIZACIÓN
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Marca *</label>
+                                <select class="form-control form-control-buzz" id="productMarca" required>
+                                    <option value="">Seleccionar marca...</option>
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Categoría</label>
+                                <select class="form-control form-control-buzz" id="productCategoria">
+                                    <option value="">Sin categoría</option>
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Proveedor</label>
+                                <select class="form-control form-control-buzz" id="productProveedor">
+                                    <option value="">Sin proveedor</option>
+                                    <!-- Opciones cargadas dinámicamente -->
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Modelo</label>
+                                <input type="text" class="form-control form-control-buzz" id="productModelo"
+                                       placeholder="Ej: G2 Pro, Clásico...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attributes Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-sliders-h"></i> ATRIBUTOS FÍSICOS
+                            <small class="text-muted ms-2">(Opcional)</small>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Color</label>
+                                <input type="text" class="form-control form-control-buzz" id="productColor"
+                                       placeholder="Ej: Negro, Azul...">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Tamaño/Talla</label>
+                                <input type="text" class="form-control form-control-buzz" id="productTamanio"
+                                       placeholder="Ej: M, Grande, A4...">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Medidas</label>
+                                <input type="text" class="form-control form-control-buzz" id="productMedidas"
+                                       placeholder="Ej: 21x27 cm">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Peso (Kg)</label>
+                                <input type="number" class="form-control form-control-buzz" id="productPeso"
+                                       step="0.001" min="0" placeholder="0.000">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Material</label>
+                                <input type="text" class="form-control form-control-buzz" id="productMaterial"
+                                       placeholder="Ej: Plástico, Madera...">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Unidad de Venta</label>
+                                <select class="form-control form-control-buzz" id="productUnidadVenta">
+                                    <option value="UND">Unidad (UND)</option>
+                                    <option value="KG">Kilogramo (KG)</option>
+                                    <option value="LT">Litro (LT)</option>
+                                    <option value="MT">Metro (MT)</option>
+                                    <option value="M2">Metro Cuadrado (M2)</option>
+                                    <option value="PACK">Pack</option>
+                                    <option value="CAJA">Caja</option>
+                                    <option value="PAR">Par</option>
                                 </select>
                             </div>
                         </div>
