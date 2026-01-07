@@ -10,7 +10,7 @@
   --buzz-primary-glow: rgba(255, 160, 0, 0.4);
   --buzz-primary-soft: rgba(255, 160, 0, 0.1);
   --buzz-text-color: #dfe5eb;
-  --buzz-text-muted: #a9b1bb;
+  --buzz-text-muted: #c5ccd5;
   --buzz-success: #28a745;
   --buzz-warning: #ffc107;
   --buzz-danger: #dc3545;
@@ -89,6 +89,27 @@ body {
 .text-muted {
   color: var(--buzz-text-muted) !important;
 }
+
+/* Placeholder text styling - improved visibility */
+::placeholder {
+  color: #8a9299 !important;
+  opacity: 1;
+}
+::-webkit-input-placeholder {
+  color: #8a9299 !important;
+  opacity: 1;
+}
+::-moz-placeholder {
+  color: #8a9299 !important;
+  opacity: 1;
+}
+:-ms-input-placeholder {
+  color: #8a9299 !important;
+}
+::-ms-input-placeholder {
+  color: #8a9299 !important;
+}
+
 .bg-dark {
   background-color: var(--buzz-dark-bg) !important;
 }

@@ -361,6 +361,13 @@ async function editOrder(orderId) {
       document.getElementById("editOrderShippingNotes").value =
         order.notas_envio
 
+      // Populate custom order date
+      if (order.fecha_creacion) {
+        // Formato local para datetime-local (YYYY-MM-DDTHH:MM)
+        const dateFormatted = order.fecha_creacion.replace(' ', 'T').substring(0, 16);
+        document.getElementById("editOrderDate").value = dateFormatted;
+      }
+
       const editProductsContainer = document.getElementById(
         "editOrderProductsContainer"
       )
@@ -586,6 +593,7 @@ async function editOrder(orderId) {
           direccion_envio: document.getElementById("editOrderShippingAddress")
             .value,
           notas_envio: document.getElementById("editOrderShippingNotes").value,
+          fecha_creacion: document.getElementById("editOrderDate").value,
           products: []
         }
 
@@ -917,6 +925,7 @@ async function openOrderModal() {
       direccion_envio: document.getElementById("createOrderShippingAddress")
         .value,
       notas_envio: document.getElementById("createOrderShippingNotes").value,
+      fecha_creacion: document.getElementById("createOrderDate").value,
       products: [] // Collect products from dynamic fields
     }
 
