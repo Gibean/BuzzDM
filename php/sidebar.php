@@ -34,7 +34,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <?php
-            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php'];
+            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php'];
             $inventarioActive = in_array($currentPage, $inventarioPages);
             ?>
             <li class="nav-item nav-dropdown <?php echo $inventarioActive ? 'open' : ''; ?>">
@@ -68,6 +68,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             <i class="fas fa-truck"></i> Proveedores
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'catalogos.php' ? 'active' : ''; ?>"
+                           href="catalogos.php">
+                            <i class="fas fa-list"></i> Catálogos
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">
@@ -88,7 +94,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <li class="nav-item">
                 <a class="nav-link-enhanced <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>" href="todo.php">
                     <i class="fas fa-tasks nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">To-Do Kanban</span>
+                    <span class="nav-text-enhanced">To-Do</span>
                 </a>
             </li>
 
