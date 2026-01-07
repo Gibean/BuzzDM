@@ -163,8 +163,7 @@
         }
 
         if (password.trim() === "") {
-          reportError.textContent =
-            "Por favor, ingrese la contraseña de administrador."
+          reportError.textContent = "Por favor, ingrese la contraseña de administrador."
           return
         }
 
@@ -173,11 +172,10 @@
           `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando ${count} reporte${count > 1 ? 's' : ''}...`
         generateReportBtn.disabled = true
 
-        // Open each report in a new tab
-        selectedReportTypes.forEach((reportType) => {
-          const reportUrl = `php/reports.php?tipo=${reportType}&password=${encodeURIComponent(password)}`
-          window.open(reportUrl, "_blank")
-        })
+        // Open consolidated report in one tab to avoid popup blocking
+        const typesParam = selectedReportTypes.join(',')
+        const reportUrl = `php/reports.php?tipo=${typesParam}&password=${encodeURIComponent(password)}`
+        window.open(reportUrl, "_blank")
 
         // Reset after a short delay
         setTimeout(() => {
@@ -469,7 +467,37 @@
           currentLogPage = pagination.current_page
       } else {
           paginationContainer.style.display = 'none'
+          return // Added return statement here
       }
+  }
+  function formatLogDetails(detalles) {
+      if (!detalles) return "N/A"
+      if (typeof detalles !== 'string' || !detalles.trim().startsWith('{')) return detalles
+      try {
+          const d = JSON.parse(detalles)
+          const parts = []
+          for (const key in d) {
+              const label = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ')
+              let val = d[key]
+              if (key === 'tamanio_mb') val += ' MB'
+              if (key === 'duracion_ms') val += ' ms'
+              parts.push(`<strong>${label}:</strong> ${val}`)
+          }
+          return parts.join(' | ')
+      } catch (e) {
+          return detalles
+      }
+  }
+
+  function getActionColor(action) {
+    if (!action) return "secondary"
+    const actionLower = action.toLowerCase()
+    if (actionLower.includes("exitoso") || actionLower.includes("success") || actionLower.includes("completado")) return "success"
+    if (actionLower.includes("fallido") || actionLower.includes("error") || actionLower.includes("denegado"))
+      return "danger"
+    if (actionLower.includes("creado") || actionLower.includes("actualizado") || actionLower.includes("nuevo"))
+      return "primary"
+    return "secondary"
   }
 
   function renderLogs() {
@@ -477,7 +505,7 @@
     if (!tbody) return
 
     if (logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No se encontraron registros</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No se encontraron registros de actividad.</td></tr>'
         return
     }
 
@@ -485,29 +513,22 @@
       .map(
         (log) => `
         <tr>
-            <td class="font-mono">${formatDateTime(log.fecha)}</td>
-            <td class="font-mono">${log.nombre_usuario || "N/A"}</td>
+            <td class="font-mono" style="font-size: 0.85em;">${formatDateTime(log.fecha)}</td>
+            <td class="font-mono">${log.nombre_usuario || "Sistema"}</td>
             <td>
                 <span class="badge badge-${getActionColor(log.accion)}">
                     ${log.accion}
                 </span>
             </td>
-            <td class="text-muted">${log.detalles || "N/A"}</td>
+            <td class="text-muted" style="font-size: 0.9em;">
+                ${formatLogDetails(log.detalles)}
+            </td>
         </tr>
     `
       )
       .join("")
   }
 
-  function getActionColor(action) {
-    const actionLower = action.toLowerCase()
-    if (actionLower.includes("exitoso")) return "success"
-    if (actionLower.includes("fallido") || actionLower.includes("denegado"))
-      return "danger"
-    if (actionLower.includes("creado") || actionLower.includes("actualizado"))
-      return "primary"
-    return "secondary"
-  }
 
   async function loadBackups() {
     const tableBody = document.getElementById("backupsTable")
@@ -1034,42 +1055,52 @@
       const data = await fetchJSON(
         "php/settings_actions.php?action=get_company_info"
       )
+
+      // Ensure we have the target elements before trying to set values
+      const rifTypeEl = document.getElementById("rifType");
+      const rifNumberEl = document.getElementById("rifNumber");
+      const companyNameEl = document.getElementById("companyName");
+      const companyAddressEl = document.getElementById("companyAddress");
+      const phoneCodeEl = document.getElementById("phoneCode");
+      const phoneNumberEl = document.getElementById("phoneNumber");
+      const companyEmailEl = document.getElementById("companyEmail");
+      const logoPreviewEl = document.getElementById("currentLogoPreview");
+
       if (data.success && data.data) {
         const info = data.data
-        const rifType = info.rif ? info.rif.substring(0, 1) : ""
+        const rifType = info.rif ? info.rif.substring(0, 1) : "J"
         const rifNumber = info.rif ? info.rif.substring(1) : ""
-        const phoneCode = info.telefono
-          ? info.telefono.substring(0, info.telefono.indexOf(" "))
-          : ""
-        const phoneNumber = info.telefono
-          ? info.telefono.substring(info.telefono.indexOf(" ") + 1)
-          : ""
 
-        document.getElementById("rifType").value = rifType
-        document.getElementById("rifNumber").value = rifNumber
-        document.getElementById("companyName").value = info.nombre
-        document.getElementById("companyAddress").value = info.direccion
-        document.getElementById("phoneCode").value = phoneCode
-        document.getElementById("phoneNumber").value = phoneNumber
-        document.getElementById("companyEmail").value = info.email
-
-        if (info.logo_svg) {
-          document.getElementById(
-            "currentLogoPreview"
-          ).innerHTML = `<img src="${info.logo_svg}" alt="Current Logo" style="max-width: 150px; max-height: 150px; border: 1px solid #ddd; padding: 5px;">`
+        let phoneCode = ""
+        let phoneNumber = ""
+        if (info.telefono && info.telefono.includes(" ")) {
+            phoneCode = info.telefono.substring(0, info.telefono.indexOf(" "))
+            phoneNumber = info.telefono.substring(info.telefono.indexOf(" ") + 1)
         } else {
-          document.getElementById("currentLogoPreview").innerHTML =
-            '<p class="text-muted">No hay logo cargado.</p>'
+            phoneNumber = info.telefono || ""
         }
-      } else {
-        showToast(
-          data.message || "Error al cargar información de la empresa.",
-          "error"
-        )
+
+        if (rifTypeEl) rifTypeEl.value = rifType
+        if (rifNumberEl) rifNumberEl.value = rifNumber
+        if (companyNameEl) companyNameEl.value = info.nombre || ""
+        if (companyAddressEl) companyAddressEl.value = info.direccion || ""
+        if (phoneCodeEl) phoneCodeEl.value = phoneCode
+        if (phoneNumberEl) phoneNumberEl.value = phoneNumber
+        if (companyEmailEl) companyEmailEl.value = info.email || ""
+
+        if (logoPreviewEl) {
+          if (info.logo_svg) {
+            logoPreviewEl.innerHTML = `<img src="${info.logo_svg}" alt="Current Logo" style="max-width: 100%; max-height: 120px; border: 1px solid rgba(255,160,0,0.1); padding: 5px;">`
+          } else {
+            logoPreviewEl.innerHTML = '<i class="fas fa-image fa-3x text-muted opacity-25"></i>'
+          }
+        }
+      } else if (!data.success) {
+         // Silently handle if no company info is yet in DB
+         console.warn("No company info found in database yet.");
       }
     } catch (error) {
       console.error("Error fetching company info:", error)
-      showToast("Error de red al cargar información de la empresa.", "error")
     }
   }
 
@@ -1100,14 +1131,28 @@
     }
   }
 
-  async function handleLogoFileInputChange() {
+  function handleLogoFileInputChange() {
     const logoFileInput = document.getElementById("logoFileInput")
     const logoFileInfo = document.getElementById("logoFileInfo")
     const logoFileName = document.getElementById("logoFileName")
-    const logoFileSize = document.getElementById("logoFileSize")
     const uploadLogoBtn = document.getElementById("uploadLogoBtn")
 
     if (logoFileInput.files.length === 0) {
+      logoFileInfo.style.display = "none"
+      return
+    }
+
+    const file = logoFileInput.files[0]
+    if (logoFileName) logoFileName.textContent = file.name
+    if (logoFileInfo) logoFileInfo.style.display = "block"
+    if (uploadLogoBtn) uploadLogoBtn.disabled = false
+  }
+
+  async function uploadLogo() {
+    const logoFileInput = document.getElementById("logoFileInput")
+    const uploadLogoBtn = document.getElementById("uploadLogoBtn")
+
+    if (!logoFileInput.files || logoFileInput.files.length === 0) {
       showToast("Por favor, seleccione un archivo de logo.", "error")
       return
     }
@@ -1117,7 +1162,10 @@
     formData.append("action", "upload_logo")
     formData.append("logoFile", file)
 
-    uploadLogoBtn.disabled = true
+    if (uploadLogoBtn) {
+        uploadLogoBtn.disabled = true
+        uploadLogoBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Subiendo...'
+    }
 
     try {
       const data = await fetchJSON("php/settings_actions.php", {
@@ -1136,7 +1184,10 @@
       console.error("Error uploading logo:", error)
       showToast("Error de red al subir el logo.", "error")
     } finally {
-      uploadLogoBtn.disabled = false
+        if (uploadLogoBtn) {
+            uploadLogoBtn.disabled = false
+            uploadLogoBtn.innerHTML = '<i class="fas fa-upload me-1"></i>SUBIR LOGO'
+        }
     }
   }
 
@@ -1145,9 +1196,9 @@
     const logoFileInfo = document.getElementById("logoFileInfo")
     const uploadLogoBtn = document.getElementById("uploadLogoBtn")
 
-    logoFileInput.value = ""
-    logoFileInfo.style.display = "none"
-    uploadLogoBtn.disabled = true
+    if (logoFileInput) logoFileInput.value = ""
+    if (logoFileInfo) logoFileInfo.style.display = "none"
+    if (uploadLogoBtn) uploadLogoBtn.disabled = true
   }
 
   // Make functions globally accessible for inline event handlers

@@ -1,11 +1,11 @@
 -- Mock data for Librería / Papelería
 -- File: db/mock_libreria_inserts.sql
 -- Created: 2025-12-25
+-- Updated: 2026-01-07 (Added import history and to-do notes)
 
 SET FOREIGN_KEY_CHECKS=0;
 
--- Cleanup: remove existing mock data for Librería (safe, id/sku-based deletes)
--- Delete children first to avoid FK issues, then parents and configs/users
+-- Cleanup: remove existing mock data for Librería
 DELETE FROM `detalle_pedido` WHERE `pedido_id` IN (2,3,4,5,6,7,8,9,10,11);
 DELETE FROM `pedidos` WHERE `id` IN (2,3,4,5,6,7,8,9,10,11);
 DELETE FROM `movimientos_inventario` WHERE `usuario_id` = 100 OR `producto_id` IN (2,3,4,5,6,7,8,9,10,11,12,13);
@@ -14,6 +14,11 @@ DELETE FROM `categorias` WHERE `id` IN (1,2,3,4,5,6);
 DELETE FROM `marcas` WHERE `id` IN (1,2,3,4,5,6);
 DELETE FROM `proveedores` WHERE `id` IN (1,2,3);
 DELETE FROM `clientes` WHERE `id` IN ('V-10000001','V-10000002','V-10000003');
+DELETE FROM `importaciones` WHERE `archivo_nombre` LIKE 'Mock_%';
+DELETE FROM `notas_checklists` WHERE `nota_id` IN (10,11,12);
+DELETE FROM `notas_adjuntos` WHERE `nota_id` IN (10,11,12);
+DELETE FROM `notas_items_inventario` WHERE `nota_id` IN (10,11,12);
+DELETE FROM `notas_kanban` WHERE `id` IN (10,11,12);
 DELETE FROM `usuarios` WHERE `id` = 100;
 DELETE FROM `empresa` WHERE `id` = 1;
 DELETE FROM `configuraciones` WHERE `clave` IN ('store_name','currency','tax_percent');
@@ -42,7 +47,7 @@ INSERT INTO `proveedores` (`id`, `nombre`, `contacto_nombre`, `email`, `telefono
   (2, 'Importadora Útiles S.R.L.', 'Carlos Rojas', 'contacto@importutiles.com', '+58 241 555 0202', 'Zona Industrial, Valencia'),
   (3, 'ArtículosCreativos C.A.', 'Ana Gómez', 'info@articuloscreativos.com', '+58 261 555 0303', 'C.C. Arte, Maracay');
 
--- Products (productos) -- IDs chosen to avoid collision with existing sample id=1
+-- Products (productos)
 INSERT INTO `productos` (`id`, `sku`, `nombre`, `descripcion`, `precio`, `stock`, `min_stock`, `estado`, `creado_at`, `categoria`, `marca_id`, `proveedor_id`) VALUES
   (2, 'LBR-0001', 'Cuaderno universitario 100 hojas', 'Cuaderno raya 100 hojas 21x27 cm', 2.50, 120, 20, 'activo', '2025-12-25 10:00:00', 1, NULL, 1),
   (3, 'LBR-0002', 'Cuaderno de dibujo A4 40 hojas', 'Papel para dibujo 120 g/m2, 40 hojas', 5.00, 60, 10, 'activo', '2025-12-25 10:01:00', 4, 5, 3),
@@ -57,13 +62,13 @@ INSERT INTO `productos` (`id`, `sku`, `nombre`, `descripcion`, `precio`, `stock`
   (12, 'LBR-0011', 'Set acuarelas Tombow 12 colores', 'Set de acuarelas en pastilla, 12 colores', 22.00, 15, 5, 'activo', '2025-12-25 10:10:00', 4, 6, 3),
   (13, 'LBR-0012', 'Marcador permanente negro', 'Marcador indeleble punta media', 2.00, 0, 10, 'agotado', '2025-12-25 10:11:00', 1, NULL, 2);
 
--- Clients (clientes) -- use unique IDs that match app format
+-- Clients (clientes)
 INSERT INTO `clientes` (`id`, `nombre`, `email`, `telefono`, `direccion`, `notas`, `vip`, `creado_at`) VALUES
   ('V-10000001', 'María López', 'm.lopez@example.com', '+58 412 345 6789', 'Calle Comercio 123, Caracas', '', 0, '2025-12-01 09:00:00'),
   ('V-10000002', 'José Pérez', 'j.perez@example.com', '+58 414 987 6543', 'Av. Bolívar 45, Valencia', 'Cliente frecuente', 1, '2025-11-20 11:30:00'),
   ('V-10000003', 'Librería La esquina', 'contabilidad@laesquina.com', '+58 212 999 8888', 'C.C. Centro, Local 12', 'Mayorista', 0, '2025-10-05 14:22:00');
 
--- Users: add an operator for store operations (password hash reused from sample users)
+-- Users
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`, `estado`, `creado_at`) VALUES
   (100, 'Operador Libreria', 'operador.libreria@example.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'operador', 'activo', '2025-12-01 08:00:00');
 
@@ -71,13 +76,13 @@ INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`, `estado`, `c
 INSERT INTO `empresa` (`id`, `tipo_rif`, `rif`, `nombre`, `direccion`, `telefono`, `email`) VALUES
   (1, 'J', 'J-12345678-9', 'Librería Papelería El Estudiante', 'Av. Principal 100, Caracas', '+58 212 555 0000', 'info@elestudiante.com');
 
--- Configurations useful for storefront
+-- Configurations
 INSERT INTO `configuraciones` (`clave`, `valor`, `descripcion`) VALUES
   ('store_name', 'Librería El Estudiante', 'Nombre mostrado en factura y sitio'),
   ('currency', 'VES', 'Moneda del sistema'),
   ('tax_percent', '12.00', 'Porcentaje de IVA aplicado a ventas');
 
--- Orders (pedidos) and details (detalle_pedido)
+-- Orders (pedidos)
 INSERT INTO `pedidos` (`id`, `cliente_id`, `referencia`, `fecha_creacion`, `total`, `estado_pago`, `estado_envio`, `direccion_envio`, `notas_envio`, `creado_por`) VALUES
   (2, 'V-10000001', 'REF-LBR-0002', '2025-12-25 11:00:00', 0.00, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', 'Entrega mañana', 100),
   (3, 'V-10000002', 'REF-LBR-0003', '2025-12-24 15:30:00', 0.00, 'no_pagado', 'pendiente', 'Av. Bolívar 45, Valencia', '', 100),
@@ -92,43 +97,23 @@ INSERT INTO `pedidos` (`id`, `cliente_id`, `referencia`, `fecha_creacion`, `tota
 
 -- Order lines
 INSERT INTO `detalle_pedido` (`pedido_id`, `producto_id`, `cantidad`, `precio_unitario`) VALUES
-  (2, 2, 2, 2.50), -- 2 cuadernos -> 5.00
-  (2, 4, 3, 1.20), -- 3 bolígrafos -> 3.60
-  (2, 8, 1, 1.10), -- pegamento -> 1.10
-  (3, 5, 1, 8.50), -- marcadores -> 8.50
-  (3, 7, 2, 0.80), -- gomitas -> 1.60
+  (2, 2, 2, 2.50), (2, 4, 3, 1.20), (2, 8, 1, 1.10),
+  (3, 5, 1, 8.50), (3, 7, 2, 0.80),
+  (4, 11, 10, 6.50), (4, 2, 20, 2.50),
+  (5, 4, 5, 1.20), (5, 6, 2, 3.75),
+  (6, 3, 2, 5.00), (6, 7, 1, 0.80),
+  (7, 9, 1, 15.00), (7, 8, 2, 1.10),
+  (8, 12, 1, 22.00), (8, 5, 1, 8.50),
+  (9, 10, 1, 4.25), (9, 2, 3, 2.50),
+  (10, 4, 10, 1.20), (10, 13, 2, 2.00),
+  (11, 3, 5, 5.00), (11, 11, 2, 6.50);
 
-  -- Additional orders detail lines
-  (4, 11, 10, 6.50), -- resmas x10 -> 65.00
-  (4, 2, 20, 2.50),  -- cuadernos x20 -> 50.00
-
-  (5, 4, 5, 1.20),   -- bolígrafos x5 -> 6.00
-  (5, 6, 2, 3.75),   -- lápices x2 -> 7.50
-
-  (6, 3, 2, 5.00),   -- cuaderno dibujo x2 -> 10.00
-  (6, 7, 1, 0.80),   -- goma x1 -> 0.80
-
-  (7, 9, 1, 15.00),  -- cartulina x1 -> 15.00
-  (7, 8, 2, 1.10),   -- pegamento x2 -> 2.20
-
-  (8, 12, 1, 22.00), -- acuarelas x1 -> 22.00
-  (8, 5, 1, 8.50),   -- marcadores x1 -> 8.50
-
-  (9, 10, 1, 4.25),  -- archivador x1 -> 4.25
-  (9, 2, 3, 2.50),   -- cuadernos x3 -> 7.50
-
-  (10, 4, 10, 1.20), -- bolígrafos x10 -> 12.00
-  (10, 13, 2, 2.00), -- marcadores permanentes x2 -> 4.00
-
-  (11, 3, 5, 5.00),  -- cuaderno dibujo x5 -> 25.00
-  (11, 11, 2, 6.50); -- resma x2 -> 13.00
-
--- Update pedidos total to reflect detalle_pedido sums (this is optional but consistent)
+-- Update pedidos total
 UPDATE `pedidos` SET `total` = (
   SELECT IFNULL(SUM(cantidad * precio_unitario), 0) FROM `detalle_pedido` d WHERE d.pedido_id = pedidos.id
 ) WHERE id IN (2,3,4,5,6,7,8,9,10,11);
 
--- Inventory movements: initial stock entries by usuario 100
+-- Inventory movements
 INSERT INTO `movimientos_inventario` (`producto_id`, `usuario_id`, `tipo_movimiento`, `cantidad`, `justificacion`, `stock_anterior`, `stock_actual`, `fecha`) VALUES
   (2, 100, 'entrada', 120, 'Ingreso inicial de stock', 0, 120, '2025-12-25 10:00:00'),
   (3, 100, 'entrada', 60, 'Ingreso inicial de stock', 0, 60, '2025-12-25 10:01:00'),
@@ -143,6 +128,34 @@ INSERT INTO `movimientos_inventario` (`producto_id`, `usuario_id`, `tipo_movimie
   (12, 100, 'entrada', 15, 'Ingreso inicial de stock', 0, 15, '2025-12-25 10:10:00'),
   (13, 100, 'entrada', 0, 'Sin stock al momento del mock', 0, 0, '2025-12-25 10:11:00');
 
-SET FOREIGN_KEY_CHECKS=1;
+-- Import History
+INSERT INTO `importaciones` (`usuario_id`, `tipo`, `archivo_nombre`, `fecha`, `estado`, `detalles`) VALUES
+  (1, 'productos', 'Mock_Productos_Enero.xlsx', '2026-01-02 09:00:00', 'procesado', '{"registros":50,"insertados":45,"actualizados":5,"errores":0}'),
+  (1, 'clientes', 'Mock_Clientes_Nuevos.xlsx', '2026-01-03 14:30:00', 'procesado', '{"registros":20,"insertados":20,"actualizados":0,"errores":0}'),
+  (1, 'general', 'Mock_Inventario_Faltante.csv', '2026-01-05 10:15:00', 'error', '{"error":"Error en la columna SKU fila 12","mensaje":"El SKU LBR-9999 no es válido"}');
 
--- End of mock data for Librería / Papelería
+-- To-Do Notes
+INSERT INTO `notas_kanban` (`id`, `titulo`, `cliente_nombre`, `contenido`, `estado`, `prioridad`, `orden`, `usuario_id`, `creado_at`) VALUES
+  (10, 'Presupuesto para Colegio San Ignacio', 'Colegio San Ignacio', 'Solicitan presupuesto de 50 resmas y 100 cuadernos para el inicio de clases.', 'pendiente', 'alta', 1, 1, '2026-01-07 08:30:00'),
+  (11, 'Seguimiento de pedido V-10000002', 'José Pérez', 'El cliente llamó preguntando por su pedido de marcadores. Revisar con el transportista.', 'seguimiento', 'media', 1, 1, '2026-01-07 09:15:00'),
+  (12, 'Reabastecer stock de Pilot G2', NULL, 'Estamos quedando bajos en stock del Bolígrafo Pilot G2 negro. Contactar a Distribuidora Papel.', 'resuelto', 'baja', 1, 1, '2026-01-07 10:00:00');
+
+-- Checklists
+INSERT INTO `notas_checklists` (`nota_id`, `tarea`, `completada`, `orden`) VALUES
+  (10, 'Contar stock de resmas disponible', 1, 1),
+  (10, 'Pedir cotización especial a Distribuidora Papel', 0, 2),
+  (10, 'Enviar PDF al cliente', 0, 3),
+  (11, 'Llamar a MRW', 1, 1),
+  (11, 'Confirmar recepción con el cliente', 0, 2);
+
+-- Attached Products
+INSERT INTO `notas_items_inventario` (`nota_id`, `producto_id`, `cantidad`) VALUES
+  (10, 11, 50), (10, 2, 100),
+  (12, 4, 100);
+
+-- Attachments
+INSERT INTO `notas_adjuntos` (`nota_id`, `nombre`, `url`) VALUES
+  (10, 'Requerimiento_Colegio.pdf', 'https://example.com/files/req_colegio_2026.pdf'),
+  (11, 'Guia_Despacho_123.jpg', 'https://example.com/img/guia_123.jpg');
+
+SET FOREIGN_KEY_CHECKS=1;

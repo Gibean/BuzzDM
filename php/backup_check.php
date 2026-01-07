@@ -182,7 +182,8 @@ function getBackupUrl() {
     $token = defined('BACKUP_SECRET_TOKEN') ? BACKUP_SECRET_TOKEN : '';
     $url = $protocol . '://' . $host . $backupScript
          . '?token=' . urlencode($token)
-         . '&fallback=1&json=1';
+         . '&fallback=1&json=1'
+         . '&triggered_by=' . ($_SESSION['usuario_id'] ?? 'unknown');
 
     return $url;
 }

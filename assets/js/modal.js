@@ -165,8 +165,8 @@ const ModalUtils = {
 // Make globally available
 window.ModalUtils = ModalUtils;
 
-// Convenience functions
 window.openModal = (modalId, options = {}) => ModalUtils.openModal(modalId, options);
 window.closeModal = (modalId, callback) => ModalUtils.closeModal(modalId, callback);
 window.showModalLoading = (modalId, message) => ModalUtils.showLoading(modalId, message);
 window.hideModalLoading = (modalId) => ModalUtils.hideLoading(modalId);
+window.setTitle = (modalId, title) => ModalUtils.setTitle(modalId, title);

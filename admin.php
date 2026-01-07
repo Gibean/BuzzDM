@@ -223,6 +223,19 @@
                                     <p class="mb-0 text-muted small">Acciones Sistema</p>
                                 </div>
                             </div>
+                            <!-- New Reports -->
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option border-warning" data-report-type="inventario_critico">
+                                    <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                    <p class="mb-0 text-muted small">Inv. Crítico</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-lg-3">
+                                <div class="buzz-card text-center p-3 report-option border-success" data-report-type="resumen_financiero">
+                                    <i class="fas fa-file-invoice-dollar fa-2x text-success mb-2"></i>
+                                    <p class="mb-0 text-muted small">Resumen Financiero</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <!-- Password and Generate Button -->
@@ -253,57 +266,108 @@
     <!--   Settings Tab  -->
         <div class="tab-content" id="settingsTab" style="display: none;">
             <div class="row">
-                <div class="col-md-6">
-                    <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">TU EMPRESA</h5>
-                        <p class="text-muted mb-1"><strong>RIF / Cédula:</strong> <?php echo htmlspecialchars($companyData['rif'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Nombre de la Empresa:</strong> <?php echo htmlspecialchars($companyData['nombre'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Dirección:</strong> <?php echo htmlspecialchars($companyData['direccion'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Teléfono:</strong> <?php echo htmlspecialchars($companyData['telefono'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Email de Contacto:</strong> <?php echo htmlspecialchars($companyData['email'] ?? ''); ?></p>
-                        <div class="text-end mt-3">
-                            <a href="company_settings.php" class="btn btn-buzz">
-                                <i class="fas fa-edit"></i> Editar Datos
-                            </a>
+                <!-- Company Information Form -->
+                <div class="col-lg-7">
+                    <div class="buzz-card h-100">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="font-primary text-primary mb-0">DATOS DE LA EMPRESA</h5>
+                            <i class="fas fa-building text-primary"></i>
                         </div>
+                        <form id="companyInfoForm">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Tipo RIF</label>
+                                    <select class="form-select form-control-buzz" id="rifType" name="rifType">
+                                        <option value="J">J - Jurídico</option>
+                                        <option value="V">V - Venezolano</option>
+                                        <option value="G">G - Gubernamental</option>
+                                        <option value="E">E - Extranjero</option>
+                                        <option value="P">P - Pasaporte</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label text-muted small">Número de RIF / Cédula</label>
+                                    <input type="text" class="form-control form-control-buzz" id="rifNumber" name="rifNumber" placeholder="Ej: 123456780">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Nombre de la Empresa</label>
+                                    <input type="text" class="form-control form-control-buzz" id="companyName" name="companyName" placeholder="Nombre Oficial">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Dirección Fiscal / Principal</label>
+                                    <textarea class="form-control form-control-buzz" id="companyAddress" name="companyAddress" rows="2" placeholder="Dirección completa..."></textarea>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted small">Cód. Área / País</label>
+                                    <input type="text" class="form-control form-control-buzz" id="phoneCode" name="phoneCode" placeholder="+58">
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label text-muted small">Teléfono</label>
+                                    <input type="text" class="form-control form-control-buzz" id="phoneNumber" name="phoneNumber" placeholder="4121234567">
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label text-muted small">Email de Contacto</label>
+                                    <input type="email" class="form-control form-control-buzz" id="companyEmail" name="companyEmail" placeholder="admin@empresa.com">
+                                </div>
+                            </div>
+                            <div class="text-end mt-4">
+                                <button type="submit" class="btn btn-buzz btn-lg w-100">
+                                    <i class="fas fa-save me-2"></i>GUARDAR CAMBIOS
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN DE SEGURIDAD (PRONTO DISPONIBLE)</h5>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="twoFactor" checked disabled>
-                                <label class="form-check-label text-muted" for="twoFactor">
-                                    Autenticación de Dos Factores
-                                </label>
-                            </div>
+
+                <!-- Logo and Security Placeholder -->
+                <div class="col-lg-5">
+                    <!-- Logo Management -->
+                    <div class="buzz-card mb-4">
+                        <h6 class="font-primary text-primary mb-3">LOGO DE LA EMPRESA (SVG)</h6>
+                        <div id="currentLogoPreview" class="text-center mb-3 p-3 rounded" style="background: rgba(0,0,0,0.2); min-height: 100px; display: flex; align-items: center; justify-content: center;">
+                            <!-- JS will populate current logo here -->
+                            <i class="fas fa-image fa-3x text-muted opacity-25"></i>
                         </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="sessionsTimeout" checked disabled>
-                                <label class="form-check-label text-muted" for="sessionsTimeout">
-                                    Timeout de Sesiones (30 min)
-                                </label>
-                            </div>
+
+                        <div class="logo-upload-box p-3 border border-dashed rounded text-center" id="logoUploadArea" style="border-color: rgba(255,160,0,0.3) !important;">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                            <p class="small text-muted mb-2">Suelte el archivo SVG aquí o</p>
+                            <input type="file" id="logoFileInput" accept=".svg" style="display: none;">
+                            <button type="button" class="btn btn-sm btn-outline-buzz" onclick="document.getElementById('logoFileInput').click()">
+                                <i class="fas fa-search me-1"></i>Buscar Archivo
+                            </button>
                         </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="loginNotifications" checked disabled>
-                                <label class="form-check-label text-muted" for="loginNotifications">
-                                    Notificaciones de Inicio de Sesión
-                                </label>
+
+                        <div id="logoFileInfo" class="mt-2 small" style="display: none;">
+                            <div class="alert alert-info py-1 px-2 d-flex justify-content-between align-items-center">
+                                <span id="logoFileName" class="text-truncate me-2"></span>
+                                <button type="button" class="btn btn-sm text-danger p-0" id="clearLogoFileBtn">&times;</button>
                             </div>
+                            <button type="button" class="btn btn-primary btn-sm w-100 mt-1" id="uploadLogoBtn">
+                                <i class="fas fa-upload me-1"></i>SUBIR LOGO
+                            </button>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-md-6">
+
+                    <!-- Security (Visual only for now as in JS) -->
                     <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN GENERAL (PRONTO DISPONIBLE)</h5>
-                        <p class="text-muted mb-1"><strong>Zona Horaria:</strong> Caracas/Venezuela</p>
-                        <p class="text-muted mb-1"><strong>Moneda:</strong> USD ($)</p>
+                        <h6 class="font-primary text-primary mb-3">SEGURIDAD</h6>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="twoFactor">
+                            <label class="form-check-label text-muted small" for="twoFactor">Autenticación de 2 Factores</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" id="sessionTimeout" checked>
+                            <label class="form-check-label text-muted small" for="sessionTimeout">Timeout de sesión automático</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="loginLogs" checked>
+                            <label class="form-check-label text-muted small" for="loginLogs">Logs de inicio de sesión</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -435,68 +499,6 @@
             </div>
         </div>
 
-    <!--      Settings Tab  -->
-        <div class="tab-content" id="settingsTab" style="display: none;">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">TU EMPRESA</h5>
-                        <p class="text-muted mb-1"><strong>RIF / Cédula:</strong> <?php echo htmlspecialchars($companyData['rif'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Nombre de la Empresa:</strong> <?php echo htmlspecialchars($companyData['nombre'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Dirección:</strong> <?php echo htmlspecialchars($companyData['direccion'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Teléfono:</strong> <?php echo htmlspecialchars($companyData['telefono'] ?? ''); ?></p>
-                        <p class="text-muted mb-1"><strong>Email de Contacto:</strong> <?php echo htmlspecialchars($companyData['email'] ?? ''); ?></p>
-                        <div class="text-end mt-3">
-                            <a href="company_settings.php" class="btn btn-buzz">
-                                <i class="fas fa-edit"></i> Editar Datos
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN DE SEGURIDAD (PRONTO DISPONIBLE)</h5>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="twoFactor" checked>
-                                <label class="form-check-label text-muted" for="twoFactor">
-                                    Autenticación de dos factores
-                                </label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="sessionTimeout" checked>
-                                <label class="form-check-label text-muted" for="sessionTimeout">
-                                    Timeout de sesión automático
-                                </label>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Duración de sesión (minutos)</label>
-                            <input type="number" class="form-control form-control-buzz" value="60">
-                        </div>
-                        <div class="mb-3">
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="loginLogs" checked>
-                                <label class="form-check-label text-muted" for="loginLogs">
-                                    Registrar intentos de login
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <div class="buzz-card">
-                        <h5 class="font-primary text-primary mb-3">CONFIGURACIÓN GENERAL (PRONTO DISPONIBLE)</h5>
-                        <p class="text-muted mb-1"><strong>Zona Horaria:</strong> Caracas/Venezuela</p>
-                        <p class="text-muted mb-1"><strong>Moneda:</strong> USD ($)</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- System Footer -->
         <?php require_once 'php/system_footer.php'; ?>
