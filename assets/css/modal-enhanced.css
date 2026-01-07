@@ -131,12 +131,41 @@ body:has(.modal-buzz[style*="flex"]) {
 }
 
 .modal-body-buzz::-webkit-scrollbar-thumb {
-    background: rgba(255, 160, 0, 0.3);
-    border-radius: 4px;
+    background: rgba(255, 160, 0, 0.2);
+    border-radius: 10px;
 }
 
 .modal-body-buzz::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 160, 0, 0.5);
+    background: rgba(255, 160, 0, 0.4);
+}
+
+/* Enhanced Form Elements inside Modals */
+.modal-body-buzz .form-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--buzz-text-muted);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.modal-body-buzz .input-group-text {
+    background: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 160, 0, 0.2);
+    color: var(--buzz-primary-color);
+    padding-left: 1rem;
+    padding-right: 1rem;
+    font-size: 0.9rem;
+}
+
+.modal-body-buzz .form-control-buzz {
+    border-color: rgba(255, 160, 0, 0.2);
+}
+
+.modal-body-buzz .form-control-buzz:focus {
+    border-color: var(--buzz-primary-color);
+    box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.1);
 }
 
 /* Modal Footer */
@@ -161,13 +190,22 @@ body:has(.modal-buzz[style*="flex"]) {
 
 .modal-section-title {
     font-family: var(--font-primary);
-    font-size: 1rem;
-    font-weight: 600;
+    font-size: 0.85rem;
+    font-weight: 700;
     color: var(--buzz-primary-color);
-    margin-bottom: 0.75rem;
-    padding-bottom: 0.35rem;
-    border-bottom: 1px solid rgba(255, 160, 0, 0.15);
-    letter-spacing: 1px;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.1);
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+}
+
+.modal-section-title i {
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 /* Loading State */

@@ -180,6 +180,12 @@ try {
             $sortOrder = $_GET['sortOrder'] ?? 'DESC';
             $showDeleted = isset($_GET['show_deleted']) && $_GET['show_deleted'] === 'true';
 
+            // New filters
+            $marca_id = $_GET['marca_id'] ?? '';
+            $categoria_id = $_GET['categoria_id'] ?? '';
+            $modelo = $_GET['modelo'] ?? '';
+            $unidad_venta = $_GET['unidad_venta'] ?? '';
+
             // Allowed sort columns
             $allowedSorts = ['sku', 'nombre', 'precio', 'stock', 'creado_at'];
             if (!in_array($sortBy, $allowedSorts)) $sortBy = 'creado_at';
@@ -191,48 +197,66 @@ try {
 
             // Filter by deleted status
             if (!$showDeleted) {
-                $whereClauses[] = "deleted_at IS NULL";
-            } else {
-                // If showing deleted, we might want to show ONLY deleted or ALL.
-                // Usually "Show Deleted" toggle implies showing them mixed in or exclusively.
-                // Based on UI implementation, it seems to filter to show deleted items.
-                // Let's assume we show ALL if show_deleted is true, or maybe we should filter?
-                // The previous implementation likely showed all or filtered.
-                // Let's stick to: if show_deleted is true, we don't filter by deleted_at IS NULL.
-                // But wait, if the user wants to see *only* deleted items, the UI might send a specific filter?
-                // The UI checkbox says "Ver eliminados". If checked, it sends show_deleted=true.
-                // If unchecked, it doesn't send it.
-                // So if checked, we show everything (including deleted).
+                $whereClauses[] = "p.deleted_at IS NULL";
             }
 
             if ($search) {
-                $whereClauses[] = "(sku LIKE ? OR nombre LIKE ? OR descripcion LIKE ?)";
+                $whereClauses[] = "(p.sku LIKE ? OR p.nombre LIKE ? OR p.descripcion LIKE ? OR m.nombre LIKE ? OR c.nombre LIKE ? OR p.modelo LIKE ?)";
                 $searchTerm = "%$search%";
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
+                $params[] = $searchTerm;
                 $params[] = $searchTerm;
                 $params[] = $searchTerm;
                 $params[] = $searchTerm;
             }
 
             if ($status) {
-                $whereClauses[] = "estado = ?";
+                $whereClauses[] = "p.estado = ?";
                 $params[] = $status;
+            }
+
+            if ($marca_id) {
+                $whereClauses[] = "p.marca_id = ?";
+                $params[] = $marca_id;
+            }
+
+            if ($categoria_id) {
+                $whereClauses[] = "p.categoria = ?";
+                $params[] = $categoria_id;
+            }
+
+            if ($modelo) {
+                $whereClauses[] = "p.modelo LIKE ?";
+                $params[] = "%$modelo%";
+            }
+
+            if ($unidad_venta) {
+                $whereClauses[] = "p.unidad_venta = ?";
+                $params[] = $unidad_venta;
             }
 
             $whereSql = implode(' AND ', $whereClauses);
 
             // Count total
-            $countSql = "SELECT COUNT(*) FROM productos WHERE $whereSql";
+            $countSql = "SELECT COUNT(*) FROM productos p
+                         LEFT JOIN marcas m ON p.marca_id = m.id
+                         LEFT JOIN categorias c ON p.categoria = c.id
+                         WHERE $whereSql";
             $stmt = $pdo->prepare($countSql);
             $stmt->execute($params);
             $total = $stmt->fetchColumn();
 
             // Fetch data
-            $sql = "SELECT p.id, p.sku, p.nombre as name, p.descripcion as description, p.precio as price, p.stock, p.min_stock, p.estado as status, p.marca_id, p.categoria, p.proveedor_id, p.modelo, p.color, p.tamanio, p.medidas, p.peso_kg, p.material, p.unidad_venta, p.tipo_producto, p.maneja_stock, p.producto_padre_id, p.es_kit_virtual, p.variante_atributo, p.deleted_at,
+            $sql = "SELECT p.*, p.nombre as name, p.descripcion as description, p.precio as price, p.estado as status,
+                           m.nombre as marca_nombre, c.nombre as categoria_nombre,
                            (SELECT COUNT(*) FROM productos v WHERE v.producto_padre_id = p.id AND v.deleted_at IS NULL) as total_variantes,
                            (SELECT COUNT(*) FROM producto_componentes pc WHERE pc.kit_id = p.id) as total_componentes
                     FROM productos p
+                    LEFT JOIN marcas m ON p.marca_id = m.id
+                    LEFT JOIN categorias c ON p.categoria = c.id
                     WHERE $whereSql
-                    ORDER BY $sortBy $sortOrder
+                    ORDER BY p.$sortBy $sortOrder
                     LIMIT $limit OFFSET $offset";
 
             $stmt = $pdo->prepare($sql);
