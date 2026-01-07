@@ -5,7 +5,7 @@ require_once 'db.php'; // Provides $pdo
 try {
     $pdo = getDbConnection();
     $query = "
-        SELECT 
+        SELECT
             estado_pago,
             COUNT(*) as total_pedidos
         FROM pedidos
@@ -21,8 +21,8 @@ try {
 
     // Define colors for statuses
     $statusColors = [
-        'pagado' => '#28a745', // Green for paid
-        'no_pagado' => '#6c757d', // Yellow for unpaid
+        'pagado' => '#FFC107', // Yellow for paid
+        'no_pagado' => '#6c757d', // Grey for unpaid
         // Add more as needed
     ];
 

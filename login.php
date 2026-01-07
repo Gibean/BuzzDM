@@ -448,6 +448,9 @@
                     } else {
                         // Error - show message and re-enable button
                         alert(data.message);
+                        // Clear fields on incorrect login
+                        document.getElementById('email').value = '';
+                        document.getElementById('password').value = '';
                         loginButton.disabled = false;
                         loginButton.innerHTML = originalText;
                     }

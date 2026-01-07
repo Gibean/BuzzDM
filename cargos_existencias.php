@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
     <link rel="stylesheet" href="assets/css/cargos.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -41,14 +42,14 @@
         <div id="vistaHistorial">
             <!-- Filtros -->
             <div class="buzz-card mb-4">
-                <div class="row">
-                    <div class="col-md-3 mb-3">
-                        <label class="form-label text-muted">Buscar</label>
+                <div class="filter-wrapper">
+                    <div class="filter-group filter-search">
+                        <label class="text-muted">Buscar</label>
                         <input type="text" class="form-control form-control-buzz" id="searchCargos"
                                placeholder="Código, proveedor, referencia...">
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label text-muted">Estado</label>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Estado</label>
                         <select class="form-control form-control-buzz" id="filterEstado">
                             <option value="">Todos</option>
                             <option value="borrador">Borrador</option>
@@ -56,8 +57,8 @@
                             <option value="anulado">Anulado</option>
                         </select>
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label text-muted">Concepto</label>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Concepto</label>
                         <select class="form-control form-control-buzz" id="filterConcepto">
                             <option value="">Todos</option>
                             <option value="compra">Compra</option>
@@ -68,17 +69,17 @@
                             <option value="otro">Otro</option>
                         </select>
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label text-muted">Desde</label>
+                    <div class="filter-group filter-date">
+                        <label class="text-muted">Desde</label>
                         <input type="date" class="form-control form-control-buzz" id="filterFechaDesde">
                     </div>
-                    <div class="col-md-2 mb-3">
-                        <label class="form-label text-muted">Hasta</label>
+                    <div class="filter-group filter-date">
+                        <label class="text-muted">Hasta</label>
                         <input type="date" class="form-control form-control-buzz" id="filterFechaHasta">
                     </div>
-                    <div class="col-md-1 mb-3 d-flex align-items-end">
-                        <button class="btn btn-outline-buzz w-100" onclick="limpiarFiltros()" title="Limpiar">
-                            <i class="fas fa-times"></i>
+                    <div class="filter-group filter-actions">
+                        <button class="btn btn-outline-buzz btn-filter-action" onclick="limpiarFiltros()" title="Limpiar">
+                            <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                         </button>
                     </div>
                 </div>

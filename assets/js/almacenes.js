@@ -21,9 +21,6 @@ const totalProductosEl = document.getElementById('totalProductos');
 const almacenPrincipalEl = document.getElementById('almacenPrincipal');
 
 // Modal elements - Almacén
-const almacenModalOverlay = document.getElementById('almacenModalOverlay');
-const almacenModal = document.getElementById('almacenModal');
-const almacenModalTitle = document.getElementById('almacenModalTitle');
 const almacenIdInput = document.getElementById('almacenId');
 const almacenCodigoInput = document.getElementById('almacenCodigo');
 const almacenNombreInput = document.getElementById('almacenNombre');
@@ -35,9 +32,6 @@ const almacenActivoCheck = document.getElementById('almacenActivo');
 const almacenNotasInput = document.getElementById('almacenNotas');
 
 // Modal elements - Ubicación
-const ubicacionModalOverlay = document.getElementById('ubicacionModalOverlay');
-const ubicacionModal = document.getElementById('ubicacionModal');
-const ubicacionModalTitle = document.getElementById('ubicacionModalTitle');
 const ubicacionIdInput = document.getElementById('ubicacionId');
 const ubicacionAlmacenIdInput = document.getElementById('ubicacionAlmacenId');
 const ubicacionCodigoInput = document.getElementById('ubicacionCodigo');
@@ -215,7 +209,7 @@ window.openAlmacenModal = function(almacenId = null) {
 
     if (almacenId) {
         // Edit mode
-        almacenModalTitle.textContent = 'Editar Almacén';
+        window.setTitle('almacenModal', 'Editar Almacén');
         const almacen = almacenes.find(a => a.id == almacenId);
         if (almacen) {
             almacenIdInput.value = almacen.id;
@@ -229,17 +223,14 @@ window.openAlmacenModal = function(almacenId = null) {
             almacenNotasInput.value = almacen.notas || '';
         }
     } else {
-        almacenModalTitle.textContent = 'Nuevo Almacén';
+        window.setTitle('almacenModal', 'Nuevo Almacén');
     }
 
-    almacenModalOverlay.classList.add('active');
-    almacenModal.classList.add('active');
-    almacenCodigoInput.focus();
+    window.openModal('almacenModal');
 };
 
 window.closeAlmacenModal = function() {
-    almacenModalOverlay.classList.remove('active');
-    almacenModal.classList.remove('active');
+    window.closeModal('almacenModal');
 };
 
 window.saveAlmacen = async function() {
@@ -354,7 +345,7 @@ window.openUbicacionModal = function(ubicacionId = null) {
     ubicacionActivoCheck.checked = true;
 
     if (ubicacionId) {
-        ubicacionModalTitle.textContent = 'Editar Ubicación';
+        window.setTitle('ubicacionModal', 'Editar Ubicación');
         const ubicacion = ubicaciones.find(u => u.id == ubicacionId);
         if (ubicacion) {
             ubicacionIdInput.value = ubicacion.id;
@@ -367,17 +358,14 @@ window.openUbicacionModal = function(ubicacionId = null) {
             ubicacionActivoCheck.checked = ubicacion.activo == 1;
         }
     } else {
-        ubicacionModalTitle.textContent = 'Nueva Ubicación';
+        window.setTitle('ubicacionModal', 'Nueva Ubicación');
     }
 
-    ubicacionModalOverlay.classList.add('active');
-    ubicacionModal.classList.add('active');
-    ubicacionCodigoInput.focus();
+    window.openModal('ubicacionModal');
 };
 
 window.closeUbicacionModal = function() {
-    ubicacionModalOverlay.classList.remove('active');
-    ubicacionModal.classList.remove('active');
+    window.closeModal('ubicacionModal');
 };
 
 window.saveUbicacion = async function() {
