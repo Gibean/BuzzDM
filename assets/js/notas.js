@@ -150,6 +150,35 @@ function createCardElement(note) {
                 </div>` : ''}
         </div>
 
+        <!-- Previsualización de contenido -->
+        <div class="kanban-card-preview-list">
+            ${(() => {
+                let previews = [];
+                // Preview de Checklist items
+                if (note.checklist && note.checklist.length > 0) {
+                    note.checklist.slice(0, 2).forEach(item => {
+                        previews.push(`
+                            <div class="preview-item ${item.completada == 1 ? 'done' : ''}">
+                                <i class="fas ${item.completada == 1 ? 'fa-check-circle text-success' : 'fa-circle-notch'}"></i>
+                                ${escapeHTML(item.tarea)}
+                            </div>
+                        `);
+                    });
+                }
+                // Preview de Productos
+                if (note.items && note.items.length > 0) {
+                    const productsList = note.items.slice(0, 2).map(p => p.producto_nombre).join(', ');
+                    previews.push(`
+                        <div class="preview-item">
+                            <i class="fas fa-box text-primary"></i>
+                            <span class="view-product-tag">${escapeHTML(productsList)}</span>
+                        </div>
+                    `);
+                }
+                return previews.join('');
+            })()}
+        </div>
+
         <div class="kanban-card-footer">
             <div class="d-flex align-items-center gap-2">
                 <small class="text-muted font-mono" style="font-size: 0.7rem;" title="Creado por">
@@ -309,8 +338,8 @@ async function openEditNoteModal(id) {
             aContainer.innerHTML = '';
             if (note.adjuntos) note.adjuntos.forEach(item => addAttachmentRow(item.nombre, item.url));
 
-            // Open in VIEW mode by default
-            setModalViewMode(true, note.id);
+            // Open in VIEW mode by default (passing the detailed note object)
+            setModalViewMode(true, note.id, note);
 
             openModal('noteModal', { static: true });
         }
@@ -323,7 +352,7 @@ async function openEditNoteModal(id) {
 /**
  * Toggle between view and edit mode
  */
-function setModalViewMode(viewMode, noteId = null) {
+function setModalViewMode(viewMode, noteId = null, noteData = null) {
     currentViewMode = viewMode;
     const modal = document.getElementById('noteModal');
     const form = document.getElementById('noteForm');
@@ -370,6 +399,15 @@ function setModalViewMode(viewMode, noteId = null) {
 
         modal.classList.add('view-mode');
 
+        // Toggle visibility of containers
+        form.querySelectorAll('.d-edit-only').forEach(el => el.classList.add('d-none'));
+        form.querySelectorAll('[id^="view-"]').forEach(el => el.classList.remove('d-none'));
+
+        // Render clean view data
+        const id = document.getElementById('noteId').value;
+        const note = noteData || allNotes.find(n => n.id == id);
+        if (note) renderNoteView(note);
+
     } else {
         // EDIT MODE
         document.getElementById('noteModalTitle').innerHTML = `<i class="fas fa-sticky-note"></i> EDITAR NOTA #${noteId || document.getElementById('noteId').value}`;
@@ -389,6 +427,10 @@ function setModalViewMode(viewMode, noteId = null) {
         if (editBtn) editBtn.style.display = 'none';
 
         modal.classList.remove('view-mode');
+
+        // Toggle visibility of containers
+        form.querySelectorAll('.d-edit-only').forEach(el => el.classList.remove('d-none'));
+        form.querySelectorAll('[id^="view-"]').forEach(el => el.classList.add('d-none'));
     }
 }
 
@@ -886,6 +928,9 @@ async function handleNoteSubmit(e) {
     titleEl.classList.remove('is-invalid');
     clientNameEl.classList.remove('is-invalid');
 
+    const dueDateInput = document.getElementById('noteDueDate').value;
+    const fecha_entrega = dueDateInput ? dueDateInput.replace('T', ' ') : null;
+
     const payload = {
         id: id,
         titulo: document.getElementById('noteTitle').value,
@@ -895,7 +940,7 @@ async function handleNoteSubmit(e) {
         email: document.getElementById('noteEmail').value,
         contenido: document.getElementById('noteContent').value,
         estado: document.getElementById('noteStatus').value,
-        fecha_entrega: document.getElementById('noteDueDate').value.replace('T', ' '),
+        fecha_entrega: fecha_entrega,
         etiquetas: JSON.stringify(activeLabels),
         miembros: JSON.stringify(activeMembers),
         items: [],
@@ -1074,3 +1119,117 @@ function formatDateShort(dateStr) {
     const date = new Date(dateStr);
     return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
 }
+
+/**
+ * Renderiza la vista de "solo lectura" de la nota
+ */
+function renderNoteView(note) {
+    // Title
+    document.getElementById('view-noteTitle').textContent = note.titulo;
+
+    // Content (Markdown)
+    const content = note.contenido || '_No hay descripción disponible._';
+    document.getElementById('view-noteContent').innerHTML = simpleMarkdown(content);
+
+    // Checklist
+    const checkContainer = document.getElementById('view-noteChecklist');
+    if (note.checklist && note.checklist.length > 0) {
+        checkContainer.innerHTML = `
+            <div class="view-list">
+                ${note.checklist.map(item => `
+                    <div class="view-item-pill">
+                        <i class="fas ${item.completada == 1 ? 'fa-check-circle view-check-done' : 'fa-circle view-check-pending'}"></i>
+                        <span class="${item.completada == 1 ? 'text-muted text-decoration-line-through' : ''}">${escapeHTML(item.tarea)}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        checkContainer.innerHTML = '<div class="text-muted small py-2">No hay tareas pendientes.</div>';
+    }
+
+    // Products
+    const prodContainer = document.getElementById('view-noteProducts');
+    if (note.items && note.items.length > 0) {
+        prodContainer.innerHTML = `
+            <div class="view-list">
+                ${note.items.map(p => `
+                    <div class="view-item-pill">
+                        <i class="fas fa-box text-primary"></i>
+                        <div class="d-flex flex-grow-1 justify-content-between align-items-center">
+                            <span>${escapeHTML(p.producto_nombre)}</span>
+                            <span class="view-product-tag">${p.cantidad} unidades</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        prodContainer.innerHTML = '<div class="text-muted small py-2">No hay productos vinculados.</div>';
+    }
+
+    // Attachments
+    const attContainer = document.getElementById('view-noteAttachments');
+    if (note.adjuntos && note.adjuntos.length > 0) {
+        attContainer.innerHTML = `
+            <div class="view-list">
+                ${note.adjuntos.map(a => `
+                    <div class="view-item-pill">
+                        <i class="fas fa-link text-info"></i>
+                        <div class="d-flex flex-grow-1 justify-content-between align-items-center">
+                            <span>${escapeHTML(a.nombre || 'Enlace')}</span>
+                            <a href="${a.url}" target="_blank" class="view-link-btn">Abrir enlace <i class="fas fa-external-link-alt ms-1"></i></a>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    } else {
+        attContainer.innerHTML = '<div class="text-muted small py-2">No hay enlaces adjuntos.</div>';
+    }
+
+    // Client Info
+    document.getElementById('view-clientInfo').innerHTML = `
+        <div class="view-info-grid">
+            <div class="view-info-item">
+                <span class="view-info-label">Nombre del Cliente</span>
+                <span class="view-info-value">${escapeHTML(note.cliente_nombre || 'No especificado')}</span>
+            </div>
+            ${note.telefono ? `
+                <div class="view-info-item">
+                    <span class="view-info-label">Teléfono</span>
+                    <span class="view-info-value">${escapeHTML(note.telefono)}</span>
+                </div>` : ''}
+            ${note.email ? `
+                <div class="view-info-item">
+                    <span class="view-info-label">Email</span>
+                    <span class="view-info-value">${escapeHTML(note.email)}</span>
+                </div>` : ''}
+        </div>
+    `;
+
+    // Logistics
+    document.getElementById('view-dueDate').innerHTML = note.fecha_entrega ? `
+        <div class="view-info-item">
+            <span class="view-info-label">Fecha Límite</span>
+            <span class="view-info-value text-primary"><i class="far fa-clock me-1"></i> ${new Date(note.fecha_entrega).toLocaleString()}</span>
+        </div>
+    ` : '<div class="text-muted small py-2">Sin fecha de entrega.</div>';
+}
+
+/**
+ * Procesador de Markdown ultra simple
+ */
+function simpleMarkdown(text) {
+    if (!text) return '';
+    return text
+        .replace(/[&<>"']/g, m => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[m])) // Escape
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>') // Headers
+        .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>') // Bold
+        .replace(/_(.*)_/gim, '<em>$1</em>') // Italic
+        .replace(/^\- (.*$)/gim, '<li>$1</li>') // Unordered list
+        .replace(/(<li>.*<\/li>)/gim, '<ul>$1</ul>') // Wrap lists
+        .replace(/<\/ul><ul>/gim, '') // Fix double wraps
+        .replace(/\n$/gim, '<br />'); // Newlines
+}
+
