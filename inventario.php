@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -32,15 +33,15 @@
             </div>
         </nav>
 
-       <!--  Filters -->
+       <!-- Filters -->
         <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label text-muted">Buscar producto</label>
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar producto</label>
                     <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="SKU, nombre o descripción...">
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Estado</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Estado</label>
                     <select class="form-control form-control-buzz" id="statusFilter">
                         <option value="">Todos los estados</option>
                         <option value="activo">Activo</option>
@@ -48,8 +49,8 @@
                         <option value="agotado">Agotado</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Ordenar por</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Ordenar por</label>
                     <select class="form-control form-control-buzz" id="sortBy">
                         <option value="name">Nombre</option>
                         <option value="sku">SKU</option>
@@ -57,19 +58,15 @@
                         <option value="price">Precio</option>
                     </select>
                 </div>
-                <div class="col-md-2 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <div class="form-check mt-2">
-                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                        <label class="form-check-label text-muted" for="showDeletedFilter">
-                            Ver eliminados
-                        </label>
-                    </div>
+                <div class="filter-group filter-checkbox">
+                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                    <label class="form-check-label text-muted" for="showDeletedFilter">
+                        Ver eliminados
+                    </label>
                 </div>
-                <div class="col-md-1 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearProductFilters()">
-                        <i class="fas fa-times"></i> Limpiar
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearProductFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>

@@ -92,18 +92,21 @@
     <?php require_once 'php/sidebar.php'; ?>
 
     <main class="main-content">
-        <!-- Header -->
-        <div class="content-header">
-            <div class="header-left">
-                <h1 class="page-title"><i class="fas fa-truck"></i> Proveedores</h1>
-                <p class="page-subtitle">Gestiona los proveedores del sistema</p>
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="d-flex align-items-center">
+                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="font-primary mb-0">GESTIÓN DE PROVEEDORES</h1>
+                <span class="text-muted ms-2 font-mono">/ PROVEEDORES</span>
             </div>
-            <div class="header-actions">
+            <div class="d-flex align-items-center">
                 <button class="btn btn-buzz" onclick="abrirModalProveedor()">
                     <i class="fas fa-plus"></i> Nuevo Proveedor
                 </button>
             </div>
-        </div>
+        </nav>
 
         <!-- Lista de proveedores -->
         <div id="proveedoresContainer">

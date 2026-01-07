@@ -42,6 +42,7 @@ try {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/dashboard-effects.css">
+    <link rel="stylesheet" href="assets/css/ui-enhancements.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 </head>
@@ -108,9 +109,14 @@ try {
                 </div>
             </div>
 
+
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card chart-container">
-                    <h5 class="font-primary text-primary mb-3 section-header">VENTAS POR ESTADO DE PAGO</h5>
+                <div class="buzz-card chart-container payment-chart-card">
+                    <div class="chart-card-header">
+                        <h5 class="font-primary text-primary mb-3 section-header">
+                            <i class="fas fa-wallet me-2"></i>VENTAS POR ESTADO DE PAGO
+                        </h5>
+                    </div>
                     <div style="position: relative; height: 320px;">
                         <canvas id="paymentStatusChart"></canvas>
                     </div>
@@ -121,36 +127,70 @@ try {
             </div>
 
         <div class="row">
-
-            <div class="col-lg-4 mb-4 dashboard-item"> <!-- Top Products -->
-                <div class="buzz-card tech-effect">
-                    <h5 class="font-primary text-primary mb-3 section-header">TOP 5 PRODUCTOS MÁS VENDIDOS</h5>
-                    <div id="topProducts">
-                        <ul class="list-unstyled">
-                            <?php if (!empty($top5Products)): ?>
-                                <?php foreach ($top5Products as $productName): ?>
-                                    <li class="font-mono text-primary mb-2"><?php echo htmlspecialchars($productName); ?></li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li class="text-muted">No hay datos disponibles.</li>
-                            <?php endif; ?>
-                        </ul>
+            <!-- Top Products -->
+            <div class="col-lg-4 mb-4 dashboard-item">
+                <div class="buzz-card tech-effect h-100">
+                    <div class="card-glow"></div>
+                    <h5 class="font-primary text-primary mb-3 section-header">
+                        <i class="fas fa-trophy me-2"></i>TOP 5 PRODUCTOS
+                    </h5>
+                    <div class="premium-list" id="topProducts">
+                        <?php if (!empty($top5Products)): ?>
+                            <?php foreach ($top5Products as $index => $productName): ?>
+                                <div class="premium-list-item">
+                                    <div class="item-rank"><?php echo $index + 1; ?></div>
+                                    <div class="item-info">
+                                        <span class="item-name font-secondary"><?php echo htmlspecialchars($productName); ?></span>
+                                    </div>
+                                    <div class="item-trend"><i class="fas fa-chevron-up text-success"></i></div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="text-muted p-3">No hay datos disponibles.</div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4 mb-4 dashboard-item"> <!-- Low Stock -->
-                <div class="buzz-card tech-effect">
-                    <h5 class="font-primary text-primary mb-3 section-header">PRODUCTOS CON STOCK BAJO</h5>
-                    <div id="lowStockProducts">
-                        <ul class="list-unstyled">
-                            <?php if (!empty($lowStockProducts)): ?>
-                                <?php foreach ($lowStockProducts as $product): ?>
-                                    <li class="font-mono text-warning mb-2"><?php echo htmlspecialchars($product['sku'] . ' - ' . $product['nombre'] . ' (' . $product['stock'] . ' unidades)'); ?></li>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <li class="text-muted">No hay productos con stock bajo.</li>
-                            <?php endif; ?>
-                        </ul>
+
+            <!-- Low Stock -->
+            <div class="col-lg-4 mb-4 dashboard-item">
+                <div class="buzz-card tech-effect h-100">
+                    <div class="card-glow"></div>
+                    <h5 class="font-primary text-warning mb-3 section-header border-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>STOCK CRÍTICO
+                    </h5>
+                    <div class="premium-list" id="lowStockProducts">
+                        <?php if (!empty($lowStockProducts)): ?>
+                            <?php foreach ($lowStockProducts as $product): ?>
+                                <div class="premium-list-item warning">
+                                    <div class="item-icon"><i class="fas fa-box"></i></div>
+                                    <div class="item-info">
+                                        <span class="item-sku font-mono"><?php echo htmlspecialchars($product['sku']); ?></span>
+                                        <span class="item-name font-secondary d-block"><?php echo htmlspecialchars($product['nombre']); ?></span>
+                                    </div>
+                                    <div class="item-value font-mono danger"><?php echo htmlspecialchars($product['stock']); ?></div>
+                                </div>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <div class="text-muted p-3">Todo el stock está normal.</div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Currency Monitor (Placeholder) -->
+            <div class="col-lg-4 mb-4 dashboard-item">
+                <div class="buzz-card tech-effect currency-monitor h-100">
+                    <div class="card-glow"></div>
+                    <h5 class="font-primary text-info mb-3 section-header border-info">
+                        <i class="fas fa-chart-line me-2"></i>MONITOR DE DIVISAS
+                    </h5>
+                    <div class="currency-content empty-state">
+                        <div class="empty-icon"><i class="fas fa-dollar-sign"></i></div>
+                        <p class="font-mono text-muted mb-0">Esperando conexión con API...</p>
+                        <div class="loading-bar">
+                            <div class="loading-progress"></div>
+                        </div>
                     </div>
                 </div>
             </div>

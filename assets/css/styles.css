@@ -1,5 +1,5 @@
 /* Importar fuentes */
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap");
 
 /* Variables CSS */
 :root {
@@ -7,6 +7,8 @@
   --buzz-card-bg: #1a1f28;
   --buzz-border-color: #343a40;
   --buzz-primary-color: #ffa000;
+  --buzz-primary-glow: rgba(255, 160, 0, 0.4);
+  --buzz-primary-soft: rgba(255, 160, 0, 0.1);
   --buzz-text-color: #dfe5eb;
   --buzz-text-muted: #a9b1bb;
   --buzz-success: #28a745;
@@ -14,6 +16,7 @@
   --buzz-danger: #dc3545;
   --font-primary: "Orbitron", sans-serif;
   --font-monospace: "Roboto Mono", monospace;
+  --font-secondary: "Inter", sans-serif;
 }
 
 /* ============================================
@@ -61,11 +64,13 @@
 }
 
 body {
-  font-family: var(--font-monospace);
+  font-family: var(--font-secondary);
   background-color: var(--buzz-dark-bg);
   color: var(--buzz-text-color) !important;
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Utilidades */
@@ -180,6 +185,7 @@ body {
   padding: 2rem;
   padding-bottom: 4rem; /* Space for footer */
   position: relative;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 160, 0, 0.03) 0%, transparent 70%);
 }
 
 /* ============================================
@@ -1172,18 +1178,38 @@ input:-webkit-autofill:active {
     margin-right: 0.6rem;
   }
 
-  /* Tables - compact cells */
+  /* Tables - responsive wrapper with horizontal scroll */
+  .table-responsive-buzz {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    -ms-overflow-style: -ms-autohiding-scrollbar;
+  }
+
+  .table-buzz {
+    min-width: 600px;
+  }
+
   .table-buzz th,
   .table-buzz td {
     padding: 0.6rem 0.75rem;
+    white-space: nowrap;
   }
 
   .table-buzz th {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
+    letter-spacing: 1px;
   }
 
   .table-buzz td {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
+  }
+
+  /* Allow text wrap for specific columns on mobile */
+  .table-buzz td.wrap-mobile {
+    white-space: normal;
+    min-width: 120px;
   }
 
   /* Form controls - smaller padding */
@@ -1266,11 +1292,12 @@ input:-webkit-autofill:active {
 
 /* Enhanced Sidebar Container */
 .sidebar-enhanced {
-  background: linear-gradient(135deg, #1a1f28 0%, #12161d 100%);
-  border-right: 2px solid rgba(255, 160, 0, 0.15);
-  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+  border-right: 1px solid rgba(255, 160, 0, 0.1);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
+  backdrop-filter: blur(10px);
 }
 
 /* Enhanced Sidebar Header */
@@ -1293,8 +1320,8 @@ input:-webkit-autofill:active {
 }
 
 @keyframes pulse-border {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.6; }
 }
 
 .logo-container {
@@ -1348,19 +1375,19 @@ input:-webkit-autofill:active {
 .nav-link-enhanced {
   display: flex;
   align-items: center;
-  padding: 0.95rem 1.25rem;
-  color: var(--buzz-text-color) !important;
+  padding: 0.85rem 1.25rem;
+  color: var(--buzz-text-muted) !important;
   text-decoration: none;
   border-radius: 8px;
-  font-family: var(--font-monospace);
-  font-size: 0.95rem;
+  font-family: var(--font-secondary);
+  font-size: 0.9rem;
   font-weight: 500;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   background: transparent;
   border: 1px solid transparent;
   position: relative;
   overflow: hidden;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Hexagon pattern background effect */
@@ -1387,24 +1414,23 @@ input:-webkit-autofill:active {
 }
 
 .nav-link-enhanced.active {
-  background: linear-gradient(135deg, rgba(255, 160, 0, 0.25) 0%, rgba(255, 160, 0, 0.15) 100%);
-  border-color: var(--buzz-primary-color);
+  background: linear-gradient(90deg, rgba(255, 160, 0, 0.15) 0%, transparent 100%);
+  border-color: rgba(255, 160, 0, 0.2);
   color: var(--buzz-primary-color) !important;
-  box-shadow: 0 0 20px rgba(255, 160, 0, 0.2),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  transform: translateX(5px);
+  transform: translateX(4px);
 }
 
 .nav-link-enhanced.active::after {
   content: '';
-  position: absolute;  left: 0;
+  position: absolute;
+  left: 0;
   top: 50%;
   transform: translateY(-50%);
-  width: 4px;
-  height: 60%;
+  width: 3px;
+  height: 50%;
   background: var(--buzz-primary-color);
-  border-radius: 0 2px 2px 0;
-  box-shadow: 0 0 10px var(--buzz-primary-color);
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 12px var(--buzz-primary-color);
 }
 
 .nav-icon-enhanced {
@@ -1417,7 +1443,9 @@ input:-webkit-autofill:active {
 
 .nav-link-enhanced:hover .nav-icon-enhanced,
 .nav-link-enhanced.active .nav-icon-enhanced {
-  transform: scale(1.15);
+  transform: scale(1.1) translateY(-1px);
+  color: var(--buzz-primary-color);
+  filter: drop-shadow(0 0 5px var(--buzz-primary-glow));
 }
 
 .nav-text-enhanced {
@@ -1450,26 +1478,44 @@ input:-webkit-autofill:active {
 .nav-dropdown-menu {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0.25rem 0 0.5rem 1.75rem;
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.3s ease;
-  background: rgba(0, 0, 0, 0.2);
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+  background: rgba(0, 0, 0, 0.15);
+  border-left: 1px solid rgba(255, 160, 0, 0.15);
+  position: relative;
 }
 
 .nav-dropdown.open .nav-dropdown-menu {
-  max-height: 200px;
+  max-height: 250px;
 }
 
 .nav-dropdown-item {
   display: flex;
   align-items: center;
-  padding: 0.6rem 1rem 0.6rem 2.5rem;
+  padding: 0.6rem 1rem 0.6rem 1.25rem;
   color: var(--buzz-text-muted);
   text-decoration: none;
+  font-family: var(--font-secondary);
   font-size: 0.85rem;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Timeline dot for each item */
+.nav-dropdown-item::before {
+  content: '';
+  position: absolute;
+  left: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 160, 0, 0.2);
+  border: 1px solid rgba(255, 160, 0, 0.3);
   transition: all 0.3s ease;
-  border-left: 2px solid transparent;
 }
 
 .nav-dropdown-item i {
@@ -1481,14 +1527,22 @@ input:-webkit-autofill:active {
 .nav-dropdown-item:hover {
   color: var(--buzz-primary-color);
   background: rgba(255, 160, 0, 0.1);
-  border-left-color: var(--buzz-primary-color);
+}
+
+.nav-dropdown-item:hover::before {
+  border-color: var(--buzz-primary-color);
 }
 
 .nav-dropdown-item.active {
   color: var(--buzz-primary-color);
   background: rgba(255, 160, 0, 0.15);
-  border-left-color: var(--buzz-primary-color);
   font-weight: 500;
+}
+
+.nav-dropdown-item.active::before {
+  background: var(--buzz-primary-color);
+  border-color: var(--buzz-primary-color);
+  box-shadow: 0 0 8px rgba(255, 160, 0, 0.5);
 }
 
 
@@ -1746,3 +1800,61 @@ input:-webkit-autofill:active {
   }
 }
 
+/* ============================================
+   WEBKIT DROPDOWN AND TABLE FIXES
+   Prevent browser styles from overriding dropdown tables
+   ============================================ */
+
+/* Reset webkit appearance for dropdown elements */
+.product-search-results,
+.list-group,
+.autocomplete-results,
+#createOrderClientSearchResults,
+#createOrderProductsContainer .product-search-results {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--buzz-card-bg) !important;
+}
+
+.list-group-item,
+.autocomplete-item {
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: var(--buzz-card-bg) !important;
+    color: var(--buzz-text-color) !important;
+}
+
+.list-group-item:hover,
+.list-group-item:focus,
+.list-group-item-action:hover,
+.list-group-item-action:focus {
+    background-color: rgba(255, 160, 0, 0.1) !important;
+    color: var(--buzz-text-color) !important;
+}
+
+/* Ensure tables in dropdowns maintain buzz theme */
+.table-responsive,
+.table-buzz {
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Override Bootstrap table background in dark theme */
+.table-sm,
+.table-bordered {
+    --bs-table-bg: var(--buzz-card-bg);
+    --bs-table-border-color: var(--buzz-border-color);
+}
+
+.table-sm thead th,
+.table-bordered thead th {
+    background-color: var(--buzz-dark-bg) !important;
+    color: var(--buzz-primary-color) !important;
+    border-color: var(--buzz-border-color) !important;
+}
+
+.table-sm tbody td,
+.table-bordered tbody td {
+    background-color: var(--buzz-card-bg) !important;
+    color: var(--buzz-text-color) !important;
+    border-color: var(--buzz-border-color) !important;
+}
