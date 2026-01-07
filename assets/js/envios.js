@@ -75,38 +75,47 @@ function renderShipments() {
   container.innerHTML = filteredShipments
     .map(
       (shipment) => `
-        <div class="buzz-card mb-3">
-            <div class="row align-items-center">
-                <div class="col-md-2">
-                    <div class="font-mono text-primary">#${shipment.id}</div>
-                    <small class="text-muted">${formatDate(
-                      shipment.date
-                    )}</small>
+        <div class="buzz-card mb-3 shipment-card-enhanced">
+            <div class="shipment-grid">
+                <!-- Column 1: Order Recap -->
+                <div class="shipment-col shipment-col-id">
+                    <span class="text-muted small">ORDEN</span>
+                    <div class="shipment-id">#${shipment.id}</div>
+                    <div class="shipment-date">${formatDate(shipment.date)}</div>
                 </div>
-                <div class="col-md-3">
-                    <div class="font-mono">${shipment.customer}</div>
-                    <small class="text-muted">${formatCurrency(
-                      shipment.amount
-                    )}</small>
+
+                <!-- Column 2: Customer Recap -->
+                <div class="shipment-col shipment-col-customer">
+                    <span class="text-muted small">CLIENTE</span>
+                    <div class="shipment-customer-name">${shipment.customer}</div>
+                    <div class="shipment-amount">${formatCurrency(shipment.amount)}</div>
                 </div>
-                <div class="col-md-2">
+
+                <!-- Column 3: Status -->
+                <div class="shipment-col shipment-col-status">
+                    <span class="text-muted small mb-1">ESTADO</span>
                     ${getStatusBadge(shipment.status)}
                 </div>
-                <div class="col-md-3">
-                    <div class="text-muted" style="font-size: 0.9rem;">
-                        ${
-                          shipment.address.length > 40
-                            ? shipment.address.substring(0, 40) + "..."
-                            : shipment.address
-                        }
+
+                <!-- Column 4: Delivery Details -->
+                <div class="shipment-col shipment-col-address">
+                    <span class="text-muted small">DESTINO</span>
+                    <div class="shipment-address-text" title="${shipment.address}">
+                        ${shipment.address}
                     </div>
                     ${
                       shipment.trackingNumber
-                        ? `<div class="tracking-badge mt-1"><i class="fas fa-barcode"></i> ${shipment.trackingNumber}</div>`
+                        ? `<div class="tracking-badge mt-2">
+                            <i class="fas fa-barcode"></i>
+                            <span>${shipment.trackingNumber}</span>
+                           </div>`
                         : ""
                     }
                 </div>
-                <div class="col-md-2 text-end">
+
+                <!-- Column 5: Actions -->
+                <div class="shipment-col shipment-col-actions text-end">
+                    <span class="text-muted small mb-2 d-none d-xl-block">ACCIONES</span>
                     ${getStatusActions(shipment)}
                 </div>
             </div>
@@ -114,22 +123,23 @@ function renderShipments() {
             ${
               shipment.status !== "recibido"
                 ? `
-                <div class="row mt-3 pt-3 border-top border-secondary">
-                    <div class="col-md-6">
-                        <small class="text-muted"><i class="fas fa-calendar-alt"></i> Entrega estimada: ${
+                <div class="shipment-progress-row">
+                    <div class="shipment-meta-info">
+                        <i class="fas fa-calendar-alt text-muted"></i>
+                        <span>Entrega estimada: <strong>${
                           shipment.estimatedDelivery
                             ? formatDate(shipment.estimatedDelivery)
                             : "N/A"
-                        }</small>
+                        }</strong></span>
                     </div>
-                    <div class="col-md-6">
+                    <div class="shipment-progress-container">
                         <div class="progress-buzz">
                             <div class="progress-buzz-bar" style="width: ${getProgressWidth(
                               shipment.status
                             )}%"></div>
                         </div>
-                        <div class="progress-text">
-                            <i class="fas fa-truck"></i>
+                        <div class="progress-text-enhanced">
+                            <i class="fas fa-truck-loading"></i>
                             <span>${getProgressText(shipment.status)}</span>
                         </div>
                     </div>
@@ -303,7 +313,7 @@ function formatDate(date) {
 }
 
 function formatCurrency(amount) {
-  return amount.toLocaleString("es-ES", { style: "currency", currency: "EUR" })
+  return 'Pref. ' + amount.toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
 // Removed - using showToast from common.js

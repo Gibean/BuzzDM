@@ -81,7 +81,7 @@ function formatDateTime(dateString) {
  * @returns {string} The formatted currency string.
  */
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('es-VE', { style: 'currency', currency: 'VES' }).format(amount);
+    return 'Pref. ' + new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
 }
 
 // --- Notification and Modal System ---

@@ -9,14 +9,17 @@
     align-items: center;
     gap: 1rem;
     padding: 1.25rem;
-    background: linear-gradient(135deg, rgba(20, 20, 35, 0.9), rgba(30, 30, 50, 0.8));
-    border: 1px solid rgba(0, 255, 136, 0.1);
+    background: var(--buzz-card-bg);
+    border: 1px solid rgba(255, 160, 0, 0.1);
     transition: all 0.3s ease;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
 }
 
 .stat-card:hover {
-    border-color: rgba(0, 255, 136, 0.3);
+    border-color: rgba(255, 160, 0, 0.3);
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 160, 0, 0.1);
 }
 
 .stat-icon {
@@ -25,10 +28,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 200, 100, 0.1));
+    background: linear-gradient(135deg, rgba(255, 160, 0, 0.15), rgba(255, 160, 0, 0.05));
     border-radius: 12px;
     font-size: 1.5rem;
-    color: var(--accent-green, #00ff88);
+    color: var(--buzz-primary-color);
+    box-shadow: 0 0 10px rgba(255, 160, 0, 0.1);
 }
 
 .stat-info {
@@ -39,13 +43,13 @@
 .stat-value {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--buzz-primary-color);
+    font-family: var(--font-monospace);
 }
 
 .stat-label {
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--buzz-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -58,8 +62,8 @@
 }
 
 .almacen-card {
-    background: linear-gradient(145deg, rgba(25, 25, 45, 0.95), rgba(15, 15, 30, 0.9));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: linear-gradient(135deg, #1a1f28 10%, #12161d 90%);
+    border: 1px solid rgba(255, 160, 0, 0.1);
     border-radius: 12px;
     padding: 1.25rem;
     cursor: pointer;
@@ -75,15 +79,15 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, var(--accent-green, #00ff88), transparent);
+    background: linear-gradient(90deg, var(--buzz-primary-color), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .almacen-card:hover {
-    border-color: rgba(0, 255, 136, 0.3);
+    border-color: rgba(255, 160, 0, 0.3);
     transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .almacen-card:hover::before {
@@ -91,8 +95,8 @@
 }
 
 .almacen-card.selected {
-    border-color: var(--accent-green, #00ff88);
-    background: linear-gradient(145deg, rgba(0, 255, 136, 0.08), rgba(15, 15, 30, 0.95));
+    border-color: var(--buzz-primary-color);
+    background: linear-gradient(135deg, rgba(255, 160, 0, 0.05) 0%, #1a1f28 100%);
 }
 
 .almacen-card.selected::before {
@@ -122,10 +126,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 200, 100, 0.05));
+    background: linear-gradient(135deg, rgba(255, 160, 0, 0.1), rgba(255, 160, 0, 0.02));
     border-radius: 10px;
     font-size: 1.25rem;
-    color: var(--accent-green, #00ff88);
+    color: var(--buzz-primary-color);
 }
 
 .almacen-badges {
@@ -158,9 +162,9 @@
 }
 
 .almacen-codigo {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-monospace);
     font-size: 0.8rem;
-    color: var(--accent-green, #00ff88);
+    color: var(--buzz-primary-color);
     margin-bottom: 0.25rem;
 }
 
@@ -173,7 +177,7 @@
 
 .almacen-direccion {
     font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--buzz-text-muted);
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -199,13 +203,13 @@
 .almacen-stat-value {
     font-size: 1.25rem;
     font-weight: 700;
-    color: #fff;
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--buzz-text-color);
+    font-family: var(--font-monospace);
 }
 
 .almacen-stat-label {
     font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--buzz-text-muted);
     text-transform: uppercase;
 }
 
@@ -258,8 +262,8 @@
 }
 
 .ubicacion-codigo {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--accent-green, #00ff88);
+    font-family: var(--font-monospace);
+    color: var(--buzz-primary-color);
     font-weight: 500;
 }
 
@@ -269,11 +273,12 @@
 }
 
 .ubicacion-full span {
-    background: rgba(100, 100, 120, 0.2);
+    background: rgba(255, 160, 0, 0.1);
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     font-size: 0.8rem;
-    font-family: 'JetBrains Mono', monospace;
+    font-family: var(--font-monospace);
+    color: var(--buzz-primary-color);
 }
 
 /* Empty State */
