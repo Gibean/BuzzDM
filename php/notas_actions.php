@@ -23,20 +23,6 @@ $pdo = getDbConnection();
 try {
     switch ($method) {
         case 'GET':
-            // 1. Obtener todas las notas agrupadas por estado (Kanban) con contadores de Trello
-            $stmt = $pdo->prepare("
-                SELECT n.*, u.nombre as usuario_nombre,
-                       (SELECT COUNT(*) FROM notas_checklists WHERE nota_id = n.id) as total_check,
-                       (SELECT COUNT(*) FROM notas_checklists WHERE nota_id = n.id AND completada = 1) as total_completadas,
-                       (SELECT COUNT(*) FROM notas_adjuntos WHERE nota_id = n.id) as total_adjuntos,
-                       (SELECT COUNT(*) FROM notas_items_inventario WHERE nota_id = n.id) as total_productos
-                FROM notas_kanban n
-                JOIN usuarios u ON n.usuario_id = u.id
-                ORDER BY n.estado, n.orden ASC, n.creado_at DESC
-            ");
-            $stmt->execute();
-            $notas = $stmt->fetchAll();
-
             if (isset($_GET['id'])) {
                 $notaId = (int)$_GET['id'];
                 $stmt = $pdo->prepare("SELECT * FROM notas_kanban WHERE id = ?");
@@ -69,6 +55,54 @@ try {
                 json_response(false, null, "Nota no encontrada");
             }
 
+            // 1. Obtener todas las notas agrupadas por estado (Kanban) con contadores de Trello
+            $stmt = $pdo->prepare("
+                SELECT n.*, u.nombre as usuario_nombre,
+                       (SELECT COUNT(*) FROM notas_checklists WHERE nota_id = n.id) as total_check,
+                       (SELECT COUNT(*) FROM notas_checklists WHERE nota_id = n.id AND completada = 1) as total_completadas,
+                       (SELECT COUNT(*) FROM notas_adjuntos WHERE nota_id = n.id) as total_adjuntos,
+                       (SELECT COUNT(*) FROM notas_items_inventario WHERE nota_id = n.id) as total_productos
+                FROM notas_kanban n
+                JOIN usuarios u ON n.usuario_id = u.id
+                ORDER BY n.estado, n.orden ASC, n.creado_at DESC
+            ");
+            $stmt->execute();
+            $notas = $stmt->fetchAll();
+
+            // 2. Fetch all details for these notes to provide data for previews and view mode
+            if (!empty($notas)) {
+                $noteIds = array_map(function($n) { return $n['id']; }, $notas);
+                $placeholders = implode(',', array_fill(0, count($noteIds), '?'));
+
+                // Fetch all checklist items
+                $stmtCheck = $pdo->prepare("SELECT * FROM notas_checklists WHERE nota_id IN ($placeholders) ORDER BY nota_id, orden ASC");
+                $stmtCheck->execute($noteIds);
+                $allChecklists = $stmtCheck->fetchAll(PDO::FETCH_GROUP);
+
+                // Fetch all linked products
+                $stmtItems = $pdo->prepare("
+                    SELECT i.*, p.nombre as producto_nombre, p.sku
+                    FROM notas_items_inventario i
+                    JOIN productos p ON i.producto_id = p.id
+                    WHERE i.nota_id IN ($placeholders)
+                ");
+                $stmtItems->execute($noteIds);
+                $allItems = $stmtItems->fetchAll(PDO::FETCH_GROUP);
+
+                // Fetch all attachments
+                $stmtAdj = $pdo->prepare("SELECT * FROM notas_adjuntos WHERE nota_id IN ($placeholders) ORDER BY nota_id, creado_at DESC");
+                $stmtAdj->execute($noteIds);
+                $allAdjuntos = $stmtAdj->fetchAll(PDO::FETCH_GROUP);
+
+                // Map details back to notes
+                foreach ($notas as &$nota) {
+                    $id = $nota['id'];
+                    $nota['checklist'] = $allChecklists[$id] ?? [];
+                    $nota['items'] = $allItems[$id] ?? [];
+                    $nota['adjuntos'] = $allAdjuntos[$id] ?? [];
+                }
+            }
+
             json_response(true, $notas);
             break;
 
@@ -86,6 +120,8 @@ try {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
 
+            $fecha_entrega = !empty($input['fecha_entrega']) ? $input['fecha_entrega'] : null;
+
             $stmt->execute([
                 $input['titulo'],
                 $input['cliente_nombre'] ?? null,
@@ -95,7 +131,7 @@ try {
                 $input['estado'] ?? 'pendiente',
                 $input['prioridad'] ?? 'media',
                 $_SESSION['usuario_id'],
-                $input['fecha_entrega'] ?? null,
+                $fecha_entrega,
                 $input['etiquetas'] ?? null
             ]);
 
@@ -149,6 +185,8 @@ try {
                 SET titulo = ?, cliente_nombre = ?, telefono = ?, email = ?, contenido = ?, estado = ?, prioridad = ?, fecha_entrega = ?, etiquetas = ?
                 WHERE id = ?
             ");
+            $fecha_entrega = !empty($input['fecha_entrega']) ? $input['fecha_entrega'] : null;
+
             $stmt->execute([
                 $input['titulo'],
                 $input['cliente_nombre'] ?? null,
@@ -157,7 +195,7 @@ try {
                 $input['contenido'] ?? '',
                 $input['estado'] ?? 'pendiente',
                 $input['prioridad'] ?? 'media',
-                $input['fecha_entrega'] ?? null,
+                $fecha_entrega,
                 $input['etiquetas'] ?? null,
                 $notaId
             ]);

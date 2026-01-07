@@ -111,8 +111,11 @@
 
                     <!-- Title Section -->
                     <div class="px-4 pt-4 pb-2 border-bottom border-secondary" style="background: rgba(0,0,0,0.2);">
-                        <label class="form-label text-muted small mb-1 text-uppercase tracking-wider">Título de la tarjeta / Cliente Principal *</label>
-                        <input type="text" class="form-control form-control-buzz form-control-lg border-0 bg-transparent p-0 fs-5 fw-bold mb-2 shadow-none" id="noteTitle" required placeholder="Ej: Consulta de Juan Pérez">
+                        <div id="view-noteTitle" class="fs-4 fw-bold mb-2 text-white d-none"></div>
+                        <div class="d-edit-only">
+                            <label class="form-label text-muted small mb-1 text-uppercase tracking-wider">Título de la tarjeta / Cliente Principal *</label>
+                            <input type="text" class="form-control form-control-buzz form-control-lg border-0 bg-transparent p-0 fs-5 fw-bold mb-2 shadow-none" id="noteTitle" required placeholder="Ej: Consulta de Juan Pérez">
+                        </div>
                         <div class="d-flex flex-wrap gap-2 mb-2">
                             <div id="activeLabels" class="d-flex gap-2"></div>
                             <div id="activeMembers" class="d-flex gap-2"></div>
@@ -148,7 +151,7 @@
                                         <h6 class="mb-0 font-primary text-uppercase small">Descripción</h6>
                                     </div>
                                     <!-- Markdown Toolbar -->
-                                    <div class="markdown-toolbar">
+                                    <div class="markdown-toolbar d-edit-only">
                                         <button type="button" class="btn" onclick="insertMarkdown('**', '**')" title="Negrita"><i class="fas fa-bold"></i></button>
                                         <button type="button" class="btn" onclick="insertMarkdown('_', '_')" title="Cursiva"><i class="fas fa-italic"></i></button>
                                         <button type="button" class="btn" onclick="insertMarkdown('### ', '')" title="Título"><i class="fas fa-heading"></i></button>
@@ -156,7 +159,8 @@
                                         <button type="button" class="btn" onclick="addAttachmentRow()" title="Enlace"><i class="fas fa-link"></i></button>
                                     </div>
                                 </div>
-                                <textarea class="form-control note-textarea" id="noteContent" placeholder="Escribe aquí los detalles del requerimiento..."></textarea>
+                                <div id="view-noteContent" class="view-markdown-content d-none"></div>
+                                <textarea class="form-control note-textarea d-edit-only" id="noteContent" placeholder="Escribe aquí los detalles del requerimiento..."></textarea>
                             </div>
 
                             <!-- Checklist Section -->
@@ -166,18 +170,21 @@
                                         <i class="fas fa-check-square me-2 text-muted"></i>
                                         <h6 class="mb-0 font-primary text-uppercase small">Tareas a Realizar</h6>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3" onclick="addChecklistItem()">
+                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3 d-edit-only" onclick="addChecklistItem()">
                                         <i class="fas fa-plus me-1"></i> Añadir Item
                                     </button>
                                 </div>
-                                <div class="mb-3 d-flex align-items-center gap-3">
-                                    <small id="checklist-percent" class="text-muted font-mono" style="min-width: 40px;">0%</small>
-                                    <div class="checklist-progress-container m-0 flex-grow-1" style="height: 6px;">
-                                        <div class="checklist-progress-bar" id="checklist-bar" style="width: 0%"></div>
+                                <div id="view-noteChecklist" class="d-none"></div>
+                                <div class="d-edit-only">
+                                    <div class="mb-3 d-flex align-items-center gap-3">
+                                        <small id="checklist-percent" class="text-muted font-mono" style="min-width: 40px;">0%</small>
+                                        <div class="checklist-progress-container m-0 flex-grow-1" style="height: 6px;">
+                                            <div class="checklist-progress-bar" id="checklist-bar" style="width: 0%"></div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div id="noteChecklistContainer">
-                                    <!-- Checklist items -->
+                                    <div id="noteChecklistContainer">
+                                        <!-- Checklist items -->
+                                    </div>
                                 </div>
                             </div>
 
@@ -188,11 +195,12 @@
                                         <i class="fas fa-boxes me-2 text-muted"></i>
                                         <h6 class="mb-0 font-primary text-uppercase small">Productos Vinculados</h6>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3" id="addProductLine">
+                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3 d-edit-only" id="addProductLine">
                                         <i class="fas fa-search me-1"></i> Buscar en Inventario
                                     </button>
                                 </div>
-                                <div id="noteProductsContainer">
+                                <div id="view-noteProducts" class="d-none mb-3"></div>
+                                <div id="noteProductsContainer" class="d-edit-only">
                                     <!-- Products -->
                                 </div>
                             </div>
@@ -204,11 +212,12 @@
                                         <i class="fas fa-paperclip me-2 text-muted"></i>
                                         <h6 class="mb-0 font-primary text-uppercase small">Archivos y Enlaces</h6>
                                     </div>
-                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3" onclick="addAttachmentRow()">
+                                    <button type="button" class="btn btn-sm btn-outline-buzz px-3 d-edit-only" onclick="addAttachmentRow()">
                                         <i class="fas fa-link me-1"></i> Adjuntar archivo (enlace)
                                     </button>
                                 </div>
-                                <div id="noteAttachmentsContainer">
+                                <div id="view-noteAttachments" class="d-none mb-3"></div>
+                                <div id="noteAttachmentsContainer" class="d-edit-only">
                                     <!-- Attachments -->
                                 </div>
                             </div>
@@ -218,23 +227,27 @@
                         <div class="col-md-4 modal-section-sidebar">
                             <div class="mb-5">
                                 <h6 class="text-uppercase tracking-wider">Detalles del Cliente</h6>
-                                <div class="mb-3">
-                                    <label class="text-muted small mb-1">Nombre Completo</label>
-                                    <input type="text" class="form-control form-control-buzz form-control-sm" id="noteClientName" placeholder="Nombre completo">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="text-muted small mb-1">Teléfono</label>
-                                    <input type="text" class="form-control form-control-buzz form-control-sm" id="notePhone" placeholder="+58 ...">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="text-muted small mb-1">Email</label>
-                                    <input type="email" class="form-control form-control-buzz form-control-sm" id="noteEmail" placeholder="cliente@correo.com">
+                                <div id="view-clientInfo" class="d-none mb-4"></div>
+                                <div class="d-edit-only">
+                                    <div class="mb-3">
+                                        <label class="text-muted small mb-1">Nombre Completo</label>
+                                        <input type="text" class="form-control form-control-buzz form-control-sm" id="noteClientName" placeholder="Nombre completo">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-muted small mb-1">Teléfono</label>
+                                        <input type="text" class="form-control form-control-buzz form-control-sm" id="notePhone" placeholder="+58 ...">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-muted small mb-1">Email</label>
+                                        <input type="email" class="form-control form-control-buzz form-control-sm" id="noteEmail" placeholder="cliente@correo.com">
+                                    </div>
                                 </div>
                             </div>
 
                             <div>
                                 <h6 class="text-uppercase tracking-wider">Logística & Fechas</h6>
-                                <div class="mb-3">
+                                <div id="view-dueDate" class="d-none mb-3"></div>
+                                <div class="mb-3 d-edit-only">
                                     <label class="text-muted small mb-1">Fecha de Entrega / Seguimiento</label>
                                     <input type="datetime-local" class="form-control form-control-buzz form-control-sm" id="noteDueDate">
                                 </div>
