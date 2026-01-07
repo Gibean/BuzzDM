@@ -22,6 +22,7 @@ $isCLI = (php_sapi_name() === 'cli');
 $isHTTP = !$isCLI;
 $providedToken = $_GET['token'] ?? '';
 $isFallback = isset($_GET['fallback']) && $_GET['fallback'] === '1';
+$triggeredById = $_GET['triggered_by'] ?? NULL;
 
 // Authentication check
 if ($isHTTP) {
@@ -122,7 +123,7 @@ try {
         $stmt = $pdo->prepare("
             INSERT INTO backups
             (archivo, ruta_archivo, tamaño_bytes, tipo, estado, resultado, detalles, usuario_id)
-            VALUES (?, ?, ?, ?, 'completado', ?, ?, NULL)
+            VALUES (?, ?, ?, ?, 'completado', ?, ?, ?)
         ");
         $stmt->execute([
             $nombreArchivo,
@@ -130,7 +131,8 @@ try {
             $tamanioBytes,
             'automatico', // Keep as 'automatico' for compatibility
             'Backup automático creado exitosamente' . ($isFallback ? ' (fallback)' : ''),
-            $detalles
+            $detalles,
+            $triggeredById
         ]);
 
         $backupId = $pdo->lastInsertId();
@@ -139,9 +141,10 @@ try {
         // Log the action
         $stmt = $pdo->prepare("
             INSERT INTO logs (usuario_id, accion, detalles)
-            VALUES (NULL, ?, ?)
+            VALUES (?, ?, ?)
         ");
         $stmt->execute([
+            $triggeredById,
             'Backup Automático' . ($isFallback ? ' (Fallback)' : ''),
             json_encode([
                 'archivo' => $nombreArchivo,

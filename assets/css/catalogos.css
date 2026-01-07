@@ -1,0 +1,464 @@
+/* ============================================
+   CATALOGS MODULE - REDESIGNED UI
+   Clean, space-efficient layout for end users
+   ============================================ */
+
+/* Search bar */
+.catalog-search {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.catalog-search i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--buzz-text-muted);
+}
+
+.catalog-search input {
+    padding-left: 2.5rem;
+}
+
+/* Grid container for catalog cards */
+.catalogs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+@media (max-width: 992px) {
+    .catalogs-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Each catalog card */
+.catalog-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.catalog-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    user-select: none;
+}
+
+.catalog-card-header:hover {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.catalog-card-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    color: var(--buzz-primary);
+    margin: 0;
+}
+
+.catalog-card-title i {
+    font-size: 1rem;
+}
+
+.catalog-count {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--buzz-text-muted);
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+.catalog-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.catalog-toggle {
+    color: var(--buzz-text-muted);
+    transition: transform 0.2s ease;
+}
+
+.catalog-card.collapsed .catalog-toggle {
+    transform: rotate(-90deg);
+}
+
+.catalog-card-body {
+    padding: 1rem 1.25rem;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.catalog-card.collapsed .catalog-card-body {
+    display: none;
+}
+
+/* Chips for simple catalogs (Categories, Materials) */
+.chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #ddd;
+    transition: background 0.15s ease;
+}
+
+.chip:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.chip-edit {
+    background: none;
+    border: none;
+    color: var(--buzz-text-muted);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.chip:hover .chip-edit {
+    opacity: 1;
+}
+
+.chip-delete {
+    background: none;
+    border: none;
+    color: var(--buzz-danger, #dc3545);
+    cursor: pointer;
+    padding: 0;
+    font-size: 0.7rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.chip:hover .chip-delete {
+    opacity: 1;
+}
+
+.chip-add {
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    color: var(--buzz-text-muted);
+    cursor: pointer;
+}
+
+.chip-add:hover {
+    border-color: var(--buzz-primary);
+    color: var(--buzz-primary);
+}
+
+/* Color grid */
+.colors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+}
+
+.color-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.color-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.color-swatch {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    flex-shrink: 0;
+}
+
+.color-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.color-name {
+    font-size: 0.8rem;
+    color: #fff;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.color-hex {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--buzz-accent);
+}
+
+.color-actions {
+    display: flex;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.color-item:hover .color-actions {
+    opacity: 1;
+}
+
+.color-action-btn {
+    background: none;
+    border: none;
+    color: var(--buzz-text-muted);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 0.7rem;
+}
+
+.color-action-btn:hover {
+    color: #fff;
+}
+
+.color-action-btn.delete:hover {
+    color: var(--buzz-danger, #dc3545);
+}
+
+/* Brands list */
+.brands-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.brand-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+}
+
+.brand-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.brand-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.brand-name {
+    font-size: 0.9rem;
+    color: #fff;
+    font-weight: 500;
+}
+
+.brand-desc {
+    font-size: 0.75rem;
+    color: var(--buzz-text-muted);
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.brand-link {
+    color: var(--buzz-accent);
+    font-size: 0.75rem;
+    text-decoration: none;
+    margin-right: 1rem;
+}
+
+.brand-link:hover {
+    text-decoration: underline;
+}
+
+.brand-actions {
+    display: flex;
+    gap: 0.5rem;
+    opacity: 0;
+    transition: opacity 0.15s;
+}
+
+.brand-item:hover .brand-actions {
+    opacity: 1;
+}
+
+/* Empty state */
+.catalog-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--buzz-text-muted);
+}
+
+.catalog-empty i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.5;
+}
+
+/* Button small for add */
+.btn-add-sm {
+    background: none;
+    border: 1px solid var(--buzz-primary);
+    color: var(--buzz-primary);
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.btn-add-sm:hover {
+    background: var(--buzz-primary);
+    color: #000;
+}
+
+/* Scrollbar for card body */
+.catalog-card-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.catalog-card-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.catalog-card-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* Hide action buttons on touch devices until tap */
+@media (hover: none) {
+    .chip-edit,
+    .chip-delete,
+    .color-actions,
+    .brand-actions {
+        opacity: 1;
+    }
+}
+
+/* ============================================
+   CATALOG MODAL - COMPACT DESIGN
+   ============================================ */
+
+/* Compact modal for catalogs */
+.modal-catalog {
+    max-width: 480px;
+}
+
+/* Icon in modal header */
+.modal-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 160, 0, 0.15);
+    color: var(--buzz-primary);
+}
+
+.modal-icon i {
+    font-size: 1rem;
+}
+
+/* Large color preview */
+.color-preview-large {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.color-swatch-large {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease;
+}
+
+/* Color picker row */
+.color-picker-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.color-picker-input {
+    width: 50px;
+    height: 42px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 2px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.color-picker-input::-webkit-color-swatch-wrapper {
+    padding: 2px;
+}
+
+.color-picker-input::-webkit-color-swatch {
+    border-radius: 6px;
+    border: none;
+}
+
+.color-hex-input {
+    flex: 1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Form labels with icons */
+.modal-catalog .form-label {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.modal-catalog .form-label i {
+    opacity: 0.7;
+}
+
+/* Responsive for modal */
+@media (max-width: 576px) {
+    .modal-catalog {
+        max-width: 95%;
+    }
+
+    .color-swatch-large {
+        width: 60px;
+        height: 60px;
+    }
+}
+
