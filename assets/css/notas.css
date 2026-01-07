@@ -915,3 +915,134 @@
 .view-mode .checklist-item input[type="checkbox"] {
     pointer-events: none;
 }
+/* ============================================
+   ENHANCED VIEW MODE STYLES
+   ============================================ */
+
+.d-none { display: none !important; }
+
+/* Markdown View */
+.view-markdown-content {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1.25rem;
+    color: #e0e0e0;
+    line-height: 1.6;
+    min-height: 100px;
+}
+
+.view-markdown-content h3 { color: var(--buzz-primary); font-size: 1.1rem; margin-top: 1rem; }
+.view-markdown-content ul { padding-left: 1.25rem; }
+.view-markdown-content blockquote { border-left: 3px solid var(--buzz-primary); padding-left: 1rem; color: #888; }
+
+/* View List Items (Checklist, Products, Attachments) */
+.view-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.view-item-pill {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.view-item-pill:hover {
+    background: rgba(255, 160, 0, 0.05);
+    border-color: rgba(255, 160, 0, 0.2);
+}
+
+.view-item-pill i {
+    width: 20px;
+    text-align: center;
+}
+
+.view-check-done { color: var(--buzz-success); }
+.view-check-pending { color: #555; }
+
+.view-product-tag {
+    background: rgba(255, 160, 0, 0.1);
+    color: var(--buzz-primary-color);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-family: var(--font-monospace);
+    border: 1px solid rgba(255, 160, 0, 0.2);
+}
+
+.view-link-btn {
+    margin-left: auto;
+    color: var(--buzz-primary-color);
+    font-size: 0.85rem;
+    text-decoration: none;
+    opacity: 0.7;
+}
+
+.view-link-btn:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/* Client Info Grid */
+.view-info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.view-info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.view-info-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    color: #666;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+}
+
+.view-info-value {
+    font-size: 0.9rem;
+    color: #ccc;
+    font-family: var(--font-monospace);
+}
+
+/* Kanban Card Enhanced */
+.kanban-card-preview-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 8px;
+}
+
+.preview-item {
+    font-size: 0.7rem;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preview-item i {
+    font-size: 0.65rem;
+    opacity: 0.6;
+}
+
+.preview-item.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+}
