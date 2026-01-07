@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
     <link rel="stylesheet" href="assets/css/ui-enhancements.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -33,20 +34,22 @@
             </div>
         </nav>
 
-        <!--  Stats Cards  -->
+        <!-- Frequent Customers Section (Full Width) -->
         <div class="row mb-4">
-            <div class="col-lg-4 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalCustomers">0</span>
-                    <span class="stats-label">Total Clientes</span>
-                </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-3 ms-auto">
-                <div class="stats-card">
-                    <h5 class="font-primary text-primary mb-3">Clientes Frecuentes</h5>
-                    <div id="frequentCustomersList">
+            <div class="col-12">
+                <div class="buzz-card frequent-customers-banner">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-primary text-primary mb-0">
+                            <i class="fas fa-crown me-2"></i>Clientes Frecuentes
+                        </h5>
+                        <small class="text-muted"><span id="totalCustomersNum">0</span> clientes totales</small>
+                    </div>
+                    <div id="frequentCustomersList" class="frequent-customers-grid">
                         <!-- Frequent customers will be populated by JavaScript -->
-                        <p class="text-muted">Cargando clientes frecuentes...</p>
+                        <div class="text-center py-3 w-100">
+                            <i class="fas fa-spinner fa-spin text-muted me-2"></i>
+                            <span class="text-muted">Cargando clientes frecuentes...</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -54,34 +57,31 @@
 
         <!--  Filters  -->
         <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label text-muted">Buscar cliente</label>
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar cliente</label>
                     <input type="text" class="form-control form-control-buzz" id="customerSearchInput" placeholder="ID, nombre, email...">
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Tipo de Cliente</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Tipo de Cliente</label>
                     <select class="form-control form-control-buzz" id="customerTypeFilter">
                         <option value="">Todos</option>
                         <option value="vip">VIP</option>
                         <option value="regular">Regular</option>
                     </select>
                 </div>
-                <div class="col-md-2 mb-3 d-flex align-items-end">
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                        <label class="form-check-label text-muted" for="showDeletedFilter">
-                            Ver eliminados
-                        </label>
-                    </div>
+                <div class="filter-group filter-checkbox">
+                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                    <label class="form-check-label text-muted" for="showDeletedFilter">
+                        Ver eliminados
+                    </label>
                 </div>
-                <div class="col-md-2 mb-3 d-flex align-items-end">
-                    <button class="btn btn-outline-buzz w-100" id="applyCustomerFilters">Aplicar Filtros</button>
-                </div>
-                <div class="col-md-1 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i>
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-buzz btn-filter-action" id="applyCustomerFilters" title="Buscar">
+                        <i class="fas fa-search"></i><span class="btn-text">Buscar</span>
+                    </button>
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>

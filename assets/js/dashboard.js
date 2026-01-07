@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     initSalesChart();
     initPaymentStatusChart(); // Initialize the new pie chart
-    loadStats(); 
+    loadStats();
     // Las siguientes funciones quedan comentadas o eliminadas porque ahora los datos
     // se cargan directamente desde PHP en el HTML.
     // loadActivityLog();
@@ -146,7 +146,6 @@ async function initPaymentStatusChart() {
                 labels: chartData.labels,
                 datasets: chartData.datasets.map(dataset => ({
                     ...dataset,
-                    backgroundColor: ['#E4A01E', '#58666B', '#808080'],
                     borderWidth: 0
                 }))
             },
@@ -217,5 +216,5 @@ function animateCounter(elementId, targetValue, isCurrency = false) {
 }
 
 function formatCurrency(value) {
-    return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value);
+    return 'Pref. ' + new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
 }

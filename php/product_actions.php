@@ -54,11 +54,30 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
+        // New attribute fields
+        $marca_id = !empty($input['marca_id']) ? intval($input['marca_id']) : null;
+        $categoria = !empty($input['categoria']) ? intval($input['categoria']) : null;
+        $proveedor_id = !empty($input['proveedor_id']) ? intval($input['proveedor_id']) : null;
+        $modelo = trim($input['modelo'] ?? '');
+        $color = trim($input['color'] ?? '');
+        $tamanio = trim($input['tamanio'] ?? '');
+        $medidas = trim($input['medidas'] ?? '');
+        $peso_kg = !empty($input['peso_kg']) ? floatval($input['peso_kg']) : null;
+        $material = trim($input['material'] ?? '');
+        $unidad_venta = trim($input['unidad_venta'] ?? '');
+
+        // Product type fields
+        $tipo_producto = $input['tipo_producto'] ?? 'fisico';
+        $maneja_stock = isset($input['maneja_stock']) ? ($input['maneja_stock'] ? 1 : 0) : 1;
+        $producto_padre_id = !empty($input['producto_padre_id']) ? intval($input['producto_padre_id']) : null;
+        $es_kit_virtual = isset($input['es_kit_virtual']) ? ($input['es_kit_virtual'] ? 1 : 0) : 0;
+        $variante_atributo = trim($input['variante_atributo'] ?? '');
+
         if ($id) {
             // Update
-            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
+            $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, marca_id = ?, categoria = ?, proveedor_id = ?, modelo = ?, color = ?, tamanio = ?, medidas = ?, peso_kg = ?, material = ?, unidad_venta = ?, tipo_producto = ?, maneja_stock = ?, producto_padre_id = ?, es_kit_virtual = ?, variante_atributo = ?, actualizado_at = NOW() WHERE id = ?";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
+            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta, $tipo_producto, $maneja_stock, $producto_padre_id, $es_kit_virtual, $variante_atributo, $id]);
             json_response(true, [], 'Producto actualizado exitosamente.');
         } else {
             // Create
@@ -69,10 +88,11 @@ try {
                 json_response(false, [], 'El SKU ya existe.');
             }
 
-            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, creado_at) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+            $sql = "INSERT INTO productos (sku, nombre, descripcion, precio, stock, min_stock, estado, marca_id, categoria, proveedor_id, modelo, color, tamanio, medidas, peso_kg, material, unidad_venta, tipo_producto, maneja_stock, producto_padre_id, es_kit_virtual, variante_atributo, creado_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado]);
-            json_response(true, [], 'Producto creado exitosamente.');
+            $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta, $tipo_producto, $maneja_stock, $producto_padre_id, $es_kit_virtual, $variante_atributo]);
+            $newId = $pdo->lastInsertId();
+            json_response(true, ['id' => $newId], 'Producto creado exitosamente.');
         }
     }
     // Handle PUT requests (Update via method override or actual PUT)
@@ -97,9 +117,28 @@ try {
         $min_stock = intval($input['min_stock'] ?? 0);
         $estado = $input['status'] ?? 'activo';
 
-        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, actualizado_at = NOW() WHERE id = ?";
+        // New attribute fields
+        $marca_id = !empty($input['marca_id']) ? intval($input['marca_id']) : null;
+        $categoria = !empty($input['categoria']) ? intval($input['categoria']) : null;
+        $proveedor_id = !empty($input['proveedor_id']) ? intval($input['proveedor_id']) : null;
+        $modelo = trim($input['modelo'] ?? '');
+        $color = trim($input['color'] ?? '');
+        $tamanio = trim($input['tamanio'] ?? '');
+        $medidas = trim($input['medidas'] ?? '');
+        $peso_kg = !empty($input['peso_kg']) ? floatval($input['peso_kg']) : null;
+        $material = trim($input['material'] ?? '');
+        $unidad_venta = trim($input['unidad_venta'] ?? '');
+
+        // Product type fields
+        $tipo_producto = $input['tipo_producto'] ?? 'fisico';
+        $maneja_stock = isset($input['maneja_stock']) ? ($input['maneja_stock'] ? 1 : 0) : 1;
+        $producto_padre_id = !empty($input['producto_padre_id']) ? intval($input['producto_padre_id']) : null;
+        $es_kit_virtual = isset($input['es_kit_virtual']) ? ($input['es_kit_virtual'] ? 1 : 0) : 0;
+        $variante_atributo = trim($input['variante_atributo'] ?? '');
+
+        $sql = "UPDATE productos SET sku = ?, nombre = ?, descripcion = ?, precio = ?, stock = ?, min_stock = ?, estado = ?, marca_id = ?, categoria = ?, proveedor_id = ?, modelo = ?, color = ?, tamanio = ?, medidas = ?, peso_kg = ?, material = ?, unidad_venta = ?, tipo_producto = ?, maneja_stock = ?, producto_padre_id = ?, es_kit_virtual = ?, variante_atributo = ?, actualizado_at = NOW() WHERE id = ?";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $id]);
+        $stmt->execute([$sku, $nombre, $descripcion, $precio, $stock, $min_stock, $estado, $marca_id, $categoria, $proveedor_id, $modelo, $color, $tamanio, $medidas, $peso_kg, $material, $unidad_venta, $tipo_producto, $maneja_stock, $producto_padre_id, $es_kit_virtual, $variante_atributo, $id]);
         json_response(true, [], 'Producto actualizado exitosamente.');
     }
     // Handle DELETE requests (Soft Delete)
@@ -120,8 +159,8 @@ try {
     // Handle GET requests (Fetch)
     elseif ($method === 'GET') {
         if (isset($_GET['id'])) {
-            // Fetch single product
-            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at FROM productos WHERE id = ?");
+            // Fetch single product with type fields and components
+            $stmt = $pdo->prepare("SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, marca_id, categoria, proveedor_id, modelo, color, tamanio, medidas, peso_kg, material, unidad_venta, tipo_producto, maneja_stock, producto_padre_id, es_kit_virtual, variante_atributo, deleted_at FROM productos WHERE id = ?");
             $stmt->execute([$_GET['id']]);
             $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -188,8 +227,10 @@ try {
             $total = $stmt->fetchColumn();
 
             // Fetch data
-            $sql = "SELECT id, sku, nombre as name, descripcion as description, precio as price, stock, min_stock, estado as status, deleted_at
-                    FROM productos
+            $sql = "SELECT p.id, p.sku, p.nombre as name, p.descripcion as description, p.precio as price, p.stock, p.min_stock, p.estado as status, p.marca_id, p.categoria, p.proveedor_id, p.modelo, p.color, p.tamanio, p.medidas, p.peso_kg, p.material, p.unidad_venta, p.tipo_producto, p.maneja_stock, p.producto_padre_id, p.es_kit_virtual, p.variante_atributo, p.deleted_at,
+                           (SELECT COUNT(*) FROM productos v WHERE v.producto_padre_id = p.id AND v.deleted_at IS NULL) as total_variantes,
+                           (SELECT COUNT(*) FROM producto_componentes pc WHERE pc.kit_id = p.id) as total_componentes
+                    FROM productos p
                     WHERE $whereSql
                     ORDER BY $sortBy $sortOrder
                     LIMIT $limit OFFSET $offset";

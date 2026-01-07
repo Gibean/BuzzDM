@@ -33,12 +33,42 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             </li>
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
-                    href="inventario.php">
-                    <i class="fas fa-box nav-icon-enhanced"></i>
+            <?php
+            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php'];
+            $inventarioActive = in_array($currentPage, $inventarioPages);
+            ?>
+            <li class="nav-item nav-dropdown <?php echo $inventarioActive ? 'open' : ''; ?>">
+                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $inventarioActive ? 'active' : ''; ?>">
+                    <i class="fas fa-boxes nav-icon-enhanced"></i>
                     <span class="nav-text-enhanced">Inventario</span>
+                    <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
                 </a>
+                <ul class="nav-dropdown-menu">
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
+                           href="inventario.php">
+                            <i class="fas fa-box"></i> Productos
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
+                           href="cargos_existencias.php">
+                            <i class="fas fa-dolly"></i> Cargar Existencias
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'almacenes.php' ? 'active' : ''; ?>"
+                           href="almacenes.php">
+                            <i class="fas fa-warehouse"></i> Almacenes
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'proveedores.php' ? 'active' : ''; ?>"
+                           href="proveedores.php">
+                            <i class="fas fa-truck"></i> Proveedores
+                        </a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link-enhanced <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>" href="clientes.php">

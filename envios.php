@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/ui-enhancements.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
 </head>
 <body>
     <!--  Sidebar (same as other pages) -->
@@ -58,13 +59,13 @@
 
          <!-- Filters  -->
         <div class="buzz-card mb-4">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label text-muted">Buscar</label>
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar</label>
                     <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID pedido, cliente...">
                 </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label text-muted">Estado de envío</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Estado de envío</label>
                     <select class="form-control form-control-buzz" id="statusFilter">
                         <option value="">Todos los estados</option>
                         <option value="pendiente">Pendiente</option>
@@ -72,8 +73,8 @@
                         <option value="entregado">Entregado</option>
                     </select>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label text-muted">Ordenar por</label>
+                <div class="filter-group filter-select">
+                    <label class="text-muted">Ordenar por</label>
                     <select class="form-control form-control-buzz" id="sortBy">
                         <option value="date">Fecha</option>
                         <option value="status">Estado</option>
@@ -81,10 +82,9 @@
                         <option value="amount">Monto</option>
                     </select>
                 </div>
-                <div class="col-md-1 mb-3">
-                    <label class="form-label text-muted">&nbsp;</label>
-                    <button class="btn btn-outline-buzz w-100" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i>
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                     </button>
                 </div>
             </div>

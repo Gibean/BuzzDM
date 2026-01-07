@@ -1,0 +1,152 @@
+/* ============================================
+   UNIFIED FILTER LAYOUT SYSTEM
+   Responsive filter layout for all pages
+   ============================================ */
+
+/* Filter wrapper container */
+.filter-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+}
+
+/* Filter group - each filter element */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.filter-group label {
+    font-size: 0.8rem;
+    margin-bottom: 0.35rem;
+    color: var(--buzz-text-muted);
+    white-space: nowrap;
+}
+
+/* Search field - takes priority/more space */
+.filter-group.filter-search {
+    flex: 2 1 200px;
+    min-width: 180px;
+}
+
+/* Dropdown selects - medium size */
+.filter-group.filter-select {
+    flex: 1 1 150px;
+    min-width: 130px;
+}
+
+/* Date inputs */
+.filter-group.filter-date {
+    flex: 1 1 130px;
+    min-width: 120px;
+}
+
+/* Checkbox group */
+.filter-group.filter-checkbox {
+    flex: 0 0 auto;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.filter-group.filter-checkbox label {
+    margin-bottom: 0;
+    white-space: nowrap;
+}
+
+/* Button groups - icon only on mobile */
+.filter-group.filter-actions {
+    flex: 0 0 auto;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: flex-end;
+}
+
+/* Action buttons */
+.btn-filter-action {
+    padding: 0.5rem 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.btn-filter-action .btn-text {
+    display: inline;
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Tablet */
+@media (max-width: 992px) {
+    .filter-group.filter-search {
+        flex: 1 1 100%;
+        order: -1;
+    }
+
+    .filter-group.filter-select {
+        flex: 1 1 calc(50% - 0.5rem);
+    }
+
+    .filter-group.filter-date {
+        flex: 1 1 calc(50% - 0.5rem);
+    }
+}
+
+/* Mobile */
+@media (max-width: 576px) {
+    .filter-wrapper {
+        gap: 0.5rem;
+    }
+
+    .filter-group {
+        flex: 1 1 100% !important;
+    }
+
+    .filter-group.filter-checkbox {
+        flex: 0 0 auto !important;
+        order: 10;
+    }
+
+    .filter-group.filter-actions {
+        flex: 1 1 100% !important;
+        flex-direction: row !important;
+        justify-content: flex-end;
+        order: 11;
+    }
+
+    /* Show icon only on small screens */
+    .btn-filter-action .btn-text {
+        display: none;
+    }
+
+    .btn-filter-action {
+        padding: 0.5rem 0.65rem;
+    }
+
+    .filter-group label {
+        font-size: 0.75rem;
+    }
+
+    .filter-group .form-control-buzz {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Extra small screens */
+@media (max-width: 375px) {
+    .filter-group.filter-actions {
+        flex-wrap: nowrap;
+    }
+
+    .btn-filter-action {
+        flex: 1;
+    }
+}
