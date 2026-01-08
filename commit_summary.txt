@@ -1,0 +1,11 @@
+TITLE: feat: implement multi-node currency monitor and fix dashboard consistency
+
+CHANGES:
+- [php/product_actions.php]: Standardized "stock-bajo" and "agotado" filtering logic to match dashboard views (v_low_stock).
+- [Database]: Migrated `tasas_cambio` table schema to support multiple exchange rates per date (unique index on fecha, fuente).
+- [php/tasa_bcv_update.php]: Overhauled sync script to fetch USD, Parallel, Euro, and USDT rates using DolarApi and cross-rate estimation.
+- [php/db.php]: Implemented `getAllTasasHoy()` function to retrieve all available daily rates.
+- [dashboard.php]: Redesigned the Currency Monitor widget into a high-density "Tactical Node" layout with localized labels and multi-node grid.
+- [assets/css/dashboard-effects.css]: Added styles for the multi-currency grid, node indicators, and refined tactical card aesthetics.
+- [assets/js/dashboard.js]: Fixed the `syncBcv()` function, standardized notification calls (showToast), and mapped currency keys to clean UI labels.
+- [DOCUMENTACION_DIVISAS.md]: Created extensive technical documentation covering API sources, file architecture, and database logic.
