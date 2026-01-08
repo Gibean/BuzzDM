@@ -58,6 +58,13 @@ document.addEventListener("DOMContentLoaded", function () {
   // Load catalogs on page load
   cargarCatalogos()
 
+  // Manejar filtros desde URL (ej: ?status=stock-bajo)
+  const urlParams = new URLSearchParams(window.location.search);
+  const statusParam = urlParams.get('status');
+  if (statusParam && statusFilter) {
+    statusFilter.value = statusParam;
+  }
+
   async function fetchProducts() {
     const search = searchInput.value
     const status = statusFilter.value

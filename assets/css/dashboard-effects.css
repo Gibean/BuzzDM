@@ -1,268 +1,231 @@
 /* ============================================
-   DASHBOARD MODERN ENHANCEMENTS
+   BLACK OPS TACTICAL ENHANCEMENTS
    ============================================ */
 
-/* Stats Cards with Modern Effects */
-.stats-card {
-  background: linear-gradient(135deg, rgba(26, 31, 40, 0.8) 0%, rgba(18, 22, 29, 0.9) 100%);
-  border: 1px solid rgba(255, 160, 0, 0.2);
-  border-radius: 10px;
-  padding: 1.5rem;
+:root {
+  --tactical-blue: #00f2ff;
+  --tactical-red: #ff3e3e;
+  --tactical-orange: #ffa000;
+  --tactical-bg-darker: #080a0e;
+  --tactical-grid: rgba(255, 160, 0, 0.03);
+}
+
+/* Base Dashboard Grid Background */
+.main-content {
+  background-image:
+    linear-gradient(var(--tactical-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--tactical-grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  background-position: center top;
+}
+
+/* Command Strip (High Density Top Bar) */
+.command-strip {
+  background: rgba(16, 20, 26, 0.8);
+  border: 1px solid rgba(255, 160, 0, 0.1);
+  border-radius: 4px;
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 2rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  backdrop-filter: blur(10px);
   position: relative;
   overflow: hidden;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Animated background gradient on hover */
-.stats-card::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255, 160, 0, 0.1) 0%, transparent 70%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.stats-card:hover::before {
-  opacity: 1;
-}
-
-.stats-card:hover {
-  border-color: var(--buzz-primary-color);
-  box-shadow: 0 8px 24px rgba(255, 160, 0, 0.2);
-  transform: translateY(-4px);
-}
-
-/* Top accent line */
-.stats-card::after {
+.command-strip::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
-  width: 0;
-  height: 3px;
-  background: linear-gradient(90deg, var(--buzz-primary-color), rgba(255, 160, 0, 0.5));
-  transition: width 0.4s ease;
+  width: 3px;
+  height: 100%;
+  background: var(--tactical-orange);
 }
 
-.stats-card:hover::after {
-  width: 100%;
+.status-node {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.stats-number {
-  font-family: var(--font-primary);
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--buzz-primary-color);
-  letter-spacing: 1px;
-  line-height: 1;
-  text-shadow: 0 0 10px rgba(255, 160, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.stats-card:hover .stats-number {
-  transform: scale(1.05);
-  text-shadow: 0 0 15px rgba(255, 160, 0, 0.5);
-}
-
-.stats-label {
+.node-label {
   font-family: var(--font-monospace);
-  font-size: 0.85rem;
+  font-size: 0.65rem;
   color: var(--buzz-text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: var(--buzz-text-muted);
+  letter-spacing: 1px;
 }
 
-/* Enhanced Card Containers for Charts */
-.buzz-card.chart-container {
-  background: linear-gradient(135deg, rgba(26, 31, 40, 0.95) 0%, rgba(18, 22, 29, 0.98) 100%);
-  border: 1px solid rgba(255, 160, 0, 0.15);
+/* Multi-Currency Layout */
+.currency-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.currency-node {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 8px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.currency-node:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 160, 0, 0.2);
+}
+
+.currency-node .node-label {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  font-family: var(--font-monospace);
+  margin-bottom: 2px;
+}
+
+.currency-node .node-value {
+  display: block;
+  font-size: 1rem;
+  color: #fff;
+  font-family: var(--font-primary);
+  font-weight: 600;
+}
+
+.currency-node.euro { border-left: 2px solid #55acee; }
+.currency-node.usdt { border-left: 2px solid #26a17b; }
+.currency-node.paralelo { border-left: 2px solid var(--tactical-orange); }
+
+.node-value {
+  font-family: var(--font-primary);
+  font-size: 1.1rem;
+  color: var(--tactical-orange);
+  font-weight: 700;
+}
+
+.node-value.blue { color: var(--tactical-blue); }
+.node-value.red { color: var(--tactical-red); }
+
+/* Tactical Cards - Refined for Consistency */
+.buzz-card.tactical-card {
+  background: rgba(26, 31, 40, 0.7) !important;
+  border: 1px solid rgba(255, 160, 0, 0.15) !important;
   position: relative;
-  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(5px);
 }
 
-.buzz-card.chart-container::before {
+.buzz-card.tactical-card:hover {
+  border-color: var(--buzz-primary-color) !important;
+  box-shadow: 0 8px 32px rgba(255, 160, 0, 0.15) !important;
+}
+
+/* Slimmed down list items */
+.premium-list {
+  gap: 6px;
+}
+
+.premium-list-item {
+  padding: 6px 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 160, 0, 0.1);
+  border-radius: 4px;
+}
+
+.premium-list-item .item-rank {
+  font-size: 1.1rem;
+  width: 26px;
+  height: 26px;
+}
+
+.premium-list-item .item-icon {
+  width: 30px;
+  height: 30px;
+  font-size: 0.9rem;
+}
+
+.premium-list-item .item-name {
+  font-size: 0.85rem;
+}
+
+.premium-list-item .item-value {
+  font-size: 1rem;
+  padding: 2px 8px;
+}
+
+/* Scanline Overlay - Subtle version for the main content only */
+.main-content::after {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background:
-    linear-gradient(45deg, transparent 30%, rgba(255, 160, 0, 0.03) 50%, transparent 70%);
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
+  background-size: 100% 4px;
   pointer-events: none;
+  z-index: 10;
+  opacity: 0.1;
+  mix-blend-mode: overlay;
 }
 
-.buzz-card.chart-container:hover {
-  border-color: rgba(255, 160, 0, 0.3);
-  box-shadow: 0 4px 20px rgba(255, 160, 0, 0.15);
-}
-
-/* Section Headers with Glow */
-.buzz-card h5.section-header {
-  position: relative;
-  padding-bottom: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.buzz-card h5.section-header::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 60px;
-  height: 2px;
-  background: linear-gradient(90deg, var(--buzz-primary-color), transparent);
-  box-shadow: 0 0 8px rgba(255, 160, 0, 0.5);
-}
-
-/* Animated List Items */
-.buzz-card ul li {
-  transition: all 0.3s ease;
-  padding-left: 1.5rem;
-  position: relative;
-}
-
-.buzz-card ul li::before {
-  content: '▸';
-  position: absolute;
-  left: 0;
-  color: var(--buzz-primary-color);
-  transition: transform 0.3s ease;
-}
-
-.buzz-card ul li:hover {
-  transform: translateX(5px);
-  color: var(--buzz-primary-color);
-}
-
-.buzz-card ul li:hover::before {
-  transform: translateX(3px);
-}
-
-/* Real-time Indicator Enhancement */
-.real-time-indicator {
-  display: flex;
+/* Mini Stats Pill */
+.stat-tag {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
+  gap: 0.4rem;
+  padding: 0.2rem 0.6rem;
   background: rgba(255, 160, 0, 0.05);
   border: 1px solid rgba(255, 160, 0, 0.2);
-  border-radius: 20px;
-  transition: all 0.3s ease;
+  border-radius: 4px;
+  font-family: var(--font-monospace);
+  font-size: 0.7rem;
+  color: var(--buzz-text-muted);
 }
 
-.real-time-indicator:hover {
-  background: rgba(255, 160, 0, 0.1);
-  border-color: var(--buzz-primary-color);
+.stat-tag i { color: var(--tactical-orange); }
+
+/* Enhanced Typography Node */
+.digital-readout {
+  font-family: var(--font-monospace);
+  color: var(--tactical-orange);
+  text-shadow: 0 0 5px var(--buzz-primary-glow);
 }
 
-.real-time-dot {
-  width: 8px;
-  height: 8px;
+/* Animations */
+@keyframes pulse-node {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.status-indicator-live {
+  width: 6px;
+  height: 6px;
   background: var(--buzz-success);
   border-radius: 50%;
-  box-shadow: 0 0 8px var(--buzz-success);
-  animation: pulse-realtime 2s ease-in-out infinite;
+  animation: pulse-node 2s infinite;
 }
 
-@keyframes pulse-realtime {
-  0%, 100% {
-    box-shadow: 0 0 8px var(--buzz-success);
-    transform: scale(1);
-  }
-  50% {
-    box-shadow: 0 0 15px var(--buzz-success);
-    transform: scale(1.1);
-  }
-}
-
-/* Stagger Animation for Dashboard Load */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.dashboard-item {
-  animation: fadeInUp 0.6s ease-out backwards;
-}
-
-.dashboard-item:nth-child(1) { animation-delay: 0.1s; }
-.dashboard-item:nth-child(2) { animation-delay: 0.2s; }
-.dashboard-item:nth-child(3) { animation-delay: 0.3s; }
-.dashboard-item:nth-child(4) { animation-delay: 0.4s; }
-
-/* Enhanced Info Display */
-.info-item {
-  display: flex;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: all 0.3s ease;
-}
-
-.info-item:hover {
-  background: rgba(255, 160, 0, 0.05);
-  transform: translateX(3px);
-}
-
-/* Subtle scan line effect for tech feel */
-@keyframes scanline {
-  0% {
-    transform: translateY(-100%);
-  }
-  100% {
-    transform: translateY(100%);
-  }
-}
-
-.buzz-card.tech-effect {
-  position: relative;
-  overflow: hidden;
-}
-
-.buzz-card.tech-effect::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(255, 160, 0, 0.3), transparent);
-  animation: scanline 8s linear infinite;
-  pointer-events: none;
-  opacity: 0.3;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .stats-card {
+/* Responsive Tactical Bar */
+@media (max-width: 992px) {
+  .command-strip {
+    gap: 1rem;
     padding: 1rem;
   }
+}
 
-  .stats-number {
-    font-size: 1.5rem;
-  }
-
-  .stats-label {
-    font-size: 0.75rem;
-  }
-
-  .dashboard-item {
-    animation-delay: 0s !important;
+@media (max-width: 576px) {
+  .command-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
