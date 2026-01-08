@@ -152,6 +152,38 @@ function getTasaCambioHoy() {
 }
 
 /**
+ * Get all available exchange rates for today
+ *
+ * @return array Array of rates indexed by source
+ */
+function getAllTasasHoy() {
+    $pdo = Database::getConnection();
+    $stmt = $pdo->query("SELECT fuente, tasa, fecha, creado_at FROM tasas_cambio WHERE fecha = CURDATE()");
+    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $indexed = [];
+    foreach ($results as $row) {
+        $indexed[$row['fuente']] = $row;
+    }
+
+    // If empty for today, fallback to most recent date but keep all sources from that date
+    if (empty($indexed)) {
+        $stmt = $pdo->query("SELECT MAX(fecha) FROM tasas_cambio");
+        $maxFecha = $stmt->fetchColumn();
+        if ($maxFecha) {
+            $stmt = $pdo->prepare("SELECT fuente, tasa, fecha, creado_at FROM tasas_cambio WHERE fecha = ?");
+            $stmt->execute([$maxFecha]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($results as $row) {
+                $indexed[$row['fuente']] = $row;
+            }
+        }
+    }
+
+    return $indexed;
+}
+
+/**
  * Set today's exchange rate
  *
  * @param float $tasa The USD rate (how many VES per 1 USD)

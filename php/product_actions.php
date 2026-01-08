@@ -212,8 +212,15 @@ try {
             }
 
             if ($status) {
-                $whereClauses[] = "p.estado = ?";
-                $params[] = $status;
+                if ($status === 'stock-bajo') {
+                    // Logic consistent with v_low_stock: stock <= min_stock and not specifically marked as 'agotado'
+                    $whereClauses[] = "p.stock <= p.min_stock AND p.estado <> 'agotado'";
+                } elseif ($status === 'agotado') {
+                    $whereClauses[] = "(p.stock <= 0 OR p.estado = 'agotado')";
+                } else {
+                    $whereClauses[] = "p.estado = ?";
+                    $params[] = $status;
+                }
             }
 
             if ($marca_id) {

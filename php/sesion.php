@@ -194,6 +194,7 @@ if (($current_page === 'inventario.php' || $current_page === 'importacion.php') 
 if (!$is_api_call && file_exists(__DIR__ . '/backup_check.php')) {
     require_once __DIR__ . '/backup_check.php';
     checkAndRunAutoBackup();
+    checkAndRunBcvSync();
 }
 
 ?>

@@ -23,6 +23,27 @@ try {
     $stmtActivity = $pdo->query($queryActivity);
     $activityLog = $stmtActivity->fetchAll(PDO::FETCH_COLUMN, 0);
 
+    // 4. Consultar TASAS DE CAMBIO (BCV, EUR, USDT)
+    $allTasas = getAllTasasHoy();
+    $tasaData = $allTasas['bcv'] ?? null; // Keep compatibility for some parts if needed
+
+    // 5. NUEVAS ESTADÍSTICAS TÁCTICAS
+    // Clientes totales
+    $stmt = $pdo->query("SELECT COUNT(*) FROM clientes WHERE deleted_at IS NULL");
+    $totalCustomers = $stmt->fetchColumn();
+
+    // Productos con bajo stock
+    $stmt = $pdo->query("SELECT COUNT(*) FROM v_low_stock");
+    $lowStockCount = $stmt->fetchColumn();
+
+    // Valor total del inventario
+    $stmt = $pdo->query("SELECT SUM(stock * precio) FROM productos WHERE deleted_at IS NULL");
+    $totalInventoryValue = $stmt->fetchColumn() ?? 0;
+
+    // Pedidos de hoy
+    $stmt = $pdo->query("SELECT COUNT(*) FROM pedidos WHERE DATE(fecha_creacion) = CURDATE()");
+    $dailyOrders = $stmt->fetchColumn();
+
 } catch (PDOException $e) {
     // Log the error or handle it gracefully
     // For now, we'll just let the arrays be empty, so the page doesn't break.
@@ -63,31 +84,39 @@ try {
         </nav>
 
 
-        <!-- Statistics Section -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalProducts">0</span>
-                    <span class="stats-label">Productos Activos</span>
-                </div>
+        <!-- Command Strip (High Density Status Bar) -->
+        <div class="command-strip dashboard-item">
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-microchip me-1"></i> Stock Critico</span>
+                <span class="node-value red" id="tcLowStock">0</span>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalOrders">0</span>
-                    <span class="stats-label">Pedidos Totales</span>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-users me-1"></i> Clientes Activos</span>
+                <span class="node-value blue" id="tcCustomers">0</span>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
-                <div class="stats-card">
-                    <span class="stats-number" id="pendingShipments">0</span>
-                    <span class="stats-label">Envíos Pendientes</span>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-shopping-cart me-1"></i> Pedidos Hoy</span>
+                <span class="node-value" id="tcDailyOrders">0</span>
             </div>
-            <div class="col-lg-3 col-md-6 mb-3 dashboard-item">
-                <div class="stats-card">
-                    <span class="stats-number" id="monthlyRevenue">$0</span>
-                    <span class="stats-label">Ingresos del Mes</span>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-boxes me-1"></i> Productos</span>
+                <span class="node-value" id="totalProducts">0</span>
+            </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-file-invoice me-1"></i> Pedidos Totales</span>
+                <span class="node-value" id="totalOrders">0</span>
+            </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-truck me-1"></i> Pendientes</span>
+                <span class="node-value red" id="pendingShipments">0</span>
+            </div>
+            <div class="status-node d-none d-xl-flex">
+                <span class="node-label"><i class="fas fa-database me-1"></i> Valor Inventario</span>
+                <span class="node-value blue" id="tcInventoryValue">$0</span>
+            </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-chart-line me-1"></i> Ingresos Mes</span>
+                <span class="node-value" id="monthlyRevenue">$0</span>
             </div>
         </div>
 
@@ -95,12 +124,12 @@ try {
        <!---  Charts and Activity -->
         <div class="row">
             <div class="col-lg-8 mb-4 dashboard-item">
-                <div class="buzz-card chart-container">
+                <div class="buzz-card chart-container tactical-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="font-primary text-primary mb-0 section-header">ACTIVIDAD DE VENTAS</h5>
+                        <h5 class="font-primary text-primary mb-0 section-header">FLUJO DE VENTAS</h5>
                         <div class="real-time-indicator">
-                            <div class="real-time-dot"></div>
-                            <span class="font-mono text-muted" style="font-size: 0.8rem;">TIEMPO REAL</span>
+                            <i class="status-indicator-live"></i>
+                            <span class="font-mono text-muted" style="font-size: 0.8rem;">LIVE_SYSTEM</span>
                         </div>
                     </div>
                     <div style="position: relative; height: 320px;">
@@ -111,10 +140,10 @@ try {
 
 
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card chart-container payment-chart-card">
+                <div class="buzz-card chart-container payment-chart-card tactical-card">
                     <div class="chart-card-header">
                         <h5 class="font-primary text-primary mb-3 section-header">
-                            <i class="fas fa-wallet me-2"></i>VENTAS POR ESTADO DE PAGO
+                            <i class="fas fa-wallet me-2"></i>ESTADO PAGOS
                         </h5>
                     </div>
                     <div style="position: relative; height: 320px;">
@@ -129,11 +158,12 @@ try {
         <div class="row">
             <!-- Top Products -->
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card tech-effect h-100">
-                    <div class="card-glow"></div>
-                    <h5 class="font-primary text-primary mb-3 section-header">
-                        <i class="fas fa-trophy me-2"></i>TOP 5 PRODUCTOS
-                    </h5>
+                <div class="buzz-card tech-effect tactical-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-primary text-primary mb-0 section-header">
+                            <i class="fas fa-trophy me-2"></i>TOP 5 PRODUCTOS
+                        </h5>
+                    </div>
                     <div class="premium-list" id="topProducts">
                         <?php if (!empty($top5Products)): ?>
                             <?php foreach ($top5Products as $index => $productName): ?>
@@ -146,7 +176,7 @@ try {
                                 </div>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <div class="text-muted p-3">No hay datos disponibles.</div>
+                            <div class="text-muted p-2 small">DATOS NO DISPONIBLES</div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -154,25 +184,29 @@ try {
 
             <!-- Low Stock -->
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card tech-effect h-100">
-                    <div class="card-glow"></div>
-                    <h5 class="font-primary text-warning mb-3 section-header border-warning">
-                        <i class="fas fa-exclamation-triangle me-2"></i>STOCK CRÍTICO
-                    </h5>
+                <div class="buzz-card tech-effect tactical-card h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="font-primary text-warning mb-0 section-header border-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>ALERTA CRÍTICA
+                        </h5>
+                        <a href="inventario.php?status=stock-bajo" class="btn-link text-warning font-mono" style="font-size: 0.7rem; text-decoration: none;">
+                            VER TODOS <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
                     <div class="premium-list" id="lowStockProducts">
                         <?php if (!empty($lowStockProducts)): ?>
                             <?php foreach ($lowStockProducts as $product): ?>
-                                <div class="premium-list-item warning">
+                                <a href="inventario.php?status=stock-bajo" class="premium-list-item warning text-decoration-none">
                                     <div class="item-icon"><i class="fas fa-box"></i></div>
                                     <div class="item-info">
                                         <span class="item-sku font-mono"><?php echo htmlspecialchars($product['sku']); ?></span>
                                         <span class="item-name font-secondary d-block"><?php echo htmlspecialchars($product['nombre']); ?></span>
                                     </div>
                                     <div class="item-value font-mono danger"><?php echo htmlspecialchars($product['stock']); ?></div>
-                                </div>
+                                </a>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <div class="text-muted p-3">Todo el stock está normal.</div>
+                            <div class="text-muted p-2 small">SISTEMA NOMINAL.</div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -180,18 +214,75 @@ try {
 
             <!-- Currency Monitor (Placeholder) -->
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card tech-effect currency-monitor h-100">
-                    <div class="card-glow"></div>
+                <div class="buzz-card tech-effect tactical-card h-100">
                     <h5 class="font-primary text-info mb-3 section-header border-info">
-                        <i class="fas fa-chart-line me-2"></i>MONITOR DE DIVISAS
+                        <i class="fas fa-coins me-2"></i>MONITOR DE DIVISAS
                     </h5>
-                    <div class="currency-content empty-state">
-                        <div class="empty-icon"><i class="fas fa-dollar-sign"></i></div>
-                        <p class="font-mono text-muted mb-0">Esperando conexión con API...</p>
-                        <div class="loading-bar">
-                            <div class="loading-progress"></div>
+                    <?php if (!empty($allTasas)):
+                        $bcv = $allTasas['bcv'] ?? null;
+                        $euro = $allTasas['bcv_euro'] ?? null;
+                        $usdt = $allTasas['binance_usdt'] ?? null;
+                        $paralelo = $allTasas['paralelo'] ?? null;
+                    ?>
+                        <div class="currency-widget p-3 text-center">
+                            <!-- Main Readout: BCV USD -->
+                            <?php if ($bcv): ?>
+                                <div class="currency-header mb-2">
+                                    <span class="badge bg-info-subtle text-info px-3 py-1 font-mono" style="font-size: 0.7rem;">
+                                        <i class="fas fa-university me-1"></i> BCV OFICIAL
+                                    </span>
+                                </div>
+                                <div class="currency-value mb-3">
+                                    <span class="text-muted d-block small font-mono mb-1">FLUJO PRINCIPAL: VES/USD</span>
+                                    <h2 class="font-primary text-white mb-0 digital-readout" style="font-size: 2.2rem; color: #00f2ff;">
+                                        Bs. <?php echo number_format($bcv['tasa'], 2, ',', '.'); ?>
+                                    </h2>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- Secondary Nodes: EUR, USDT, PARALELO -->
+                            <div class="currency-grid">
+                                <?php if ($euro): ?>
+                                    <div class="currency-node euro">
+                                        <span class="node-label">BCV EURO</span>
+                                        <span class="node-value">Bs. <?php echo number_format($euro['tasa'], 2, ',', '.'); ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($usdt): ?>
+                                    <div class="currency-node usdt">
+                                        <span class="node-label">BINANCE USDT</span>
+                                        <span class="node-value">Bs. <?php echo number_format($usdt['tasa'], 2, ',', '.'); ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($paralelo): ?>
+                                    <div class="currency-node paralelo">
+                                        <span class="node-label">ESTIMADO PARALELO</span>
+                                        <span class="node-value">Bs. <?php echo number_format($paralelo['tasa'], 2, ',', '.'); ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+
+                            <div class="currency-footer border-top border-secondary-subtle pt-3 mt-3 d-flex justify-content-between align-items-center">
+                                <span class="text-muted small font-mono">
+                                    <i class="far fa-clock me-1"></i> ÚLTIMA SINCRONIZACIÓN:
+                                    <?php
+                                        $lastSync = !empty($allTasas) ? reset($allTasas)['creado_at'] : '00:00';
+                                        echo date('H:i', strtotime($lastSync));
+                                    ?>
+                                </span>
+                                <button class="btn btn-outline-info btn-sm p-1" onclick="syncBcv()" title="Sincronizar ahora" style="width: 30px; height: 30px;">
+                                    <i class="fas fa-sync-alt"></i>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    <?php else: ?>
+                        <div class="currency-content empty-state">
+                            <div class="empty-icon"><i class="fas fa-dollar-sign"></i></div>
+                            <p class="font-mono text-muted mb-0">NODES_OFFLINE.</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
