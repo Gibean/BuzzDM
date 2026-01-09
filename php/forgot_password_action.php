@@ -3,27 +3,92 @@
  * Backend para procesar solicitudes de recuperación de contraseña
  */
 
-header('Content-Type: application/json');
+// Iniciar output buffering para evitar que se envíe HTML antes del JSON
+ob_start();
 
-// Incluir dependencias
+// Configurar manejo de errores
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // No mostrar errores en pantalla
+ini_set('log_errors', 1); // Sí guardar en log
+
+// Manejador de errores fatal para siempre devolver JSON
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        ob_end_clean();
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Error interno del servidor. Revisa los logs para más detalles.',
+            'debug' => [
+                'error' => $error['message'],
+                'file' => $error['file'],
+                'line' => $error['line']
+            ]
+        ]);
+        exit;
+    }
+});
+
+// Manejador de excepciones no capturadas
+set_exception_handler(function($e) {
+    ob_end_clean();
+    http_response_code(500);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error no controlado: ' . $e->getMessage()
+    ]);
+    error_log('Excepción no capturada: ' . $e->getMessage() . ' en ' . $e->getFile() . ':' . $e->getLine());
+    exit;
+});
+
+// Incluir dependencias (db.php ya carga vendor/autoload.php)
 require_once 'db.php';
 require_once 'email_config.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+
+// Asegurarse de que PHPMailer esté disponible
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $vendor_path = __DIR__ . '/../vendor/autoload.php';
+    if (file_exists($vendor_path)) {
+        require_once $vendor_path;
+    } else {
+        ob_end_clean();
+        error_log('ERROR: vendor/autoload.php no encontrado. Ejecuta: composer install');
+        http_response_code(500);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode([
+            'success' => false,
+            'message' => 'Sistema no configurado correctamente. Contacta al administrador.'
+        ]);
+        exit;
+    }
+}
+
+// Establecer header después de cargar dependencias
+header('Content-Type: application/json; charset=utf-8');
 
 use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 try {
     // Verificar que sea una petición POST
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-        throw new Exception('Método no permitido');
+        throw new \Exception('Método no permitido');
     }
 
     // Obtener el email del usuario
     $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
 
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        throw new Exception('Por favor, proporciona un correo electrónico válido');
+        throw new \Exception('Por favor, proporciona un correo electrónico válido');
+    }
+
+    // Verificar configuración de correo
+    if (empty(SMTP_USERNAME) || empty(SMTP_PASSWORD)) {
+        error_log('ERROR: Credenciales SMTP no configuradas en .env');
+        throw new \Exception('El sistema de recuperación de contraseña no está configurado. Contacta al administrador.');
     }
 
     // Conectar a la base de datos
@@ -40,6 +105,7 @@ try {
         // Esperar un poco para simular el procesamiento
         usleep(500000); // 0.5 segundos
 
+        ob_end_clean(); // Limpiar buffer
         echo json_encode([
             'success' => true,
             'message' => 'Si el correo electrónico está registrado, recibirás un enlace de recuperación en unos minutos.'
@@ -49,11 +115,11 @@ try {
 
     // Verificar que el usuario no esté bloqueado
     if ($usuario['estado'] === 'bloqueado') {
-        throw new Exception('Esta cuenta está bloqueada. Contacta al administrador.');
+        throw new \Exception('Esta cuenta está bloqueada. Contacta al administrador.');
     }
 
     if ($usuario['estado'] === 'inactivo') {
-        throw new Exception('Esta cuenta está inactiva. Contacta al administrador.');
+        throw new \Exception('Esta cuenta está inactiva. Contacta al administrador.');
     }
 
     // Generar token único y seguro
@@ -181,25 +247,39 @@ Este es un correo automático, por favor no respondas a este mensaje.
         // Enviar el correo
         $mail->send();
 
+        // Limpiar buffer y enviar respuesta
+        ob_end_clean();
         echo json_encode([
             'success' => true,
             'message' => 'Si el correo electrónico está registrado, recibirás un enlace de recuperación en unos minutos.'
         ]);
 
-    } catch (Exception $e) {
+    } catch (PHPMailerException $e) {
         // Log del error (en producción, usar un sistema de logs apropiado)
         error_log("Error al enviar correo de recuperación: " . $mail->ErrorInfo);
 
         // No revelamos detalles del error al usuario
-        throw new Exception('Hubo un problema al enviar el correo. Por favor, intenta nuevamente más tarde.');
+        throw new \Exception('Hubo un problema al enviar el correo. Por favor, intenta nuevamente más tarde.');
     }
 
-} catch (Exception $e) {
+} catch (\PDOException $e) {
+    // Error de base de datos
+    ob_end_clean(); // Limpiar buffer
+    error_log('ERROR DB en forgot_password: ' . $e->getMessage());
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Error de base de datos. Verifica que la tabla password_reset_tokens exista.'
+    ]);
+} catch (\Exception $e) {
+    // Log del error completo para debugging
+    ob_end_clean(); // Limpiar buffer
+    error_log('ERROR en forgot_password: ' . $e->getMessage());
+    error_log('Stack trace: ' . $e->getTraceAsString());
+
     http_response_code(400);
     echo json_encode([
         'success' => false,
         'message' => $e->getMessage()
     ]);
 }
-?>
-

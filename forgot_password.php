@@ -195,6 +195,26 @@
                         body: new URLSearchParams({ email })
                     });
 
+                    // Manejar diferentes códigos de estado HTTP
+                    if (response.status === 500) {
+                        const data = await response.json();
+                        let errorMsg = data.message || 'Error del servidor. Contacta al administrador.';
+
+                        // Si hay información de debug, mostrarla en consola
+                        if (data.debug) {
+                            console.error('Error 500 - Debug info:', data.debug);
+                            errorMsg += ' Ver consola para detalles.';
+                        }
+
+                        showAlert(errorMsg, 'error');
+                        console.error('Error 500:', data);
+                        return;
+                    }
+
+                    if (!response.ok && response.status !== 400) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
                     const data = await response.json();
 
                     if (data.success) {
@@ -206,11 +226,19 @@
                             window.location.href = 'login.php';
                         }, 5000);
                     } else {
-                        showAlert(data.message || 'Error al procesar la solicitud', 'error');
+                        // Agregar enlace de ayuda si es un error de configuración
+                        let message = data.message || 'Error al procesar la solicitud';
+
+                        if (message.includes('no está configurado') || message.includes('base de datos')) {
+                            message += ' <a href="php/check_forgot_password_config.php" target="_blank" style="color: #FFA000; text-decoration: underline;">Ver diagnóstico</a>';
+                        }
+
+                        showAlert(message, 'error');
+                        console.error('Error de validación:', data.message);
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    showAlert('Error de conexión. Por favor, intenta nuevamente.', 'error');
+                    showAlert('Error de conexión. Por favor, intenta nuevamente. Si el problema persiste, <a href="php/check_forgot_password_config.php" target="_blank" style="color: #FFA000; text-decoration: underline;">verifica la configuración</a>.', 'error');
                 } finally {
                     submitBtn.innerHTML = originalText;
                     submitBtn.disabled = false;
