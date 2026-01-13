@@ -644,6 +644,25 @@ INSERT INTO `notas_kanban` (`id`, `titulo`, `cliente_nombre`, `telefono`, `email
 	(11, 'Seguimiento de pedido V-10000002', 'José Pérez', '', '', 'El cliente llamó preguntando por su pedido de marcadores. Revisar con el transportista.', 'seguimiento', 'media', 1, NULL, NULL, '[]', NULL, 1, '2026-01-07 13:15:00', '2026-01-07 22:19:12'),
 	(12, 'Reabastecer stock de Pilot G2', NULL, NULL, NULL, 'Estamos quedando bajos en stock del Bolígrafo Pilot G2 negro. Contactar a Distribuidora Papel.', 'resuelto', 'baja', 1, NULL, NULL, NULL, NULL, 1, '2026-01-07 14:00:00', NULL);
 
+-- Volcando estructura para tabla dbuzz.notificaciones
+DROP TABLE IF EXISTS `notificaciones`;
+CREATE TABLE IF NOT EXISTS `notificaciones` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `usuario_id` int(10) unsigned NOT NULL,
+  `tipo` enum('info','success','warning','error','task_assign','low_stock','security') DEFAULT 'info',
+  `titulo` varchar(100) NOT NULL,
+  `mensaje` text NOT NULL,
+  `enlace` varchar(255) DEFAULT NULL,
+  `leido` tinyint(1) DEFAULT 0,
+  `creado_at` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `usuario_id` (`usuario_id`),
+  CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Volcando datos para la tabla dbuzz.notificaciones: ~0 rows (aproximadamente)
+DELETE FROM `notificaciones`;
+
 -- Volcando estructura para tabla dbuzz.password_reset_tokens
 DROP TABLE IF EXISTS `password_reset_tokens`;
 CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
