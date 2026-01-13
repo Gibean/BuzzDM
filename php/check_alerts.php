@@ -26,7 +26,7 @@ if (isset($_SESSION['usuario_rol']) && in_array($_SESSION['usuario_rol'], ['admi
         }
 
         try {
-            $userId = $_SESSION['user_id'];
+            $userId = $_SESSION['usuario_id'];
 
             // 1. LOW STOCK CHECK
             // Check if we already sent a notification today
