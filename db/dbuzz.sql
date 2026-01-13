@@ -454,7 +454,8 @@ INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VAL
 	(19, 1, 'Denegado', 'Intento de inicio de sesión con usuario bloqueado', '2026-01-07 22:43:58'),
 	(20, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 22:44:18'),
 	(21, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-07 23:58:51'),
-	(22, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-12 20:34:12');
+	(22, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-12 20:34:12'),
+	(23, 1, 'Exitoso', 'Inicio de sesión de admin', '2026-01-13 01:22:10');
 
 -- Volcando estructura para tabla dbuzz.marcas
 DROP TABLE IF EXISTS `marcas`;
@@ -1012,7 +1013,8 @@ INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_e
 	(62, 1, '71d76eea3cdcc60eb5a2ea8c64a87e95a2e99c51d4b798a909e8b4ec800deca6', '2026-01-08 07:43:21', '2026-01-07 18:43:21'),
 	(63, 1, '4d0863ca40f40d8ee23ff66f636464d656301cb9c9603e68458e9ee623a1a2fd', '2026-01-08 11:44:18', '2026-01-07 22:44:18'),
 	(64, 1, 'd308f23ce98669979dcc72c0feafa723ccb3673382af81682061af880f024f51', '2026-01-08 12:58:51', '2026-01-07 23:58:51'),
-	(65, 1, 'c55f38d62996970021baf526ebaa9f59a1c857d6b8b69adc88b34a9e941c0d9c', '2026-01-13 09:34:12', '2026-01-12 20:34:12');
+	(65, 1, 'c55f38d62996970021baf526ebaa9f59a1c857d6b8b69adc88b34a9e941c0d9c', '2026-01-13 09:34:12', '2026-01-12 20:34:12'),
+	(66, 1, '61803dc8ee183ee4fe9da194870d9e75b98cfa37a29ad409c003348af4044ae1', '2026-01-13 14:22:10', '2026-01-13 01:22:10');
 
 -- Volcando estructura para tabla dbuzz.stock_ubicacion
 DROP TABLE IF EXISTS `stock_ubicacion`;
