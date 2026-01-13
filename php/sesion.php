@@ -162,6 +162,20 @@ if (!empty($db_permissions)) {
     $allowed_pages = $fallback_pages;
 }
 
+// Always-allowed APIs for any authenticated user (core system functionality)
+$always_allowed_apis = [
+    'api_notifications.php',
+    'api_stats.php',
+    'search_api.php',
+    'sidebar.php'
+];
+
+// Merge always-allowed APIs into current user's permissions
+if (isset($allowed_pages[$user_role])) {
+    $allowed_pages[$user_role] = array_merge($allowed_pages[$user_role], $always_allowed_apis);
+} else {
+    $allowed_pages[$user_role] = $always_allowed_apis;
+}
 
 // Verificar si la página actual está permitida para el rol del usuario
 if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_pages[$user_role])) {
