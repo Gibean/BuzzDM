@@ -32,7 +32,10 @@ $api_scripts = [
     'almacenes_actions.php',
     'ubicaciones_actions.php',
     // Proveedores
-    'proveedores_actions.php'
+    'proveedores_actions.php',
+    // Notificaciones y estadísticas
+    'api_notifications.php',
+    'api_stats.php'
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -129,7 +132,8 @@ $fallback_pages = [
         'backups.php', 'backup_status.php', 'logs.php', 'process_import.php', 'settings_actions.php',
         'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php', 'productos_search.php',
         'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
-        'proveedores.php', 'proveedores_actions.php', 'todo.php', 'notas_actions.php'
+        'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
+        'api_notifications.php', 'api_stats.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -138,14 +142,16 @@ $fallback_pages = [
         'sidebar.php', 'reports.php', 'pedidos_actions.php', 'search_api.php', 'clientes.php',
         'clientes_actions.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
         'process_import.php', 'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php',
-        'productos_search.php', 'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php',
-        'ubicaciones_actions.php', 'proveedores.php', 'proveedores_actions.php', 'todo.php', 'notas_actions.php'
+        'productos_search.php', 'proveedores_search.php', 'catalogos_actions.php', 'kit_actions.php',
+        'almacenes_actions.php', 'ubicaciones_actions.php', 'proveedores.php', 'proveedores_actions.php',
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
         'pedidos_actions.php', 'search_api.php', 'api_sales_by_status_chart.php',
-        'envios_actions.php', 'product_actions.php', 'todo.php', 'notas_actions.php'
+        'envios_actions.php', 'product_actions.php', 'todo.php', 'notas_actions.php',
+        'api_notifications.php', 'api_stats.php'
     ]
 ];
 
