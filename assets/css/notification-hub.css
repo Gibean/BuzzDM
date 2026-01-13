@@ -1,0 +1,319 @@
+/* ============================================
+   NOTIFICATION HUB - Global Styles
+   Included via sidebar.php for all pages
+   ============================================ */
+
+:root {
+  --notif-bg: rgba(16, 20, 26, 0.98);
+  --notif-border: rgba(255, 160, 0, 0.15);
+  --notif-accent: #ffa000;
+  --notif-blue: #00f2ff;
+  --notif-red: #ff3e3e;
+  --notif-success: #28a745;
+}
+
+/* ============================================
+   NOTIFICATION BELL IN NAVBAR
+   ============================================ */
+.notification-bell-btn {
+  position: relative;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px 14px;
+  margin-left: auto;
+  margin-right: 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.notification-bell-btn:hover {
+  color: var(--notif-accent);
+  background: rgba(255, 160, 0, 0.1);
+  border-color: rgba(255, 160, 0, 0.3);
+}
+
+.notification-bell-btn.has-unread {
+  border-color: rgba(255, 160, 0, 0.3);
+}
+
+.notification-bell-btn.has-unread i {
+  color: var(--notif-accent);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--notif-red);
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 0.65rem;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ============================================
+   OFFCANVAS SIDEBAR - Right Side
+   ============================================ */
+.notification-offcanvas {
+  position: fixed;
+  top: 0;
+  right: -420px;
+  width: 400px;
+  height: 100vh;
+  background: var(--notif-bg);
+  border-left: 1px solid var(--notif-border);
+  z-index: 10001;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(15px);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.6);
+}
+
+.notification-offcanvas.open {
+  right: 0;
+}
+
+/* Overlay when open */
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.notification-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ============================================
+   OFFCANVAS HEADER
+   ============================================ */
+.notification-offcanvas .offcanvas-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255, 160, 0, 0.05) 0%, transparent 100%);
+}
+
+.notification-offcanvas .offcanvas-title {
+  font-family: var(--font-primary, 'Orbitron', sans-serif);
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.5px;
+}
+
+.notification-offcanvas .offcanvas-title i {
+  color: var(--notif-accent);
+}
+
+.notification-offcanvas .offcanvas-close {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notification-offcanvas .offcanvas-close:hover {
+  background: rgba(255, 62, 62, 0.2);
+  border-color: rgba(255, 62, 62, 0.4);
+  color: #fff;
+}
+
+/* ============================================
+   OFFCANVAS ACTIONS
+   ============================================ */
+.notification-offcanvas .offcanvas-actions {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.notification-offcanvas .action-link {
+  color: var(--notif-blue);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.notification-offcanvas .action-link:hover {
+  color: #fff;
+  background: rgba(0, 242, 255, 0.1);
+}
+
+.notification-offcanvas .action-link.text-danger {
+  color: #dc3545;
+}
+
+.notification-offcanvas .action-link.text-danger:hover {
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* ============================================
+   OFFCANVAS BODY
+   ============================================ */
+.notification-offcanvas .offcanvas-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0;
+}
+
+/* Custom scrollbar */
+.notification-offcanvas .offcanvas-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notification-offcanvas .offcanvas-body::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb {
+  background: rgba(255, 160, 0, 0.3);
+  border-radius: 3px;
+}
+
+.notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 160, 0, 0.5);
+}
+
+/* ============================================
+   NOTIFICATION ITEMS
+   ============================================ */
+.notif-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.2s;
+  position: relative;
+  cursor: pointer;
+}
+
+.notif-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.notif-item.unread {
+  background: rgba(0, 242, 255, 0.03);
+  border-left: 3px solid var(--notif-blue);
+}
+
+.notif-icon {
+  font-size: 1.2rem;
+  margin-right: 12px;
+  width: 28px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.notif-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.notif-message {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.notif-time {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 6px;
+  display: block;
+  font-family: var(--font-monospace, monospace);
+}
+
+/* Notification Types */
+.notif-item.type-success .notif-icon { color: var(--notif-success); }
+.notif-item.type-error .notif-icon { color: var(--notif-red); }
+.notif-item.type-warning .notif-icon { color: var(--notif-accent); }
+.notif-item.type-info .notif-icon { color: var(--notif-blue); }
+.notif-item.type-task_assign .notif-icon { color: #d63384; }
+.notif-item.type-security .notif-icon { color: #dc3545; }
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.notif-empty {
+  padding: 60px 30px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.notif-empty i {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 20px;
+  opacity: 0.3;
+  color: var(--notif-accent);
+}
+
+.notif-empty p {
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 576px) {
+  .notification-offcanvas {
+    width: 100%;
+    right: -100%;
+  }
+
+  .notification-bell-btn {
+    padding: 8px 10px;
+    font-size: 1.1rem;
+  }
+}
