@@ -112,6 +112,63 @@ function checkAndRunAutoBackup() {
 }
 
 /**
+ * Check if a BCV rate sync is needed and trigger it
+ */
+function checkAndRunBcvSync() {
+    global $pdo;
+
+    if (!isset($pdo) || !$pdo) return;
+
+    // Cooldown check for BCV (e.g., check every 4 hours)
+    $lockFile = sys_get_temp_dir() . '/buzzdm_bcv_check.lock';
+    $cooldown = 14400; // 4 hours
+
+    if (file_exists($lockFile)) {
+        if ((time() - filemtime($lockFile)) < $cooldown) return;
+    }
+
+    // Update lock file
+    @touch($lockFile);
+
+    try {
+        // Check if we already have today's rate
+        $stmt = $pdo->query("SELECT id FROM tasas_cambio WHERE fecha = CURDATE() AND fuente = 'bcv' LIMIT 1");
+        if (!$stmt->fetch()) {
+            // Trigger bcv update in background
+            triggerBcvSyncAsync();
+        }
+    } catch (Exception $e) {
+        error_log("BUZZ BCV Sync check error: " . $e->getMessage());
+    }
+}
+
+/**
+ * Trigger the BCV sync script asynchronously
+ */
+function triggerBcvSyncAsync() {
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+    $basePath = dirname($scriptName);
+    if (basename($basePath) === 'php') $basePath = dirname($basePath);
+
+    $url = $protocol . '://' . $host . rtrim($basePath, '/') . '/php/tasa_bcv_update.php';
+
+    // Fire and forget
+    if (function_exists('curl_init')) {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 500);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        @curl_exec($ch);
+        curl_close($ch);
+    } else {
+        $context = stream_context_create(['http' => ['timeout' => 0.5, 'ignore_errors' => true]]);
+        @file_get_contents($url, false, $context);
+    }
+}
+
+/**
  * Trigger the backup script asynchronously
  * Uses different methods depending on server configuration
  */
@@ -182,7 +239,8 @@ function getBackupUrl() {
     $token = defined('BACKUP_SECRET_TOKEN') ? BACKUP_SECRET_TOKEN : '';
     $url = $protocol . '://' . $host . $backupScript
          . '?token=' . urlencode($token)
-         . '&fallback=1&json=1';
+         . '&fallback=1&json=1'
+         . '&triggered_by=' . ($_SESSION['usuario_id'] ?? 'unknown');
 
     return $url;
 }

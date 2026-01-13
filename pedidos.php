@@ -122,14 +122,17 @@
                 <form id="createOrderForm">
                     <div class="modal-body position-relative">
                         <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="col-md-7 mb-3">
                                 <label class="form-label text-muted">Buscar Cliente *</label>
                                 <input type="text" class="form-control form-control-buzz" id="createOrderClientSearch" placeholder="Nombre o Cédula" required>
                                 <input type="hidden" id="createOrderSelectedClientId">
                                 <div id="createOrderClientSearchResults" class="list-group position-absolute w-100" style="z-index: 1000;"></div>
                                 <div id="createOrderSelectedClientDisplay" class="mt-2 text-success"></div>
                             </div>
-
+                            <div class="col-md-5 mb-3">
+                                <label class="form-label text-muted">Fecha del Pedido</label>
+                                <input type="datetime-local" class="form-control form-control-buzz" id="createOrderDate" value="<?php echo date('Y-m-d\TH:i'); ?>">
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Dirección de envío *</label>
@@ -230,13 +233,17 @@
                     <div class="modal-body">
                         <input type="hidden" id="editOrderIdHidden">
                         <div class="row">
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label text-muted">ID Cliente *</label>
                                 <input type="text" class="form-control form-control-buzz" id="editOrderCustomerId" required readonly>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label class="form-label text-muted">Referencia</label>
                                 <input type="text" class="form-control form-control-buzz" id="editOrderReference" readonly>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label text-muted">Fecha</label>
+                                <input type="datetime-local" class="form-control form-control-buzz" id="editOrderDate">
                             </div>
                         </div>
                         <div class="mb-3">

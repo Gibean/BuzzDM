@@ -34,7 +34,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <?php
-            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php'];
+            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php'];
             $inventarioActive = in_array($currentPage, $inventarioPages);
             ?>
             <li class="nav-item nav-dropdown <?php echo $inventarioActive ? 'open' : ''; ?>">
@@ -68,6 +68,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             <i class="fas fa-truck"></i> Proveedores
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'catalogos.php' ? 'active' : ''; ?>"
+                           href="catalogos.php">
+                            <i class="fas fa-list"></i> Catálogos
+                        </a>
+                    </li>
                 </ul>
             </li>
             <li class="nav-item">
@@ -82,6 +88,13 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <a class="nav-link-enhanced <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>" href="pedidos.php">
                     <i class="fas fa-shopping-cart nav-icon-enhanced"></i>
                     <span class="nav-text-enhanced">Pedidos</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link-enhanced <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>" href="todo.php">
+                    <i class="fas fa-tasks nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">To-Do</span>
                 </a>
             </li>
 
@@ -144,3 +157,24 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </form>
     </div>
 </nav>
+
+<!-- Notification Hub Offcanvas -->
+<div class="notification-offcanvas" id="notificationHub">
+    <div class="offcanvas-header">
+        <div class="offcanvas-title">
+            <i class="fas fa-bell"></i> Centro de Notificaciones
+        </div>
+        <button class="offcanvas-close" id="closeHub">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="offcanvas-actions">
+        <button class="action-link" id="markAllRead">Marcar todo como leído</button>
+        <button class="action-link text-danger" id="clearHistory">Borrar historial</button>
+    </div>
+    <div class="offcanvas-body" id="notifList">
+        <!-- Notificaciones inyectadas por JS -->
+    </div>
+</div>
+
+<script src="assets/js/notifications.js"></script>

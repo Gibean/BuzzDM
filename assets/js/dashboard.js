@@ -26,6 +26,12 @@ async function loadStats() {
         animateCounter('pendingShipments', stats.pendingShipments);
         animateCounter('monthlyRevenue', stats.monthlyRevenue, true);
 
+        // Nuevos contadores tácticos
+        animateCounter('tcLowStock', stats.lowStockCount);
+        animateCounter('tcCustomers', stats.totalCustomers);
+        animateCounter('tcDailyOrders', stats.dailyOrders);
+        animateCounter('tcInventoryValue', stats.totalInventoryValue, true);
+
         // Actualizar la fecha de "ÚLTIMA ACTUALIZACIÓN"
         const lastUpdateElement = document.getElementById('lastUpdate');
         if (lastUpdateElement) {
@@ -215,6 +221,33 @@ function animateCounter(elementId, targetValue, isCurrency = false) {
     }, 20);
 }
 
+
 function formatCurrency(value) {
-    return 'Pref. ' + new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+    return 'Bs. ' + new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2 }).format(value);
+}
+
+async function syncBcv() {
+    const syncBtn = document.querySelector('[onclick="syncBcv()"]');
+    const icon = syncBtn ? syncBtn.querySelector('i') : null;
+
+    if (icon) icon.classList.add('fa-spin');
+
+    try {
+        const response = await fetch('php/tasa_bcv_update.php');
+        const data = await response.json();
+
+        if (data.success) {
+            const labelMap = { 'bcv': 'BCV', 'paralelo': 'Paralelo', 'bcv_euro': 'Euro', 'binance_usdt': 'USDT' };
+            const cleanLabels = Object.keys(data.rates).map(key => labelMap[key] || key);
+            showToast('Tasas actualizadas: ' + cleanLabels.join(', '), 'success');
+            setTimeout(() => window.location.reload(), 1500);
+        } else {
+            throw new Error(data.error || 'Error desconocido');
+        }
+    } catch (error) {
+        console.error("Error sincronizando tasas:", error);
+        showToast('Error al sincronizar: ' + error.message, 'error');
+    } finally {
+        if (icon) icon.classList.remove('fa-spin');
+    }
 }
