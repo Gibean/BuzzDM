@@ -1,3 +1,4 @@
+<?php
 require_once 'php/sesion.php';
 require_once 'php/db.php'; // Provides $pdo
 require_once 'php/check_alerts.php'; // System notifications
