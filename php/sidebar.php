@@ -157,3 +157,24 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </form>
     </div>
 </nav>
+
+<!-- Notification Hub Offcanvas -->
+<div class="notification-offcanvas" id="notificationHub">
+    <div class="offcanvas-header">
+        <div class="offcanvas-title">
+            <i class="fas fa-bell"></i> Centro de Notificaciones
+        </div>
+        <button class="offcanvas-close" id="closeHub">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="offcanvas-actions">
+        <button class="action-link" id="markAllRead">Marcar todo como leído</button>
+        <button class="action-link text-danger" id="clearHistory">Borrar historial</button>
+    </div>
+    <div class="offcanvas-body" id="notifList">
+        <!-- Notificaciones inyectadas por JS -->
+    </div>
+</div>
+
+<script src="assets/js/notifications.js"></script>
