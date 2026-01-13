@@ -162,9 +162,12 @@ if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_page
     if ($is_api_call) {
         json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
     } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
-        header('Location: dashboard.php');
+        // Fix relative path redirect issues
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard.php' : 'dashboard.php';
+        header("Location: $redirectPath?error=access_denied&code=403");
     } else {
-        header('Location: login.php');
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login.php' : 'login.php';
+        header("Location: $redirectPath?error=auth_required&code=401");
     }
     exit();
 }

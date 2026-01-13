@@ -124,41 +124,41 @@ async function handleFormSubmit(event) {
     const result = await response.json()
 
     if (result.success) {
-      showToast("¡Importación exitosa! " + result.message, "success")
-      document.getElementById("currentStatus").textContent = "Archivo procesado en el servidor."
-      // Here you would typically get actual import progress/results from the server
-      // For now, we'll simulate a successful import for history
-      addToImportHistory({
-        date: new Date().toISOString(),
-        type: formData.get("dataType"),
-        filename: result.data.fileName,
-        status: "exitoso", // Assuming success for now
-        records: 0, // Placeholder
-        errors: 0, // Placeholder
-        user: "admin", // Placeholder
-      })
-    } else {
-      document.getElementById("currentStatus").textContent = "Error en la importación."
-      let errorMessage = result.message || "Error inesperado durante la importación."
-      if (result.errors && Array.isArray(result.errors) && result.errors.length > 0) {
-        errorMessage += "\n\nDetalles de los errores:\n"
-        result.errors.forEach(error => {
-          errorMessage += `- Fila ${error.row}: ${error.message}\n`
-          if (error.data) {
-            errorMessage += `  Datos: ${JSON.stringify(error.data)}\n`
+      document.getElementById("currentStatus").textContent = "Procesamiento finalizado."
+      let totalMsg = ""
+      let hasErrors = false
+
+      // Process per-entity results
+      for (const [entity, stats] of Object.entries(result.results)) {
+          let entityMsg = `<b>${entity}:</b> ${stats.processed} procesados`
+          if (stats.failed > 0) {
+              entityMsg += `, <span class="text-danger">${stats.failed} fallos</span>`
+              hasErrors = true
+          } else {
+              entityMsg += `, <span class="text-success">Exitoso</span>`
           }
-        })
+          totalMsg += `<div>${entityMsg}</div>`
       }
-      showToast("Importación fallida: " + errorMessage, "error")
+
+      showToast("Importación completada", hasErrors ? "warning" : "success")
+
+      // Update status area with detailed breakdown
+      const statusDiv = document.getElementById("currentStatus")
+      statusDiv.innerHTML = totalMsg
+
       addToImportHistory({
         date: new Date().toISOString(),
-        type: formData.get("dataType"),
-        filename: selectedFile.name,
-        status: "error",
-        records: (result.data && result.data.importedRecords) || 0,
-        errors: (result.data && result.data.errorsEncountered) || 1,
+        type: "general",
+        filename: result.data ? result.data.fileName : selectedFile.name,
+        status: hasErrors ? "completado-errores" : "exitoso",
+        records: Object.values(result.results).reduce((acc, curr) => acc + curr.processed, 0),
+        errors: Object.values(result.results).reduce((acc, curr) => acc + curr.failed, 0),
         user: "admin",
       })
+
+    } else {
+      document.getElementById("currentStatus").textContent = "Error crítico en la importación."
+      showToast("Error: " + result.message, "error")
     }
   } catch (error) {
     console.error("Error durante la importación:", error)
@@ -302,3 +302,45 @@ function retryImport(importId) {
   })
 }
 
+
+// Expose function for onclick events
+window.downloadTemplate = async (type) => {
+    // Capture Toast ID
+    let toastId = showToast("Descargando plantilla...", "info")
+
+    try {
+        const response = await fetch(`php/download_template.php?type=${type}`)
+        if (!response.ok) throw new Error("Error en el servidor al descargar")
+
+        const blob = await response.blob()
+        const url = window.URL.createObjectURL(blob)
+
+        // Extract filename from header or assume default
+        let filename = `Plantilla_${type.charAt(0).toUpperCase() + type.slice(1)}.xlsx`
+        const disposition = response.headers.get('Content-Disposition')
+        if (disposition && disposition.indexOf('attachment') !== -1) {
+            const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+            const matches = filenameRegex.exec(disposition);
+            if (matches != null && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '');
+            }
+        }
+
+        const a = document.createElement('a')
+        a.style.display = 'none'
+        a.href = url
+        a.download = filename
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+
+        // Update the existing toast instead of showing a new one
+        updateToast(toastId, `Plantilla descargada: ${filename}`, "success")
+
+    } catch (error) {
+        console.error("Download error:", error)
+        // Update toast with error
+        updateToast(toastId, "Error al descargar la plantilla.", "error")
+    }
+}

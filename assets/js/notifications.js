@@ -1,131 +1,205 @@
+/**
+ * BuzzDM Notification Hub Logic
+ * Handles polling, UI updates, and interactions for the notification system.
+ */
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Crea el contenedor para las notificaciones toast si no existe.
-    if (!document.getElementById('toast-container')) {
-        const container = document.createElement('div');
-        container.id = 'toast-container';
-        document.body.appendChild(container);
-    }
+    const hub = document.getElementById('notificationHub');
+    const closeBtn = document.getElementById('closeHub');
+    const notifList = document.getElementById('notifList');
+    const markAllReadBtn = document.getElementById('markAllRead');
+    const clearHistoryBtn = document.getElementById('clearHistory');
+
+    // Inject Bell Icon
+    injectBellIcon();
+
+    // Event Listeners
+    if (closeBtn) closeBtn.onclick = toggleHub;
+    if (markAllReadBtn) markAllReadBtn.onclick = () => performAction('mark_read', 'all');
+    if (clearHistoryBtn) clearHistoryBtn.onclick = () => performAction('delete', 'all_read');
+
+    // Initial Fetch & Polling (every 60s)
+    fetchNotifications();
+    setInterval(fetchNotifications, 60000);
 });
 
-/**
- * Muestra una notificación estilo toast en la esquina superior derecha.
- * @param {string} message El mensaje a mostrar.
- * @param {string} type Tipo de notificación (success, error, info, warning). Por defecto es 'info'.
- * @param {number} duration Duración en milisegundos. Por defecto es 4000.
- */
-function showNotification(message, type = 'info', duration = 4000) {
-    const container = document.getElementById('toast-container');
-    if (!container) return;
+function injectBellIcon() {
+    // Try to find the top navbar actions area
+    const topNavbar = document.querySelector('.top-navbar > div'); // Adjust selector based on layout
+    // Or maybe a specific container. If not found, create a floating one.
 
-    const toast = document.createElement('div');
-    toast.className = `toast-notification toast-${type}`;
-    toast.innerHTML = `<span>${message}</span>`;
+    let container = topNavbar;
+    let isFloating = false;
 
-    container.appendChild(toast);
+    if (!container) {
+        // Fallback: Fixed position
+        /*
+        container = document.createElement('div');
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.right = '20px'; // Conflict with toasts? Move left or adjust.
+        container.style.zIndex = '9990';
+        document.body.appendChild(container);
+        isFloating = true;
+        */
 
-    // Animar la entrada
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100); // Pequeño retraso para asegurar que la transición ocurra
+       // Ideally, sidebar.php should have provided a hook, but let's try to append to the .top-navbar if it exists outside the div
+       const nav = document.querySelector('.top-navbar');
+       if (nav) {
+           container = nav.querySelector('div') || nav;
+       } else {
+           // Last resort: Fixed floating button bottom-left or simply don't show (but we must)
+           return; // User has to ensure top-navbar exists.
+       }
+    }
 
-    // Ocultar y eliminar la notificación después de la duración especificada
-    setTimeout(() => {
-        toast.classList.remove('show');
-        toast.addEventListener('transitionend', () => toast.remove());
-    }, duration);
+    const btn = document.createElement('button');
+    btn.className = 'notification-bell-btn';
+    btn.id = 'notifBell';
+    btn.innerHTML = '<i class="fas fa-bell"></i><span class="notification-badge" style="display:none">0</span>';
+    btn.onclick = toggleHub;
+
+    // Prepend to be the first item or append?
+    // In top-navbar usually: [Toggle Sidebar] [Title] ..... [Actions]
+    // If container is flex, appending puts it at the end.
+    container.appendChild(btn);
 }
 
-/**
- * Muestra un diálogo modal genérico.
- * @param {string} title Título del modal.
- * @param {string} message Mensaje o contenido HTML del cuerpo del modal.
- * @param {string} type Tipo de modal para colorear el encabezado (success, error, warning, info, confirm).
- * @param {Array<Object>} buttons Array de objetos para los botones del footer.
- *                                Cada objeto: { text, class, onClick }
- */
-function showModal(title, message, type, buttons = []) {
-    // Eliminar cualquier modal existente
-    const existingModal = document.querySelector('.modal-overlay');
-    if (existingModal) existingModal.remove();
+function toggleHub() {
+    const hub = document.getElementById('notificationHub');
+    const isActive = hub.classList.contains('open');
+    if (isActive) {
+        hub.classList.remove('open');
+    } else {
+        hub.classList.add('open');
+        // Re-fetch when opening
+        fetchNotifications();
+    }
+}
 
-    const modalOverlay = document.createElement('div');
-    modalOverlay.className = 'modal-overlay';
+async function fetchNotifications() {
+    try {
+        const response = await fetch('php/api_notifications.php?action=fetch');
+        const data = await response.json();
 
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal-content';
+        if (data.success) {
+            updateBadge(data.unread_count);
+            renderNotifications(data.notifications);
+        }
+    } catch (error) {
+        console.error("Error fetching notifications:", error);
+    }
+}
 
-    const modalHeader = document.createElement('div');
-    modalHeader.className = `modal-header modal-header-${type}`;
-    modalHeader.textContent = title;
+function updateBadge(count) {
+    const badge = document.querySelector('.notification-badge');
+    const bell = document.querySelector('.notification-bell-btn');
+    if (!badge || !bell) return;
 
-    const modalBody = document.createElement('div');
-    modalBody.className = 'modal-body';
-    modalBody.innerHTML = message;
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'block';
+        bell.classList.add('has-unread');
+    } else {
+        badge.style.display = 'none';
+        bell.classList.remove('has-unread');
+    }
+}
 
-    const modalFooter = document.createElement('div');
-    modalFooter.className = 'modal-footer';
+function renderNotifications(notifications) {
+    const list = document.getElementById('notifList');
+    if (!list) return;
 
-    // Función para cerrar el modal
-    const closeModal = () => {
-        modalOverlay.classList.remove('show');
-        modalOverlay.addEventListener('transitionend', () => modalOverlay.remove());
-    };
+    list.innerHTML = '';
 
-    buttons.forEach(btnInfo => {
-        const button = document.createElement('button');
-        button.className = `modal-button ${btnInfo.class}`;
-        button.textContent = btnInfo.text;
-        button.onclick = (e) => {
-            if (btnInfo.onClick) {
-                btnInfo.onClick(e);
+    if (notifications.length === 0) {
+        list.innerHTML = `
+            <div class="notif-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>No tienes notificaciones</p>
+            </div>
+        `;
+        return;
+    }
+
+    notifications.forEach(notif => {
+        const item = document.createElement('div');
+        item.className = `notif-item type-${notif.tipo} ${notif.leido == 0 ? 'unread' : ''}`;
+
+        // Icon logic
+        let icon = 'fa-info-circle';
+        if (notif.tipo === 'success') icon = 'fa-check-circle';
+        if (notif.tipo === 'error') icon = 'fa-exclamation-triangle';
+        if (notif.tipo === 'warning') icon = 'fa-exclamation-circle';
+        if (notif.tipo === 'task_assign') icon = 'fa-tasks';
+        if (notif.tipo === 'security') icon = 'fa-shield-alt';
+
+        const timeAgo = timeSince(new Date(notif.creado_at));
+
+        item.innerHTML = `
+            <div style="display:flex; align-items:flex-start">
+                 <div class="notif-icon"><i class="fas ${icon}"></i></div>
+                 <div class="notif-content">
+                     <div class="notif-title">${notif.titulo}</div>
+                     <div class="notif-message">${notif.mensaje}</div>
+                     <small class="notif-time">${timeAgo}</small>
+                 </div>
+                 ${notif.leido == 0 ? '<div style="width:8px; height:8px; background:var(--tactical-blue); border-radius:50%; margin-top:6px;"></div>' : ''}
+            </div>
+        `;
+
+        item.onclick = (e) => {
+            // If click on checking/action buttons logic (if any)
+            if (notif.enlace) {
+                window.location.href = notif.enlace;
             }
-            closeModal(); // Cierra el modal por defecto al hacer clic en un botón
+            if (notif.leido == 0) {
+                markAsRead(notif.id);
+            }
         };
-        modalFooter.appendChild(button);
+
+        // Add long press or separate delete button logic?
+        // Simplicity: Right click to delete? Or hover actions?
+        // For now, simple click reads it.
+
+        list.appendChild(item);
     });
-
-    modalContent.append(modalHeader, modalBody, modalFooter);
-    modalOverlay.appendChild(modalContent);
-    document.body.appendChild(modalOverlay);
-
-    // Animar la entrada
-    setTimeout(() => {
-        modalOverlay.classList.add('show');
-    }, 50);
 }
 
-/**
- * Muestra un modal de confirmación simple con botones Aceptar/Cancelar.
- * @param {string} title Título del diálogo.
- * @param {string} message Mensaje de confirmación.
- * @param {function} onConfirm Función a ejecutar si el usuario confirma.
- */
-function showConfirmation(title, message, onConfirm) {
-    showModal(title, message, 'confirm', [
-        {
-            text: 'Cancelar',
-            class: 'btn-secondary',
-            onClick: () => {}
-        },
-        {
-            text: 'Aceptar',
-            class: 'btn-primary',
-            onClick: onConfirm
-        }
-    ]);
+async function markAsRead(id) {
+    await performAction('mark_read', id);
+    fetchNotifications(); // Refresh UI
 }
 
-/**
- * Muestra un modal de error simple.
- * @param {string} title Título del error.
- * @param {string} message Mensaje del error.
- */
-function showErrorModal(title, message) {
-    showModal(title, message, 'error', [
-        {
-            text: 'Cerrar',
-            class: 'btn-danger',
-            onClick: () => {}
-        }
-    ]);
+async function performAction(action, id) {
+    try {
+        const formData = new FormData();
+        formData.append('action', action);
+        formData.append('id', id);
+
+        await fetch('php/api_notifications.php', {
+            method: 'POST',
+            body: formData
+        });
+
+        fetchNotifications();
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// Utility: Time Ago
+function timeSince(date) {
+  const seconds = Math.floor((new Date() - date) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " años";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " meses";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " días";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " horas";
+  interval = seconds / 60;
+  if (interval > 1) return Math.floor(interval) + " minutos";
+  return Math.floor(seconds) + " segundos";
 }

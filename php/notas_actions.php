@@ -5,6 +5,7 @@
 
 require_once 'sesion.php';
 require_once 'db.php';
+require_once 'notification_functions.php';
 
 header('Content-Type: application/json');
 
@@ -126,13 +127,13 @@ try {
                 $input['titulo'],
                 $input['cliente_nombre'] ?? null,
                 $input['telefono'] ?? null,
-                $input['email'] ?? null,
                 $input['contenido'] ?? '',
                 $input['estado'] ?? 'pendiente',
                 $input['prioridad'] ?? 'media',
                 $_SESSION['usuario_id'],
                 $fecha_entrega,
-                $input['etiquetas'] ?? null
+                $input['etiquetas'] ?? null,
+                $miembrosJson
             ]);
 
             $notaId = $pdo->lastInsertId();
@@ -161,6 +162,15 @@ try {
                 }
             }
 
+            // Notify Assigned Members
+            if (!empty($input['miembros']) && is_array($input['miembros'])) {
+                foreach ($input['miembros'] as $memberId) {
+                    if ($memberId != $_SESSION['usuario_id']) {
+                        createNotification($pdo, $memberId, 'task_assign', 'Nueva Tarea Asignada', 'Te han asignado la tarea: ' . $input['titulo'], 'todo.php?id=' . $notaId);
+                    }
+                }
+            }
+
             $pdo->commit();
             json_response(true, ['id' => $notaId], "Nota creada correctamente");
             break;
@@ -180,9 +190,16 @@ try {
 
             // Actualización completa
             $pdo->beginTransaction();
+
+            // Handle Miembros
+            $miembrosJson = null;
+            if (isset($input['miembros']) && is_array($input['miembros'])) {
+                 $miembrosJson = json_encode($input['miembros']);
+            }
+
             $stmt = $pdo->prepare("
                 UPDATE notas_kanban
-                SET titulo = ?, cliente_nombre = ?, telefono = ?, email = ?, contenido = ?, estado = ?, prioridad = ?, fecha_entrega = ?, etiquetas = ?
+                SET titulo = ?, cliente_nombre = ?, telefono = ?, email = ?, contenido = ?, estado = ?, prioridad = ?, fecha_entrega = ?, etiquetas = ?, miembros = ?
                 WHERE id = ?
             ");
             $fecha_entrega = !empty($input['fecha_entrega']) ? $input['fecha_entrega'] : null;
@@ -197,6 +214,7 @@ try {
                 $input['prioridad'] ?? 'media',
                 $fecha_entrega,
                 $input['etiquetas'] ?? null,
+                $miembrosJson,
                 $notaId
             ]);
 
@@ -224,6 +242,16 @@ try {
                 $stmtAdj = $pdo->prepare("INSERT INTO notas_adjuntos (nota_id, nombre, url) VALUES (?, ?, ?)");
                 foreach ($input['adjuntos'] as $adj) {
                     $stmtAdj->execute([$notaId, $adj['nombre'] ?? 'Sin nombre', $adj['url']]);
+                }
+            }
+
+            // Notify Assigned Members (Simple Approach: Notify all current members on update)
+            // Ideally we should check diff, but notifying on update is also valid "Task Updated"
+            if (!empty($input['miembros']) && is_array($input['miembros'])) {
+                foreach ($input['miembros'] as $memberId) {
+                    if ($memberId != $_SESSION['usuario_id']) {
+                        createNotification($pdo, $memberId, 'task_assign', 'Tarea Actualizada', 'Se ha actualizado una tarea asignada: ' . $input['titulo'], 'todo.php?id=' . $notaId);
+                    }
                 }
             }
 

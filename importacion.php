@@ -9,6 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css">
+    <link rel="stylesheet" href="assets/css/dashboard-effects.css">
 </head>
 <body>
      <!-- Sidebar (same structure as other pages)  -->
@@ -60,6 +61,29 @@
                     </div>
                     <div class="col-md-4">
                         <h6 class="font-mono text-muted mb-3">OPCIONES DE IMPORTACIÓN</h6>
+
+                        <div class="mb-4">
+                            <label class="form-label small text-muted">Descargar Plantillas:</label>
+                            <div class="d-grid gap-2">
+                                <div class="btn-group">
+                                    <button type="button" onclick="downloadTemplate('productos')" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-box"></i> Prod.
+                                    </button>
+                                    <button type="button" onclick="downloadTemplate('clientes')" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-users"></i> Cli.
+                                    </button>
+                                    <button type="button" onclick="downloadTemplate('proveedores')" class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-truck"></i> Prov.
+                                    </button>
+                                </div>
+                                <button type="button" onclick="downloadTemplate('catalogos')" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-tags"></i> Catálogos (Marcas/Cats)
+                                </button>
+                            </div>
+                        </div>
+
+                        <hr class="border-secondary opacity-10 my-3">
+
                         <button type="submit" class="btn btn-buzz w-100" id="importBtn" disabled>
                             <i class="fas fa-upload"></i> Iniciar Importación
                         </button>
