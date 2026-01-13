@@ -5,7 +5,7 @@
 
 const ModalUtils = {
     // Open modal instantly
-    openModal: function(modalId) {
+    openModal: function(modalId, options = {}) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
@@ -13,7 +13,7 @@ const ModalUtils = {
         modal.style.display = 'flex';
 
         // Add event listeners
-        this.addModalEventListeners(modalId);
+        this.addModalEventListeners(modalId, options);
 
         // Focus first input
         setTimeout(() => {
@@ -85,27 +85,31 @@ const ModalUtils = {
     },
 
     // Add event listeners for modal
-    addModalEventListeners: function(modalId) {
+    addModalEventListeners: function(modalId, options = {}) {
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
-        // Close on ESC key
-        const escHandler = (e) => {
-            if (e.key === 'Escape') {
-                this.closeModal(modalId);
-            }
-        };
-        modal._escHandler = escHandler;
-        document.addEventListener('keydown', escHandler);
+        // Close on ESC key (only if not static)
+        if (!options.static) {
+            const escHandler = (e) => {
+                if (e.key === 'Escape') {
+                    this.closeModal(modalId);
+                }
+            };
+            modal._escHandler = escHandler;
+            document.addEventListener('keydown', escHandler);
+        }
 
-        // Close on outside click
-        const outsideClickHandler = (e) => {
-            if (e.target === modal) {
-                this.closeModal(modalId);
-            }
-        };
-        modal._outsideClickHandler = outsideClickHandler;
-        modal.addEventListener('click', outsideClickHandler);
+        // Close on outside click (only if not static)
+        if (!options.static) {
+            const outsideClickHandler = (e) => {
+                if (e.target === modal) {
+                    this.closeModal(modalId);
+                }
+            };
+            modal._outsideClickHandler = outsideClickHandler;
+            modal.addEventListener('click', outsideClickHandler);
+        }
     },
 
     // Remove event listeners
@@ -161,8 +165,8 @@ const ModalUtils = {
 // Make globally available
 window.ModalUtils = ModalUtils;
 
-// Convenience functions
-window.openModal = (modalId) => ModalUtils.openModal(modalId);
+window.openModal = (modalId, options = {}) => ModalUtils.openModal(modalId, options);
 window.closeModal = (modalId, callback) => ModalUtils.closeModal(modalId, callback);
 window.showModalLoading = (modalId, message) => ModalUtils.showLoading(modalId, message);
 window.hideModalLoading = (modalId) => ModalUtils.hideLoading(modalId);
+window.setTitle = (modalId, title) => ModalUtils.setTitle(modalId, title);
