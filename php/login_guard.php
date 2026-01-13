@@ -107,6 +107,14 @@ try {
 
             $response_message = 'Demasiados intentos, usuario bloqueado. Contacte al administrador para recuperar su contraseña.';
             $log_detail = 'Máximo intento de contraseña, usuario bloqueado';
+
+            // Notify Admins
+            require_once 'notification_functions.php'; // Ensure helper is available
+            $stmtAdmins = $pdo->query("SELECT id FROM usuarios WHERE rol = 'admin'");
+            while ($admin = $stmtAdmins->fetch(PDO::FETCH_ASSOC)) {
+                $msg = "El usuario con email $email ha sido bloqueado tras 10 intentos fallidos.";
+                createNotification($pdo, $admin['id'], 'security', 'Usuario Bloqueado', $msg, 'users.php?search=' . urlencode($email));
+            }
         } else {
             $update_stmt = $pdo->prepare("UPDATE usuarios SET intentos_fallidos = ? WHERE id = ?");
             $update_stmt->execute([$new_attempts, $user_id]);

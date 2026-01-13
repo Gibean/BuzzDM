@@ -87,12 +87,13 @@ function formatCurrency(amount) {
 // --- Notification and Modal System ---
 
 /**
- * Creates and shows a toast notification in the top-right corner.
+ * Creates and shows a persistent notification in the top-right corner.
  * @param {string} message The message to display.
- * @param {string} type The type of toast (success, error, info). Defaults to 'info'.
- * @param {number} duration Duration in ms. Defaults to 3000.
+ * @param {string} type The type of toast (success, error, info, warning). Defaults to 'info'.
+ * @param {number} duration Ignored in this persistent version.
+ * @returns {string} The unique ID of the created toast.
  */
-function showToast(message, type = 'info', duration = 3000) {
+function showToast(message, type = 'info', duration = null) {
     let container = document.getElementById('toast-container');
     if (!container) {
         container = document.createElement('div');
@@ -100,22 +101,156 @@ function showToast(message, type = 'info', duration = 3000) {
         document.body.appendChild(container);
     }
 
+    // Check if Clear All button exists, if not create it but hide it initially
+    let clearBtn = container.querySelector('.clear-all-btn');
+    if (!clearBtn) {
+        clearBtn = document.createElement('button');
+        clearBtn.className = 'clear-all-btn';
+        clearBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Limpiar Todo';
+        clearBtn.onclick = () => clearAllToasts();
+        clearBtn.style.display = 'none';
+        container.prepend(clearBtn); // Add to top
+    }
+
+    // Generate Unique ID
+    const toastId = 'toast-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+
+    // Create Toast Card
     const toast = document.createElement('div');
-    toast.className = `toast ${type}`;
-    toast.textContent = message;
+    toast.className = `toast-card ${type}`;
+    toast.id = toastId;
 
+    // Icon mapping
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-triangle',
+        warning: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    };
+
+    // Title mapping
+    const titles = {
+        success: 'Éxito',
+        error: 'Error',
+        warning: 'Alerta',
+        info: 'Información'
+    };
+
+    const iconClass = icons[type] || icons.info;
+    const titleText = titles[type] || 'Notificación';
+
+    // Timestamp
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    toast.innerHTML = `
+        <div class="toast-header">
+            <span class="toast-type">
+                <i class="fas ${iconClass}"></i> <span class="toast-title-text">${titleText}</span>
+            </span>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <span class="toast-time" style="font-size:0.7em; opacity:0.7">${time}</span>
+                <button class="toast-close" onclick="dismissToast(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+    `;
+
+    // Append to container (below clear button)
     container.appendChild(toast);
+    updateClearButtonVisibility();
 
-    // Animate in
-    setTimeout(() => {
-        toast.classList.add('show');
-    }, 100); // Small delay to allow CSS transition
+    return toastId;
+}
 
-    // Hide and remove after duration
-    setTimeout(() => {
-        toast.classList.remove('show');
-        toast.addEventListener('transitionend', () => toast.remove());
-    }, duration);
+/**
+ * Updates an existing toast notification with new content and type.
+ * @param {string} toastId The ID of the toast to update.
+ * @param {string} message The new message body.
+ * @param {string} type The new type (success, error, etc.).
+ */
+function updateToast(toastId, message, type = 'info') {
+    const toast = document.getElementById(toastId);
+    if (!toast) {
+        // Fallback: create new if not found
+        return showToast(message, type);
+    }
+
+    // Update classes
+    toast.className = `toast-card ${type}`;
+
+    // Icon mapping
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-triangle',
+        warning: 'fa-exclamation-circle',
+        info: 'fa-info-circle'
+    };
+
+    const titles = {
+        success: 'Éxito',
+        error: 'Error',
+        warning: 'Alerta',
+        info: 'Información'
+    };
+
+    const iconClass = icons[type] || icons.info;
+    const titleText = titles[type] || 'Notificación';
+
+    // Update Header Content
+    const typeContainer = toast.querySelector('.toast-type');
+    if (typeContainer) {
+        typeContainer.innerHTML = `<i class="fas ${iconClass}"></i> <span class="toast-title-text">${titleText}</span>`;
+    }
+
+    // Update Body Content
+    const bodyContainer = toast.querySelector('.toast-body');
+    if (bodyContainer) {
+        bodyContainer.innerHTML = message;
+    }
+
+    // Update Timestamp
+    const timeContainer = toast.querySelector('.toast-time');
+    if (timeContainer) {
+        timeContainer.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+}
+
+function dismissToast(btn) {
+    const card = btn.closest('.toast-card');
+    card.classList.add('hiding');
+    card.addEventListener('animationend', () => {
+        card.remove();
+        updateClearButtonVisibility();
+    });
+}
+
+function clearAllToasts() {
+    const container = document.getElementById('toast-container');
+    const toasts = container.querySelectorAll('.toast-card');
+    toasts.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('hiding');
+            card.addEventListener('animationend', () => card.remove());
+        }, index * 50); // Staggered removal
+    });
+    setTimeout(updateClearButtonVisibility, toasts.length * 50 + 300);
+}
+
+function updateClearButtonVisibility() {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    // Count visible toasts (not hiding)
+    const count = container.querySelectorAll('.toast-card:not(.hiding)').length;
+    const clearBtn = container.querySelector('.clear-all-btn');
+
+    if (clearBtn) {
+        clearBtn.style.display = count > 1 ? 'block' : 'none';
+    }
 }
 
 /**
@@ -271,3 +406,40 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+
+// --- Global Error Handling for URL Parameters ---
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    const code = urlParams.get('code');
+
+    if (error) {
+        let title = "Notificación del Sistema";
+        let message = "Se ha registrado un evento.";
+        let type = "info";
+
+        if (error === 'access_denied') {
+            title = "Acceso Denegado";
+            message = "No tienes los permisos necesarios para acceder a esta sección o realizar esta acción.";
+            if (code === '403') title += " (403)";
+            type = "error";
+        } else if (error === 'auth_required') {
+            title = "Autenticación Requerida";
+            message = "Tu sesión ha expirado o necesitas iniciar sesión para continuar.";
+            if (code === '401') title += " (401)";
+            type = "warning";
+        }
+
+        if (typeof showModal === 'function') {
+             showModal({
+                title: title,
+                message: message,
+                type: type
+            });
+        }
+
+        // Clean URL to prevent modal from reappearing on refresh
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: newUrl}, '', newUrl);
+    }
+});
