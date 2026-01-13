@@ -15,6 +15,9 @@ if ($usuarioRol === 'admin') {
 
 $currentPage = basename($_SERVER['PHP_SELF']);
 ?>
+<!-- Notification Hub CSS - Global include -->
+<link rel="stylesheet" href="assets/css/notification-hub.css">
+
 <nav class="sidebar sidebar-enhanced" id="sidebar">
     <div class="sidebar-header-enhanced">
         <div class="logo-container">
@@ -158,6 +161,9 @@ $currentPage = basename($_SERVER['PHP_SELF']);
     </div>
 </nav>
 
+<!-- Notification Overlay (closes hub when clicked) -->
+<div class="notification-overlay" id="notificationOverlay"></div>
+
 <!-- Notification Hub Offcanvas -->
 <div class="notification-offcanvas" id="notificationHub">
     <div class="offcanvas-header">
@@ -178,3 +184,4 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 </div>
 
 <script src="assets/js/notifications.js"></script>
+
