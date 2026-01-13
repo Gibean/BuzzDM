@@ -20,17 +20,17 @@ if (strlen($query) < 2) {
 try {
     $pdo = getDbConnection();
 
+    $searchTerm = '%' . $query . '%';
+
     $sql = "SELECT id, nombre, contacto_nombre, telefono
             FROM proveedores
-            WHERE nombre LIKE :query
-               OR contacto_nombre LIKE :query
+            WHERE nombre LIKE ?
+               OR contacto_nombre LIKE ?
             ORDER BY nombre ASC
-            LIMIT :limit";
+            LIMIT ?";
 
     $stmt = $pdo->prepare($sql);
-    $stmt->bindValue(':query', '%' . $query . '%', PDO::PARAM_STR);
-    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-    $stmt->execute();
+    $stmt->execute([$searchTerm, $searchTerm, $limit]);
 
     $proveedores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

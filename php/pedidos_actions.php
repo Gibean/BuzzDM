@@ -138,10 +138,11 @@ try {
                 $referencia = strval(mt_rand(1000000000, 9999999999));
 
                 // Insert order
-                $stmt = $pdo->prepare("INSERT INTO pedidos (cliente_id, referencia, fecha_creacion, total, estado_pago, estado_envio, direccion_envio, notas_envio) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?)");
+                $stmt = $pdo->prepare("INSERT INTO pedidos (cliente_id, referencia, fecha_creacion, total, estado_pago, estado_envio, direccion_envio, notas_envio) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $input['cliente_id'],
                     $referencia,
+                    $input['fecha_creacion'] ?? date('Y-m-d H:i:s'),
                     $input['total'],
                     $input['estado_pago'],
                     $input['estado_envio'],
@@ -198,10 +199,11 @@ try {
                 }
 
                 // Update order
-                $stmt = $pdo->prepare("UPDATE pedidos SET cliente_id = ?, referencia = ?, total = ?, estado_pago = ?, estado_envio = ?, direccion_envio = ?, notas_envio = ? WHERE id = ?");
+                $stmt = $pdo->prepare("UPDATE pedidos SET cliente_id = ?, referencia = ?, fecha_creacion = ?, total = ?, estado_pago = ?, estado_envio = ?, direccion_envio = ?, notas_envio = ? WHERE id = ?");
                 $stmt->execute([
                     $input['cliente_id'], // Removed (int) cast
                     $input['referencia'],
+                    $input['fecha_creacion'] ?? date('Y-m-d H:i:s'),
                     $input['total'],
                     $input['estado_pago'],
                     $input['estado_envio'],

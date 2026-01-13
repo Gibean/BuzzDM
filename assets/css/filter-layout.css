@@ -150,3 +150,60 @@
         flex: 1;
     }
 }
+/* ============================================
+   ADVANCED FILTERS OPTIMIZATION
+   ============================================ */
+
+.advanced-filters-section {
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.advanced-filters-section.d-none {
+    display: none !important;
+}
+
+/* Badge for active filters */
+#activeFiltersBadge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.45rem;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+/* Animations */
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.advanced-filters-section:not(.d-none) {
+    animation: fadeInDown 0.3s ease-out forwards;
+}
+
+/* Extra polishing for filters */
+.filter-group .position-relative i {
+    pointer-events: none;
+}
+
+.filter-group .form-control-buzz:focus + i {
+    color: var(--buzz-primary) !important;
+}
+
+/* Responsive adjustments for advanced section */
+@media (max-width: 768px) {
+    .advanced-filters-section .filter-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .advanced-filters-section .filter-group {
+        width: 100%;
+    }
+}
