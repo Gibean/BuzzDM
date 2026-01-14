@@ -37,9 +37,7 @@ try {
     $stmt = $pdo->query("SELECT COUNT(*) FROM v_low_stock");
     $lowStockCount = $stmt->fetchColumn();
 
-    // Valor total del inventario
-    $stmt = $pdo->query("SELECT SUM(stock * precio) FROM productos WHERE deleted_at IS NULL");
-    $totalInventoryValue = $stmt->fetchColumn() ?? 0;
+
 
     // Pedidos de hoy
     $stmt = $pdo->query("SELECT COUNT(*) FROM pedidos WHERE DATE(fecha_creacion) = CURDATE()");
@@ -111,10 +109,7 @@ try {
                 <span class="node-label"><i class="fas fa-truck me-1"></i> Pendientes</span>
                 <span class="node-value red" id="pendingShipments">0</span>
             </div>
-            <div class="status-node d-none d-xl-flex">
-                <span class="node-label"><i class="fas fa-database me-1"></i> Valor Inventario</span>
-                <span class="node-value blue" id="tcInventoryValue">$0</span>
-            </div>
+
             <div class="status-node">
                 <span class="node-label"><i class="fas fa-chart-line me-1"></i> Ingresos Mes</span>
                 <span class="node-value" id="monthlyRevenue">$0</span>
