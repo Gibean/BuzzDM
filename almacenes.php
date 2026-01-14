@@ -127,91 +127,113 @@
     <div id="almacenModal" class="modal-buzz">
         <div class="modal-content-buzz">
             <div class="modal-header-buzz">
-                <h4 id="almacenModalTitle"><i class="fas fa-warehouse me-2"></i>Nuevo Almacén</h4>
+                <h5 class="font-primary text-primary" id="almacenModalTitle">
+                    <i class="fas fa-warehouse"></i> Nuevo Almacén
+                </h5>
                 <button type="button" class="close-buzz" onclick="closeAlmacenModal()">&times;</button>
             </div>
-        <div class="modal-body-buzz">
             <form id="almacenForm" onsubmit="event.preventDefault(); saveAlmacen();">
                 <input type="hidden" id="almacenId">
+                <div class="modal-body-buzz">
+                    <!-- Información Básica -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Código *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="almacenCodigo"
+                                           placeholder="ALM-001" maxlength="20" required>
+                                </div>
+                            </div>
+                            <div class="col-md-8 mb-3">
+                                <label class="form-label">Nombre *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="almacenNombre"
+                                           placeholder="Nombre del almacén" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Tipo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <select class="form-control form-control-buzz" id="almacenTipo">
+                                        <option value="almacen">Almacén</option>
+                                        <option value="bodega">Bodega</option>
+                                        <option value="tienda">Tienda</option>
+                                        <option value="deposito">Depósito</option>
+                                        <option value="otro">Otro</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="almacenTelefono"
+                                           placeholder="+1 234 567 8900">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-map-marker-alt"></i></span>
+                                <input type="text" class="form-control form-control-buzz" id="almacenDireccion"
+                                       placeholder="Calle, número, ciudad...">
+                            </div>
+                        </div>
+                    </div>
 
-                <!-- Información Básica -->
-                <div class="modal-section">
-                    <div class="modal-section-title">
-                        <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
-                    </div>
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label text-muted">Código *</label>
-                            <input type="text" class="form-control form-control-buzz" id="almacenCodigo"
-                                   placeholder="ALM-001" maxlength="20" required>
+                    <!-- Configuración -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-cog"></i> CONFIGURACIÓN
                         </div>
-                        <div class="col-md-8 mb-3">
-                            <label class="form-label text-muted">Nombre *</label>
-                            <input type="text" class="form-control form-control-buzz" id="almacenNombre"
-                                   placeholder="Nombre del almacén" required>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="almacenPrincipalCheck">
+                                    <label class="form-check-label" for="almacenPrincipalCheck">
+                                        <i class="fas fa-star text-warning me-1"></i> Almacén Principal
+                                    </label>
+                                    <small class="text-muted d-block">Se usará como destino por defecto</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="almacenActivo" checked>
+                                    <label class="form-check-label" for="almacenActivo">
+                                        <i class="fas fa-check-circle text-success me-1"></i> Activo
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Tipo</label>
-                            <select class="form-control form-control-buzz" id="almacenTipo">
-                                <option value="almacen">Almacén</option>
-                                <option value="bodega">Bodega</option>
-                                <option value="tienda">Tienda</option>
-                                <option value="deposito">Depósito</option>
-                                <option value="otro">Otro</option>
-                            </select>
+                        <div class="mb-3">
+                            <label class="form-label">Notas</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-sticky-note"></i></span>
+                                <textarea class="form-control form-control-buzz" id="almacenNotas" rows="2"
+                                          placeholder="Observaciones adicionales..."></textarea>
+                            </div>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Teléfono</label>
-                            <input type="text" class="form-control form-control-buzz" id="almacenTelefono"
-                                   placeholder="+1 234 567 8900">
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Dirección</label>
-                        <input type="text" class="form-control form-control-buzz" id="almacenDireccion"
-                               placeholder="Calle, número, ciudad...">
                     </div>
                 </div>
-
-                <!-- Configuración -->
-                <div class="modal-section">
-                    <div class="modal-section-title">
-                        <i class="fas fa-cog"></i> CONFIGURACIÓN
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="almacenPrincipalCheck">
-                                <label class="form-check-label" for="almacenPrincipalCheck">
-                                    <i class="fas fa-star text-warning me-1"></i> Almacén Principal
-                                </label>
-                                <small class="text-muted d-block">Se usará como destino por defecto</small>
-                            </div>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="almacenActivo" checked>
-                                <label class="form-check-label" for="almacenActivo">
-                                    <i class="fas fa-check-circle text-success me-1"></i> Activo
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label text-muted">Notas</label>
-                        <textarea class="form-control form-control-buzz" id="almacenNotas" rows="2"
-                                  placeholder="Observaciones adicionales..."></textarea>
-                    </div>
+                <div class="modal-footer-buzz">
+                    <button type="button" class="btn btn-outline-buzz" onclick="closeAlmacenModal()">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-buzz">
+                        <i class="fas fa-save me-2"></i>Guardar
+                    </button>
                 </div>
             </form>
-        </div>
-        <div class="modal-footer-buzz">
-            <button type="button" class="btn btn-outline-buzz" onclick="closeAlmacenModal()">Cancelar</button>
-            <button type="submit" form="almacenForm" class="btn btn-buzz">
-                <i class="fas fa-save"></i> Guardar
-            </button>
         </div>
     </div>
 
@@ -219,69 +241,92 @@
     <div id="ubicacionModal" class="modal-buzz">
         <div class="modal-content-buzz">
             <div class="modal-header-buzz">
-                <h4 id="ubicacionModalTitle"><i class="fas fa-map-marker-alt me-2"></i>Nueva Ubicación</h4>
+                <h5 class="font-primary text-primary" id="ubicacionModalTitle">
+                    <i class="fas fa-map-marker-alt"></i> Nueva Ubicación
+                </h5>
                 <button type="button" class="close-buzz" onclick="closeUbicacionModal()">&times;</button>
             </div>
-            <div class="modal-body-buzz">
-                <form id="ubicacionForm" onsubmit="event.preventDefault(); saveUbicacion();">
-                    <input type="hidden" id="ubicacionId">
-                    <input type="hidden" id="ubicacionAlmacenId">
-
+            <form id="ubicacionForm" onsubmit="event.preventDefault(); saveUbicacion();">
+                <input type="hidden" id="ubicacionId">
+                <input type="hidden" id="ubicacionAlmacenId">
+                <div class="modal-body-buzz">
                     <div class="modal-section">
                         <div class="modal-section-title">
                             <i class="fas fa-map-pin"></i> DATOS DE UBICACIÓN
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label text-muted">Código *</label>
-                                <input type="text" class="form-control form-control-buzz" id="ubicacionCodigo"
-                                       placeholder="A-01-E1-N1" required>
+                                <label class="form-label">Código *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-barcode"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="ubicacionCodigo"
+                                           placeholder="A-01-E1-N1" required>
+                                </div>
                             </div>
                             <div class="col-md-8 mb-3">
-                                <label class="form-label text-muted">Nombre</label>
-                                <input type="text" class="form-control form-control-buzz" id="ubicacionNombre"
-                                       placeholder="Descripción de la ubicación">
+                                <label class="form-label">Nombre</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="ubicacionNombre"
+                                           placeholder="Descripción de la ubicación">
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label text-muted">Pasillo</label>
-                                <input type="text" class="form-control form-control-buzz" id="ubicacionPasillo"
-                                       placeholder="A">
+                                <label class="form-label">Pasillo</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-road"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="ubicacionPasillo"
+                                           placeholder="A">
+                                </div>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label text-muted">Estante</label>
-                                <input type="text" class="form-control form-control-buzz" id="ubicacionEstante"
-                                       placeholder="01">
+                                <label class="form-label">Estante</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-th-large"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="ubicacionEstante"
+                                           placeholder="01">
+                                </div>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <label class="form-label text-muted">Nivel</label>
-                                <input type="text" class="form-control form-control-buzz" id="ubicacionNivel"
-                                       placeholder="N1">
+                                <label class="form-label">Nivel</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-layer-group"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="ubicacionNivel"
+                                           placeholder="N1">
+                                </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row g-3">
                             <div class="col-md-6 mb-3">
-                                <label class="form-label text-muted">Capacidad Máxima (unidades)</label>
-                                <input type="number" class="form-control form-control-buzz" id="ubicacionCapacidad"
-                                       placeholder="0" min="0">
+                                <label class="form-label">Capacidad Máxima (unidades)</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-cubes"></i></span>
+                                    <input type="number" class="form-control form-control-buzz" id="ubicacionCapacidad"
+                                           placeholder="0" min="0">
+                                </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <div class="form-check mt-4">
                                     <input class="form-check-input" type="checkbox" id="ubicacionActivo" checked>
-                                    <label class="form-check-label" for="ubicacionActivo">Activa</label>
+                                    <label class="form-check-label" for="ubicacionActivo">
+                                        <i class="fas fa-check-circle text-success me-1"></i> Activa
+                                    </label>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer-buzz">
-                <button type="button" class="btn btn-outline-buzz" onclick="closeUbicacionModal()">Cancelar</button>
-                <button type="submit" form="ubicacionForm" class="btn btn-buzz">
-                    <i class="fas fa-save"></i> Guardar
-                </button>
-            </div>
+                </div>
+                <div class="modal-footer-buzz">
+                    <button type="button" class="btn btn-outline-buzz" onclick="closeUbicacionModal()">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-buzz">
+                        <i class="fas fa-save me-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 
