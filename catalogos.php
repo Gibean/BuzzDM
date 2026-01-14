@@ -132,21 +132,20 @@
         <?php require_once 'php/system_footer.php'; ?>
     </main>
 
-    <!-- Modal para Catálogos (Compacto) -->
+    <!-- Modal para Catálogos (Unificado) -->
     <div id="itemModal" class="modal-buzz">
         <div class="modal-content-buzz modal-catalog">
             <div class="modal-header-buzz">
-                <h4 id="itemModalTitle">
-                    <span class="modal-icon" id="modalIcon"><i class="fas fa-edit"></i></span>
+                <h5 class="font-primary text-primary" id="itemModalTitle">
+                    <i id="modalIconClass" class="fas fa-edit"></i>
                     <span id="modalTitleText">Editar Item</span>
-                </h4>
+                </h5>
                 <button type="button" class="close-buzz" onclick="closeItemModal()">&times;</button>
             </div>
             <form id="itemForm" onsubmit="event.preventDefault(); saveItem();">
+                <input type="hidden" id="itemId">
+                <input type="hidden" id="itemCatalog">
                 <div class="modal-body-buzz">
-                    <input type="hidden" id="itemId">
-                    <input type="hidden" id="itemCatalog">
-
                     <!-- Vista previa de color (solo para colores) -->
                     <div class="color-preview-large field-color" style="display:none;">
                         <div class="color-swatch-large" id="colorPreviewSwatch"></div>
@@ -154,49 +153,50 @@
 
                     <!-- Campo Nombre -->
                     <div class="mb-3">
-                        <label class="form-label text-muted">
-                            <i class="fas fa-font me-1"></i> Nombre *
-                        </label>
-                        <input type="text" class="form-control form-control-buzz" id="itemName" required
-                               placeholder="Nombre del item" autocomplete="off">
+                        <label class="form-label">Nombre *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-font"></i></span>
+                            <input type="text" class="form-control form-control-buzz" id="itemName" required
+                                   placeholder="Nombre del item" autocomplete="off">
+                        </div>
                     </div>
 
                     <!-- Descripción (Categorías/Marcas) -->
                     <div class="mb-3 field-desc">
-                        <label class="form-label text-muted">
-                            <i class="fas fa-align-left me-1"></i> Descripción
-                        </label>
-                        <textarea class="form-control form-control-buzz" id="itemDescription" rows="2"
-                                  placeholder="Breve descripción (opcional)"></textarea>
+                        <label class="form-label">Descripción</label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start pt-2"><i class="fas fa-align-left"></i></span>
+                            <textarea class="form-control form-control-buzz" id="itemDescription" rows="2"
+                                      placeholder="Breve descripción (opcional)"></textarea>
+                        </div>
                     </div>
 
                     <!-- Sitio Web (Solo Marcas) -->
                     <div class="mb-3 field-web" style="display:none;">
-                        <label class="form-label text-muted">
-                            <i class="fas fa-globe me-1"></i> Sitio Web
-                        </label>
-                        <input type="url" class="form-control form-control-buzz" id="itemWeb"
-                               placeholder="https://ejemplo.com">
+                        <label class="form-label">Sitio Web</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                            <input type="url" class="form-control form-control-buzz" id="itemWeb"
+                                   placeholder="https://ejemplo.com">
+                        </div>
                     </div>
 
                     <!-- Selector de Color (Solo Colores) -->
                     <div class="field-color" style="display:none;">
-                        <label class="form-label text-muted">
-                            <i class="fas fa-palette me-1"></i> Código de Color
-                        </label>
-                        <div class="color-picker-row">
-                            <input type="color" class="color-picker-input" id="itemHex" value="#FFA000">
-                            <input type="text" class="form-control form-control-buzz font-mono color-hex-input"
-                                   id="itemHexText" placeholder="#FFA000" maxlength="7">
+                        <label class="form-label">Código de Color</label>
+                        <div class="input-group">
+                            <input type="color" class="color-picker-input" id="itemHex" value="#FFA000" style="width: 50px; height: 42px; padding: 2px; border-radius: 8px 0 0 8px;">
+                            <input type="text" class="form-control form-control-buzz font-mono"
+                                   id="itemHexText" placeholder="#FFA000" maxlength="7" style="text-transform: uppercase; letter-spacing: 1px;">
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer-buzz">
                     <button type="button" class="btn btn-outline-buzz" onclick="closeItemModal()">
-                        Cancelar
+                        <i class="fas fa-times me-2"></i>Cancelar
                     </button>
                     <button type="submit" class="btn btn-buzz">
-                        <i class="fas fa-check"></i> Guardar
+                        <i class="fas fa-check me-2"></i>Guardar
                     </button>
                 </div>
             </form>

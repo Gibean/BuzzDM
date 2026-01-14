@@ -117,11 +117,10 @@
 
 /* Tactical Cards - Refined for Consistency */
 .buzz-card.tactical-card {
-  background: rgba(26, 31, 40, 0.7) !important;
+  background: #1a1f28 !important; /* Solid background to match app theme */
   border: 1px solid rgba(255, 160, 0, 0.15) !important;
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(5px);
 }
 
 .buzz-card.tactical-card:hover {
@@ -383,43 +382,8 @@
   100% { transform: rotate(0); }
 }
 
-.notification-bell-btn {
-  position: relative;
-  background: none;
-  border: none;
-  color: var(--buzz-text-muted);
-  font-size: 1.3rem;
-  cursor: pointer;
-  transition: all 0.3s;
-  padding: 10px 12px;
-  margin-left: auto; /* Push to right side of navbar */
-  margin-right: 10px;
-  border-radius: 8px;
-}
-
-.notification-bell-btn:hover {
-  color: var(--tactical-orange);
-  background: rgba(255, 160, 0, 0.1);
-}
-
-.notification-bell-btn.has-unread i {
-  animation: ring 4s ease-in-out infinite;
-  color: var(--tactical-orange);
-}
-
-.notification-badge {
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  background: var(--tactical-red);
-  color: white;
-  border-radius: 50%;
-  padding: 2px 5px;
-  font-size: 0.65rem;
-  font-weight: bold;
-  box-shadow: 0 0 5px rgba(255, 62, 62, 0.5);
-  animation: pulse-node 2s infinite;
-}
+/* Note: notification-bell-btn styles are now centralized in styles.css (.navbar-icon-btn)
+   and notification-hub.css. Removed duplicate styles to prevent conflicts. */
 
 /* Offcanvas Sidebar - Right Side */
 .notification-offcanvas {
