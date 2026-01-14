@@ -123,54 +123,81 @@
     <div id="modalProveedor" class="modal-buzz">
         <div class="modal-content-buzz">
             <div class="modal-header-buzz">
-                <h5><i class="fas fa-truck"></i> <span id="modalProveedorTitulo">Nuevo Proveedor</span></h5>
+                <h5 class="font-primary text-primary">
+                    <i class="fas fa-truck"></i> <span id="modalProveedorTitulo">Nuevo Proveedor</span>
+                </h5>
                 <button type="button" class="close-buzz" onclick="cerrarModalProveedor()">&times;</button>
             </div>
-            <div class="modal-body-buzz">
-                <form id="formProveedor">
-                    <input type="hidden" id="proveedorId">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label text-muted">Nombre *</label>
-                            <input type="text" class="form-control form-control-buzz" id="proveedorNombre" required placeholder="Nombre del proveedor">
+            <form id="formProveedor">
+                <input type="hidden" id="proveedorId">
+                <div class="modal-body-buzz">
+                    <!-- Información Básica Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-info-circle"></i> INFORMACIÓN BÁSICA
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Nombre *</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                <input type="text" class="form-control form-control-buzz" id="proveedorNombre" required placeholder="Nombre del proveedor">
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">RIF/Identificación</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-id-card"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Teléfono</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="text" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="+58 412 1234567">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">RIF/Identificación</label>
-                            <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9">
+
+                    <!-- Contacto Section -->
+                    <div class="modal-section">
+                        <div class="modal-section-title">
+                            <i class="fas fa-address-book"></i> CONTACTO
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label text-muted">Teléfono</label>
-                            <input type="text" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="+58 412 1234567">
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                <input type="email" class="form-control form-control-buzz" id="proveedorEmail" placeholder="contacto@proveedor.com">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Dirección</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-map-marker-alt"></i></span>
+                                <textarea class="form-control form-control-buzz" id="proveedorDireccion" rows="2" placeholder="Dirección del proveedor"></textarea>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notas</label>
+                            <div class="input-group">
+                                <span class="input-group-text align-items-start pt-2"><i class="fas fa-sticky-note"></i></span>
+                                <textarea class="form-control form-control-buzz" id="proveedorNotas" rows="2" placeholder="Notas adicionales..."></textarea>
+                            </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label text-muted">Email</label>
-                            <input type="email" class="form-control form-control-buzz" id="proveedorEmail" placeholder="contacto@proveedor.com">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label text-muted">Dirección</label>
-                            <textarea class="form-control form-control-buzz" id="proveedorDireccion" rows="2" placeholder="Dirección del proveedor"></textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
-                            <label class="form-label text-muted">Notas</label>
-                            <textarea class="form-control form-control-buzz" id="proveedorNotas" rows="2" placeholder="Notas adicionales..."></textarea>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer-buzz">
-                <button type="button" class="btn btn-outline-buzz" onclick="cerrarModalProveedor()">Cancelar</button>
-                <button type="button" class="btn btn-buzz" onclick="guardarProveedor()">
-                    <i class="fas fa-save"></i> Guardar
-                </button>
-            </div>
+                </div>
+                <div class="modal-footer-buzz">
+                    <button type="button" class="btn btn-outline-buzz" onclick="cerrarModalProveedor()">
+                        <i class="fas fa-times me-2"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-buzz" onclick="guardarProveedor()">
+                        <i class="fas fa-save me-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

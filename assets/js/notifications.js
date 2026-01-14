@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearHistoryBtn = document.getElementById('clearHistory');
     const overlay = document.getElementById('notificationOverlay');
 
-    // Inject Bell Icon in navbar
-    injectBellIcon();
+    // Inject navbar action buttons (info + bell)
+    injectNavbarButtons();
 
     // Event Listeners
     if (closeBtn) closeBtn.onclick = closeHub;
@@ -38,23 +38,62 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(fetchNotifications, 60000);
 });
 
-function injectBellIcon() {
-    // Find the top navbar's inner div
+function injectNavbarButtons() {
+    // Find the top navbar
     const topNavbar = document.querySelector('.top-navbar');
     if (!topNavbar) return;
 
-    // Check if bell already exists
+    // Check if buttons already exist
     if (document.getElementById('notifBell')) return;
 
-    const btn = document.createElement('button');
-    btn.className = 'notification-bell-btn';
-    btn.id = 'notifBell';
-    btn.title = 'Notificaciones';
-    btn.innerHTML = '<i class="fas fa-bell"></i><span class="notification-badge" style="display:none">0</span>';
-    btn.onclick = toggleHub;
+    // Strategy: Find or create a container for our utility buttons
+    // Look for an existing actions container (second div in navbar that has buttons)
+    let actionsContainer = null;
 
-    // Append to the navbar (will be pushed to the right by margin-left: auto in CSS)
-    topNavbar.appendChild(btn);
+    // Get all direct children that could be containers
+    const navChildren = topNavbar.querySelectorAll(':scope > div, :scope > nav');
+
+    for (const child of navChildren) {
+        // Skip the title container (has h1)
+        if (child.querySelector('h1')) continue;
+
+        // Found a potential actions container
+        actionsContainer = child;
+        break;
+    }
+
+    // If no actions container exists, create one
+    if (!actionsContainer) {
+        actionsContainer = document.createElement('div');
+        actionsContainer.className = 'd-flex align-items-center navbar-utils';
+        topNavbar.appendChild(actionsContainer);
+    } else {
+        // Ensure it has proper flexbox classes for consistent spacing
+        if (!actionsContainer.classList.contains('d-flex')) {
+            actionsContainer.classList.add('d-flex', 'align-items-center');
+        }
+    }
+
+    // Create info/manual button
+    const infoBtn = document.createElement('a');
+    infoBtn.className = 'navbar-icon-btn navbar-info-btn';
+    infoBtn.id = 'navInfoBtn';
+    infoBtn.href = 'manual.php';
+    infoBtn.title = 'Manual de Usuario';
+    infoBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
+
+    // Create notification bell button
+    const bellBtn = document.createElement('button');
+    bellBtn.className = 'navbar-icon-btn notification-bell-btn';
+    bellBtn.id = 'notifBell';
+    bellBtn.type = 'button';
+    bellBtn.title = 'Notificaciones';
+    bellBtn.innerHTML = '<i class="fas fa-bell"></i><span class="notification-badge" style="display:none">0</span>';
+    bellBtn.onclick = toggleHub;
+
+    // Append buttons: Info first, then Bell
+    actionsContainer.appendChild(infoBtn);
+    actionsContainer.appendChild(bellBtn);
 }
 
 function openHub() {
