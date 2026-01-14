@@ -6,36 +6,41 @@
 BuzzDM/
 ├── forgot_password.php          # Formulario para solicitar recuperación
 ├── reset_password.php           # Formulario para nueva contraseña
-├── db/
-│   └── password_reset_tokens.sql # Script SQL para crear tabla
 └── php/
-    ├── email_config.php         # ⚙️ Configuración SMTP (EDITAR)
-    ├── forgot_password_action.php
-    ├── validate_token.php
-    ├── reset_password_action.php
-    ├── cleanup_tokens.php       # Limpia tokens expirados
-    ├── test_email.php           # Prueba de envío
-    └── verify_password_recovery.php
+    ├── email_config.php             # ⚙️ Configuración SMTP (EDITAR)
+    ├── forgot_password_action.php   # Procesa solicitud y envía email
+    ├── validate_token.php           # Valida tokens de recuperación
+    ├── reset_password_action.php    # Restablece la contraseña
+    ├── cleanup_tokens.php           # Limpia tokens expirados, debe ser configurado con un cron probablemente
+    └── verify_password_recovery.php # Script de verificación del sistema
 ```
 
 ---
 
 ## Configuración SMTP
 
-Editar `php/email_config.php`:
+### Método 1: Archivo `.env` (Recomendado)
 
-```php
-define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_PORT', 587);
-define('SMTP_SECURE', 'tls');
-define('SMTP_USERNAME', 'tu-email@gmail.com');     // ← Cambiar
-define('SMTP_PASSWORD', 'xxxx xxxx xxxx xxxx');     // ← App Password
-define('MAIL_FROM_EMAIL', 'tu-email@gmail.com');
-define('MAIL_FROM_NAME', 'BUZZ Data Manager');
-define('APP_BASE_URL', 'http://localhost/BuzzDM'); // ← Verificar
+1. Copia el archivo `env.example.txt` en la raíz del proyecto
+2. Renómbralo a `.env`
+3. Configura tus credenciales:
+
+```ini
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=tls
+SMTP_USERNAME=tu-email@gmail.com
+SMTP_PASSWORD=xxxxxxxxxxxxxxxx
+SMTP_FROM_EMAIL=tu-email@gmail.com
+SMTP_FROM_NAME=BuzzDM
+APP_BASE_URL=http://localhost/BuzzDM
 ```
 
-### Obtener App Password de Gmail
+### Método 2: Editar directamente `php/email_config.php`
+
+Si no puedes crear un archivo `.env`, edita los valores por defecto en el archivo PHP.
+
+### Obtener App Password de Gmail (en caso de utilizar gmail)
 1. Ve a https://myaccount.google.com/security
 2. Activa verificación en 2 pasos
 3. Busca "Contraseñas de aplicaciones"
@@ -111,17 +116,13 @@ sequenceDiagram
 # 1. Instalar PHPMailer
 composer update
 
-# 2. Crear tabla en BD
-mysql -u root -p dbuzz < db/password_reset_tokens.sql
+# 2. Verifica la existencia de la tabla para alamcenar tokens
+# la base de datos deberia tener una tabla llamada:
+password_reset_tokens
 
 # 3. Configurar email
 # Editar php/email_config.php
 
-# 4. Verificar instalación
-php php/verify_password_recovery.php
-
-# 5. Probar envío
-php php/test_email.php
 ```
 
 ---

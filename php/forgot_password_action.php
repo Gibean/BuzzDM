@@ -79,6 +79,12 @@ try {
     $mail = new PHPMailer(true);
     $config = getMailerConfig();
 
+    // Verificar que las credenciales SMTP estén configuradas
+    if (empty($config['username']) || empty($config['password'])) {
+        error_log("ERROR: Credenciales SMTP no configuradas. Por favor, configure el archivo .env");
+        throw new Exception('El sistema de correo no está configurado. Por favor, contacta al administrador.');
+    }
+
     try {
         // Configuración del servidor SMTP
         $mail->isSMTP();
