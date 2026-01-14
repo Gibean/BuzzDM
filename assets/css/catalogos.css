@@ -36,7 +36,7 @@
 
 /* Each catalog card */
 .catalog-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: #1a1f28; /* Solid background to match app theme */
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 8px;
     overflow: hidden;
@@ -47,14 +47,14 @@
     justify-content: space-between;
     align-items: center;
     padding: 1rem 1.25rem;
-    background: rgba(0, 0, 0, 0.2);
+    background: #14181f; /* Slightly darker solid background */
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     cursor: pointer;
     user-select: none;
 }
 
 .catalog-card-header:hover {
-    background: rgba(0, 0, 0, 0.3);
+    background: #111519;
 }
 
 .catalog-card-title {
