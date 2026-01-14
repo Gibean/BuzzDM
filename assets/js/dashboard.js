@@ -30,7 +30,7 @@ async function loadStats() {
         animateCounter('tcLowStock', stats.lowStockCount);
         animateCounter('tcCustomers', stats.totalCustomers);
         animateCounter('tcDailyOrders', stats.dailyOrders);
-        animateCounter('tcInventoryValue', stats.totalInventoryValue, true);
+
 
         // Actualizar la fecha de "ÚLTIMA ACTUALIZACIÓN"
         const lastUpdateElement = document.getElementById('lastUpdate');
