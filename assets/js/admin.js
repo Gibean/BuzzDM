@@ -537,7 +537,7 @@
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando backups...</td></tr>'
 
     try {
-      const data = await fetchJSON("php/backups.php")
+      const data = await fetchJSON("php/api_backups.php")
 
       if (!data.success) {
         tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
@@ -630,7 +630,7 @@
 
     try {
       console.log('loadAutoBackupStatus: Fetching data...')
-      const data = await fetchJSON('php/backup_status.php')
+      const data = await fetchJSON('php/api_backups.php?action=status')
       console.log('loadAutoBackupStatus: Data received:', data)
 
       if (!data.success) {
@@ -690,7 +690,7 @@
       const enabled = this.checked
 
       try {
-        const data = await fetchJSON('php/backup_status.php?action=toggle', {
+        const data = await fetchJSON('php/api_backups.php?action=toggle', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ enabled: enabled })
@@ -729,7 +729,7 @@
     }
 
     try {
-      const data = await fetchJSON("php/backups.php?action=create", {
+      const data = await fetchJSON("php/api_backups.php?action=create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -759,7 +759,7 @@
   async function downloadBackup(backupId) {
     try {
       // Use direct link approach to preserve server filename
-      window.location.href = `php/backups.php?action=download&id=${backupId}`;
+      window.location.href = `php/api_backups.php?action=download&id=${backupId}`;
       showToast("Descargando backup...", "success");
     } catch (error) {
       console.error("Error downloading backup:", error);
@@ -774,7 +774,7 @@
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/backups.php", {
+          const data = await fetchJSON("php/api_backups.php", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json"
@@ -808,7 +808,7 @@
         showToast("Iniciando restauración... Por favor espere.", "info", 5000)
 
         try {
-          const data = await fetchJSON("php/backups.php?action=restore", {
+          const data = await fetchJSON("php/api_backups.php?action=restore", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
@@ -1053,7 +1053,7 @@
   async function loadCompanyInfo() {
     try {
       const data = await fetchJSON(
-        "php/settings_actions.php?action=get_company_info"
+        "php/api_settings.php?action=get_company_info"
       )
 
       // Ensure we have the target elements before trying to set values
@@ -1111,7 +1111,7 @@
     formData.append("action", "update_company_info")
 
     try {
-      const data = await fetchJSON("php/settings_actions.php", {
+      const data = await fetchJSON("php/api_settings.php", {
         method: "POST",
         body: formData
       })
@@ -1168,7 +1168,7 @@
     }
 
     try {
-      const data = await fetchJSON("php/settings_actions.php", {
+      const data = await fetchJSON("php/api_settings.php", {
         method: "POST",
         body: formData
       })

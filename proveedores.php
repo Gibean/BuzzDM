@@ -218,7 +218,7 @@
 
         async function cargarProveedores() {
             try {
-                const response = await fetch('php/proveedores_actions.php');
+                const response = await fetch('php/api_suppliers.php');
                 const data = await response.json();
 
                 if (data.success) {
@@ -322,7 +322,7 @@
             };
 
             try {
-                const url = id ? `php/proveedores_actions.php?id=${id}` : 'php/proveedores_actions.php';
+                const url = id ? `php/api_suppliers.php?id=${id}` : 'php/api_suppliers.php';
                 const method = id ? 'PUT' : 'POST';
 
                 const response = await fetch(url, {
@@ -352,7 +352,7 @@
                 `¿Estás seguro de eliminar al proveedor "${nombre}"?`,
                 async function() {
                     try {
-                        const response = await fetch(`php/proveedores_actions.php?id=${id}`, {
+                        const response = await fetch(`php/api_suppliers.php?id=${id}`, {
                             method: 'DELETE'
                         });
                         const result = await response.json();

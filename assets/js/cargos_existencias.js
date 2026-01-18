@@ -1009,7 +1009,7 @@ async function guardarNuevoProveedor() {
     };
 
     try {
-        const response = await fetch('php/proveedores_actions.php', {
+        const response = await fetch('php/api_suppliers.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
