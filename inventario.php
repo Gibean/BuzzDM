@@ -436,6 +436,73 @@
         </div>
     </div>
 
+    <!-- Kit Component Search Modal -->
+    <div class="modal-buzz" id="kitComponentModal" style="z-index: 9999;">
+        <div class="modal-content-buzz" style="max-width: 600px;">
+            <div class="modal-header-buzz">
+                <h5 class="font-primary text-primary">
+                    <i class="fas fa-puzzle-piece"></i> Agregar Componente al Kit
+                </h5>
+                <button class="close-buzz" onclick="closeKitComponentModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body-buzz">
+                <!-- Search Field -->
+                <div class="mb-4">
+                    <label class="form-label" for="kitComponentSearch"><i class="fas fa-search"></i> Buscar Producto</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-buzz" id="kitComponentSearch"
+                               placeholder="Escribe SKU o nombre del producto..." autocomplete="off">
+                        <div id="kitComponentSpinner" class="position-absolute end-0 top-50 translate-middle-y me-3" style="display: none;">
+                            <i class="fas fa-spinner fa-spin text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="kitComponentResults" class="mb-4" style="max-height: 300px; overflow-y: auto;">
+                    <div class="text-center text-muted py-4" id="kitComponentPlaceholder">
+                        <i class="fas fa-search fa-2x mb-2"></i>
+                        <p class="mb-0">Escribe para buscar productos</p>
+                    </div>
+                </div>
+
+                <!-- Selected Product Preview -->
+                <div id="kitComponentSelected" class="buzz-card p-3 mb-3" style="display: none; background: var(--buzz-card-bg-alt);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="font-mono text-accent" id="selectedComponentSku"></span>
+                            <span class="ms-2" id="selectedComponentName"></span>
+                            <div class="text-muted small mt-1">
+                                <span>Precio: $<span id="selectedComponentPrice">0.00</span></span>
+                                <span class="ms-3">Stock: <span id="selectedComponentStock">0</span></span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearSelectedComponent()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="selectedComponentId">
+                </div>
+
+                <!-- Quantity Input -->
+                <div id="kitComponentQuantityRow" style="display: none;">
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label" for="kitComponentQuantity"><i class="fas fa-sort-numeric-up"></i> Cantidad</label>
+                            <input type="number" class="form-control form-control-buzz" id="kitComponentQuantity"
+                                   value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-buzz w-100" onclick="confirmAddKitComponent()">
+                                <i class="fas fa-plus"></i> Agregar al Kit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/toast.js"></script>

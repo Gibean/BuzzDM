@@ -23,6 +23,9 @@ $api_scripts = [
     'api_users.php', // Standardized API
     'api_catalogs.php', // Standardized API
     'api_auth.php', // Standardized API - Authentication
+    'api_shipments.php', // Standardized API - Shipments
+    'api_locations.php', // Standardized API - Locations
+    'api_kits.php', // Standardized API - Kit Components
     // Legacy Actions
 
     'settings_actions.php',
@@ -140,7 +143,7 @@ $fallback_pages = [
         'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
         'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
-        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php'
+        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -148,14 +151,14 @@ $fallback_pages = [
         'get_import_history.php', 'api_products.php', 'users.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php'
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
         'api_orders.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php'
     ]
 ];
 
