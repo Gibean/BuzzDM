@@ -1,9 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/AuthService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
-/**
- * AuthController - HTTP request handler for authentication
- */
+#[OA\Tag(name: "Auth", description: "Authentication Operations")]
 class AuthController {
     private $service;
 
@@ -52,6 +51,35 @@ class AuthController {
         } catch (Exception $e) {
             $this->jsonResponse(false, null, $e->getMessage());
         }
+    }
+
+    #[OA\Post(
+        path: "/php/api_auth.php",
+        tags: ["Auth"],
+        summary: "Authentication Actions",
+        description: "Login, Logout, Forgot Password, Reset Password via 'action' param",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "application/x-www-form-urlencoded",
+                schema: new OA\Schema(
+                    required: ["action"],
+                    properties: [
+                        new OA\Property(property: "action", type: "string", enum: ["login", "logout", "forgot_password", "reset_password"]),
+                        new OA\Property(property: "email", type: "string", description: "For login/forgot"),
+                        new OA\Property(property: "password", type: "string", description: "For login/reset"),
+                        new OA\Property(property: "confirmPassword", type: "string", description: "For reset"),
+                        new OA\Property(property: "token", type: "string", description: "For reset")
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Action result")
+        ]
+    )]
+    private function authActions() {
+        // Placeholder for OpenAPI to attach to
     }
 
     private function jsonResponse($success, $data = null, $message = '') {

@@ -1,11 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/CargoService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
-use OpenApi\Annotations as OA;
-
-/**
- * @OA\Info(title="BuzzDM API - Cargos de Existencias", version="1.0")
- */
+#[OA\Tag(name: "Cargos", description: "Operations related to Stock Cargos")]
 class CargoController {
     private $service;
 
@@ -27,14 +24,8 @@ class CargoController {
     }
 
     public function handleRequest() {
-        if (!isset($_SESSION['usuario_id'])) {
+        if (!isset($_SESSION['usuario_id']) || !in_array($_SESSION['usuario_rol'], ['admin', 'supervisor'])) {
             $this->jsonResponse(false, [], 'No autorizado');
-        }
-
-        // Role check handled by sesion.php / allowed pages, but good to reinforce if specific methods need it.
-        // Original code checked for admin/supervisor explicitly at start.
-        if (!in_array($_SESSION['usuario_rol'], ['admin', 'supervisor'])) {
-             $this->jsonResponse(false, [], 'No autorizado');
         }
 
         $method = $_SERVER['REQUEST_METHOD'];
@@ -62,6 +53,17 @@ class CargoController {
         }
     }
 
+    #[OA\Get(
+        path: "/php/api_cargos.php",
+        tags: ["Cargos"],
+        summary: "List cargos or get cargo",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Cargo ID", required: false, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Cargo data")
+        ]
+    )]
     private function handleGet() {
         if (isset($_GET['id'])) {
             $cargo = $this->service->getCargo($_GET['id']);
@@ -72,6 +74,18 @@ class CargoController {
         }
     }
 
+    #[OA\Post(
+        path: "/php/api_cargos.php",
+        tags: ["Cargos"],
+        summary: "Create or act on cargo",
+        parameters: [
+            new OA\Parameter(name: "action", in: "query", description: "Action (create/confirm/cancel)", required: false, schema: new OA\Schema(type: "string"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Cargo created or updated")
+        ]
+    )]
     private function handlePost($input) {
         $action = $_GET['action'] ?? 'create';
 
@@ -98,6 +112,18 @@ class CargoController {
         }
     }
 
+    #[OA\Put(
+        path: "/php/api_cargos.php",
+        tags: ["Cargos"],
+        summary: "Update cargo",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Cargo ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Cargo updated")
+        ]
+    )]
     private function handlePut($input) {
         if (!isset($_GET['id'])) throw new Exception('ID de cargo requerido');
 
@@ -109,6 +135,17 @@ class CargoController {
         $this->jsonResponse(true, [], $msg);
     }
 
+    #[OA\Delete(
+        path: "/php/api_cargos.php",
+        tags: ["Cargos"],
+        summary: "Delete cargo",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Cargo ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Cargo deleted")
+        ]
+    )]
     private function handleDelete($input) {
         if (!isset($_GET['id'])) throw new Exception('ID de cargo requerido');
 

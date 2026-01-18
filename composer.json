@@ -5,5 +5,12 @@
     "dompdf/dompdf": "^3.1",
     "phpmailer/phpmailer": "^6.9",
     "vlucas/phpdotenv": "^5.6"
+  },
+  "autoload": {
+    "classmap": ["php/src/"],
+    "files": ["php/api_docs_config.php"]
+  },
+  "require-dev": {
+    "zircote/swagger-php": "^6.0"
   }
 }

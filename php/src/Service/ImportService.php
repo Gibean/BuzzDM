@@ -1,7 +1,5 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
-require_once __DIR__ . '/../Repository/ImportRepository.php';
-
+// Autoload handled by composer
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ImportService {

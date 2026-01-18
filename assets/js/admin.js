@@ -419,16 +419,20 @@
     if (logDateTo) queryParams += `&dateTo=${logDateTo}`
 
     try {
-      const response = await fetchJSON(`php/logs.php?${queryParams}`)
+      const response = await fetchJSON(`php/api_logs.php?${queryParams}`)
 
       // Handle both old format (array) and new format (object with data & pagination)
       if (Array.isArray(response)) {
           logs = response
           renderLogs()
-      } else {
+      } else if (response.success && response.data) { // New API structure
           logs = response.data
+          if (response.pagination) renderPagination(response.pagination)
           renderLogs()
-          updatePaginationControls(response.pagination)
+      } else { // Standard direct structure if any
+          logs = response.data || []
+          if(response.pagination) renderPagination(response.pagination)
+          renderLogs()
       }
     } catch (error) {
       console.error("Error al cargar logs:", error)
@@ -1024,7 +1028,7 @@
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/users.php", {
+          const data = await fetchJSON("php/api_users.php", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json"

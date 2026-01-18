@@ -504,7 +504,7 @@ async function buscarProveedor(query) {
     }
 
     try {
-        const response = await fetch(`php/proveedores_search.php?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`php/api_suppliers.php?action=search&q=${encodeURIComponent(query)}`);
         const data = await response.json();
 
         if (data.success && data.proveedores && data.proveedores.length > 0) {
@@ -929,7 +929,7 @@ async function cargarAlmacenes() {
     if (!select) return;
 
     try {
-        const response = await fetch('php/almacenes_actions.php');
+        const response = await fetch('php/api_warehouses.php');
         const data = await response.json();
 
         if (data.success && data.almacenes) {
