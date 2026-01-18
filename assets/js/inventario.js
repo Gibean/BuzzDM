@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentPage = 1
   const productsPerPage = 10
   let totalProducts = 0
-  const product_actions_url = "php/product_actions.php"
+  const product_actions_url = "php/api_products.php"
 
   // Catalogs cache
   let catalogos = { marcas: [], categorias: [], proveedores: [] }

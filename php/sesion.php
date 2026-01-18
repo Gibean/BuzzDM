@@ -10,20 +10,19 @@ if (session_status() == PHP_SESSION_NONE) {
 // List of API scripts that should return JSON on auth/access failure
 $api_scripts = [
     'api_sales_chart.php',
-    'clientes_actions.php',
-    'get_import_history.php',
-    'pedidos_actions.php',
-    'product_actions.php',
-    'search_api.php',
-    'process_import.php',
+    'api_clientes.php', // Standardized API
+    'api_products.php', // Standardized API
+    'api_orders.php', // Standardized API
+    'api_warehouses.php', // Standardized API
+    'api_import.php', // Standardized API
+    'api_cargos.php', // Standardized API
+    // Legacy Actions
+
     'settings_actions.php',
     'logs.php',
     'users.php',
     'backups.php',
     'backup_status.php',
-    // Phase 1 - Cargos de existencias
-    'cargos_actions.php',
-    'productos_search.php',
     'proveedores_search.php',
     // Phase 1.7 - Product types and kits
     'catalogos_actions.php',
@@ -59,7 +58,7 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Conexión a la base de datos
-require_once 'db.php'; // This now provides the getDbConnection() function
+require_once __DIR__ . '/db.php'; // This now provides the getDbConnection() function
 $pdo = getDbConnection(); // Call the function to get the PDO object
 
 // Verificar si el usuario está logeado y obtener su rol
@@ -125,33 +124,30 @@ $fallback_pages = [
     'admin' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
         'admin.php', 'about.php', 'manual.php', 'login.php', 'logout.php',
-        'api_sales_chart.php', 'create_admin.php', 'get_import_history.php', 'product_actions.php',
-        'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'pedidos_actions.php',
-        'search_api.php', 'clientes.php', 'clientes_actions.php', 'api_sales_by_status_chart.php',
+        'api_sales_chart.php', 'create_admin.php', 'get_import_history.php',
+        'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'api_orders.php',
+        'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'company_settings.php', 'company_settings_actions.php', 'backup.php',
-        'backups.php', 'backup_status.php', 'logs.php', 'process_import.php', 'settings_actions.php',
-        'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php', 'productos_search.php',
+        'backups.php', 'backup_status.php', 'logs.php', 'settings_actions.php',
+        'cargos_existencias.php', 'almacenes.php',
         'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
         'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
         'about.php', 'manual.php', 'login.php', 'logout.php', 'api_sales_chart.php',
-        'get_import_history.php', 'product_actions.php', 'users.php', 'sesion.php', 'db.php',
-        'sidebar.php', 'reports.php', 'pedidos_actions.php', 'search_api.php', 'clientes.php',
-        'clientes_actions.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
-        'process_import.php', 'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php',
-        'productos_search.php', 'proveedores_search.php', 'catalogos_actions.php', 'kit_actions.php',
-        'almacenes_actions.php', 'ubicaciones_actions.php', 'proveedores.php', 'proveedores_actions.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php'
+        'get_import_history.php', 'api_products.php', 'users.php', 'sesion.php', 'db.php',
+        'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
+        'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
-        'pedidos_actions.php', 'search_api.php', 'api_sales_by_status_chart.php',
-        'envios_actions.php', 'product_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php'
+        'api_orders.php', 'api_sales_by_status_chart.php',
+        'envios_actions.php', 'todo.php', 'notas_actions.php',
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php'
     ]
 ];
 

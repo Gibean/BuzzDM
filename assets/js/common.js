@@ -142,25 +142,31 @@ function showToast(message, type = 'info', duration = null) {
     // Timestamp
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+    // Structure matching toast.css (Icon - Content - Close)
     toast.innerHTML = `
-        <div class="toast-header">
-            <span class="toast-type">
-                <i class="fas ${iconClass}"></i> <span class="toast-title-text">${titleText}</span>
-            </span>
-            <div style="display:flex; gap:8px; align-items:center;">
-                <span class="toast-time" style="font-size:0.7em; opacity:0.7">${time}</span>
-                <button class="toast-close" onclick="dismissToast(this)">
-                    <i class="fas fa-times"></i>
-                </button>
+        <div class="toast-icon">
+            <i class="fas ${iconClass}"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">
+                ${titleText} <span style="opacity:0.6; font-size:0.8em; margin-left:8px; font-weight:normal;">${time}</span>
             </div>
+            <div class="toast-message">${message}</div>
         </div>
-        <div class="toast-body">
-            ${message}
-        </div>
+        <button class="toast-close" onclick="dismissToast(this)">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="toast-progress"></div>
     `;
 
     // Append to container (below clear button)
     container.appendChild(toast);
+
+    // Trigger animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+
     updateClearButtonVisibility();
 
     return toastId;
@@ -180,7 +186,7 @@ function updateToast(toastId, message, type = 'info') {
     }
 
     // Update classes
-    toast.className = `toast-card ${type}`;
+    toast.className = `toast-card ${type} show`;
 
     // Icon mapping
     const icons = {
@@ -199,24 +205,24 @@ function updateToast(toastId, message, type = 'info') {
 
     const iconClass = icons[type] || icons.info;
     const titleText = titles[type] || 'Notificación';
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    // Update Header Content
-    const typeContainer = toast.querySelector('.toast-type');
-    if (typeContainer) {
-        typeContainer.innerHTML = `<i class="fas ${iconClass}"></i> <span class="toast-title-text">${titleText}</span>`;
-    }
-
-    // Update Body Content
-    const bodyContainer = toast.querySelector('.toast-body');
-    if (bodyContainer) {
-        bodyContainer.innerHTML = message;
-    }
-
-    // Update Timestamp
-    const timeContainer = toast.querySelector('.toast-time');
-    if (timeContainer) {
-        timeContainer.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+    // Re-render inner HTML structure to avoid complex DOM manipulation of different structure
+    toast.innerHTML = `
+        <div class="toast-icon">
+            <i class="fas ${iconClass}"></i>
+        </div>
+        <div class="toast-content">
+            <div class="toast-title">
+                ${titleText} <span style="opacity:0.6; font-size:0.8em; margin-left:8px; font-weight:normal;">${time}</span>
+            </div>
+            <div class="toast-message">${message}</div>
+        </div>
+        <button class="toast-close" onclick="dismissToast(this)">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="toast-progress"></div>
+    `;
 }
 
 function dismissToast(btn) {

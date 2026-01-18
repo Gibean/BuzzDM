@@ -1,0 +1,29 @@
+
+/* Clear All Button */
+.clear-all-btn {
+    align-self: flex-end;
+    background-color: var(--buzz-card-bg);
+    color: var(--buzz-text-muted);
+    border: 1px solid var(--buzz-border-color);
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: var(--font-monospace);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+}
+
+.clear-all-btn:hover {
+    color: #fff;
+    background-color: var(--buzz-danger);
+    border-color: var(--buzz-danger);
+}
+
+.clear-all-btn i {
+    margin-right: 5px;
+}
