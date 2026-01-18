@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../Repository/ProductRepository.php';
+// Autoload handled by composer
 
 class ProductService {
     private $repository;

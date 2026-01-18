@@ -1,6 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/WarehouseService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Warehouses", description: "Operations related to Warehouses")]
 class WarehouseController {
     private $service;
 
@@ -15,10 +17,7 @@ class WarehouseController {
             $id = $_GET['id'] ?? null;
 
             // Handle Locations Sub-resource
-            if ($action === 'locations' || ($method === 'GET' && isset($_GET['almacen_id']))) { // Support legacy param if needed, but clean API prefers consistent action
-                 // Note: The frontend calls `php/ubicaciones_actions.php?almacen_id=1` -> mapped to query param
-                 // My plan says: `GET /?action=locations&warehouse_id=X`
-                 // I will handle legacy query alias here for robustness
+            if ($action === 'locations' || ($method === 'GET' && isset($_GET['almacen_id']))) {
                  $warehouseId = $_GET['warehouse_id'] ?? $_GET['almacen_id'] ?? null;
 
                  if ($method === 'GET') {
@@ -60,6 +59,18 @@ class WarehouseController {
 
     // --- Warehouses Handlers ---
 
+    #[OA\Get(
+        path: "/php/api_warehouses.php",
+        tags: ["Warehouses"],
+        summary: "List warehouses or get details",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Warehouse ID", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "show_inactive", in: "query", description: "Show inactive", required: false, schema: new OA\Schema(type: "boolean"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Warehouse list or details")
+        ]
+    )]
     private function listWarehouses($showInactive) {
         $result = $this->service->getAllWarehouses($showInactive);
         $this->jsonResponse(true, $result);
@@ -70,12 +81,33 @@ class WarehouseController {
         $this->jsonResponse(true, ['almacen' => $warehouse]);
     }
 
+    #[OA\Post(
+        path: "/php/api_warehouses.php",
+        tags: ["Warehouses"],
+        summary: "Create a new warehouse",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Warehouse created")
+        ]
+    )]
     private function createWarehouse() {
         $data = json_decode(file_get_contents('php://input'), true);
         $id = $this->service->createWarehouse($data);
         $this->jsonResponse(true, ['id' => $id], 'Almacén creado exitosamente');
     }
 
+    #[OA\Put(
+        path: "/php/api_warehouses.php",
+        tags: ["Warehouses"],
+        summary: "Update a warehouse",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Warehouse ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Warehouse updated")
+        ]
+    )]
     private function updateWarehouse($id) {
         if (!$id) throw new Exception("ID no proporcionado");
         $data = json_decode(file_get_contents('php://input'), true);
@@ -83,14 +115,39 @@ class WarehouseController {
         $this->jsonResponse(true, [], 'Almacén actualizado exitosamente');
     }
 
+    #[OA\Delete(
+        path: "/php/api_warehouses.php",
+        tags: ["Warehouses"],
+        summary: "Deactivate a warehouse",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Warehouse ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Warehouse deactivated")
+        ]
+    )]
     private function deactivateWarehouse($id) {
         if (!$id) throw new Exception("ID no proporcionado");
         $this->service->deactivateWarehouse($id);
         $this->jsonResponse(true, [], 'Almacén desactivado exitosamente');
     }
 
-    // --- Locations Handlers ---
+    // --- Locations Handlers (Mapped to api_warehouses.php?action=locations) ---
+    // Note: Can also be accessed via LocationController.
+    // I will annotate them here as alias paths or just leave them implied.
+    // For coverage, I'll add simplified annotations.
 
+    #[OA\Get(
+        path: "/php/api_warehouses.php?action=locations",
+        tags: ["Warehouses"],
+        summary: "List locations in warehouse",
+        parameters: [
+            new OA\Parameter(name: "warehouse_id", in: "query", description: "Warehouse ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Location list")
+        ]
+    )]
     private function listLocations($warehouseId) {
         $locations = $this->service->getLocations($warehouseId);
         $this->jsonResponse(true, ['ubicaciones' => $locations]);

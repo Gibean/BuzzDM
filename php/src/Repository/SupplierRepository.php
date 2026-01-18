@@ -19,6 +19,20 @@ class SupplierRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function search($query, $limit = 10) {
+        $stmt = $this->pdo->prepare("
+            SELECT id, nombre, contacto_nombre, telefono
+            FROM proveedores
+            WHERE deleted_at IS NULL
+              AND (nombre LIKE ? OR contacto_nombre LIKE ?)
+            ORDER BY nombre ASC
+            LIMIT ?
+        ");
+        $searchTerm = '%' . $query . '%';
+        $stmt->execute([$searchTerm, $searchTerm, $limit]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findById($id) {
         $stmt = $this->pdo->prepare("SELECT * FROM proveedores WHERE id = ? AND deleted_at IS NULL");
         $stmt->execute([$id]);

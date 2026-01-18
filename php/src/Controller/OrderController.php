@@ -1,6 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/OrderService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Orders", description: "Operations related to Orders")]
 class OrderController {
     private $service;
 
@@ -14,8 +16,6 @@ class OrderController {
         $response = ['success' => $success];
         if ($message) $response['message'] = $message;
 
-        // Merge data keys directly into response root for compatibility with specific frontend expectations
-        // (e.g. data.orders, data.products)
         if (!empty($data)) {
             $response = array_merge($response, $data);
         }
@@ -53,6 +53,19 @@ class OrderController {
         }
     }
 
+    #[OA\Get(
+        path: "/php/api_orders.php",
+        tags: ["Orders"],
+        summary: "List orders or get details",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Order ID", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "action", in: "query", description: "Action 'get_products'", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "order_id", in: "query", description: "Order ID for products", required: false, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Order list or details")
+        ]
+    )]
     private function handleGet() {
         if (isset($_GET['action']) && $_GET['action'] === 'get_products' && isset($_GET['order_id'])) {
             $products = $this->service->getOrderProducts($_GET['order_id']);
@@ -66,6 +79,15 @@ class OrderController {
         }
     }
 
+    #[OA\Post(
+        path: "/php/api_orders.php",
+        tags: ["Orders"],
+        summary: "Create a new order",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Order created")
+        ]
+    )]
     private function handlePost($input) {
         // Check for Restore Action
         if (isset($input['action']) && $input['action'] === 'restore') {
@@ -80,6 +102,18 @@ class OrderController {
         $this->jsonResponse(true, ['id' => $result['id']], 'Pedido creado exitosamente.');
     }
 
+    #[OA\Put(
+        path: "/php/api_orders.php",
+        tags: ["Orders"],
+        summary: "Update an order",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Order ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Order updated")
+        ]
+    )]
     private function handlePut($input) {
         if (!isset($_GET['id'])) throw new Exception("ID de pedido requerido");
 
@@ -90,6 +124,17 @@ class OrderController {
         $this->jsonResponse(true, [], 'Pedido actualizado exitosamente.');
     }
 
+    #[OA\Delete(
+        path: "/php/api_orders.php",
+        tags: ["Orders"],
+        summary: "Delete an order",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Order ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Order deleted")
+        ]
+    )]
     private function handleDelete($input) {
         // DELETE usually comes with ID in query string for strict REST, but legacy might send body
         // Original code: $input['id'] form body
