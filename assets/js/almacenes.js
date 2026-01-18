@@ -49,11 +49,11 @@ const ubicacionActivoCheck = document.getElementById('ubicacionActivo');
 async function fetchAlmacenes() {
     try {
         const showInactive = showInactivos?.checked ? '&show_inactive=true' : '';
-        const response = await fetch(`php/almacenes_actions.php?${showInactive}`);
+        const response = await fetch(`php/api_warehouses.php?${showInactive}`);
         const data = await response.json();
 
         if (data.success) {
-            almacenes = data.almacenes || [];
+            almacenes = data.warehouses || data.almacenes || []; // Support both keys
             renderAlmacenes();
             updateStats(data.stats);
         } else {
@@ -67,7 +67,7 @@ async function fetchAlmacenes() {
 
 async function fetchUbicaciones(almacenId) {
     try {
-        const response = await fetch(`php/ubicaciones_actions.php?almacen_id=${almacenId}`);
+        const response = await fetch(`php/api_warehouses.php?action=locations&warehouse_id=${almacenId}`);
         const data = await response.json();
 
         if (data.success) {
@@ -257,7 +257,7 @@ window.saveAlmacen = async function() {
 
     try {
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `php/almacenes_actions.php?id=${id}` : 'php/almacenes_actions.php';
+        const url = id ? `php/api_warehouses.php?id=${id}` : 'php/api_warehouses.php';
 
         const response = await fetch(url, {
             method: method,
@@ -284,7 +284,7 @@ window.deleteAlmacen = async function(id) {
     if (!confirm('¿Está seguro de desactivar este almacén?')) return;
 
     try {
-        const response = await fetch(`php/almacenes_actions.php?id=${id}`, {
+        const response = await fetch(`php/api_warehouses.php?id=${id}`, {
             method: 'DELETE'
         });
 
@@ -391,7 +391,7 @@ window.saveUbicacion = async function() {
 
     try {
         const method = id ? 'PUT' : 'POST';
-        const url = id ? `php/ubicaciones_actions.php?id=${id}` : 'php/ubicaciones_actions.php';
+        const url = id ? `php/api_warehouses.php?action=locations&id=${id}` : 'php/api_warehouses.php?action=locations';
 
         const response = await fetch(url, {
             method: method,
@@ -419,7 +419,7 @@ window.deleteUbicacion = async function(id) {
     if (!confirm('¿Está seguro de eliminar esta ubicación?')) return;
 
     try {
-        const response = await fetch(`php/ubicaciones_actions.php?id=${id}`, {
+        const response = await fetch(`php/api_warehouses.php?action=locations&id=${id}`, {
             method: 'DELETE'
         });
 

@@ -14,7 +14,7 @@ async function fetchAndRenderCustomers() {
       ? document.getElementById("showDeletedFilter").checked
       : false
 
-    let url = `php/clientes_actions.php?page=${currentCustomerPage}&limit=${customersPerPage}`
+    let url = `php/api_clientes.php?page=${currentCustomerPage}&limit=${customersPerPage}`
     if (searchInput) {
       url += `&search=${searchInput}`
     }
@@ -125,7 +125,7 @@ async function fetchAndRenderFrequentCustomers() {
   )
   frequentCustomersListContainer.innerHTML = `<p class="text-muted">Cargando clientes frecuentes...</p>`
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?action=frequent`)
+    const data = await fetchJSON(`php/api_clientes.php?action=frequent`)
     const frequentCustomers = data.data.frequentCustomers
 
     if (frequentCustomers && frequentCustomers.length > 0) {
@@ -150,7 +150,7 @@ async function fetchAndRenderFrequentCustomers() {
 
 async function viewCustomerDetail(customerId) {
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
+    const data = await fetchJSON(`php/api_clientes.php?id=${customerId}`)
     const customer = data.data.customer
 
     if (customer) {
@@ -181,7 +181,7 @@ async function viewCustomerDetail(customerId) {
 
 async function editCustomer(customerId) {
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
+    const data = await fetchJSON(`php/api_clientes.php?id=${customerId}`)
     const customer = data.data.customer
 
     if (customer) {
@@ -209,7 +209,7 @@ async function editCustomer(customerId) {
         }
 
         try {
-          await fetchJSON(`php/clientes_actions.php?id=${updatedCustomer.id}`, {
+          await fetchJSON(`php/api_clientes.php?id=${updatedCustomer.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedCustomer)
@@ -238,7 +238,7 @@ async function deleteCustomer(customerId) {
     type: "confirm",
     onConfirm: async () => {
       try {
-        await fetchJSON(`php/clientes_actions.php?id=${customerId}`, {
+        await fetchJSON(`php/api_clientes.php?id=${customerId}`, {
           method: "DELETE"
         })
         showToast("Cliente eliminado exitosamente.", "success")
@@ -253,7 +253,7 @@ async function deleteCustomer(customerId) {
 
 async function restoreCustomer(customerId) {
   try {
-    const response = await fetchJSON("php/clientes_actions.php", {
+    const response = await fetchJSON("php/api_clientes.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "restore", id: customerId })
@@ -300,7 +300,7 @@ async function setupCreateCustomerForm() {
     }
 
     try {
-      const response = await fetchJSON("php/clientes_actions.php", {
+      const response = await fetchJSON("php/api_clientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCustomer)
