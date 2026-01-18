@@ -705,7 +705,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function cargarCatalogos() {
     try {
-      const response = await fetch('php/catalogos_actions.php?type=resumen')
+      const response = await fetch('php/api_catalogs.php?type=resumen')
       const data = await response.json()
 
       if (data.success) {

@@ -243,6 +243,7 @@
                         <h6 class="font-primary text-primary mb-3">2. CONFIRMAR Y GENERAR</h6>
                         <div class="buzz-card p-3">
                             <form id="reportGenerationForm">
+                                <input type="text" name="username" autocomplete="username" style="display:none;" aria-hidden="true">
                                 <div class="mb-3">
                                     <label for="adminPasswordReport" class="form-label text-muted">Contraseña de Administrador</label>
                                     <div style="position: relative;">
@@ -573,6 +574,7 @@
                                     <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
                                     <select class="form-control form-control-buzz" id="userRole">
                                         <option value="user">Usuario</option>
+                                        <option value="supervisor">Supervisor</option>
                                         <option value="admin">Administrador</option>
                                     </select>
                                 </div>
