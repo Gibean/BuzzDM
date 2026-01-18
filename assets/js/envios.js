@@ -30,7 +30,7 @@ async function loadShipments() {
     const statusFilter = document.getElementById("statusFilter").value
     const sortBy = document.getElementById("sortBy").value
 
-    let url = `php/envios_actions.php?`
+    let url = `php/api_shipments.php?`
     if (searchInput) {
       url += `&search=${encodeURIComponent(searchInput)}`
     }
@@ -273,7 +273,7 @@ async function updateShipmentStatus(shipmentId, newStatus) {
       }
 
       try {
-        const response = await fetchJSON(`php/envios_actions.php`, {
+        const response = await fetchJSON(`php/api_shipments.php`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
