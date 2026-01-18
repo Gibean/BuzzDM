@@ -432,7 +432,7 @@
                 const formData = new FormData(loginForm);
 
                 try {
-                    const response = await fetch('php/login_guard.php', {
+                    const response = await fetch('php/api_auth.php?action=login', {
                         method: 'POST',
                         body: formData
                     });
