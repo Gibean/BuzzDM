@@ -1,0 +1,1189 @@
+openapi: 3.0.0
+info:
+  title: 'BuzzDM API'
+  description: 'API documentation for BuzzDM System'
+  version: 1.0.0
+servers:
+  -
+    url: 'http://localhost/BuzzDM'
+    description: 'Local Development Server'
+paths:
+  /php/api_auth.php:
+    post:
+      tags:
+        - Auth
+      summary: 'Authentication Actions'
+      description: "Login, Logout, Forgot Password, Reset Password via 'action' param"
+      operationId: 25fece8acb463af16d2a9159879e81f8
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [login, logout, forgot_password, reset_password]
+                email:
+                  description: 'For login/forgot'
+                  type: string
+                password:
+                  description: 'For login/reset'
+                  type: string
+                confirmPassword:
+                  description: 'For reset'
+                  type: string
+                token:
+                  description: 'For reset'
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Action result'
+  /php/api_backups.php:
+    get:
+      tags:
+        - Backups
+      summary: 'List backups'
+      operationId: 167c48e6290c4b580657d2af59e8776a
+      responses:
+        '200':
+          description: 'Backup list'
+    delete:
+      tags:
+        - Backups
+      summary: 'Delete backup'
+      operationId: 73b53df78ca0ad0bbb626b4c995a1de3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                id:
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: 'Backup deleted'
+  '/php/api_backups.php?action=create':
+    post:
+      tags:
+        - Backups
+      summary: 'Create backup'
+      operationId: e410090d7e85c2ed394a0cf634c4eeb6
+      responses:
+        '200':
+          description: 'Backup created'
+  '/php/api_backups.php?action=restore':
+    post:
+      tags:
+        - Backups
+      summary: 'Restore backup'
+      operationId: f1c2af3cce6045b454553967ee73d885
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                id:
+                  type: integer
+              type: object
+      responses:
+        '200':
+          description: 'Backup restored'
+  '/php/api_backups.php?action=download':
+    get:
+      tags:
+        - Backups
+      summary: 'Download backup'
+      operationId: b6df29e8c103e09c72237bd8ddd1ee53
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Backup ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'File download'
+          content:
+            application/octet-stream: {  }
+  '/php/api_backups.php?action=status':
+    get:
+      tags:
+        - Backups
+      summary: 'Get backup status'
+      operationId: 74b5d09740e920d786e4d167ab9e5a9c
+      responses:
+        '200':
+          description: Status
+  '/php/api_backups.php?action=toggle_fallback':
+    post:
+      tags:
+        - Backups
+      summary: 'Toggle fallback backup'
+      operationId: 6ea20faa73c02a359122c7dae3dd7d03
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                enabled:
+                  type: boolean
+              type: object
+      responses:
+        '200':
+          description: Toggled
+  /php/api_cargos.php:
+    get:
+      tags:
+        - Cargos
+      summary: 'List cargos or get cargo'
+      operationId: 3747b5fc0b09d1e634ff19cad4bac6e7
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Cargo ID'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Cargo data'
+    put:
+      tags:
+        - Cargos
+      summary: 'Update cargo'
+      operationId: cd556bb995629c35bacfc563b51f2db8
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Cargo ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Cargo updated'
+    post:
+      tags:
+        - Cargos
+      summary: 'Create or act on cargo'
+      operationId: 4d68a9db55071ada4381f83914970c09
+      parameters:
+        -
+          name: action
+          in: query
+          description: 'Action (create/confirm/cancel)'
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Cargo created or updated'
+    delete:
+      tags:
+        - Cargos
+      summary: 'Delete cargo'
+      operationId: 19e1fd2926a43dc939a431d654625443
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Cargo ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Cargo deleted'
+  /php/api_catalogs.php:
+    get:
+      tags:
+        - Catalogs
+      summary: 'Get catalogs or items'
+      operationId: 81d2f56c8e7a3f6741588e9c5b6b56df
+      parameters:
+        -
+          name: type
+          in: query
+          description: 'Type (resumen)'
+          required: false
+          schema:
+            type: string
+        -
+          name: catalog
+          in: query
+          description: 'Strict catalog name'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Catalog data'
+    put:
+      tags:
+        - Catalogs
+      summary: 'Update catalog item'
+      operationId: e408098a82a74e9fc8e89a7e854addde
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Item updated'
+    post:
+      tags:
+        - Catalogs
+      summary: 'Create catalog item'
+      operationId: ec823476e8735f18ca8c793ae0434bcc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Item created'
+    delete:
+      tags:
+        - Catalogs
+      summary: 'Delete catalog item'
+      operationId: 542c59bec378fba6097b871d545ce27e
+      parameters:
+        -
+          name: catalog
+          in: query
+          description: 'Catalog name'
+          required: true
+          schema:
+            type: string
+        -
+          name: id
+          in: query
+          description: 'Item ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Item deleted'
+  /php/api_clientes.php:
+    get:
+      tags:
+        - Clients
+      summary: 'List or get clients'
+      operationId: 09d0b93d3b6f36f667c1ca9fc6583434
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Client ID'
+          required: false
+          schema:
+            type: integer
+        -
+          name: action
+          in: query
+          description: "Action (e.g., 'frequent')"
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Client list or details'
+    put:
+      tags:
+        - Clients
+      summary: 'Update a client'
+      operationId: ae870e6fce00ec2fa627ca2c607f3fd1
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Client ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Client updated'
+    post:
+      tags:
+        - Clients
+      summary: 'Create a new client'
+      operationId: 897024c38fd012c8f056f4ec27df7241
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - nombre
+              properties:
+                nombre:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Client created'
+    delete:
+      tags:
+        - Clients
+      summary: 'Delete a client'
+      operationId: e37f80920ef02dbaad1c05c8cebb9a07
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Client ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Client deleted'
+  /php/api_kits.php:
+    get:
+      tags:
+        - Kits
+      summary: 'Get kit components'
+      operationId: d7d04da7a9a788a4044c1b01de5e94f7
+      parameters:
+        -
+          name: kit_id
+          in: query
+          description: 'Kit ID'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Component list'
+    put:
+      tags:
+        - Kits
+      summary: 'Update component'
+      operationId: d728f5de2bdb00c7f38edb0b8db8d8e7
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Component ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Component updated'
+    post:
+      tags:
+        - Kits
+      summary: 'Add component to kit'
+      operationId: 58da7cb380f7d998519b186ce7f13c2e
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Component added'
+    delete:
+      tags:
+        - Kits
+      summary: 'Remove component from kit'
+      operationId: cf2a308d61dbff161e453f93b2c3ab9f
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Component ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Component removed'
+  /php/api_locations.php:
+    get:
+      tags:
+        - Locations
+      summary: 'List locations'
+      operationId: 5c855808919414a52edd10ae8eb63694
+      parameters:
+        -
+          name: almacen_id
+          in: query
+          description: 'Warehouse ID'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Location list'
+    put:
+      tags:
+        - Locations
+      summary: 'Update a location'
+      operationId: 4c981dd0eacc125bca2c58fc45bcb12a
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Location ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Location updated'
+    post:
+      tags:
+        - Locations
+      summary: 'Create a location'
+      operationId: 3ec250dfea4fd0aa0c5f72fc8459b0bf
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Location created'
+    delete:
+      tags:
+        - Locations
+      summary: 'Delete a location'
+      operationId: 6aa38eb1d6570fce5891c275fb55c814
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Location ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Location deleted'
+  /php/api_logs.php:
+    get:
+      tags:
+        - Logs
+      summary: 'Get system logs'
+      operationId: 710cb251d63d007736c0015c64e107bc
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'Page number'
+          required: false
+          schema:
+            type: integer
+        -
+          name: limit
+          in: query
+          description: 'Items per page'
+          required: false
+          schema:
+            type: integer
+        -
+          name: search
+          in: query
+          description: 'Search query'
+          required: false
+          schema:
+            type: string
+        -
+          name: dateFrom
+          in: query
+          description: 'Date from'
+          required: false
+          schema:
+            type: string
+        -
+          name: dateTo
+          in: query
+          description: 'Date to'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Logs data'
+  /php/api_notes.php:
+    get:
+      tags:
+        - Notes
+      summary: 'List or get notes'
+      operationId: a4bcdef5108aeb909cca9b3a9168df6b
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Note ID'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Note list or detail'
+    put:
+      tags:
+        - Notes
+      summary: 'Update a note'
+      operationId: 47534fcce41daa7f2707fd451f1af982
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Note updated'
+    post:
+      tags:
+        - Notes
+      summary: 'Create a note'
+      operationId: cf5679df7165ed632c90613a2e87e781
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Note created'
+    delete:
+      tags:
+        - Notes
+      summary: 'Delete a note'
+      operationId: a3e49c783afe2c7a2b0b5657033bfb96
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Note ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Note deleted'
+  /php/api_orders.php:
+    get:
+      tags:
+        - Orders
+      summary: 'List orders or get details'
+      operationId: b23885e0561b7fd0f6742239033538cf
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Order ID'
+          required: false
+          schema:
+            type: integer
+        -
+          name: action
+          in: query
+          description: "Action 'get_products'"
+          required: false
+          schema:
+            type: string
+        -
+          name: order_id
+          in: query
+          description: 'Order ID for products'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Order list or details'
+    put:
+      tags:
+        - Orders
+      summary: 'Update an order'
+      operationId: bbd673fc6ab97f929101f684a940a1f0
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Order ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Order updated'
+    post:
+      tags:
+        - Orders
+      summary: 'Create a new order'
+      operationId: e29ace0e9d86618e4033f0d33ab2231a
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Order created'
+    delete:
+      tags:
+        - Orders
+      summary: 'Delete an order'
+      operationId: ecd6dc0b008c1479fe25aa614701e5aa
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Order ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Order deleted'
+  /api_products.php:
+    get:
+      tags:
+        - Products
+      summary: 'List products'
+      operationId: 49254378cf83bc42313735c7ef9fb82c
+      parameters:
+        -
+          name: search
+          in: query
+          description: 'Search term'
+          required: false
+          schema:
+            type: string
+        -
+          name: page
+          in: query
+          description: 'Page number'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema:
+                properties:
+                  success: { type: boolean }
+                  products: { type: array, items: { type: object } }
+                  pagination: { type: object }
+                type: object
+    put:
+      tags:
+        - Products
+      summary: 'Update an existing product'
+      operationId: 1efb843c8683102e91096de0c46c4e7b
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Product ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Product updated'
+    post:
+      tags:
+        - Products
+      summary: 'Create a new product'
+      operationId: fbf5b611cbcad8825ca652656debe303
+      requestBody:
+        description: 'Product data'
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - nombre
+                - sku
+                - precio_venta
+              properties:
+                nombre:
+                  type: string
+                sku:
+                  type: string
+                precio_venta:
+                  type: number
+              type: object
+      responses:
+        '200':
+          description: 'Product created'
+    delete:
+      tags:
+        - Products
+      summary: 'Delete a product'
+      operationId: b8f654d048acb0497cdd801b4a53e9e9
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Product ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Product deleted'
+  '/php/api_settings.php?action=get_company_info':
+    get:
+      tags:
+        - Settings
+      summary: 'Get company info'
+      operationId: cbb2a8cf34871818100487c497ca8eaf
+      responses:
+        '200':
+          description: 'Company info'
+  '/php/api_settings.php?action=update_company_info':
+    post:
+      tags:
+        - Settings
+      summary: 'Update company info'
+      operationId: 82df50754c7771ec31d5570e749bbc50
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Info updated'
+  '/php/api_settings.php?action=upload_logo':
+    post:
+      tags:
+        - Settings
+      summary: 'Upload logo'
+      operationId: 31a45620e89836f51b3de3cd03a63642
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - logoFile
+              properties:
+                logoFile:
+                  type: string
+                  format: binary
+              type: object
+      responses:
+        '200':
+          description: 'Logo uploaded'
+  /php/api_shipments.php:
+    get:
+      tags:
+        - Shipments
+      summary: 'List shipments'
+      operationId: a693b898153d98dcff434b7dd95feaa4
+      parameters:
+        -
+          name: search
+          in: query
+          description: Search
+          required: false
+          schema:
+            type: string
+        -
+          name: statusFilter
+          in: query
+          description: 'Status filter'
+          required: false
+          schema:
+            type: string
+        -
+          name: sortBy
+          in: query
+          description: 'Sort field'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Shipment list'
+    put:
+      tags:
+        - Shipments
+      summary: 'Update shipment status'
+      operationId: a592daa39d841d86da24e1e89ded4538
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Status updated'
+  /php/api_suppliers.php:
+    get:
+      tags:
+        - Suppliers
+      summary: 'List or search suppliers'
+      operationId: 56283cefca4376e1574ce2b92cc89896
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Supplier ID'
+          required: false
+          schema:
+            type: integer
+        -
+          name: action
+          in: query
+          description: "Action 'search'"
+          required: false
+          schema:
+            type: string
+        -
+          name: q
+          in: query
+          description: 'Search query'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Supplier list'
+    put:
+      tags:
+        - Suppliers
+      summary: 'Update a supplier'
+      operationId: c12925f059fb0cf4759dab4b584527ff
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Supplier ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Supplier updated'
+    post:
+      tags:
+        - Suppliers
+      summary: 'Create a new supplier'
+      operationId: 4e1c3296dc2b6bfbdf2fb1cf96632fae
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Supplier created'
+    delete:
+      tags:
+        - Suppliers
+      summary: 'Delete a supplier'
+      operationId: 438a5b58891e42492de6466872c62b6e
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Supplier ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Supplier deleted'
+  /php/api_users.php:
+    get:
+      tags:
+        - Users
+      summary: 'List all users'
+      operationId: 4c614037b60dbe64fefe1a2dc5a3dc51
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'User ID'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'User list'
+    put:
+      tags:
+        - Users
+      summary: 'Update a user'
+      operationId: 5d3ce6f6bcf5897eb44459ce26ec3c5a
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'User updated'
+    post:
+      tags:
+        - Users
+      summary: 'Create a new user'
+      operationId: ad55d8f633ef40fcd74c8cb38288bbb2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'User created'
+    delete:
+      tags:
+        - Users
+      summary: 'Delete a user'
+      operationId: d2733c44573c5ba190d5386f46c92623
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'User ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'User deleted'
+  /php/api_warehouses.php:
+    get:
+      tags:
+        - Warehouses
+      summary: 'List warehouses or get details'
+      operationId: 07adb2fa08788ad877914db722b69f95
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Warehouse ID'
+          required: false
+          schema:
+            type: integer
+        -
+          name: show_inactive
+          in: query
+          description: 'Show inactive'
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: 'Warehouse list or details'
+    put:
+      tags:
+        - Warehouses
+      summary: 'Update a warehouse'
+      operationId: 7b98ddc12d030f415a38fd91286f6647
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Warehouse ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Warehouse updated'
+    post:
+      tags:
+        - Warehouses
+      summary: 'Create a new warehouse'
+      operationId: b410c0eea9a9638a30186d879181932d
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Warehouse created'
+    delete:
+      tags:
+        - Warehouses
+      summary: 'Deactivate a warehouse'
+      operationId: 4ebff51309fcf0000f837b633bc269e4
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Warehouse ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Warehouse deactivated'
+  '/php/api_warehouses.php?action=locations':
+    get:
+      tags:
+        - Warehouses
+      summary: 'List locations in warehouse'
+      operationId: 5e178fdaa4a620cbe1c3377041499d96
+      parameters:
+        -
+          name: warehouse_id
+          in: query
+          description: 'Warehouse ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Location list'
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: PHPSESSID
+      in: cookie
+tags:
+  -
+    name: Auth
+    description: 'Authentication Operations'
+  -
+    name: Backups
+    description: 'Backup Management'
+  -
+    name: Cargos
+    description: 'Operations related to Stock Cargos'
+  -
+    name: Catalogs
+    description: 'Operations related to Catalogs (Categories, Brands, etc.)'
+  -
+    name: Clients
+    description: 'Operations related to Clients'
+  -
+    name: Kits
+    description: 'Operations related to Kit Components'
+  -
+    name: Locations
+    description: 'Operations related to Warehouse Locations'
+  -
+    name: Logs
+    description: 'Audit Logs'
+  -
+    name: Notes
+    description: 'Operations related to Kanban Notes'
+  -
+    name: Orders
+    description: 'Operations related to Orders'
+  -
+    name: Products
+    description: 'Operations related to Products'
+  -
+    name: Settings
+    description: 'System Settings'
+  -
+    name: Shipments
+    description: 'Operations related to Shipments'
+  -
+    name: Suppliers
+    description: 'Operations related to Suppliers'
+  -
+    name: Users
+    description: 'Operations related to Users'
+  -
+    name: Warehouses
+    description: 'Operations related to Warehouses'

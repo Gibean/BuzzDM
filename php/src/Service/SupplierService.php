@@ -12,6 +12,10 @@ class SupplierService {
         return $this->repository->findAll();
     }
 
+    public function searchSuppliers($query) {
+        return $this->repository->search($query);
+    }
+
     public function getSupplierById($id) {
         return $this->repository->findById($id);
     }

@@ -1,11 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/ClienteService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
-use OpenApi\Annotations as OA;
-
-/**
- * @OA\Info(title="BuzzDM API - Clientes", version="1.0")
- */
+#[OA\Tag(name: "Clients", description: "Operations related to Clients")]
 class ClienteController {
     private $service;
 
@@ -49,13 +46,18 @@ class ClienteController {
         }
     }
 
-    /**
-     * @OA\Get(
-     *     path="/php/api_clientes.php",
-     *     @OA\Parameter(name="id", in="query", required=false, description="ID del cliente"),
-     *     @OA\Response(response="200", description="Retorna cliente(s)")
-     * )
-     */
+    #[OA\Get(
+        path: "/php/api_clientes.php",
+        tags: ["Clients"],
+        summary: "List or get clients",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Client ID", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "action", in: "query", description: "Action (e.g., 'frequent')", required: false, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Client list or details")
+        ]
+    )]
     private function handleGet() {
         if (isset($_GET['id'])) {
             $customer = $this->service->getCustomer($_GET['id']);
@@ -73,6 +75,24 @@ class ClienteController {
         }
     }
 
+    #[OA\Post(
+        path: "/php/api_clientes.php",
+        tags: ["Clients"],
+        summary: "Create a new client",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["nombre"],
+                properties: [
+                    new OA\Property(property: "nombre", type: "string")
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Client created")
+        ]
+    )]
     private function handlePost($input) {
         if (isset($input['action']) && $input['action'] === 'restore') {
             $id = $input['id'] ?? null;
@@ -84,6 +104,18 @@ class ClienteController {
         }
     }
 
+    #[OA\Put(
+        path: "/php/api_clientes.php",
+        tags: ["Clients"],
+        summary: "Update a client",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Client ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Client updated")
+        ]
+    )]
     private function handlePut($input) {
         $id = $_GET['id'] ?? $input['id'] ?? null;
         if (!$id) {
@@ -93,6 +125,17 @@ class ClienteController {
         $this->jsonResponse(true, [], 'Cliente actualizado exitosamente');
     }
 
+    #[OA\Delete(
+        path: "/php/api_clientes.php",
+        tags: ["Clients"],
+        summary: "Delete a client",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Client ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Client deleted")
+        ]
+    )]
     private function handleDelete() {
         $id = $_GET['id'] ?? null;
         if (!$id) {

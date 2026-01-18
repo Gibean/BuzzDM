@@ -1,6 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/SettingsService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Settings", description: "System Settings")]
 class SettingsController {
     private $service;
 
@@ -48,6 +50,14 @@ class SettingsController {
         }
     }
 
+    #[OA\Get(
+        path: "/php/api_settings.php?action=get_company_info",
+        tags: ["Settings"],
+        summary: "Get company info",
+        responses: [
+            new OA\Response(response: 200, description: "Company info")
+        ]
+    )]
     private function getCompanyInfo() {
         $data = $this->service->getCompanyInfo();
         if ($data) {
@@ -57,6 +67,15 @@ class SettingsController {
         }
     }
 
+    #[OA\Post(
+        path: "/php/api_settings.php?action=update_company_info",
+        tags: ["Settings"],
+        summary: "Update company info",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Info updated")
+        ]
+    )]
     private function updateCompanyInfo($input) {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
              throw new Exception('Método no permitido.');
@@ -65,6 +84,24 @@ class SettingsController {
         $this->jsonResponse(true, null, 'Información de la empresa actualizada exitosamente.');
     }
 
+    #[OA\Post(
+        path: "/php/api_settings.php?action=upload_logo",
+        tags: ["Settings"],
+        summary: "Upload logo",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["logoFile"],
+                    properties: [new OA\Property(property: "logoFile", type: "string", format: "binary")]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Logo uploaded")
+        ]
+    )]
     private function uploadLogo() {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
              throw new Exception('Método no permitido.');

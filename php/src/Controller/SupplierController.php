@@ -1,6 +1,9 @@
 <?php
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 require_once __DIR__ . '/../Service/SupplierService.php';
 
+#[OA\Tag(name: "Suppliers", description: "Operations related to Suppliers")]
 class SupplierController {
     private $service;
 
@@ -15,7 +18,9 @@ class SupplierController {
 
             switch ($method) {
                 case 'GET':
-                    if (isset($_GET['id'])) {
+                    if (isset($_GET['action']) && $_GET['action'] === 'search') {
+                        $this->searchSuppliers($_GET['q'] ?? '');
+                    } elseif (isset($_GET['id'])) {
                         $this->getSupplier((int)$_GET['id']);
                     } else {
                         $this->getAllSuppliers();
@@ -31,61 +36,111 @@ class SupplierController {
                     break;
 
                 case 'DELETE':
-                    $this->deleteSupplier($_GET['id'] ?? null);
+                    $this->deleteSupplier();
                     break;
 
                 default:
-                    $this->jsonResponse(false, null, 'Método no permitido');
+                    $this->jsonResponse(false, 'Método no permitido', [], 405);
             }
-
         } catch (Exception $e) {
-            $this->jsonResponse(false, null, $e->getMessage());
+            $this->jsonResponse(false, $e->getMessage(), [], 500);
         }
     }
 
+    #[OA\Get(
+        path: "/php/api_suppliers.php",
+        tags: ["Suppliers"],
+        summary: "List or search suppliers",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Supplier ID", required: false, schema: new OA\Schema(type: "integer")),
+            new OA\Parameter(name: "action", in: "query", description: "Action 'search'", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "q", in: "query", description: "Search query", required: false, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Supplier list")
+        ]
+    )]
     private function getAllSuppliers() {
-        $data = $this->service->getAllSuppliers();
-        $this->jsonResponse(true, ['proveedores' => $data]); // Keep 'proveedores' key for frontend compatibility
+        $suppliers = $this->service->getAllSuppliers();
+        $this->jsonResponse(true, 'Proveedores obtenidos', $suppliers);
+    }
+
+    private function searchSuppliers($query) {
+        $suppliers = $this->service->searchSuppliers($query);
+        $this->jsonResponse(true, 'Resultados de búsqueda', $suppliers);
     }
 
     private function getSupplier($id) {
-        $data = $this->service->getSupplierById($id);
-        if ($data) {
-            $this->jsonResponse(true, $data);
+        $supplier = $this->service->getSupplierById($id);
+        if ($supplier) {
+            $this->jsonResponse(true, 'Proveedor obtenido', $supplier);
         } else {
-            $this->jsonResponse(false, null, "Proveedor no encontrado");
+            $this->jsonResponse(false, 'Proveedor no encontrado', [], 404);
         }
     }
 
-    private function createSupplier($input) {
-        $newId = $this->service->createSupplier($input);
-        $this->jsonResponse(true, ['id' => $newId], "Proveedor creado correctamente");
+    #[OA\Post(
+        path: "/php/api_suppliers.php",
+        tags: ["Suppliers"],
+        summary: "Create a new supplier",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Supplier created")
+        ]
+    )]
+    private function createSupplier($data) {
+        $id = $this->service->createSupplier($data);
+        $this->jsonResponse(true, 'Proveedor creado', ['id' => $id]);
     }
 
-    private function updateSupplier($input) {
-        $id = $input['id'] ?? ($_GET['id'] ?? null);
+    #[OA\Put(
+        path: "/php/api_suppliers.php",
+        tags: ["Suppliers"],
+        summary: "Update a supplier",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Supplier ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Supplier updated")
+        ]
+    )]
+    private function updateSupplier($data) {
+        $id = $_GET['id'] ?? $data['id'] ?? null;
         if (!$id) {
-            throw new Exception("ID de proveedor no proporcionado");
+            throw new Exception("ID de proveedor requerido para actualización");
         }
-        $this->service->updateSupplier($id, $input);
-        $this->jsonResponse(true, null, "Proveedor actualizado correctamente");
+        $this->service->updateSupplier($id, $data);
+        $this->jsonResponse(true, 'Proveedor actualizado');
     }
 
-    private function deleteSupplier($id) {
+    #[OA\Delete(
+        path: "/php/api_suppliers.php",
+        tags: ["Suppliers"],
+        summary: "Delete a supplier",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Supplier ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Supplier deleted")
+        ]
+    )]
+    private function deleteSupplier() {
+        $id = $_GET['id'] ?? null;
         if (!$id) {
-            throw new Exception("ID de proveedor no proporcionado");
+            throw new Exception("ID de proveedor requerido para eliminación");
         }
         $this->service->deleteSupplier($id);
-        $this->jsonResponse(true, null, "Proveedor eliminado correctamente");
+        $this->jsonResponse(true, 'Proveedor eliminado');
     }
 
-    private function jsonResponse($success, $data = [], $message = '') {
+    private function jsonResponse($success, $message, $data = [], $code = 200) {
         header('Content-Type: application/json');
+        http_response_code($code);
         echo json_encode([
             'success' => $success,
-            'data' => $data, // New standard
-            'proveedores' => $data['proveedores'] ?? null, // Backward compatibility for list
-            'message' => $message
+            'message' => $message,
+            'data' => $data
         ]);
         exit;
     }

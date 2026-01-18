@@ -1,6 +1,7 @@
-<?php
-require_once __DIR__ . '/../Service/ImportService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Import", description: "Import Operations")]
 class ImportController {
     private $service;
 
@@ -26,6 +27,31 @@ class ImportController {
         }
     }
 
+    #[OA\Post(
+        path: "/php/api_import.php",
+        tags: ["Import"],
+        summary: "Process excel import",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["import_file"],
+                    properties: [
+                        new OA\Property(
+                            property: "import_file",
+                            type: "string",
+                            format: "binary",
+                            description: "Excel file to import"
+                        )
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Import result")
+        ]
+    )]
     private function processImport() {
         // Validate File
         if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
@@ -49,6 +75,14 @@ class ImportController {
         exit;
     }
 
+    #[OA\Get(
+        path: "/php/api_import.php",
+        tags: ["Import"],
+        summary: "Get import history",
+        responses: [
+            new OA\Response(response: 200, description: "History list")
+        ]
+    )]
     private function getHistory() {
         $history = $this->service->getHistory();
 

@@ -1,6 +1,8 @@
 <?php
 // Inicia la sesión en cada página que lo requiera
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use function PHPSTORM_META\map;
 
 if (session_status() == PHP_SESSION_NONE) {
@@ -22,26 +24,11 @@ $api_scripts = [
     'api_backups.php', // Standardized API
     'api_users.php', // Standardized API
     'api_catalogs.php', // Standardized API
+    'api_logs.php', // Standardized API - Logs
     'api_auth.php', // Standardized API - Authentication
     'api_shipments.php', // Standardized API - Shipments
     'api_locations.php', // Standardized API - Locations
     'api_kits.php', // Standardized API - Kit Components
-    // Legacy Actions
-
-    'settings_actions.php',
-    'logs.php',
-    'users.php',
-    'backups.php',
-    'backup_status.php',
-    'proveedores_search.php',
-    // Phase 1.7 - Product types and kits
-    'catalogos_actions.php',
-    'kit_actions.php',
-    // Phase 2 - Multi-warehouse
-    'almacenes_actions.php',
-    'ubicaciones_actions.php',
-    // Proveedores
-    'proveedores_actions.php',
     // Notificaciones y estadísticas
     'api_notifications.php',
     'api_stats.php'
@@ -137,18 +124,16 @@ $fallback_pages = [
         'api_sales_chart.php', 'create_admin.php', 'get_import_history.php',
         'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'api_orders.php',
         'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
-        'envios_actions.php', 'company_settings.php', 'company_settings_actions.php', 'backup.php',
-        'backups.php', 'backup_status.php', 'logs.php', 'settings_actions.php',
+        'backup_status.php',
         'cargos_existencias.php', 'almacenes.php',
-        'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
-        'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
+        'proveedores.php', 'todo.php', 'notas_actions.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
         'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
         'about.php', 'manual.php', 'login.php', 'logout.php', 'api_sales_chart.php',
-        'get_import_history.php', 'api_products.php', 'users.php', 'sesion.php', 'db.php',
+        'api_products.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
         'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'

@@ -1,9 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/ShipmentService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
-/**
- * ShipmentController - HTTP request handler for shipments
- */
+#[OA\Tag(name: "Shipments", description: "Operations related to Shipments")]
 class ShipmentController {
     private $service;
 
@@ -17,31 +16,59 @@ class ShipmentController {
         try {
             switch ($method) {
                 case 'GET':
-                    $filters = [
-                        'search' => $_GET['search'] ?? '',
-                        'status' => $_GET['statusFilter'] ?? '',
-                        'sortBy' => $_GET['sortBy'] ?? 'date'
-                    ];
-                    $result = $this->service->getAllShipments($filters);
-                    $this->jsonResponse(true, $result);
+                    $this->getAllShipments();
                     break;
-
                 case 'PUT':
-                    $input = json_decode(file_get_contents('php://input'), true);
-                    $result = $this->service->updateShipmentStatus(
-                        $input['id'] ?? null,
-                        $input['status'] ?? '',
-                        $input['trackingNumber'] ?? null
-                    );
-                    $this->jsonResponse(true, $result);
+                    $this->updateShipmentStatus();
                     break;
-
                 default:
                     $this->jsonResponse(false, null, 'Método no permitido');
             }
         } catch (Exception $e) {
             $this->jsonResponse(false, null, $e->getMessage());
         }
+    }
+
+    #[OA\Get(
+        path: "/php/api_shipments.php",
+        tags: ["Shipments"],
+        summary: "List shipments",
+        parameters: [
+            new OA\Parameter(name: "search", in: "query", description: "Search", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "statusFilter", in: "query", description: "Status filter", required: false, schema: new OA\Schema(type: "string")),
+            new OA\Parameter(name: "sortBy", in: "query", description: "Sort field", required: false, schema: new OA\Schema(type: "string"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Shipment list")
+        ]
+    )]
+    private function getAllShipments() {
+        $filters = [
+            'search' => $_GET['search'] ?? '',
+            'status' => $_GET['statusFilter'] ?? '',
+            'sortBy' => $_GET['sortBy'] ?? 'date'
+        ];
+        $result = $this->service->getAllShipments($filters);
+        $this->jsonResponse(true, $result);
+    }
+
+    #[OA\Put(
+        path: "/php/api_shipments.php",
+        tags: ["Shipments"],
+        summary: "Update shipment status",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Status updated")
+        ]
+    )]
+    private function updateShipmentStatus() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $result = $this->service->updateShipmentStatus(
+            $input['id'] ?? null,
+            $input['status'] ?? '',
+            $input['trackingNumber'] ?? null
+        );
+        $this->jsonResponse(true, $result);
     }
 
     private function jsonResponse($success, $data = null, $message = '') {

@@ -1,6 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/BackupService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
+#[OA\Tag(name: "Backups", description: "Backup Management")]
 class BackupController {
     private $service;
 
@@ -40,13 +42,10 @@ class BackupController {
                         $this->create();
                     } elseif ($action === 'restore') {
                         $this->restore($input['id'] ?? 0);
-                    } elseif ($action === 'toggle_fallback') { // Can be a get param or post
-                         // Also check if action is in query string but payload in body (admin.js toggle)
-                         // Actually the JS uses query param ?action=toggle but POST body
+                    } elseif ($action === 'toggle_fallback') {
                          $enabled = $input['enabled'] ?? true;
                          $this->toggleFallback($enabled);
                     } else {
-                         // Check query param if payload didn't specify 'create' etc
                          if (isset($_GET['action']) && $_GET['action'] === 'toggle') {
                              $this->toggleFallback($input['enabled'] ?? true);
                          } else {
@@ -65,26 +64,71 @@ class BackupController {
         }
     }
 
+    #[OA\Get(
+        path: "/php/api_backups.php",
+        tags: ["Backups"],
+        summary: "List backups",
+        responses: [
+            new OA\Response(response: 200, description: "Backup list")
+        ]
+    )]
     private function list() {
         $backups = $this->service->getAllBackups();
         $this->jsonResponse(true, ['backups' => $backups]);
     }
 
+    #[OA\Post(
+        path: "/php/api_backups.php?action=create",
+        tags: ["Backups"],
+        summary: "Create backup",
+        responses: [
+            new OA\Response(response: 200, description: "Backup created")
+        ]
+    )]
     private function create() {
         $result = $this->service->performBackup('manual', $_SESSION['usuario_id']);
         $this->jsonResponse(true, $result);
     }
 
+    #[OA\Post(
+        path: "/php/api_backups.php?action=restore",
+        tags: ["Backups"],
+        summary: "Restore backup",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object", properties: [new OA\Property(property: "id", type: "integer")])),
+        responses: [
+            new OA\Response(response: 200, description: "Backup restored")
+        ]
+    )]
     private function restore($id) {
         $result = $this->service->restoreBackup($id, $_SESSION['usuario_id']);
         $this->jsonResponse(true, $result);
     }
 
+    #[OA\Delete(
+        path: "/php/api_backups.php",
+        tags: ["Backups"],
+        summary: "Delete backup",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object", properties: [new OA\Property(property: "id", type: "integer")])),
+        responses: [
+            new OA\Response(response: 200, description: "Backup deleted")
+        ]
+    )]
     private function delete($id) {
         $this->service->deleteBackup($id);
         $this->jsonResponse(true, null, 'Backup eliminado exitosamente');
     }
 
+    #[OA\Get(
+        path: "/php/api_backups.php?action=download",
+        tags: ["Backups"],
+        summary: "Download backup",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Backup ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "File download", content: new OA\MediaType(mediaType: "application/octet-stream"))
+        ]
+    )]
     private function download($id) {
         $file = $this->service->getDownloadPath($id);
         if (!$file) {
@@ -99,27 +143,37 @@ class BackupController {
         exit;
     }
 
+    #[OA\Get(
+        path: "/php/api_backups.php?action=status",
+        tags: ["Backups"],
+        summary: "Get backup status",
+        responses: [
+            new OA\Response(response: 200, description: "Status")
+        ]
+    )]
     private function status() {
         $data = $this->service->getAutoBackupStatus();
         $this->jsonResponse(true, $data);
     }
 
+    #[OA\Post(
+        path: "/php/api_backups.php?action=toggle_fallback",
+        tags: ["Backups"],
+        summary: "Toggle fallback backup",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object", properties: [new OA\Property(property: "enabled", type: "boolean")])),
+        responses: [
+            new OA\Response(response: 200, description: "Toggled")
+        ]
+    )]
     private function toggleFallback($enabled) {
         $this->service->setFallbackEnabled($enabled);
         $this->jsonResponse(true, ['enabled' => $enabled]);
     }
 
     private function jsonResponse($success, $data = [], $message = '') {
-        // If data has keys, merge them to root or keep in 'data' key?
-        // Admin.js expects root keys like 'backups', 'autoBackup', etc.
-        // So I should pass array directly if it's already structured, or wrap it.
-        // My Service methods performBackup returns array with 'backup' key.
-        // status returns array with 'autoBackup' key.
-        // So I will merge $data into the response array.
-
         $response = ['success' => $success];
         if ($message) $response['message'] = $message;
-        if (!$success && $message) $response['error'] = $message; // For compatibility
+        if (!$success && $message) $response['error'] = $message;
 
         if (is_array($data)) {
             $response = array_merge($response, $data);

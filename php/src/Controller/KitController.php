@@ -1,9 +1,8 @@
 <?php
-require_once __DIR__ . '/../Service/KitService.php';
+// Autoload handled by composer
+use OpenApi\Attributes as OA;
 
-/**
- * KitController - HTTP request handler for kit components
- */
+#[OA\Tag(name: "Kits", description: "Operations related to Kit Components")]
 class KitController {
     private $service;
 
@@ -17,33 +16,88 @@ class KitController {
         try {
             switch ($method) {
                 case 'GET':
-                    $result = $this->service->getComponents($_GET['kit_id'] ?? null);
-                    $this->jsonResponse(true, $result);
+                    $this->getComponents();
                     break;
-
                 case 'POST':
-                    $input = json_decode(file_get_contents('php://input'), true);
-                    $result = $this->service->addComponent($input);
-                    $this->jsonResponse(true, $result);
+                    $this->addComponent();
                     break;
-
                 case 'PUT':
-                    $input = json_decode(file_get_contents('php://input'), true);
-                    $result = $this->service->updateComponent($_GET['id'] ?? null, $input);
-                    $this->jsonResponse(true, $result);
+                    $this->updateComponent();
                     break;
-
                 case 'DELETE':
-                    $result = $this->service->deleteComponent($_GET['id'] ?? null);
-                    $this->jsonResponse(true, $result);
+                    $this->deleteComponent();
                     break;
-
                 default:
                     $this->jsonResponse(false, null, 'Método no permitido');
             }
         } catch (Exception $e) {
             $this->jsonResponse(false, null, $e->getMessage());
         }
+    }
+
+    #[OA\Get(
+        path: "/php/api_kits.php",
+        tags: ["Kits"],
+        summary: "Get kit components",
+        parameters: [
+            new OA\Parameter(name: "kit_id", in: "query", description: "Kit ID", required: false, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Component list")
+        ]
+    )]
+    private function getComponents() {
+        $result = $this->service->getComponents($_GET['kit_id'] ?? null);
+        $this->jsonResponse(true, $result);
+    }
+
+    #[OA\Post(
+        path: "/php/api_kits.php",
+        tags: ["Kits"],
+        summary: "Add component to kit",
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Component added")
+        ]
+    )]
+    private function addComponent() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $result = $this->service->addComponent($input);
+        $this->jsonResponse(true, $result);
+    }
+
+    #[OA\Put(
+        path: "/php/api_kits.php",
+        tags: ["Kits"],
+        summary: "Update component",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Component ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        responses: [
+            new OA\Response(response: 200, description: "Component updated")
+        ]
+    )]
+    private function updateComponent() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $result = $this->service->updateComponent($_GET['id'] ?? null, $input);
+        $this->jsonResponse(true, $result);
+    }
+
+    #[OA\Delete(
+        path: "/php/api_kits.php",
+        tags: ["Kits"],
+        summary: "Remove component from kit",
+        parameters: [
+            new OA\Parameter(name: "id", in: "query", description: "Component ID", required: true, schema: new OA\Schema(type: "integer"))
+        ],
+        responses: [
+            new OA\Response(response: 200, description: "Component removed")
+        ]
+    )]
+    private function deleteComponent() {
+        $result = $this->service->deleteComponent($_GET['id'] ?? null);
+        $this->jsonResponse(true, $result);
     }
 
     private function jsonResponse($success, $data = null, $message = '') {

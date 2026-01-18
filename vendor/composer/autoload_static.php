@@ -7,6 +7,8 @@ namespace Composer\Autoload;
 class ComposerStaticInit5fcd097d580619b7ade124f385609135
 {
     public static $files = array (
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
+        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '72243e5536b63e298acb6476f01f1aff' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/special_cases.php',
         '3f648889e687f31c52f949ba8a9d0873' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apache.php',
         'eeb4581d958421a4244aaa4167c6a575' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/apcu.php',
@@ -87,9 +89,9 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         '4af1dca6db8c527c6eed27bff85ff0e5' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/yaz.php',
         'fe43ca06499ac37bc2dedd823af71eb5' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/zip.php',
         '356736db98a6834f0a886b8d509b0ecd' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/zlib.php',
-        '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        'dddd44608da72a00b57f77096a4b21b7' => __DIR__ . '/../..' . '/php/api_docs_config.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -102,8 +104,15 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
             'Symfony\\Polyfill\\Ctype\\' => 23,
+            'Symfony\\Component\\Yaml\\' => 23,
+            'Symfony\\Component\\TypeInfo\\' => 27,
+            'Symfony\\Component\\Finder\\' => 25,
             'Svg\\' => 4,
             'Sabberworm\\CSS\\' => 15,
+        ),
+        'R' => 
+        array (
+            'Radebatz\\TypeInfoExtras\\' => 24,
         ),
         'P' => 
         array (
@@ -111,9 +120,16 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'Psr\\Container\\' => 14,
+            'PhpParser\\' => 10,
             'PhpOption\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'PHPStan\\PhpDocParser\\' => 21,
             'PHPMailer\\PHPMailer\\' => 20,
+        ),
+        'O' => 
+        array (
+            'OpenApi\\' => 8,
         ),
         'M' => 
         array (
@@ -158,6 +174,18 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
+        'Symfony\\Component\\Yaml\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/yaml',
+        ),
+        'Symfony\\Component\\TypeInfo\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/type-info',
+        ),
+        'Symfony\\Component\\Finder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/finder',
+        ),
         'Svg\\' => 
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
@@ -165,6 +193,10 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'Sabberworm\\CSS\\' => 
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
+        ),
+        'Radebatz\\TypeInfoExtras\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/radebatz/type-info-extras/src',
         ),
         'Psr\\SimpleCache\\' => 
         array (
@@ -183,6 +215,14 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
+        'Psr\\Container\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/container/src',
+        ),
+        'PhpParser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
+        ),
         'PhpOption\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
@@ -191,9 +231,17 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
+        'PHPStan\\PhpDocParser\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
         'PHPMailer\\PHPMailer\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
+        ),
+        'OpenApi\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
         ),
         'Monolog\\' => 
         array (
@@ -235,9 +283,45 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'AuthController' => __DIR__ . '/../..' . '/php/src/Controller/AuthController.php',
+        'AuthRepository' => __DIR__ . '/../..' . '/php/src/Repository/AuthRepository.php',
+        'AuthService' => __DIR__ . '/../..' . '/php/src/Service/AuthService.php',
+        'BackupController' => __DIR__ . '/../..' . '/php/src/Controller/BackupController.php',
+        'BackupRepository' => __DIR__ . '/../..' . '/php/src/Repository/BackupRepository.php',
+        'BackupService' => __DIR__ . '/../..' . '/php/src/Service/BackupService.php',
+        'CargoController' => __DIR__ . '/../..' . '/php/src/Controller/CargoController.php',
+        'CargoRepository' => __DIR__ . '/../..' . '/php/src/Repository/CargoRepository.php',
+        'CargoService' => __DIR__ . '/../..' . '/php/src/Service/CargoService.php',
+        'CatalogController' => __DIR__ . '/../..' . '/php/src/Controller/CatalogController.php',
+        'CatalogRepository' => __DIR__ . '/../..' . '/php/src/Repository/CatalogRepository.php',
+        'CatalogService' => __DIR__ . '/../..' . '/php/src/Service/CatalogService.php',
+        'ClienteController' => __DIR__ . '/../..' . '/php/src/Controller/ClienteController.php',
+        'ClienteRepository' => __DIR__ . '/../..' . '/php/src/Repository/ClienteRepository.php',
+        'ClienteService' => __DIR__ . '/../..' . '/php/src/Service/ClienteService.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
+        'ImportController' => __DIR__ . '/../..' . '/php/src/Controller/ImportController.php',
+        'ImportRepository' => __DIR__ . '/../..' . '/php/src/Repository/ImportRepository.php',
+        'ImportService' => __DIR__ . '/../..' . '/php/src/Service/ImportService.php',
+        'KitController' => __DIR__ . '/../..' . '/php/src/Controller/KitController.php',
+        'KitRepository' => __DIR__ . '/../..' . '/php/src/Repository/KitRepository.php',
+        'KitService' => __DIR__ . '/../..' . '/php/src/Service/KitService.php',
+        'LocationController' => __DIR__ . '/../..' . '/php/src/Controller/LocationController.php',
+        'LocationRepository' => __DIR__ . '/../..' . '/php/src/Repository/LocationRepository.php',
+        'LocationService' => __DIR__ . '/../..' . '/php/src/Service/LocationService.php',
+        'LogController' => __DIR__ . '/../..' . '/php/src/Controller/LogController.php',
+        'LogRepository' => __DIR__ . '/../..' . '/php/src/Repository/LogRepository.php',
+        'LogService' => __DIR__ . '/../..' . '/php/src/Service/LogService.php',
+        'NoteController' => __DIR__ . '/../..' . '/php/src/Controller/NoteController.php',
+        'NoteRepository' => __DIR__ . '/../..' . '/php/src/Repository/NoteRepository.php',
+        'NoteService' => __DIR__ . '/../..' . '/php/src/Service/NoteService.php',
+        'OrderController' => __DIR__ . '/../..' . '/php/src/Controller/OrderController.php',
+        'OrderRepository' => __DIR__ . '/../..' . '/php/src/Repository/OrderRepository.php',
+        'OrderService' => __DIR__ . '/../..' . '/php/src/Service/OrderService.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+        'ProductController' => __DIR__ . '/../..' . '/php/src/Controller/ProductController.php',
+        'ProductRepository' => __DIR__ . '/../..' . '/php/src/Repository/ProductRepository.php',
+        'ProductService' => __DIR__ . '/../..' . '/php/src/Service/ProductService.php',
         'Safe\\DateTime' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTime.php',
         'Safe\\DateTimeImmutable' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTimeImmutable.php',
         'Safe\\Exceptions\\ApacheException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ApacheException.php',
@@ -321,9 +405,24 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'Safe\\Exceptions\\YazException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/YazException.php',
         'Safe\\Exceptions\\ZipException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZipException.php',
         'Safe\\Exceptions\\ZlibException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZlibException.php',
+        'SettingsController' => __DIR__ . '/../..' . '/php/src/Controller/SettingsController.php',
+        'SettingsRepository' => __DIR__ . '/../..' . '/php/src/Repository/SettingsRepository.php',
+        'SettingsService' => __DIR__ . '/../..' . '/php/src/Service/SettingsService.php',
+        'ShipmentController' => __DIR__ . '/../..' . '/php/src/Controller/ShipmentController.php',
+        'ShipmentRepository' => __DIR__ . '/../..' . '/php/src/Repository/ShipmentRepository.php',
+        'ShipmentService' => __DIR__ . '/../..' . '/php/src/Service/ShipmentService.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'SupplierController' => __DIR__ . '/../..' . '/php/src/Controller/SupplierController.php',
+        'SupplierRepository' => __DIR__ . '/../..' . '/php/src/Repository/SupplierRepository.php',
+        'SupplierService' => __DIR__ . '/../..' . '/php/src/Service/SupplierService.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'UserController' => __DIR__ . '/../..' . '/php/src/Controller/UserController.php',
+        'UserRepository' => __DIR__ . '/../..' . '/php/src/Repository/UserRepository.php',
+        'UserService' => __DIR__ . '/../..' . '/php/src/Service/UserService.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+        'WarehouseController' => __DIR__ . '/../..' . '/php/src/Controller/WarehouseController.php',
+        'WarehouseRepository' => __DIR__ . '/../..' . '/php/src/Repository/WarehouseRepository.php',
+        'WarehouseService' => __DIR__ . '/../..' . '/php/src/Service/WarehouseService.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
