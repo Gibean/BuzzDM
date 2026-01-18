@@ -65,7 +65,7 @@ function closeNoteModal() {
  */
 async function fetchNotes() {
     try {
-        const response = await fetchJSON('php/notas_actions.php');
+        const response = await fetchJSON('php/api_notes.php');
         if (response.success) {
             allNotes = response.data;
             renderKanban();
@@ -236,7 +236,7 @@ async function drop(ev) {
             renderKanban();
 
             try {
-                await fetchJSON('php/notas_actions.php', {
+                await fetchJSON('php/api_notes.php', {
                     method: 'PUT',
                     body: JSON.stringify({
                         id: id,
@@ -299,9 +299,12 @@ let currentViewMode = false; // Track if modal is in view mode
 
 async function openEditNoteModal(id) {
     try {
-        const response = await fetchJSON(`php/notas_actions.php?id=${id}`);
+        const response = await fetchJSON(`php/api_notes.php?id=${id}`);
         if (response.success) {
             const note = response.data;
+            console.log('Note Details Loaded:', note); // Debug log
+            console.log('Miembros Type:', typeof note.miembros, Array.isArray(note.miembros));
+            console.log('Etiquetas Type:', typeof note.etiquetas, Array.isArray(note.etiquetas));
 
             document.getElementById('noteId').value = note.id;
             document.getElementById('noteTitle').value = note.titulo;
@@ -315,8 +318,8 @@ async function openEditNoteModal(id) {
             document.getElementById('noteIdLabel').textContent = `# ${note.id}`;
 
             // Etiquetas y Miembros
-            activeLabels = JSON.parse(note.etiquetas || '[]');
-            activeMembers = JSON.parse(note.miembros || '[]');
+            activeLabels = note.etiquetas || [];
+            activeMembers = note.miembros || [];
             renderActiveLabels();
             renderActiveMembers();
 
@@ -967,7 +970,7 @@ async function handleNoteSubmit(e) {
     });
 
     try {
-        const response = await fetchJSON('php/notas_actions.php', {
+        const response = await fetchJSON('php/api_notes.php', {
             method: isEdit ? 'PUT' : 'POST',
             body: JSON.stringify(payload)
         });
@@ -990,7 +993,7 @@ async function deleteNote() {
     if (!id) return;
     if (confirm('¿Estás seguro de eliminar esta nota?')) {
         try {
-            const response = await fetchJSON(`php/notas_actions.php?id=${id}`, { method: 'DELETE' });
+            const response = await fetchJSON(`php/api_notes.php?id=${id}`, { method: 'DELETE' });
             if (response.success) {
                 showToast('Nota eliminada', 'success');
                 closeNoteModal();

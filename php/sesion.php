@@ -16,6 +16,10 @@ $api_scripts = [
     'api_warehouses.php', // Standardized API
     'api_import.php', // Standardized API
     'api_cargos.php', // Standardized API
+    'api_notes.php', // Standardized API
+    'api_suppliers.php', // Standardized API
+    'api_settings.php', // Standardized API
+    'api_backups.php', // Standardized API
     // Legacy Actions
 
     'settings_actions.php',
@@ -132,7 +136,8 @@ $fallback_pages = [
         'cargos_existencias.php', 'almacenes.php',
         'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
         'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
+        'api_settings.php', 'api_backups.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -140,14 +145,14 @@ $fallback_pages = [
         'get_import_history.php', 'api_products.php', 'users.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php'
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
         'api_orders.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php'
     ]
 ];
 
