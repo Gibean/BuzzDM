@@ -147,7 +147,7 @@ async function cargarCargos() {
     });
 
     try {
-        const response = await fetch(`php/cargos_actions.php?${params.toString()}`);
+        const response = await fetch(`php/api_cargos.php?${params.toString()}`);
         const data = await response.json();
 
         if (data.success) {
@@ -389,12 +389,15 @@ async function buscarProductos(query, resultsContainer, lineaId) {
     const productosEnCargo = obtenerProductosEnCargo(lineaId);
 
     try {
-        const response = await fetch(`php/productos_search.php?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`php/api_products.php?search=${encodeURIComponent(query)}&limit=10`);
         const data = await response.json();
 
-        if (data.success && data.productos && data.productos.length > 0) {
+        // api_products returns 'products' (English), previously 'productos' (Spanish)
+        const productsList = data.products || [];
+
+        if (data.success && productsList.length > 0) {
             // Filtrar productos ya agregados
-            const productosFiltrados = data.productos.filter(p => !productosEnCargo.includes(p.id.toString()));
+            const productosFiltrados = productsList.filter(p => !productosEnCargo.includes(p.id.toString()));
 
             if (productosFiltrados.length > 0) {
                 resultsContainer.innerHTML = productosFiltrados.map(p => `
@@ -604,8 +607,8 @@ async function guardarCargo(confirmar) {
 
     try {
         const url = data.id
-            ? `php/cargos_actions.php?id=${data.id}`
-            : 'php/cargos_actions.php';
+            ? `php/api_cargos.php?id=${data.id}`
+            : 'php/api_cargos.php';
         const method = data.id ? 'PUT' : 'POST';
 
         const response = await fetch(url, {
@@ -652,7 +655,7 @@ function obtenerLineasValidas() {
 
 async function editarCargo(id) {
     try {
-        const response = await fetch(`php/cargos_actions.php?id=${id}`);
+        const response = await fetch(`php/api_cargos.php?id=${id}`);
         const data = await response.json();
 
         if (data.success && data.cargo) {
@@ -719,7 +722,7 @@ function cargarFormularioDesdeData(cargo) {
 
 async function verDetalleCargo(id) {
     try {
-        const response = await fetch(`php/cargos_actions.php?id=${id}`);
+        const response = await fetch(`php/api_cargos.php?id=${id}`);
         const data = await response.json();
 
         if (data.success && data.cargo) {

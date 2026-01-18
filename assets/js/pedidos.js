@@ -14,7 +14,7 @@ async function fetchAndRenderOrders() {
     const dateTo = document.getElementById("dateTo").value
     const showDeleted = document.getElementById("showDeletedFilter") ? document.getElementById("showDeletedFilter").checked : false;
 
-    let url = `php/pedidos_actions.php?page=${currentPage}&limit=${ordersPerPage}`
+    let url = `php/api_orders.php?page=${currentPage}&limit=${ordersPerPage}`
     if (searchInput) {
       url += `&search=${encodeURIComponent(searchInput)}`
     }
@@ -148,7 +148,7 @@ async function deleteOrder(orderId) {
         `¿Estás seguro de que deseas eliminar el pedido #${orderId}? Esta acción no se puede deshacer.`,
         async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
+                await fetchJSON(`php/api_orders.php?id=${orderId}`, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" }
                 })
@@ -168,7 +168,7 @@ async function restoreOrder(orderId) {
         `¿Estás seguro de que deseas restaurar el pedido #${orderId}?`,
         async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php`, {
+                await fetchJSON(`php/api_orders.php`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: 'restore', id: orderId })
@@ -216,7 +216,7 @@ async function toggleOrderProducts(button, orderId) {
       productsDiv.innerHTML = `<div class="text-center p-3"><i class="fas fa-spinner fa-spin text-muted"></i> Cargando productos...</div>`
       try {
         const data = await fetchJSON(
-          `php/pedidos_actions.php?action=get_products&order_id=${orderId}`
+          `php/api_orders.php?action=get_products&order_id=${orderId}`
         )
         if (data.products && data.products.length > 0) {
           productsDiv.innerHTML = `
@@ -340,7 +340,7 @@ async function viewOrderDetail(orderId) {
 
 async function editOrder(orderId) {
   try {
-    const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`)
+    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`)
     const order = data.order
 
     if (order) {
@@ -634,7 +634,7 @@ async function editOrder(orderId) {
         }
 
         try {
-          await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
+          await fetchJSON(`php/api_orders.php?id=${orderId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedOrder)
@@ -963,8 +963,8 @@ async function openOrderModal() {
     }
 
     try {
-      await fetchJSON(`php/pedidos_actions.php`, {
-        method: "POST",
+      await fetchJSON("php/api_orders.php", {
+          method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newOrder)
       })
@@ -990,7 +990,7 @@ async function deleteOrder(orderId) {
         type: "confirm",
         onConfirm: async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php`, {
+                await fetchJSON(`php/api_orders.php?id=${orderId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: orderId })
