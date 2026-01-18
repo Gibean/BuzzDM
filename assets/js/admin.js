@@ -314,8 +314,8 @@
 
   async function loadUsers() {
     try {
-      const data = await fetchJSON("php/users.php")
-      users = data
+      const response = await fetchJSON("php/api_users.php")
+      users = response.users || []
       renderUsers()
       updateUserStats()
     } catch (error) {
@@ -387,7 +387,7 @@
     const admins = users.filter((u) => u.rol === "admin").length
 
     try {
-      const sessionData = await fetchJSON("php/users.php?action=get_sessions")
+      const sessionData = await fetchJSON("php/api_users.php?action=get_sessions")
       const todaySessions = sessionData.session_count
       document.getElementById("todaySessions").textContent = todaySessions
     } catch (error) {
@@ -884,7 +884,12 @@
       document.getElementById("userName").value = user.nombre
       document.getElementById("userEmail").value = user.email
       document.getElementById("userRole").value = user.rol
-      document.getElementById("userStatus").value = user.estado
+      // Map DB state (active/inactive) to Dropdown values (activo/inactivo)
+      let displayStatus = user.estado;
+      if (displayStatus === 'active') displayStatus = 'activo';
+      if (displayStatus === 'inactive') displayStatus = 'inactivo';
+      document.getElementById("userStatus").value = displayStatus
+
       userPassword.required = false
       userPasswordConfirm.required = false
     } else {
@@ -965,7 +970,7 @@
     }
 
     let method = "POST"
-    let url = "php/users.php"
+    let url = "php/api_users.php"
 
     if (currentUserId) {
       user.id = currentUserId
@@ -996,14 +1001,19 @@
 
   async function editUser(id) {
     try {
-      const user = await fetchJSON(`php/users.php?id=${id}`)
-      if (user) {
+      const response = await fetchJSON(`php/api_users.php?id=${id}`)
+      // Support both wrapped and unwrapped (legacy) just in case
+      const user = response.user || response
+
+      if (user && user.id) {
         openUserModal(user)
       } else {
-        showToast("Usuario no encontrado.", "error")
+        showToast("Error: No se pudieron cargar los datos del usuario", "error")
+        console.error("Invalid user data received:", response)
       }
     } catch (error) {
       console.error("Error al obtener usuario para edición:", error)
+      showToast("Error al obtener usuario.", "error")
     }
   }
 
