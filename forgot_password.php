@@ -187,7 +187,7 @@
                 submitBtn.disabled = true;
 
                 try {
-                    const response = await fetch('php/forgot_password_action.php', {
+                    const response = await fetch('php/api_auth.php?action=forgot_password', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
