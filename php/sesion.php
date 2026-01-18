@@ -22,6 +22,7 @@ $api_scripts = [
     'api_backups.php', // Standardized API
     'api_users.php', // Standardized API
     'api_catalogs.php', // Standardized API
+    'api_auth.php', // Standardized API - Authentication
     // Legacy Actions
 
     'settings_actions.php',
