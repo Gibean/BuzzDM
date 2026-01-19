@@ -34,10 +34,40 @@ function inicializarFecha() {
 function configurarEventos() {
     // Filtros
     document.getElementById('searchCargos').addEventListener('input', debounce(cargarCargos, 300));
-    document.getElementById('filterEstado').addEventListener('change', cargarCargos);
-    document.getElementById('filterConcepto').addEventListener('change', cargarCargos);
+    document.getElementById('filterEstado').addEventListener('change', () => { cargarCargos(); updateActiveFiltersCount(); });
+    document.getElementById('filterConcepto').addEventListener('change', () => { cargarCargos(); updateActiveFiltersCount(); });
     document.getElementById('filterFechaDesde').addEventListener('change', cargarCargos);
     document.getElementById('filterFechaHasta').addEventListener('change', cargarCargos);
+
+    // Advanced filters toggle logic
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_cargos") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_cargos", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_cargos", "false");
+            }
+        });
+    }
 
     // Concepto change handler (también llamado desde onchange en HTML)
     document.getElementById('cargoConcepto').addEventListener('change', function() {
@@ -56,6 +86,26 @@ function configurarEventos() {
             cerrarTodosAutocomplete();
         }
     });
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section (Estado, Concepto)
+    const filterEstado = document.getElementById("filterEstado");
+    const filterConcepto = document.getElementById("filterConcepto");
+
+    if (filterEstado && filterEstado.value !== "") activeFilters++;
+    if (filterConcepto && filterConcepto.value !== "") activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
 }
 
 // =====================================================
@@ -91,6 +141,8 @@ function verHistorial() {
     cargoActualId = null;
     cargarCargos();
 }
+// Expose to window to ensure HTML onclick works
+window.verHistorial = verHistorial;
 
 function nuevoCargo() {
     cargoActualId = null;

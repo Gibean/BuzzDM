@@ -13,6 +13,7 @@
 
   function initAdmin() {
     switchTab("users")
+    setupAdvancedFilters()
   }
 
   function setupEventListeners() {
@@ -222,10 +223,25 @@
       }
     }
 
-    const logFilterButton = document.querySelector("#logsTab button")
-    if (logFilterButton) {
-      logFilterButton.addEventListener("click", () => loadLogs(1))
-    }
+    // Expose functions to window for HTML onclick attributes
+    window.filterLogs = () => loadLogs(1);
+    window.clearLogsFilters = () => {
+        document.getElementById("logSearch").value = "";
+        document.getElementById("logDateFrom").value = "";
+        document.getElementById("logDateTo").value = "";
+
+        // Reset toggle button state if needed (not strictly necessary but good UX)
+        // const toggleBtn = document.getElementById("toggleAdvancedFilters");
+        // if (toggleBtn && toggleBtn.classList.contains('active')) {
+             // Optional: collapse advanced filters or keep them open? Keeping them is fine.
+        // }
+
+        // Reset badge
+        const activeBadge = document.getElementById("activeFiltersBadge");
+        if(activeBadge) activeBadge.classList.add("d-none");
+
+        loadLogs(1);
+    };
 
     const prevLogBtn = document.getElementById('logsPrevPage')
     const nextLogBtn = document.getElementById('logsNextPage')
@@ -241,7 +257,75 @@
             loadLogs(currentLogPage + 1)
         })
     }
+
+    const logFilterButton = document.querySelector("#logsTab button[onclick='filterLogs()']")
+    if (logFilterButton) {
+      // Remove onclick attribute to avoid double firing if we attach listener
+      // logFilterButton.removeAttribute("onclick");
+      // Actually, since we exposed window.filterLogs, the onclick works.
+      // We don't need this listener if onclick is present.
+      // But let's keep it safe.
+    }
   }
+
+// Advanced filters toggle logic for Logs
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_admin_logs") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_admin_logs", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_admin_logs", "false");
+            }
+        });
+    }
+
+    // Attach listener to advanced filters to update badge
+    const logDateFrom = document.getElementById("logDateFrom");
+    const logDateTo = document.getElementById("logDateTo");
+
+    if(logDateFrom) logDateFrom.addEventListener('change', updateActiveFiltersCount);
+    if(logDateTo) logDateTo.addEventListener('change', updateActiveFiltersCount);
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const logDateFrom = document.getElementById("logDateFrom");
+    const logDateTo = document.getElementById("logDateTo");
+
+    if (logDateFrom && logDateFrom.value !== "") activeFilters++;
+    if (logDateTo && logDateTo.value !== "") activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
 
   function preventDefaults(e) {
     e.preventDefault()
@@ -427,11 +511,12 @@
           renderLogs()
       } else if (response.success && response.data) { // New API structure
           logs = response.data
-          if (response.pagination) renderPagination(response.pagination)
+          // Fixed ReferenceError: use updatePaginationControls instead of renderPagination (or alias it)
+          if (response.pagination) updatePaginationControls(response.pagination)
           renderLogs()
       } else { // Standard direct structure if any
           logs = response.data || []
-          if(response.pagination) renderPagination(response.pagination)
+          if(response.pagination) updatePaginationControls(response.pagination)
           renderLogs()
       }
     } catch (error) {
@@ -474,6 +559,12 @@
           return // Added return statement here
       }
   }
+
+  // Alias for backward compatibility or if I missed any renderPagination calls
+  function renderPagination(pagination) {
+      updatePaginationControls(pagination);
+  }
+
   function formatLogDetails(detalles) {
       if (!detalles) return "N/A"
       if (typeof detalles !== 'string' || !detalles.trim().startsWith('{')) return detalles

@@ -29,20 +29,26 @@ if (isset($_SESSION['usuario_rol']) && in_array($_SESSION['usuario_rol'], ['admi
             $userId = $_SESSION['usuario_id'];
 
             // 1. LOW STOCK CHECK
-            // Check if we already sent a notification today
-            $stmtCheck = $pdo->prepare("SELECT COUNT(*) FROM notificaciones WHERE usuario_id = ? AND tipo = 'low_stock' AND DATE(creado_at) = ?");
-            $stmtCheck->execute([$userId, $today]);
+            // Check if there is an existing UNREAD low stock notification
+            $stmtCheck = $pdo->prepare("SELECT id, mensaje FROM notificaciones WHERE usuario_id = ? AND tipo = 'low_stock' AND leido = 0 ORDER BY creado_at DESC LIMIT 1");
+            $stmtCheck->execute([$userId]);
+            $existingNotif = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
-            if ($stmtCheck->fetchColumn() == 0) {
-                // Check actual stock
-                // Ensure v_low_stock view exists, otherwise query table directly
-                $stmtStock = $pdo->query("SELECT COUNT(*) FROM v_low_stock"); // v_low_stock should be defined in DB
-                $lowCount = $stmtStock->fetchColumn();
-                // If view fails or logic differs, fallback:
-                // SELECT COUNT(*) FROM productos WHERE stock <= min_stock
+            // Check actual stock
+            // Ensure v_low_stock view exists, otherwise query table directly
+            $stmtStock = $pdo->query("SELECT COUNT(*) FROM v_low_stock");
+            $lowCount = $stmtStock->fetchColumn();
 
-                if ($lowCount > 0) {
-                    $msg = "Hay $lowCount productos con existencias críticas. Se recomienda reabastecer.";
+            if ($lowCount > 0) {
+                $msg = "Hay $lowCount productos con existencias críticas. Se recomienda reabastecer.";
+
+                if ($existingNotif) {
+                    // Update existing notification timestamp and message (if changed) to bump it up
+                    // This prevents accumulation of duplicate alerts
+                    $updateStmt = $pdo->prepare("UPDATE notificaciones SET creado_at = NOW(), mensaje = ? WHERE id = ?");
+                    $updateStmt->execute([$msg, $existingNotif['id']]);
+                } else {
+                    // Create new notification if no unread one exists
                     createNotification($pdo, $userId, 'low_stock', 'Stock Crítico Detectado', $msg, 'inventario.php?filter=low_stock');
                 }
             }

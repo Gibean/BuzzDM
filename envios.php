@@ -57,38 +57,52 @@
             </div>
         </div>
 
-         <!-- Filters  -->
-        <div class="buzz-card mb-4">
-            <div class="filter-wrapper">
-                <div class="filter-group filter-search">
-                    <label class="text-muted">Buscar</label>
-                    <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID pedido, cliente...">
+            <!-- Filtros -->
+            <div class="buzz-card mb-4 pb-3">
+                <div class="filter-wrapper">
+                    <!-- Basic Filters (Always Visible) -->
+                    <div class="filter-group filter-search">
+                        <label class="text-muted">Buscar</label>
+                        <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID pedido, cliente...">
+                    </div>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Estado de envío</label>
+                        <select class="form-control form-control-buzz" id="statusFilter">
+                            <option value="">Todos los estados</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="enviado">Enviado</option>
+                            <option value="entregado">Entregado</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group filter-actions">
+                        <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                            <i class="fas fa-filter"></i>
+                            <span class="btn-text">Filtros Avanzados</span>
+                            <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                        </button>
+                        <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar">
+                            <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="filter-group filter-select">
-                    <label class="text-muted">Estado de envío</label>
-                    <select class="form-control form-control-buzz" id="statusFilter">
-                        <option value="">Todos los estados</option>
-                        <option value="pendiente">Pendiente</option>
-                        <option value="enviado">Enviado</option>
-                        <option value="entregado">Entregado</option>
-                    </select>
-                </div>
-                <div class="filter-group filter-select">
-                    <label class="text-muted">Ordenar por</label>
-                    <select class="form-control form-control-buzz" id="sortBy">
-                        <option value="date">Fecha</option>
-                        <option value="status">Estado</option>
-                        <option value="customer">Cliente</option>
-                        <option value="amount">Monto</option>
-                    </select>
-                </div>
-                <div class="filter-group filter-actions">
-                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
-                    </button>
+
+                <!-- Advanced Filters (Collapsible) -->
+                <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                    <hr class="border-secondary opacity-25">
+                    <div class="filter-wrapper">
+                         <div class="filter-group filter-select">
+                            <label class="text-muted">Ordenar por</label>
+                            <select class="form-control form-control-buzz" id="sortBy">
+                                <option value="date">Fecha</option>
+                                <option value="status">Estado</option>
+                                <option value="customer">Cliente</option>
+                                <option value="amount">Monto</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
          <!-- Shipments Cards  -->
         <div id="shipmentsContainer">
