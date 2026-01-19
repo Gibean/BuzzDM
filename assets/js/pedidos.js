@@ -10,9 +10,15 @@ async function fetchAndRenderOrders() {
   try {
     const searchInput = document.getElementById("searchInput").value
     const paymentFilter = document.getElementById("paymentFilter").value
-    const dateFrom = document.getElementById("dateFrom").value
-    const dateTo = document.getElementById("dateTo").value
-    const showDeleted = document.getElementById("showDeletedFilter") ? document.getElementById("showDeletedFilter").checked : false;
+    const showDeleted = document.getElementById("showDeletedFilter")
+      ? document.getElementById("showDeletedFilter").checked
+      : false
+
+    // Call updateActiveFiltersCount here to ensure badge is correct on every fetch
+    // Ensure function exists before calling to avoid initial errors if script order issues
+    if (typeof updateActiveFiltersCount === 'function') {
+        updateActiveFiltersCount();
+    }
 
     let url = `php/api_orders.php?page=${currentPage}&limit=${ordersPerPage}`
     if (searchInput) {
@@ -1050,4 +1056,72 @@ document.getElementById('showDeletedFilter').addEventListener('change', () => {
 
 // Event listener for "Nuevo Pedido" button
 document.getElementById('newOrderBtn').addEventListener('click', openOrderModal);
+
+// Advanced filters toggle logic
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_pedidos") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_pedidos", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_pedidos", "false");
+            }
+        });
+    }
+
+    // Attach listener to advanced filters to update badge
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if(dateFrom) dateFrom.addEventListener('change', updateActiveFiltersCount);
+    if(dateTo) dateTo.addEventListener('change', updateActiveFiltersCount);
+    if(showDeletedFilter) showDeletedFilter.addEventListener('change', updateActiveFiltersCount);
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if (dateFrom && dateFrom.value !== "") activeFilters++;
+    if (dateTo && dateTo.value !== "") activeFilters++;
+    if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
+
+// Initialize advanced filters
+document.addEventListener('DOMContentLoaded', () => {
+    setupAdvancedFilters();
+});
 

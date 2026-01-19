@@ -13,6 +13,7 @@
     flex-direction: column;
     gap: 12px;
     max-width: 400px;
+    pointer-events: none; /* Allow clicks to pass through container */
 }
 
 /* Toast Base */
@@ -24,6 +25,7 @@
     border-left: 4px solid var(--buzz-primary-color);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     display: flex;
+    pointer-events: auto; /* Re-enable clicks on the toasts themselves */
     align-items: center;
     gap: 1rem;
     min-width: 300px;

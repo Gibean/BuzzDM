@@ -1,3 +1,4 @@
+<?php
 // Autoload handled by composer
 use OpenApi\Attributes as OA;
 

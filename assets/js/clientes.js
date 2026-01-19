@@ -346,13 +346,73 @@ document
   })
 document
   .getElementById("customerTypeFilter")
-  .addEventListener("change", fetchAndRenderCustomers)
+  .addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
 document
   .getElementById("showDeletedFilter")
-  .addEventListener("change", fetchAndRenderCustomers)
+  .addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+
+// Advanced filters toggle logic
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_clientes") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_clientes", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_clientes", "false");
+            }
+        });
+    }
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const customerTypeFilter = document.getElementById("customerTypeFilter");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if (customerTypeFilter && customerTypeFilter.value !== "") activeFilters++;
+    if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
+
+// Initialize advanced filters
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof setupAdvancedFilters === 'function') {
+        setupAdvancedFilters();
+    }
+});
 
 // Initial load
 document.addEventListener("DOMContentLoaded", () => {
   fetchAndRenderCustomers()
   setupCreateCustomerForm()
+  setupAdvancedFilters()
 })

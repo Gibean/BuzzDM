@@ -122,25 +122,41 @@
         <div class="tab-content" id="logsTab" style="display: none;">
             <div class="buzz-card">
                 <h5 class="font-primary text-primary mb-3">LOGS DE SESIÓN</h5>
-                <div class="row mb-3">
-                    <div class="col-md-4">
+                <div class="filter-wrapper">
+                    <!-- Basic Filters (Always Visible) -->
+                    <div class="filter-group filter-search" style="flex-grow: 1;">
+                        <label class="text-muted">Buscar</label>
                         <input type="text" class="form-control form-control-buzz" id="logSearch" placeholder="Buscar por usuario...">
                     </div>
-                    <div class="col-md-3">
-                        <input type="date" class="form-control form-control-buzz" id="logDateFrom">
-                    </div>
-                    <div class="col-md-3">
-                        <input type="date" class="form-control form-control-buzz" id="logDateTo">
-                    </div>
-                    <div class="col-md-1">
-                        <button class="btn btn-outline-buzz w-100" onclick="filterLogs()">
-                            <i class="fas fa-search"></i> Filtrar
+
+                    <div class="filter-group filter-actions">
+                         <button class="btn btn-outline-buzz btn-filter-action" onclick="filterLogs()" title="Buscar">
+                            <i class="fas fa-search"></i>
+                            <span class="btn-text">Filtrar</span>
+                        </button>
+                        <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                            <i class="fas fa-filter"></i>
+                            <span class="btn-text">Filtros Avanzados</span>
+                            <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                        </button>
+                        <button class="btn btn-outline-buzz btn-filter-action" onclick="clearLogsFilters()" title="Limpiar">
+                            <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                         </button>
                     </div>
-                    <div class="col-md-1">
-                        <button class="btn btn-outline-buzz w-100" onclick="clearLogsFilters()" title="Limpiar filtros">
-                            <i class="fas fa-times"></i>
-                        </button>
+                </div>
+
+                 <!-- Advanced Filters (Collapsible) -->
+                 <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                    <hr class="border-secondary opacity-25">
+                    <div class="filter-wrapper">
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Desde</label>
+                            <input type="date" class="form-control form-control-buzz" id="logDateFrom">
+                        </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Hasta</label>
+                            <input type="date" class="form-control form-control-buzz" id="logDateTo">
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">

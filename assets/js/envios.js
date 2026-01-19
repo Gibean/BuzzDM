@@ -5,7 +5,63 @@ let filteredShipments = []
 document.addEventListener("DOMContentLoaded", () => {
   initShipments()
   setupEventListeners()
+  setupAdvancedFilters()
 })
+// Advanced filters toggle logic
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_envios") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_envios", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_envios", "false");
+            }
+        });
+    }
+
+    // Attach listener to advanced filters to update badge
+    const sortBy = document.getElementById("sortBy");
+
+    if(sortBy) sortBy.addEventListener('change', updateActiveFiltersCount);
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const sortBy = document.getElementById("sortBy");
+
+    // Check if sortBy is not the default value (assuming 'date' is default)
+    if (sortBy && sortBy.value !== "date") activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
 
 async function initShipments() {
   await loadShipments()
