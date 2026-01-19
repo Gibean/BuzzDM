@@ -124,7 +124,7 @@ $fallback_pages = [
         'api_sales_chart.php', 'create_admin.php', 'get_import_history.php',
         'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'api_orders.php',
         'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
-        'backup_status.php',
+        'backup_status.php', 'api_logs.php',
         'cargos_existencias.php', 'almacenes.php',
         'proveedores.php', 'todo.php', 'notas_actions.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
@@ -152,6 +152,11 @@ if (!empty($db_permissions)) {
     $allowed_pages = [$user_role => $db_permissions];
 } else {
     $allowed_pages = $fallback_pages;
+}
+
+// HOTFIX: Ensure api_logs.php is allowed for admin even if not in DB yet (failed migration protection)
+if ($user_role === 'admin' && isset($allowed_pages['admin']) && !in_array('api_logs.php', $allowed_pages['admin'])) {
+    $allowed_pages['admin'][] = 'api_logs.php';
 }
 
 // Always-allowed APIs for any authenticated user (core system functionality)

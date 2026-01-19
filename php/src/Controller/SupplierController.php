@@ -11,6 +11,24 @@ class SupplierController {
         $this->service = new SupplierService();
     }
 
+    /*
+     * Standardized JSON Response to match ProductController
+     */
+    private function jsonResponse($success, $data = [], $message = '') {
+        header('Content-Type: application/json');
+        $response = ['success' => $success];
+        if ($message) $response['message'] = $message;
+
+        // Merge data into root if logic requires, or keep as is.
+        // ProductController merges. We will do the same for consistency.
+        if (!empty($data)) {
+            $response = array_merge($response, $data);
+        }
+
+        echo json_encode($response);
+        exit;
+    }
+
     public function handleRequest() {
         try {
             $method = $_SERVER['REQUEST_METHOD'];
@@ -40,10 +58,10 @@ class SupplierController {
                     break;
 
                 default:
-                    $this->jsonResponse(false, 'Método no permitido', [], 405);
+                    $this->jsonResponse(false, [], 'Método no permitido');
             }
         } catch (Exception $e) {
-            $this->jsonResponse(false, $e->getMessage(), [], 500);
+            $this->jsonResponse(false, [], $e->getMessage());
         }
     }
 
@@ -62,20 +80,21 @@ class SupplierController {
     )]
     private function getAllSuppliers() {
         $suppliers = $this->service->getAllSuppliers();
-        $this->jsonResponse(true, 'Proveedores obtenidos', $suppliers);
+        // Wrapper 'proveedores' to match frontend expectation
+        $this->jsonResponse(true, ['proveedores' => $suppliers], 'Proveedores obtenidos');
     }
 
     private function searchSuppliers($query) {
         $suppliers = $this->service->searchSuppliers($query);
-        $this->jsonResponse(true, 'Resultados de búsqueda', $suppliers);
+        $this->jsonResponse(true, ['proveedores' => $suppliers], 'Resultados de búsqueda');
     }
 
     private function getSupplier($id) {
         $supplier = $this->service->getSupplierById($id);
         if ($supplier) {
-            $this->jsonResponse(true, 'Proveedor obtenido', $supplier);
+            $this->jsonResponse(true, ['proveedor' => $supplier], 'Proveedor obtenido');
         } else {
-            $this->jsonResponse(false, 'Proveedor no encontrado', [], 404);
+            $this->jsonResponse(false, [], 'Proveedor no encontrado');
         }
     }
 
@@ -90,7 +109,7 @@ class SupplierController {
     )]
     private function createSupplier($data) {
         $id = $this->service->createSupplier($data);
-        $this->jsonResponse(true, 'Proveedor creado', ['id' => $id]);
+        $this->jsonResponse(true, ['id' => $id], 'Proveedor creado');
     }
 
     #[OA\Put(
@@ -111,7 +130,7 @@ class SupplierController {
             throw new Exception("ID de proveedor requerido para actualización");
         }
         $this->service->updateSupplier($id, $data);
-        $this->jsonResponse(true, 'Proveedor actualizado');
+        $this->jsonResponse(true, [], 'Proveedor actualizado');
     }
 
     #[OA\Delete(
@@ -131,17 +150,6 @@ class SupplierController {
             throw new Exception("ID de proveedor requerido para eliminación");
         }
         $this->service->deleteSupplier($id);
-        $this->jsonResponse(true, 'Proveedor eliminado');
-    }
-
-    private function jsonResponse($success, $message, $data = [], $code = 200) {
-        header('Content-Type: application/json');
-        http_response_code($code);
-        echo json_encode([
-            'success' => $success,
-            'message' => $message,
-            'data' => $data
-        ]);
-        exit;
+        $this->jsonResponse(true, [], 'Proveedor eliminado');
     }
 }
