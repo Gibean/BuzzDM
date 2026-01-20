@@ -374,6 +374,36 @@ paths:
       responses:
         '200':
           description: 'Client deleted'
+  /php/api_import.php:
+    get:
+      tags:
+        - Import
+      summary: 'Get import history'
+      operationId: 890bed880536b6aac4d75b24bd7ef9a3
+      responses:
+        '200':
+          description: 'History list'
+    post:
+      tags:
+        - Import
+      summary: 'Process excel import'
+      operationId: 615737a611446dc315f4c9702727c122
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - import_file
+              properties:
+                import_file:
+                  description: 'Excel file to import'
+                  type: string
+                  format: binary
+              type: object
+      responses:
+        '200':
+          description: 'Import result'
   /php/api_kits.php:
     get:
       tags:
@@ -1154,6 +1184,9 @@ tags:
   -
     name: Clients
     description: 'Operations related to Clients'
+  -
+    name: Import
+    description: 'Import Operations'
   -
     name: Kits
     description: 'Operations related to Kit Components'

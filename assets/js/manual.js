@@ -1,339 +1,603 @@
 /**
- * manual.js
- * Interactive User Manual logic using Driver.js, Tippy.js, and Lottie
- * + SPA View Logic (Master/Detail)
+ * manual.js - Enterprise Documentation Logic
+ * SPA Navigation, Global Search, Driver.js Tour, Mermaid Rendering
+ * BuzzDM User Manual
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    initTooltips();
+    // Initialize all components
+    initThemeToggle(); // Theme first to avoid flash
+    initMermaid();
+    initSPANavigation();
+    initGlobalSearch();
     initTour();
-    initSearch();
-    // Initialize Mermaid (but it won't render hidden elements correctly until shown)
+    initMobileSidebar();
+    initGlossaryTooltips();
+});
+
+// ==========================================
+// THEME TOGGLE (Light/Dark Mode)
+// ==========================================
+let currentTheme = 'dark';
+
+function initThemeToggle() {
+    const toggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+
+    // Load saved theme or default to dark
+    const savedTheme = localStorage.getItem('docs-theme') || 'dark';
+    setTheme(savedTheme);
+
+    if (!toggle) return;
+
+    toggle.addEventListener('click', () => {
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        setTheme(newTheme);
+        localStorage.setItem('docs-theme', newTheme);
+    });
+}
+
+function setTheme(theme) {
+    const html = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+
+    html.setAttribute('data-theme', theme);
+    currentTheme = theme;
+
+    // Update toggle button text/icon
+    if (toggle) {
+        const icon = toggle.querySelector('i');
+        const text = toggle.querySelector('span');
+
+        if (theme === 'dark') {
+            icon.className = 'fas fa-moon';
+            text.textContent = 'Modo Claro';
+        } else {
+            icon.className = 'fas fa-sun';
+            text.textContent = 'Modo Oscuro';
+        }
+    }
+
+    // Reinitialize Mermaid with correct theme
+    updateMermaidTheme(theme);
+}
+
+function updateMermaidTheme(theme) {
+    const isDark = theme === 'dark';
+
     mermaid.initialize({
         startOnLoad: false,
-        theme: 'dark',
-        securityLevel: 'loose'
+        theme: isDark ? 'dark' : 'default',
+        themeVariables: isDark ? {
+            primaryColor: '#6ea8fe',
+            primaryTextColor: '#dfe5eb',
+            primaryBorderColor: '#6ea8fe',
+            lineColor: '#8b939e',
+            secondaryColor: '#1a1f28',
+            tertiaryColor: '#10141a',
+            background: '#1a1f28',
+            mainBkg: '#1a1f28',
+            nodeBorder: '#6ea8fe',
+            clusterBkg: '#10141a',
+            clusterBorder: '#343a40',
+            titleColor: '#dfe5eb',
+            edgeLabelBackground: '#1a1f28'
+        } : {
+            primaryColor: '#0d6efd',
+            primaryTextColor: '#1a1a1a',
+            primaryBorderColor: '#0d6efd',
+            lineColor: '#6c757d',
+            secondaryColor: '#f8f9fa',
+            tertiaryColor: '#ffffff',
+            background: '#ffffff',
+            mainBkg: '#f8f9fa',
+            nodeBorder: '#0d6efd',
+            clusterBkg: '#f8f9fa',
+            clusterBorder: '#dee2e6',
+            titleColor: '#1a1a1a',
+            edgeLabelBackground: '#ffffff'
+        },
+        securityLevel: 'loose',
+        flowchart: {
+            useMaxWidth: true,
+            htmlLabels: true,
+            curve: 'basis'
+        }
     });
-});
+}
+
+// ==========================================
+// MERMAID INITIALIZATION
+// ==========================================
+function initMermaid() {
+    // Initial setup handled by updateMermaidTheme via initThemeToggle
+    updateMermaidTheme(currentTheme);
+}
 
 // ==========================================
 // SPA NAVIGATION (Master/Detail)
 // ==========================================
+let currentSection = 'home';
+
+function initSPANavigation() {
+    // Card click handlers (Updated for new Block Link style)
+    document.querySelectorAll('.docs-block-link').forEach(card => {
+        card.addEventListener('click', () => {
+            const section = card.dataset.section;
+            if (section) showSection(section);
+        });
+    });
+
+    // Nav item click handlers
+    document.querySelectorAll('.docs-nav-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const section = item.dataset.section;
+            if (section) showSection(section);
+        });
+    });
+}
 
 function showSection(sectionId) {
+    // Special case: home shows master view
+    if (sectionId === 'home') {
+        showMaster();
+        return;
+    }
+
+    const template = document.getElementById(`tpl-${sectionId}`);
+    const docContent = document.getElementById('doc-content');
     const masterView = document.getElementById('master-view');
     const detailView = document.getElementById('detail-view');
-    const docContent = document.getElementById('doc-content');
-    const template = document.getElementById(`tpl-${sectionId}`);
+    const toc = document.getElementById('docsToc');
 
-    if (template) {
-        masterView.style.display = 'none';
-        detailView.style.display = 'block';
-
-        // Inject content
-        docContent.innerHTML = template.innerHTML;
-
-        // Render Diagrams
-        setTimeout(() => {
-            mermaid.init(undefined, document.querySelectorAll('.mermaid'));
-        }, 100);
-
-        // Update TOC (Simple H3 grabber)
-        updateTableOfContents();
-
-        // Scroll to top
-        window.scrollTo(0,0);
-    } else {
-        // Fallback for sections not yet migrated
-        const moduleMap = {
-            'envios': 'envios.php',
-            'importacion': 'importacion.php',
-            'admin': 'admin.php',
-            'cargos': 'cargos_existencias.php'
-        };
-        if(moduleMap[sectionId]) {
-            window.location.href = moduleMap[sectionId];
-        } else {
-            alert('Guía en construcción');
-        }
+    if (!template || !docContent) {
+        console.warn(`Template not found for section: ${sectionId}`);
+        return;
     }
+
+    // Update content
+    docContent.innerHTML = template.innerHTML;
+
+    // Switch views
+    masterView.style.display = 'none';
+    detailView.style.display = 'block';
+
+    // Show TOC
+    if (toc) {
+        toc.classList.remove('hidden');
+    }
+
+    // Update navigation active state
+    updateNavActiveState(sectionId);
+
+    // Update breadcrumb
+    updateBreadcrumb(sectionId);
+
+    // Render Mermaid diagrams in new content
+    renderMermaidDiagrams();
+
+    // Generate Table of Contents
+    generateTableOfContents();
+
+    // Initialize tooltips for new content
+    refreshGlossaryTooltips();
+
+    // Scroll to top
+    document.querySelector('.docs-content').scrollTop = 0;
+    window.scrollTo(0, 0);
+
+    // Store current section
+    currentSection = sectionId;
+
+    // Close mobile sidebar if open
+    closeMobileSidebar();
 }
 
 function showMaster() {
-    document.getElementById('master-view').style.display = 'block';
-    document.getElementById('detail-view').style.display = 'none';
-    window.scrollTo(0,0);
+    const masterView = document.getElementById('master-view');
+    const detailView = document.getElementById('detail-view');
+    const toc = document.getElementById('docsToc');
+
+    masterView.style.display = 'block';
+    detailView.style.display = 'none';
+
+    if (toc) {
+        toc.classList.add('hidden');
+    }
+
+    updateNavActiveState('home');
+    currentSection = 'home';
+
+    // Scroll to top
+    window.scrollTo(0, 0);
 }
 
-function updateTableOfContents() {
-    const toc = document.getElementById('doc-toc');
-    const headers = document.getElementById('doc-content').querySelectorAll('h3');
-    toc.innerHTML = '';
-
-    headers.forEach((header, index) => {
-        const id = `section-${index}`;
-        header.id = id;
-        const li = document.createElement('li');
-        li.innerHTML = `<a href="#${id}" class="text-decoration-none text-muted hover-primary"><i class="fas fa-angle-right me-2"></i>${header.textContent}</a>`;
-        toc.appendChild(li);
-
-        // Smooth scroll
-        li.querySelector('a').addEventListener('click', (e) => {
-            e.preventDefault();
-            document.getElementById(id).scrollIntoView({behavior: 'smooth'});
-        });
+function updateNavActiveState(sectionId) {
+    // Update step items (new sidebar style)
+    document.querySelectorAll('.docs-step-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.section === sectionId) {
+            item.classList.add('active');
+        }
     });
+    // Legacy support for old nav items
+    document.querySelectorAll('.docs-nav-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.dataset.section === sectionId) {
+            item.classList.add('active');
+        }
+    });
+}
+
+// Section names mapping
+const sectionNames = {
+    'home': 'Centro de Ayuda',
+    'dashboard': 'Panel de Control',
+    'empresa': 'Datos de Empresa',
+    'usuarios': 'Usuarios y Roles',
+    'catalogos': 'Categorías y Marcas',
+    'clientes': 'Registrar Clientes',
+    'proveedores': 'Agregar Proveedores',
+    'productos': 'Crear Productos',
+    'kits': 'Armar Kits',
+    'importar': 'Importar Excel',
+    'almacenes': 'Configurar Almacenes',
+    'cargos': 'Registrar Cargos',
+    'pedidos': 'Crear Pedidos',
+    'pagos': 'Estados de Pago',
+    'envios': 'Seguimiento Envíos',
+    'notas': 'Notas Kanban',
+    'divisas': 'Monitor Divisas',
+    'backups': 'Respaldos',
+    'logs': 'Registro de Actividad'
+};
+
+function updateBreadcrumb(sectionId) {
+    const breadcrumb = document.getElementById('docsBreadcrumb');
+    if (!breadcrumb) return;
+
+    const sectionName = sectionNames[sectionId] || sectionId;
+
+    if (sectionId === 'home') {
+        breadcrumb.innerHTML = `<a href="#" onclick="showSection('home'); return false;">Centro de Ayuda</a>`;
+    } else {
+        breadcrumb.innerHTML = `
+            <a href="#" onclick="showSection('home'); return false;">Centro de Ayuda</a>
+            <span>›</span>
+            <span>${sectionName}</span>
+        `;
+    }
+}
+
+// ==========================================
+// MERMAID DIAGRAM RENDERING
+// ==========================================
+async function renderMermaidDiagrams() {
+    const mermaidElements = document.querySelectorAll('#doc-content .mermaid');
+
+    if (mermaidElements.length === 0) return;
+
+    for (let i = 0; i < mermaidElements.length; i++) {
+        const element = mermaidElements[i];
+        const graphDefinition = element.textContent.trim();
+
+        if (!graphDefinition) continue;
+
+        try {
+            const id = `mermaid-graph-${Date.now()}-${i}`;
+            const { svg } = await mermaid.render(id, graphDefinition);
+            element.innerHTML = svg;
+        } catch (error) {
+            console.error('Mermaid rendering error:', error);
+            element.innerHTML = `<p style="color: #dc3545;">Error rendering diagram</p>`;
+        }
+    }
+}
+
+// ==========================================
+// TABLE OF CONTENTS GENERATION
+// ==========================================
+function generateTableOfContents() {
+    const tocList = document.getElementById('docs-toc-list');
+    const content = document.getElementById('doc-content');
+
+    if (!tocList || !content) return;
+
+    // Clear existing TOC
+    tocList.innerHTML = '';
+
+    // Find all headings
+    const headings = content.querySelectorAll('h2, h3');
+
+    if (headings.length === 0) {
+        tocList.innerHTML = '<li class="docs-toc-item"><span style="color: var(--buzz-text-muted); font-size: 0.8rem;">Sin secciones</span></li>';
+        return;
+    }
+
+    headings.forEach((heading, index) => {
+        // Add ID to heading for anchor links
+        const headingId = `section-${index}`;
+        heading.id = headingId;
+
+        // Create TOC item
+        const li = document.createElement('li');
+        li.className = 'docs-toc-item';
+
+        const a = document.createElement('a');
+        a.className = 'docs-toc-link';
+        a.href = `#${headingId}`;
+        a.textContent = heading.textContent.replace(/^[📊🎯📈⚠️📦➕✏️🗑️🔍📋🛒💰🚚👥⭐📥📝🏭📍🔄🔒📤💱⚙️🏢]/g, '').trim();
+
+        // Add level class for indentation
+        if (heading.tagName === 'H3') {
+            a.classList.add('level-3');
+        }
+
+        // Smooth scroll on click
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+            // Update active state
+            document.querySelectorAll('.docs-toc-link').forEach(link => link.classList.remove('active'));
+            a.classList.add('active');
+        });
+
+        li.appendChild(a);
+        tocList.appendChild(li);
+    });
+}
+
+// ==========================================
+// GLOBAL SEARCH
+// ==========================================
+function initGlobalSearch() {
+    const searchInput = document.getElementById('docsGlobalSearch');
+    const moduleGrid = document.getElementById('module-grid');
+    const noResults = document.getElementById('noResults');
+
+    if (!searchInput) return;
+
+    let debounceTimer;
+
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            performSearch(e.target.value.toLowerCase().trim());
+        }, 300);
+    });
+
+    // Clear search on Escape
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            clearSearch();
+        }
+    });
+}
+
+function performSearch(query) {
+    const cards = document.querySelectorAll('.docs-block-link');
+    const noResults = document.getElementById('noResults');
+    let hasResults = false;
+
+    if (!query) {
+        // Show all cards
+        cards.forEach(card => {
+            card.style.display = '';
+        });
+        if (noResults) noResults.classList.remove('visible');
+        return;
+    }
+
+    cards.forEach(card => {
+        const title = card.querySelector('.docs-block-title')?.textContent.toLowerCase() || '';
+        const desc = card.querySelector('.docs-block-desc')?.textContent.toLowerCase() || '';
+        const keywords = card.dataset.keywords?.toLowerCase() || '';
+
+        const matches = title.includes(query) || desc.includes(query) || keywords.includes(query);
+
+        if (matches) {
+            card.style.display = '';
+            hasResults = true;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    if (noResults) {
+        noResults.classList.toggle('visible', !hasResults);
+    }
 }
 
 function clearSearch() {
-    const input = document.getElementById('manualSearch');
-    if (input) {
-        input.value = '';
-        input.dispatchEvent(new Event('input'));
-    }
-}
-
-
-// ==========================================
-// TIPPY.JS - Tooltips
-// ==========================================
-function initTooltips() {
-    tippy('[data-tippy-content]', {
-        theme: 'buzz',
-        placement: 'top',
-        animation: 'scale',
-        duration: 200
-    });
-}
-
-// ==========================================
-// DRIVER.JS - Guided Tour
-// ==========================================
-function initTour() {
-    const driver = window.driver.js.driver;
-
-    const driverObj = driver({
-        showProgress: true,
-        animate: true,
-        allowClose: true,
-        stagePadding: 10,
-        overlayOpacity: 0.5, // Reduced opacity
-        popoverClass: 'driverjs-theme',
-        steps: [
-            {
-                element: '#hero-section',
-                popover: {
-                    title: '¡Bienvenido al Centro de Ayuda!',
-                    description: 'Esta sección está diseñada para ayudarte. Aquí encontrarás guías interactivas y documentación de todo el sistema.',
-                    side: "bottom",
-                    align: 'center'
-                }
-            },
-            {
-                element: '#module-grid',
-                popover: {
-                    title: 'Guías por Módulo',
-                    description: 'Haz click en cualquier tarjeta para ver el MANUAL COMPLETO sin salir de esta página.',
-                    side: "top",
-                    align: 'center'
-                }
-            },
-            {
-                element: '#search-container',
-                popover: {
-                    title: 'Buscador Inteligente',
-                    description: 'Escribe palabras clave como "factura", "stock" o "usuario" para filtrar las guías.',
-                    side: "bottom",
-                    align: 'center'
-                }
-            }
-        ],
-        nextBtnText: 'Siguiente <i class="fas fa-arrow-right ms-1"></i>',
-        prevBtnText: 'Anterior',
-        doneBtnText: '¡Entendido! <i class="fas fa-check ms-1"></i>',
-
-        onHighlightStarted: (element) => {
-            if (element) {
-                element.style.zIndex = '100005';
-                element.style.position = 'relative';
-            }
-        },
-        onDeselected: (element) => {
-             if (element) {
-                element.style.zIndex = '';
-                element.style.position = '';
-            }
-        }
-    });
-
-    const startBtn = document.getElementById('start-tour-btn');
-    if (startBtn) {
-        startBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            driverObj.drive();
-        });
-    }
-}
-
-// ==========================================
-// MODULE CARDS - Search Logic
-// ==========================================
-function initSearch() {
-    const searchInput = document.getElementById('manualSearch');
+    const searchInput = document.getElementById('docsGlobalSearch');
     if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            const term = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.manual-card');
-            let hasResults = false;
-
-            cards.forEach(card => {
-                // Traverse up to col element to hide/show
-                const col = card.parentElement;
-                const title = card.querySelector('h3').textContent.toLowerCase();
-                const desc = card.querySelector('p').textContent.toLowerCase();
-                const keywords = card.getAttribute('data-keywords') || '';
-
-                if (title.includes(term) || desc.includes(term) || keywords.includes(term)) {
-                    col.style.display = 'block';
-                    hasResults = true;
-                } else {
-                    col.style.display = 'none';
-                }
-            });
-
-            const noResults = document.getElementById('noResults');
-            if (noResults) {
-                noResults.style.display = hasResults ? 'none' : 'block';
-            }
-        });
+        searchInput.value = '';
+        performSearch('');
     }
 }
 
-// Call initSearch inside DOMContentLoaded
+// ==========================================
+// MOBILE SIDEBAR TOGGLE
+// ==========================================
+function initMobileSidebar() {
+    const toggle = document.getElementById('docsSidebarToggle');
+    const sidebar = document.getElementById('docsSidebar');
+    const overlay = document.getElementById('docsOverlay');
 
-// ==========================================
-// TIPPY.JS - Tooltips
-// ==========================================
-function initTooltips() {
-    // Initialize tooltips for elements with data-tippy-content
-    tippy('[data-tippy-content]', {
-        theme: 'buzz',
-        placement: 'top',
-        animation: 'scale',
-        duration: 200
+    if (!toggle || !sidebar) return;
+
+    toggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('visible');
     });
+
+    if (overlay) {
+        overlay.addEventListener('click', closeMobileSidebar);
+    }
+}
+
+function closeMobileSidebar() {
+    const sidebar = document.getElementById('docsSidebar');
+    const overlay = document.getElementById('docsOverlay');
+
+    if (sidebar) sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('visible');
 }
 
 // ==========================================
-// DRIVER.JS - Guided Tour
+// DRIVER.JS TOUR (Simplified 4-Step)
 // ==========================================
 function initTour() {
-    const driver = window.driver.js.driver;
+    const startBtn = document.getElementById('startTourBtn');
 
-    const driverObj = driver({
-        showProgress: true,
-        animate: true,
-        allowClose: true,
-        stagePadding: 10, // Breathing room around highlighted element
-        overlayOpacity: 0.6, // Lighter overlay to avoid "black screen" feeling
-        popoverClass: 'driverjs-theme', // Use our custom CSS
-        steps: [
-            {
-                element: '#hero-section',
-                popover: {
-                    title: '¡Bienvenido al Centro de Ayuda!',
-                    description: 'Esta sección está diseñada para ayudarte. Aquí encontrarás guías interactivas y documentación de todo el sistema.',
-                    side: "bottom",
-                    align: 'center'
-                }
-            },
-            {
-                element: '#module-grid',
-                popover: {
-                    title: 'Guías por Módulo',
-                    description: '¿Tienes dudas sobre Inventario o Pedidos? Haz click en estas tarjetas para ver el manual específico de cada área.',
-                    side: "top",
-                    align: 'center'
-                }
-            },
-            {
-                element: '#search-container',
-                popover: {
-                    title: 'Buscador Inteligente',
-                    description: 'Escribe palabras clave como "factura", "stock" o "usuario" para filtrar rápidamente las guías que necesitas.',
-                    side: "bottom",
-                    align: 'center'
-                }
-            },
-            {
-                element: '#start-tour-btn',
-                popover: {
-                    title: 'Estamos para ayudarte',
-                    description: 'Si alguna vez te sientes perdido, puedes volver a iniciar este tour cuando quieras.',
-                    side: "left",
-                    align: 'center'
-                }
-            }
-        ],
-        nextBtnText: 'Siguiente <i class="fas fa-arrow-right ms-1"></i>',
-        prevBtnText: 'Anterior',
-        doneBtnText: '¡Entendido! <i class="fas fa-check ms-1"></i>',
+    if (!startBtn) return;
 
-        // Fix z-index issues proactively
-        onHighlightStarted: (element) => {
-            if (element) {
-                element.style.zIndex = '100005';
-                element.style.position = 'relative';
-            }
-        },
-        onDeselected: (element) => {
-             if (element) {
-                element.style.zIndex = '';
-                element.style.position = '';
-            }
-        }
-    });
+    startBtn.addEventListener('click', startTour);
+}
 
-    // Attach tour start to button
-    const startBtn = document.getElementById('start-tour-btn');
-    if (startBtn) {
-        startBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            driverObj.drive();
-        });
+function startTour() {
+    // Ensure we're on the home view before starting tour
+    if (currentSection !== 'home') {
+        showMaster();
     }
 
-    // Auto-start tour if specific param is present? Maybe not for now to avoid annoying users.
-}
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+        const driver = window.driver.js.driver;
 
-// ==========================================
-// MODULE CARDS - Search Logic
-// ==========================================
-const searchInput = document.getElementById('manualSearch');
-if (searchInput) {
-    searchInput.addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase().trim();
-        const cards = document.querySelectorAll('.manual-card');
-        let hasResults = false;
-
-        cards.forEach(card => {
-            const title = card.querySelector('h3').textContent.toLowerCase();
-            const desc = card.querySelector('p').textContent.toLowerCase();
-            const keywords = card.getAttribute('data-keywords') || '';
-
-            if (title.includes(term) || desc.includes(term) || keywords.includes(term)) {
-                card.parentElement.style.display = 'block';
-                hasResults = true;
-            } else {
-                card.parentElement.style.display = 'none';
+        const driverObj = driver({
+            popoverClass: 'docs-tour-theme',
+            showProgress: true,
+            progressText: '{{current}} de {{total}}',
+            nextBtnText: 'Siguiente',
+            prevBtnText: 'Anterior',
+            doneBtnText: '¡Listo!',
+            animate: true,
+            allowClose: true,
+            overlayOpacity: 0.75,
+            stagePadding: 10,
+            stageRadius: 8,
+            steps: [
+                {
+                    element: '#docs-hero',
+                    popover: {
+                        title: '👋 ¡Bienvenido al Centro de Ayuda!',
+                        description: 'Aquí encontrarás guías completas para cada módulo de BUZZ Data Manager. El sistema está diseñado para ser intuitivo y flexible.',
+                        side: 'bottom',
+                        align: 'center'
+                    }
+                },
+                {
+                    element: '#docsSidebar',
+                    popover: {
+                        title: '🔢 Flujo de Trabajo',
+                        description: 'Hemos organizado la navegación siguiendo el proceso lógico de uso del sistema, desde la configuración inicial hasta la administración avanzada.',
+                        side: 'right',
+                        align: 'start'
+                    }
+                },
+                {
+                    element: '#docsGlobalSearch',
+                    popover: {
+                        title: '🔍 Búsqueda Inteligente',
+                        description: 'Busca cualquier funcionalidad o término. El sistema filtrará instantáneamente las guías relevantes para ti.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                },
+                {
+                    element: '#themeToggle',
+                    popover: {
+                        title: '🌗 Modo Oscuro/Claro',
+                        description: 'Personaliza tu experiencia visual. Cambia el tema según tu preferencia o las condiciones de iluminación.',
+                        side: 'bottom',
+                        align: 'end'
+                    }
+                },
+                {
+                    element: '#moduleGrid',
+                    popover: {
+                        title: '🧱 Módulos Principales',
+                        description: 'Haz clic en cualquier tarjeta para abrir la guía detallada. Dentro encontrarás diagramas interactivos y pasos detallados.',
+                        side: 'top',
+                        align: 'center'
+                    }
+                },
+                {
+                    element: '#docsBreadcrumb',
+                    popover: {
+                        title: '📍 ¿Dónde estás?',
+                        description: 'Usa el rastro de migas de pan para saber exactamente en qué sección te encuentras y volver rápidamente al inicio.',
+                        side: 'bottom',
+                        align: 'start'
+                    }
+                },
+                {
+                    element: '#docsToc',
+                    popover: {
+                        title: '📑 Tabla de Contenidos',
+                        description: 'Al leer un artículo, usa este panel para saltar rápidamente entre subsecciones y encontrar el dato preciso.',
+                        side: 'left',
+                        align: 'start'
+                    }
+                }
+            ],
+            onDestroyStarted: () => {
+                driverObj.destroy();
             }
         });
 
-        const noResults = document.getElementById('noResults');
-        if (noResults) {
-            noResults.style.display = hasResults ? 'none' : 'block';
-        }
+        driverObj.drive();
+    }, 100);
+}
+
+// ==========================================
+// GLOSSARY TOOLTIPS (Tippy.js)
+// ==========================================
+function initGlossaryTooltips() {
+    // Initialize tooltips for glossary terms in the currently visible content
+    const terms = document.querySelectorAll('.glossary-term');
+
+    if (terms.length === 0) return;
+
+    terms.forEach(term => {
+        if (term._tippy) return; // Already initialized
+
+        tippy(term, {
+            theme: 'buzz',
+            placement: 'top',
+            arrow: true,
+            animation: 'fade',
+            delay: [200, 0],
+            maxWidth: 280
+        });
     });
 }
+
+// Re-initialize tooltips when content changes (SPA navigation)
+function refreshGlossaryTooltips() {
+    setTimeout(() => {
+        const terms = document.querySelectorAll('#doc-content .glossary-term');
+        terms.forEach(term => {
+            if (term._tippy) return;
+
+            tippy(term, {
+                theme: 'buzz',
+                placement: 'top',
+                arrow: true,
+                animation: 'fade',
+                delay: [200, 0],
+                maxWidth: 280
+            });
+        });
+    }, 100);
+}
+
+// ==========================================
+// EXPOSE FUNCTIONS TO GLOBAL SCOPE
+// ==========================================
+window.showSection = showSection;
+window.showMaster = showMaster;
+window.clearSearch = clearSearch;
+window.refreshGlossaryTooltips = refreshGlossaryTooltips;
