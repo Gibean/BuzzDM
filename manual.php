@@ -1,6 +1,5 @@
 <?php
 require_once 'php/sesion.php';
-require_once 'php/sidebar.php';
 ?>
 
 <!DOCTYPE html>
@@ -9,853 +8,637 @@ require_once 'php/sidebar.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual de Usuario - BUZZ Data Manager</title>
+    <title>Ayuda - BUZZ Data Manager</title>
     <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Driver.js CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.css"/>
-    <!-- Tippy.js CSS (via styles usually, but for theme we might need custom CSS) -->
-
+    <!-- Driver.js CSS (Local) -->
+    <link rel="stylesheet" href="assets/css/driver.css"/>
+    <!-- Main Styles -->
     <link rel="stylesheet" href="assets/css/styles.css">
-    <style>
-        /* Interactive Manual Specific Styles */
-        .manual-hero {
-            background: linear-gradient(135deg, rgba(255, 160, 0, 0.1) 0%, rgba(33, 37, 41, 1) 100%);
-            border-radius: 12px;
-            padding: 3rem 2rem;
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border: 1px solid var(--buzz-border-color);
-        }
-
-        .manual-hero-content {
-            z-index: 2;
-            max-width: 60%;
-        }
-
-        .manual-hero-visual {
-            z-index: 2;
-            width: 300px;
-            height: 300px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .manual-card {
-            background: var(--buzz-card-bg);
-            border: 1px solid var(--buzz-border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
-            height: 100%;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .manual-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            border-color: var(--buzz-primary-color);
-        }
-
-        .manual-card-icon {
-            font-size: 2.5rem;
-            color: var(--buzz-primary-color);
-            margin-bottom: 1rem;
-            background: rgba(255, 160, 0, 0.1);
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-        }
-
-        .manual-card h3 {
-            font-family: var(--font-primary);
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-            color: var(--buzz-text-color);
-        }
-
-        .manual-card p {
-            font-size: 0.9rem;
-            color: var(--buzz-text-muted);
-            margin-bottom: 1rem;
-        }
-
-        .manual-card .card-link {
-            font-size: 0.85rem;
-            color: var(--buzz-primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-        }
-
-        .manual-card .card-link i {
-            margin-left: 5px;
-            transition: transform 0.2s;
-        }
-
-        .manual-card:hover .card-link i {
-            transform: translateX(5px);
-        }
-
-        .search-container {
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--buzz-text-muted);
-        }
-
-        .search-container input {
-            padding-left: 45px;
-            height: 50px;
-            border-radius: 25px;
-            background: var(--buzz-dark-bg);
-            border: 1px solid var(--buzz-border-color);
-            color: white;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .search-container input:focus {
-            background: var(--buzz-card-bg);
-            border-color: var(--buzz-primary-color);
-            box-shadow: 0 0 0 4px rgba(255,160,0,0.1);
-        }
-
-        .no-results {
-            text-align: center;
-            padding: 3rem;
-            display: none;
-        }
-
-        /* Tippy Theme Customization */
-        .tippy-box[data-theme~='buzz'] {
-            background-color: var(--buzz-primary-color);
-            color: var(--buzz-dark-bg);
-            font-family: var(--font-primary);
-            font-weight: 600;
-            border-radius: 4px;
-        }
-        .tippy-box[data-theme~='buzz'][data-placement^='top'] > .tippy-arrow::before {
-            border-top-color: var(--buzz-primary-color);
-        }
-
-        /* Driver.js Customization */
-        .driver-popover.driverjs-theme {
-            background-color: var(--buzz-card-bg);
-            color: var(--buzz-text-color);
-            border: 1px solid var(--buzz-primary-color);
-            border-radius: 8px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-        }
-
-        .driver-popover.driverjs-theme .driver-popover-title {
-            font-family: var(--font-primary);
-            font-size: 1.2rem;
-            color: var(--buzz-primary-color);
-        }
-
-        .driver-popover.driverjs-theme .driver-popover-description {
-            font-family: var(--font-monospace);
-            font-size: 0.9rem;
-            color: var(--buzz-text-muted);
-        }
-
-        .driver-popover.driverjs-theme button {
-            background-color: var(--buzz-primary-color);
-            color: #000;
-            border: none;
-            border-radius: 4px;
-            padding: 5px 10px;
-            font-weight: bold;
-            font-family: var(--font-primary);
-            text-shadow: none;
-        }
-
-        .driver-popover.driverjs-theme button:hover {
-            background-color: #ffb300;
-        }
-
-        /* Fix for black screen / stacking context issues */
-        body.driver-active .manual-hero {
-            z-index: 100000 !important; /* Ensure it pops out */
-            position: relative;
-        }
-    </style>
+    <!-- Documentation Styles -->
+    <link rel="stylesheet" href="assets/css/manual.css">
 </head>
 
 <body>
-    <main class="main-content">
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">CENTRO DE AYUDA</h1>
-                <span class="text-muted ms-2 font-mono">/ MANUAL INTERACTIVO</span>
+    <main class="docs-layout">
+
+        <!-- Mobile Sidebar Toggle -->
+        <button class="docs-sidebar-toggle" id="docsSidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Mobile Overlay -->
+        <div class="docs-overlay" id="docsOverlay"></div>
+
+        <!-- HEADER - Fixed with Search -->
+        <header class="docs-header">
+            <a href="dashboard.php" class="docs-header-brand">
+                <img src="assets/img/logov1_icon.png" alt="BuzzDM">
+                <span>Centro de Ayuda</span>
+            </a>
+
+            <div class="docs-header-search">
+                <input type="text" id="docsGlobalSearch" placeholder="Buscar en la documentación...">
             </div>
+
+            <div class="docs-header-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-sun"></i>
+                    <span>Claro</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Breadcrumb -->
+        <nav class="docs-breadcrumb" id="docsBreadcrumb">
+            <a href="#" onclick="showSection('home'); return false;">Centro de Ayuda</a>
         </nav>
 
-        <div class="container-fluid py-4">
+        <!-- Main Area: Sidebar + Content -->
+        <div class="docs-main-area">
 
-<!-- Master View: Module Grid -->
-            <div id="master-view">
-                <!-- Hero Section -->
-                <div id="hero-section" class="manual-hero">
-                    <div class="manual-hero-content">
-                        <h2 class="display-5 fw-bold text-white mb-3">Hola, <span class="text-primary"><?php echo $_SESSION['usuario_nombre'] ?? 'Usuario'; ?></span></h2>
-                        <p class="lead text-muted mb-4">¿En qué podemos ayudarte hoy? Explora las guías por módulo o realiza una visita guiada por el sistema.</p>
-                        <button id="start-tour-btn" class="btn btn-buzz btn-lg pulse-animation" data-tippy-content="Inicia un recorrido rápido por la interfaz">
-                            <i class="fas fa-play-circle me-2"></i>Iniciar Tour de Bienvenida
-                        </button>
-                    </div>
-                    <div class="manual-hero-visual d-none d-md-flex">
-                        <lottie-player src="https://assets2.lottiefiles.com/packages/lf20_M9p23l.json"  background="transparent"  speed="1"  style="width: 300px; height: 300px;"  loop  autoplay></lottie-player>
-                    </div>
+            <!-- Left Sidebar: Module Navigation -->
+            <aside class="docs-sidebar" id="docsSidebar">
+                <div class="docs-sidebar-header">
+                    <a href="dashboard.php" class="docs-back-btn-main">
+                        <i class="fas fa-arrow-left"></i> Volver a BuzzDM
+                    </a>
                 </div>
 
-                <!-- Search -->
-                <div id="search-container" class="search-container">
-                    <i class="fas fa-search fa-lg"></i>
-                    <input type="text" id="manualSearch" class="form-control" placeholder="Buscar ayuda... (ej. cómo crear pedido, importar excel, stock bajo)">
-                </div>
+            <!-- Navigation - Step by Step -->
+            <nav class="docs-nav docs-nav-steps">
+                <ol class="docs-steps-list">
+                    <li><a class="docs-step-item active" data-section="home" onclick="showSection('home')">Vista General</a></li>
+                    <li><a class="docs-step-item" data-section="dashboard" onclick="showSection('dashboard')">Panel de Control</a></li>
+                    <li><a class="docs-step-item" data-section="empresa" onclick="showSection('empresa')">Datos de Empresa</a></li>
+                    <li><a class="docs-step-item" data-section="usuarios" onclick="showSection('usuarios')">Usuarios y Roles</a></li>
+                    <li><a class="docs-step-item" data-section="catalogos" onclick="showSection('catalogos')">Categorías y Marcas</a></li>
+                    <li><a class="docs-step-item" data-section="clientes" onclick="showSection('clientes')">Registrar Clientes</a></li>
+                    <li><a class="docs-step-item" data-section="proveedores" onclick="showSection('proveedores')">Agregar Proveedores</a></li>
+                    <li><a class="docs-step-item" data-section="productos" onclick="showSection('productos')">Crear Productos</a></li>
+                    <li><a class="docs-step-item" data-section="kits" onclick="showSection('kits')">Armar Kits</a></li>
+                    <li><a class="docs-step-item" data-section="importar" onclick="showSection('importar')">Importar Excel</a></li>
+                    <li><a class="docs-step-item" data-section="almacenes" onclick="showSection('almacenes')">Configurar Almacenes</a></li>
+                    <li><a class="docs-step-item" data-section="cargos" onclick="showSection('cargos')">Registrar Cargos</a></li>
+                    <li><a class="docs-step-item" data-section="pedidos" onclick="showSection('pedidos')">Crear Pedidos</a></li>
+                    <li><a class="docs-step-item" data-section="pagos" onclick="showSection('pagos')">Estados de Pago</a></li>
+                    <li><a class="docs-step-item" data-section="envios" onclick="showSection('envios')">Seguimiento Envíos</a></li>
+                    <li><a class="docs-step-item" data-section="notas" onclick="showSection('notas')">Notas Kanban</a></li>
+                    <li><a class="docs-step-item" data-section="divisas" onclick="showSection('divisas')">Monitor Divisas</a></li>
+                    <li><a class="docs-step-item" data-section="backups" onclick="showSection('backups')">Respaldos</a></li>
+                    <li><a class="docs-step-item" data-section="logs" onclick="showSection('logs')">Registro de Actividad</a></li>
+                </ol>
+            </nav>
+        </aside>
 
-                <!-- Modules Grid -->
-                <div id="module-grid" class="row g-4">
-                    <!-- Dashboard -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="graficos, metricas, ventas, resumen" onclick="showSection('dashboard')">
-                            <div class="manual-card-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            <h3>Dashboard</h3>
-                            <p>Métricas clave, gráficos de ventas y alertas en tiempo real.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Inventario -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="productos, stock, existencias, precios" onclick="showSection('inventario')">
-                            <div class="manual-card-icon"><i class="fas fa-boxes"></i></div>
-                            <h3>Inventario</h3>
-                            <p>Gestión de productos, ajustes de stock y control de almacenes.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Pedidos -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="ordenes, ventas, facturacion" onclick="showSection('pedidos')">
-                            <div class="manual-card-icon"><i class="fas fa-shopping-cart"></i></div>
-                            <h3>Pedidos</h3>
-                            <p>Procesamiento de ventas, gestión de pagos y despachos.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Clientes -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="personas, contactos, crm" onclick="showSection('clientes')">
-                            <div class="manual-card-icon"><i class="fas fa-users"></i></div>
-                            <h3>Clientes</h3>
-                            <p>Base de datos de compradores, historial y cuenta VIP.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Envíos -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="despacho, transporte, guia" onclick="showSection('envios')">
-                            <div class="manual-card-icon"><i class="fas fa-truck"></i></div>
-                            <h3>Envíos</h3>
-                            <p>Logística de entrega, tracking y estados de envío.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Importación -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="excel, carga masiva, csv" onclick="showSection('importacion')">
-                            <div class="manual-card-icon"><i class="fas fa-file-upload"></i></div>
-                            <h3>Importación</h3>
-                            <p>Carga masiva de datos mediante plantillas Excel.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                    <!-- Admin -->
-                    <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="usuarios, roles, permisos" onclick="showSection('admin')">
-                            <div class="manual-card-icon"><i class="fas fa-user-shield"></i></div>
-                            <h3>Admin & Logs</h3>
-                            <p>Gestión de usuarios y auditoría de seguridad.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                     <!-- Cargos -->
-                     <div class="col-md-6 col-lg-4">
-                        <div class="manual-card" data-keywords="entradas, compras, recepcion" onclick="showSection('cargos')">
-                            <div class="manual-card-icon"><i class="fas fa-dolly"></i></div>
-                            <h3>Cargos (Entradas)</h3>
-                            <p>Recepción de mercancía y compras a proveedores.</p>
-                            <span class="card-link">Ver guía <i class="fas fa-arrow-right"></i></span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Center: Content Area -->
+        <section class="docs-content">
+            <div class="docs-content-inner">
 
-                <!-- No Results -->
-                <div id="noResults" class="no-results">
-                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No encontramos guías para esa búsqueda.</p>
-                    <button class="btn btn-outline-primary btn-sm" onclick="clearSearch()">Ver todo</button>
-                </div>
-            </div>
-
-            <!-- Detail View: Documentation Container -->
-            <div id="detail-view" style="display: none;">
-                <div class="mb-4">
-                    <button class="btn btn-outline-secondary" onclick="showMaster()"><i class="fas fa-arrow-left me-2"></i>Volver al Índice</button>
-                </div>
-
-                <div class="row">
-                    <!-- Left: Content -->
-                    <div class="col-lg-9">
-                        <div class="buzz-card p-4" id="doc-content">
-                            <!-- Content Injected via JS -->
-                        </div>
-                    </div>
-                    <!-- Right: Sticky TOC (Optional for future) -->
-                    <div class="col-lg-3 d-none d-lg-block">
-                        <div class="sticky-top" style="top: 20px;">
-                            <div class="buzz-card p-3">
-                                <h6>En esta página</h6>
-                                <hr class="my-2">
-                                <ul class="list-unstyled text-muted font-mono small" id="doc-toc">
-                                    <!-- TOC Generated via JS -->
-                                </ul>
+                <!-- MASTER VIEW -->
+                <div id="master-view">
+                    <!-- Minimal Hero -->
+                    <div class="docs-hero-minimal" id="docs-hero">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h1>Centro de Ayuda</h1>
+                                <p class="lead">
+                                    Hola, <strong><?php echo $_SESSION['usuario_nombre'] ?? 'Usuario'; ?></strong>. Bienvenid@ al soporte central de BuzzDM. Aquí resolvemos tus dudas para que impulses tu negocio sin complicaciones.
+                                </p>
+                                <button class="start-tour-btn" id="startTourBtn">
+                                    <i class="fas fa-route me-2"></i>Iniciar Tour Guiado
+                                </button>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Module Grid -->
+                    <div class="docs-module-grid" id="moduleGrid">
+                        <a class="docs-block-link" onclick="showSection('dashboard')">
+                            <div class="docs-block-icon"><i class="fas fa-chart-line"></i></div>
+                            <div class="docs-block-title">Panel de Control</div>
+                            <div class="docs-block-desc">KPIs, gráficos y alertas del sistema</div>
+                        </a>
+                        <a class="docs-block-link" onclick="showSection('productos')">
+                            <div class="docs-block-icon"><i class="fas fa-box"></i></div>
+                            <div class="docs-block-title">Inventario</div>
+                            <div class="docs-block-desc">Productos, kits e importación</div>
+                        </a>
+                        <a class="docs-block-link" onclick="showSection('pedidos')">
+                            <div class="docs-block-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="docs-block-title">Ventas</div>
+                            <div class="docs-block-desc">Pedidos, pagos y envíos</div>
+                        </a>
+                        <a class="docs-block-link" onclick="showSection('clientes')">
+                            <div class="docs-block-icon"><i class="fas fa-users"></i></div>
+                            <div class="docs-block-title">Clientes</div>
+                            <div class="docs-block-desc">Registro y gestión de clientes</div>
+                        </a>
+                        <a class="docs-block-link" onclick="showSection('almacenes')">
+                            <div class="docs-block-icon"><i class="fas fa-warehouse"></i></div>
+                            <div class="docs-block-title">Almacenes</div>
+                            <div class="docs-block-desc">Ubicaciones y stock</div>
+                        </a>
+                        <a class="docs-block-link" onclick="showSection('empresa')">
+                            <div class="docs-block-icon"><i class="fas fa-cog"></i></div>
+                            <div class="docs-block-title">Configuración</div>
+                            <div class="docs-block-desc">Empresa, usuarios y sistema</div>
+                        </a>
+                    </div>
+
+                    <!-- No Results -->
+                    <div class="docs-no-results" id="noResults">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <h4>Sin resultados</h4>
+                        <p>No se encontraron resultados para tu búsqueda.</p>
+                    </div>
+                </div>
+
+                <!-- DETAIL VIEW -->
+                <div id="detail-view" style="display: none;">
+                    <div class="docs-article-container" id="doc-content">
+                        <!-- Content injected via JS -->
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Hidden Content Templates -->
-            <div id="content-templates" style="display: none;">
+        <!-- Right: Table of Contents (Inside main-area) -->
+        <aside class="docs-toc" id="docsToc">
+            <div class="docs-toc-header">En esta página</div>
+            <ul id="docs-toc-list"></ul>
 
-                <!-- Dashboard Content -->
-                <div id="tpl-dashboard">
-                    <h1 class="font-primary text-primary mb-4"><i class="fas fa-tachometer-alt me-2"></i>Manual de Dashboard</h1>
-                    <p class="lead">El Dashboard es su centro de comando. Ofrece una vista panorámica del estado de su negocio con métricas en tiempo real.</p>
-                    <hr>
-                    <h3 class="mt-4">Vista General</h3>
-                    <div class="mermaid">
-                        flowchart TB
-                        subgraph Dashboard["🏠 Dashboard"]
-                            subgraph KPIs["📈 Métricas Principales"]
-                                TotalProd[Total Productos]
-                                TotalPed[Pedidos Activos]
-                                StockBajo[Alertas Stock]
-                            end
-                            subgraph Charts["📊 Gráficos"]
-                                Ventas[Ventas por Mes]
-                                Pagos[Estado de Pagos]
-                            end
-                        end
-                    </div>
-                    <h3 class="mt-4">Métricas Clave (KPIs)</h3>
-                    <table class="table table-bordered table-dark mt-3">
-                        <tr><th>KPI</th><th>Descripción</th></tr>
-                        <tr><td><strong>Total Productos</strong></td><td>Cantidad de SKUs activos en su inventario.</td></tr>
-                        <tr><td><strong>Pedidos Activos</strong></td><td>Suma de pedidos pendientes y en proceso.</td></tr>
-                        <tr><td><strong>Alertas Stock</strong></td><td>Productos que han alcanzado su nivel mínimo.</td></tr>
-                    </table>
+            <div class="docs-toc-footer mt-5 pt-4 border-top">
+                <p class="small text-muted mb-2">¿Necesitas más ayuda?</p>
+                <a href="#" class="d-block small mb-1"><i class="fas fa-book-open me-2"></i>Docs Avanzadas</a>
+                <a href="#" class="d-block small"><i class="fas fa-life-ring me-2"></i>Soporte Técnico</a>
+            </div>
+        </aside>
+
+        </div><!-- /docs-main-area -->
+
+    </main>
+
+    <!-- TEMPLATES -->
+    <div id="content-templates" style="display: none;">
+
+        <!-- DASHBOARD -->
+        <div id="tpl-dashboard">
+            <div class="docs-hero-minimal">
+                <h1>Panel de Control</h1>
+                <p class="lead">Tu centro de operaciones. Visualiza métricas, alertas y rendimiento en tiempo real.</p>
+            </div>
+
+            <h2><i class="fas fa-chart-pie me-2"></i>Visualización de Datos</h2>
+            <p>El Dashboard está dividido en tres secciones estratégicas para facilitar la toma de decisiones:</p>
+
+            <div class="docs-alert info">
+                El Dashboard se actualiza automáticamente cada vez que accedes, dándote una foto exacta de tu negocio.
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Resumen de Ventas</span> Visualiza gráficos de barras con las ventas de los últimos 7 días y la distribución por estados de pago.</li>
+                <li><span class="step-title">Alertas Críticas</span> Revisa los cuadros de stock bajo. Los productos resaltados en rojo requieren atención inmediata.</li>
+                <li><span class="step-title">Accesos Rápidos</span> Usa los botones laterales para saltar directamente a las acciones más comunes como "Nuevo Pedido" o "Ver Inventario".</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    graph TD
+                    A[Dashboard] --> B[Indicadores Rápidos]
+                    A --> C[Gráficos de Tendencia]
+                    A --> D[Alertas de Inventario]
+                    B --> B1[Ventas Hoy]
+                    B --> B2[Pedidos Pendientes]
                 </div>
-
-                <!-- Inventario Content -->
-                <div id="tpl-inventario">
-                    <h1 class="font-primary text-primary mb-4"><i class="fas fa-boxes me-2"></i>Manual de Inventario</h1>
-                    <p class="lead">Gestión centralizada de su catálogo de productos, control de existencias y precios.</p>
-                    <hr>
-                    <h3 class="mt-4">Flujo de Creación de Producto</h3>
-                    <div class="mermaid">
-                        flowchart TD
-                            A[Click '+ Nuevo Producto'] --> B[Abrir modal]
-                            B --> C[Completar campos obligatorios]
-                            C --> D{¿Datos válidos?}
-                            D -->|No| E[Mostrar errores]
-                            E --> C
-                            D -->|Sí| F[Click 'Guardar']
-                            F --> G[✅ Producto creado]
-                    </div>
-                    <h3 class="mt-4">Campos Importantes</h3>
-                    <ul>
-                        <li><strong>SKU:</strong> Código único e irrepetible del producto.</li>
-                        <li><strong>Stock Mínimo:</strong> Nivel que activa la alerta amarilla de reabastecimiento.</li>
-                        <li><strong>Precio Venta:</strong> Valor final para el cliente.</li>
-                    </ul>
-                </div>
-
-                <!-- Pedidos Content -->
-                <div id="tpl-pedidos">
-                    <h1 class="font-primary text-primary mb-4"><i class="fas fa-shopping-cart me-2"></i>Manual de Pedidos</h1>
-                    <p class="lead">Procese las órdenes de compra desde la creación hasta la entrega final.</p>
-                    <hr>
-                    <h3 class="mt-4">Ciclo de Vida del Pedido</h3>
-                    <div class="mermaid">
-                        stateDiagram-v2
-                            [*] --> Pendiente
-                            Pendiente --> Pagado: Pago confirmado
-                            Pagado --> Enviado: Despacho realizado
-                            Enviado --> Entregado: Confirmación cliente
-                    </div>
-                    <h3 class="mt-4">Crear un Pedido</h3>
-                    <ol>
-                        <li>Click en <strong>+ Nuevo Pedido</strong>.</li>
-                        <li>Seleccione un Cliente existente o cree uno nuevo.</li>
-                        <li>Busque y agregue productos al carrito.</li>
-                        <li>Defina la dirección de envío y guarde.</li>
-                    </ol>
-                </div>
-
-                <!-- Clientes Content -->
-                <div id="tpl-clientes">
-                    <h1 class="font-primary text-primary mb-4"><i class="fas fa-users me-2"></i>Manual de Clientes</h1>
-                    <p class="lead">Administre la relación con sus compradores (CRM Básico).</p>
-                    <hr>
-                    <h3 class="mt-4">Gestión de Clientes</h3>
-                    <div class="mermaid">
-                        flowchart LR
-                        subgraph CRM["👥 Gestión"]
-                            Nuevo[➕ Nuevo cliente]
-                            Buscar[🔍 Buscar]
-                            Historial[📦 Historial pedidos]
-                            VIP[⭐ Marcar VIP]
-                        end
-                    </div>
-                    <h3 class="mt-4">Cliente VIP</h3>
-                    <p>Marcar un cliente como VIP permite filtrarlos rápidamente y darles atención prioritaria. Para hacerlo, edite el cliente y marque la casilla "VIP".</p>
-                </div>
-
             </div>
         </div>
-    </main>
+
+        <!-- PRODUCTOS -->
+        <div id="tpl-productos">
+            <div class="docs-hero-minimal">
+                <h1>Crear Productos</h1>
+                <p class="lead">La base de tu inventario. Registra cada ítem con precisión para un control total.</p>
+            </div>
+
+            <h2><i class="fas fa-box me-2"></i>Cómo registrar un producto</h2>
+            <p>Para mantener un inventario ordenado, sigue este flujo recomendado:</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Identificación (SKU)</span> El SKU es el código maestro. Puedes usar el de fábrica o generar uno propio. Debe ser único.</li>
+                <li><span class="step-title">Clasificación</span> Asigna el producto a una Marca y Categoría. Esto es vital para los filtros y reportes de ventas.</li>
+                <li><span class="step-title">Costos y Precios</span> Define tu precio de venta. Si incluyes el costo, el sistema podrá calcular tu margen de ganancia real.</li>
+                <li><span class="step-title">Umbral de Alerta</span> Establece un "Mínimo". Cuando el stock caiga a este número, aparecerá en tu Dashboard.</li>
+            </ol>
+
+            <div class="docs-alert warning">
+                Un producto con stock cero no aparecerá en el buscador de pedidos a menos que habilites "ventas sin stock".
+            </div>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    stateDiagram-v2
+                    [*] --> Registro
+                    Registro --> Activo : Stock > 0
+                    Activo --> Alerta : Stock <= Mínimo
+                    Alerta --> Agotado : Stock = 0
+                    Agotado --> Activo : Cargar Mercancía
+                </div>
+            </div>
+        </div>
+
+        <!-- KITS -->
+        <div id="tpl-kits">
+            <div class="docs-hero-minimal">
+                <h1>Armar Kits</h1>
+                <p class="lead">Potencia tus ventas creando combos o paquetes de productos.</p>
+            </div>
+
+            <h2>¿Qué es un Kit en BuzzDM?</h2>
+            <p>Es un producto "virtual" que representa un conjunto. Lo más importante: <strong>El stock del Kit depende de sus componentes.</strong></p>
+
+            <div class="docs-alert info">
+                Si un Kit lleva 2 pilas y solo quedan 1 en stock, el Kit se marcará automáticamente como "Agotado".
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Crear Producto Base</span> Crea un producto nuevo y marca el switch "Es un Kit".</li>
+                <li><span class="step-title">Asignar Receta</span> En la pestaña de componentes, busca y agrega los productos base (ej: Caja + 3 Jabones).</li>
+                <li><span class="step-title">Sincronización</span> Al guardar, el sistema calculará cuántos Kits puedes vender basándose en el componente más escaso.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    graph LR
+                    P1[Producto A] -- x1 --> K(KIT)
+                    P2[Producto B] -- x2 --> K
+                    K -- Venta --> S[Descuento Automático]
+                </div>
+            </div>
+        </div>
+
+        <!-- IMPORTAR -->
+        <div id="tpl-importar">
+            <div class="docs-hero-minimal">
+                <h1>Importación Masiva</h1>
+                <p class="lead">Ahorra horas de trabajo cargando grandes volúmenes de datos desde Excel.</p>
+            </div>
+
+            <h2><i class="fas fa-file-excel me-2"></i>Reglas de Oro del Excel</h2>
+            <div class="docs-alert warning">
+                El archivo debe estar en formato <strong>.xlsx</strong> y no debe contener celdas combinadas ni fórmulas complejas.
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Plantilla Oficial</span> Descarga siempre la plantilla desde el botón "Importar". El sistema espera columnas específicas en un orden exacto.</li>
+                <li><span class="step-title">Limpieza de Datos</span> Verifica que los SKUs no tengan espacios al final y que los precios no lleven símbolos de moneda ($).</li>
+                <li><span class="step-title">Pre-validación</span> Al subir el archivo, el sistema te mostrará una vista previa. Revisa si hay filas marcadas en rojo antes de confirmar.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    graph LR
+                    X[Excel] --> V[Validación Sistema]
+                    V -->|Error| F[Corregir en Excel]
+                    V -->|OK| S[Sincronizar DB]
+                    F --> X
+                </div>
+            </div>
+        </div>
+
+        <!-- PEDIDOS -->
+        <div id="tpl-pedidos">
+            <div class="docs-hero-minimal">
+                <h1>Gestión de Pedidos</h1>
+                <p class="lead">Desde la cotización inicial hasta la entrega final al cliente.</p>
+            </div>
+
+            <h2><i class="fas fa-shopping-bag me-2"></i>Ciclo de Vida de una Venta</h2>
+            <ol class="step-list">
+                <li><span class="step-title">Check-in Cliente</span> Busca un cliente existente. Si es nuevo, el sistema te permitirá crearlo sin salir de la pantalla de pedidos.</li>
+                <li><span class="step-title">Selección de Ítems</span> Agrega productos. El sistema te avisará en tiempo real si el stock es insuficiente.</li>
+                <li><span class="step-title">Confirmación</span> Al guardar, el stock queda "Reservado" (ya no está disponible para otros, pero aún no sale físicamente).</li>
+                <li><span class="step-title">Cierre</span> Una vez pagado y entregado, el pedido pasa a histórico para tus reportes de ingresos.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    stateDiagram-v2
+                    [*] --> Pendiente : Crear Pedido
+                    Pendiente --> Pagado : Registrar Pago
+                    Pendiente --> Enviado : Despachar
+                    Pagado --> Entregado : Finalizar
+                    Enviado --> Entregado : Finalizar
+                    Entregado --> [*]
+                </div>
+            </div>
+        </div>
+
+        <!-- CLIENTES -->
+        <div id="tpl-clientes">
+            <div class="docs-hero-minimal">
+                <h1>Base de Clientes</h1>
+                <p class="lead">Conoce a tus compradores y agiliza tus cierres de venta.</p>
+            </div>
+
+            <h2><i class="fas fa-address-book me-2"></i>Gestión de Directorio</h2>
+            <p>Un directorio de clientes bien alimentado te permite:</p>
+            <ul>
+                <li>Ver historial de compras por persona.</li>
+                <li>Generar facturas y recibos automáticos.</li>
+                <li>Hacer seguimiento de deudas pendientes.</li>
+            </ul>
+
+            <div class="docs-alert info">
+                Usa el campo "Notas" para guardar detalles importantes, como direcciones de entrega preferidas o días de recepción.
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Registro Único</span> Evita duplicados verificando por Nro. de Cédula o RIF.</li>
+                <li><span class="step-title">Clasificación</span> Identifica si es cliente Retail o Mayorista (si manejas precios diferenciados).</li>
+            </ol>
+        </div>
+
+        <!-- CARGOS -->
+        <div id="tpl-cargos">
+            <div class="docs-hero-minimal">
+                <h1>Entrada de Mercancía</h1>
+                <p class="lead">Registra las compras a proveedores y abastece tus almacenes de forma controlada.</p>
+            </div>
+
+            <h2><i class="fas fa-truck-loading me-2"></i>El Proceso de "Cargo"</h2>
+            <p>Un cargo es el documento legal que respalda la entrada física de productos a tu inventario.</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Origen</span> Selecciona el Proveedor y el Almacén de destino. Ten en cuenta que solo puedes elegir un almacén por cada cargo.</li>
+                <li><span class="step-title">Conteo</span> Escanea o busca los productos recibidos. Ingresa la cantidad exacta que llegó físicamente.</li>
+                <li><span class="step-title">Validación de Costos</span> Revisa que el costo unitario coincida con tu factura de compra. El sistema actualizará el "Costo Promedio" del producto.</li>
+                <li><span class="step-title">Finalización</span> Al confirmar, el stock se suma inmediatamente y el costo se actualiza para los cálculos de ganancia.</li>
+            </ol>
+
+            <div class="docs-alert warning">
+                Un cargo confirmado <strong>no se puede revertir</strong> directamente para mantener la integridad contable. Si hubo un error, deberás realizar un ajuste de inventario.
+            </div>
+        </div>
+
+        <!-- ALMACENES -->
+        <div id="tpl-almacenes">
+            <div class="docs-hero-minimal">
+                <h1>Gestión de Almacenes</h1>
+                <p class="lead">Organiza tu inventario por ubicaciones físicas o virtuales.</p>
+            </div>
+
+            <h2><i class="fas fa-warehouse me-2"></i>Multi-Almacén</h2>
+            <p>BuzzDM te permite separar el stock por sucursales, depósitos o incluso estantes virtuales.</p>
+
+            <div class="docs-alert info">
+                Puedes transferir mercancía entre almacenes sin afectar el costo total de tu inventario.
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Creación</span> Asigna un nombre claro (ej: "Depósito Norte" o "Tienda Principal").</li>
+                <li><span class="step-title">Responsable</span> Puedes asignar un encargado para tener trazabilidad de quién administra cada ubicación.</li>
+                <li><span class="step-title">Stock por Ubicación</span> Al consultar un producto, verás el desglose de cuántas unidades hay en cada almacén creado.</li>
+            </ol>
+        </div>
+
+        <!-- PROVEEDORES -->
+        <div id="tpl-proveedores">
+            <div class="docs-hero-minimal">
+                <h1>Gestión de Proveedores</h1>
+                <p class="lead">Mantén un directorio de tus aliados comerciales y fuentes de suministro.</p>
+            </div>
+
+            <h2><i class="fas fa-handshake me-2"></i>Relación Comercial</h2>
+            <p>Registrar proveedores es fundamental para:");</p>
+            <ul>
+                <li>Tener trazabilidad de quién te suministra cada producto.</li>
+                <li>Comparar costos de compra entre diferentes fuentes.</li>
+                <li>Mantener contacto rápido (WhatsApp/Correo) desde el sistema.</li>
+            </ul>
+
+            <ol class="step-list">
+                <li><span class="step-title">Datos Fiscales</span> Registra el RIF o NIT para tus registros contables legales.</li>
+                <li><span class="step-title">Contactos</span> Agrega el nombre del vendedor y su teléfono para pedidos rápidos.</li>
+            </ol>
+        </div>
+
+        <!-- CATALOGOS -->
+        <div id="tpl-catalogos">
+            <div class="docs-hero-minimal">
+                <h1>Clasificación y Atributos</h1>
+                <p class="lead">Estructura tu inventario para que encontrar un producto sea cuestión de segundos.</p>
+            </div>
+
+            <h2><i class="fas fa-tags me-2"></i>Categorías, Marcas y Unidades</h2>
+            <p>Los catálogos son los cimientos de tu tienda virtual y reportes.</p>
+
+            <div class="docs-alert info">
+                Una buena categorización permite a tus clientes filtrar productos por "Celulares", "Accesorios", etc., mejorando su experiencia de compra.
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Categorías</span> Agrupa productos por tipo. Ej: "Electrónica", "Hogar".</li>
+                <li><span class="step-title">Marcas</span> Identifica el fabricante. Vital para reportes de garantía y fidelidad.</li>
+                <li><span class="step-title">Unidades de Medida</span> Define cómo vendes: Por unidad (Pza), por peso (Kg), o por paquete (Pte).</li>
+            </ol>
+        </div>
+
+        <!-- NOTAS -->
+        <div id="tpl-notas">
+            <div class="docs-hero-minimal">
+                <h1>Colaboración Kanban</h1>
+                <p class="lead">Administra tareas, recordatorios y pendientes de tu equipo de forma visual.</p>
+            </div>
+
+            <h2><i class="fas fa-columns me-2"></i>El Tablero de Trabajo</h2>
+            <p>Usa las columnas para mover tarjetas según su progreso:</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Pendiente</span> Tareas nuevas o por iniciar.</li>
+                <li><span class="step-title">En Proceso</span> Trabajo activo. Evita tener demasiadas notas aquí para no saturarte.</li>
+                <li><span class="step-title">Terminado</span> Tareas concluidas. Límpialas periódicamente para mantener el orden.</li>
+            </ol>
+
+            <div class="docs-alert info">
+                Puedes adjuntar fotos o documentos directamente en cada nota para tener toda la información en un solo lugar.
+            </div>
+        </div>
+
+        <!-- BACKUPS -->
+        <div id="tpl-backups">
+            <div class="docs-hero-minimal">
+                <h1>Respaldo y Seguridad</h1>
+                <p class="lead">Protege la información de tu negocio ante cualquier eventualidad.</p>
+            </div>
+
+            <h2><i class="fas fa-shield-alt me-2"></i>Copias de Seguridad</h2>
+            <p>El sistema permite generar archivos SQL que contienen toda tu base de datos.</p>
+
+            <div class="docs-alert warning">
+                Se recomienda generar un respaldo **al menos una vez por semana** y guardarlo fuera de este servidor (ej: Google Drive o un disco externo).
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Generación</span> Haz click en "Generar Nuevo Respaldo". El proceso puede tardar unos segundos.</li>
+                <li><span class="step-title">Descarga</span> Una vez finalizado, verás un botón de descarga. Guárdalo con una fecha clara.</li>
+                <li><span class="step-title">Restauración</span> En caso de emergencia, este archivo permite reconstruir toda tu base de datos desde cero.</li>
+            </ol>
+        </div>
+
+        <!-- EMPRESA -->
+        <div id="tpl-empresa">
+            <div class="docs-hero-minimal">
+                <h1>Identidad de Empresa</h1>
+                <p class="lead">Personaliza BuzzDM con los datos legales y visuales de tu negocio.</p>
+            </div>
+
+            <h2><i class="fas fa-building me-2"></i>Configuración Legal</h2>
+            <p>La información que registres aquí aparecerá automáticamente en tus reportes y recibos.</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Razón Social y RIF</span> Asegúrate de que coincidan exactamente con tu registro fiscal.</li>
+                <li><span class="step-title">Dirección y Contacto</span> Estos datos son vitales para que tus proveedores y clientes te ubiquen correctamente.</li>
+                <li><span class="step-title">Logo Corporativo</span> Sube una imagen clara. El sistema la usará para personalizar la interfaz y los documentos impresos.</li>
+            </ol>
+
+            <div class="docs-alert info">
+                Puedes actualizar estos datos en cualquier momento si tu empresa cambia de sede o redes sociales.
+            </div>
+        </div>
+
+        <!-- USUARIOS -->
+        <div id="tpl-usuarios">
+            <div class="docs-hero-minimal">
+                <h1>Gestión de Accesos</h1>
+                <p class="lead">Controla quién puede entrar al sistema y qué acciones puede realizar.</p>
+            </div>
+
+            <h2><i class="fas fa-user-shield me-2"></i>Roles y Permisos</h2>
+            <p>No todos los usuarios necesitan ver todo. Asigna roles según la responsabilidad:</p>
+
+            <ul>
+                <li><strong>Administrador</strong>: Acceso total a configuraciones, backups y logs.</li>
+                <li><strong>Vendedor</strong>: Enfocado en pedidos, clientes y consulta de stock.</li>
+                <li><strong>Almacenista</strong>: Especializado en cargos, almacenes e inventario.</li>
+            </ul>
+
+            <ol class="step-list">
+                <li><span class="step-title">Crear Cuenta</span> Asigna un correo real y una contraseña segura.</li>
+                <li><span class="step-title">Asignar Rol</span> Elige el perfil que mejor se adapte a sus tareas diarias.</li>
+                <li><span class="step-title">Seguridad</span> Puedes desactivar usuarios en cualquier momento sin borrar sus registros históricos.</li>
+            </ol>
+        </div>
+
+        <!-- PAGOS -->
+        <div id="tpl-pagos">
+            <div class="docs-hero-minimal">
+                <h1>Control de Pagos</h1>
+                <p class="lead">Asegura tu flujo de caja monitoreando cada transacción.</p>
+            </div>
+
+            <h2><i class="fas fa-money-check-alt me-2"></i>El Semáforo de Cartera</h2>
+            <p>Cada pedido tiene un estado de pago que debes actualizar manualmente:</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">No Pagado (Rojo)</span> Deuda pendiente del cliente. Aparece en las alertas de cobranza.</li>
+                <li><span class="step-title">Pagado (Verde)</span> Conciliado con tu banco o caja física. Cierra el ciclo financiero del pedido.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    stateDiagram-v2
+                    [*] --> Pendiente
+                    Pendiente --> Pagado : Registro de Pago
+                    Pagado --> Conciliado : Auditoría Admin
+                    Conciliado --> [*]
+                </div>
+            </div>
+        </div>
+
+        <!-- ENVIOS -->
+        <div id="tpl-envios">
+            <div class="docs-hero-minimal">
+                <h1>Rastreo Operativo</h1>
+                <p class="lead">Garantiza que cada pedido llegue a su destino final.</p>
+            </div>
+
+            <h2><i class="fas fa-shipping-fast me-2"></i>Estados de Envío</h2>
+            <p>Mantén a tu equipo informado sobre la ubicación física de la mercancía:</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Pendiente</span> Pedido nuevo, aún no preparado.</li>
+                <li><span class="step-title">En Proceso</span> El equipo de almacén está armando el paquete.</li>
+                <li><span class="step-title">Enviado</span> La mercancía salió del almacén por transporte propio o externo.</li>
+                <li><span class="step-title">Entregado</span> El cliente recibió conforme. El stock se deduce definitivamente.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    flowchart LR
+                    A[Pendiente] --> B[Pick & Pack]
+                    B --> C[Tránsito]
+                    C --> D[Entregado]
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGS -->
+        <div id="tpl-logs">
+            <div class="docs-hero-minimal">
+                <h1>Auditoría y Trazabilidad</h1>
+                <p class="lead">Mantén un registro histórico de cada cambio realizado para garantizar la transparencia.</p>
+            </div>
+
+            <h2><i class="fas fa-history me-2"></i>La Caja Negra del Sistema</h2>
+            <p>El registro de actividad guarda detalles cruciales de la operación diaria:</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Quién</span> El nombre del usuario que realizó la acción.</li>
+                <li><span class="step-title">Qué</span> El tipo de acción (Creación, Edición, Eliminación, Login).</li>
+                <li><span class="step-title">Cuándo</span> Fecha y hora exacta (segundos incluidos).</li>
+                <li><span class="step-title">Referencia</span> El ID del registro afectado para facilitar búsquedas.</li>
+            </ol>
+
+            <div class="docs-alert info">
+                Estos registros son permanentes y no pueden ser alterados por ningún usuario, garantizando una auditoría confiable.
+            </div>
+        </div>
+
+        <!-- DIVISAS -->
+        <div id="tpl-divisas">
+            <div class="docs-hero-minimal">
+                <h1>Manejo Multi-moneda</h1>
+                <p class="lead">Gestiona tus precios en moneda local o extranjera con tasas actualizadas.</p>
+            </div>
+
+            <h2><i class="fas fa-exchange-alt me-2"></i>Monitor del Dólar</h2>
+            <p>BuzzDM usa una tasa de referencia centralizada para todos los cálculos de conversión.</p>
+
+            <ol class="step-list">
+                <li><span class="step-title">Consulta</span> El monitor muestra el valor actual del dólar según las fuentes configuradas.</li>
+                <li><span class="step-title">Actualización</span> Puedes actualizar la tasa manualmente si el mercado varía bruscamente.</li>
+                <li><span class="step-title">Impacto</span> Al cambiar la tasa, todos los precios marcados "en $ pero pagaderos en BS" se recalculan al instante en la pantalla de pedidos.</li>
+            </ol>
+
+            <div class="docs-alert info">
+                Esta herramienta es fundamental para proteger tus márgenes de ganancia ante la inflación o volatilidad cambiaria.
+            </div>
+        </div>
+
+    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
-    <script src="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.js.iife.js"></script>
+    <!-- Driver.js (Local) -->
+    <script src="assets/js/driver.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
-
-    <!-- Custom Logic -->
     <script src="assets/js/common.js"></script>
     <script src="assets/js/manual.js"></script>
 </body>
-</html>
-
-    <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <style>
-    .manual-header {
-        background: linear-gradient(135deg, var(--buzz-dark-bg) 0%, var(--buzz-card-bg) 100%);
-        border-bottom: 2px solid var(--buzz-primary-color);
-        padding: 2rem;
-        border-radius: 8px 8px 0 0;
-    }
-
-    .search-box {
-        position: relative;
-        margin-bottom: 2rem;
-    }
-
-    .search-box input {
-        padding-left: 3rem;
-    }
-
-    .search-box i {
-        position: absolute;
-        left: 1rem;
-        top: 50%;
-        transform: translateY(-50%);
-        color: var(--buzz-text-muted);
-        pointer-events: none;
-    }
-
-    .accordion-item {
-        background-color: var(--buzz-card-bg);
-        border: 1px solid var(--buzz-border-color);
-        margin-bottom: 0.5rem;
-        border-radius: 4px !important;
-        overflow: hidden;
-    }
-
-    .accordion-button {
-        background-color: var(--buzz-card-bg);
-        color: var(--buzz-text-color);
-        font-family: var(--font-primary);
-        font-weight: 600;
-        border: none;
-        padding: 1.25rem 1.5rem;
-        transition: all 0.3s ease;
-    }
-
-    .accordion-button:not(.collapsed) {
-        background-color: var(--buzz-primary-color);
-        color: var(--buzz-dark-bg);
-        box-shadow: none;
-    }
-
-    .accordion-button:hover {
-        background-color: var(--buzz-primary-color);
-        color: var(--buzz-dark-bg);
-    }
-
-    .accordion-button:focus {
-        box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2);
-        border-color: var(--buzz-primary-color);
-    }
-
-    .accordion-button::after {
-        filter: brightness(0) invert(1);
-    }
-
-    .accordion-button:not(.collapsed)::after {
-        filter: brightness(0);
-    }
-
-    .accordion-body {
-        background-color: var(--buzz-card-bg);
-        color: var(--buzz-text-color);
-        padding: 1.5rem;
-        border-top: 1px solid var(--buzz-border-color);
-    }
-
-    .manual-list-item {
-        background-color: transparent;
-        border: none;
-        border-left: 3px solid var(--buzz-primary-color);
-        padding: 0.75rem 1rem;
-        margin-bottom: 0.5rem;
-        color: var(--buzz-text-color);
-        font-family: var(--font-monospace);
-        transition: all 0.3s ease;
-    }
-
-    .manual-list-item:hover {
-        background-color: rgba(255, 160, 0, 0.1);
-        border-left-color: var(--buzz-primary-color);
-        transform: translateX(5px);
-    }
-
-    .manual-list-item i {
-        color: var(--buzz-primary-color);
-        margin-right: 0.75rem;
-        width: 20px;
-    }
-
-    .no-results {
-        text-align: center;
-        padding: 3rem;
-        color: var(--buzz-text-muted);
-    }
-
-    .no-results i {
-        font-size: 4rem;
-        margin-bottom: 1rem;
-        opacity: 0.5;
-    }
-    </style>
-</head>
-
-<body>
-    <main class="main-content">
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">MANUAL DE USUARIO</h1>
-                <span class="text-muted ms-2 font-mono">/ GUÍA INTERACTIVA</span>
-            </div>
-        </nav>
-
-        <div class="buzz-card">
-            <div class="manual-header">
-                <h2 class="font-primary text-primary mb-3">
-                    <i class="fas fa-book-open me-2"></i>Bienvenido al Manual de BUZZ Data Manager
-                </h2>
-                <p class="font-mono text-muted mb-0">
-                    Guía completa para utilizar todas las funcionalidades del sistema de gestión
-                </p>
-            </div>
-
-            <div class="p-4">
-                <!-- Search Box -->
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="form-control form-control-buzz" id="manualSearch"
-                           placeholder="Buscar en el manual... (ej: productos, clientes, importar)">
-                </div>
-
-                <!-- Accordion Container -->
-                <div class="accordion" id="manualAccordion">
-
-                        <!-- Sección Dashboard -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingOne">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                    <i class="fas fa-tachometer-alt me-2"></i>Dashboard
-                                </button>
-                            </h2>
-                            <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>El <strong>Dashboard</strong> es la pantalla principal al iniciar sesión. Ofrece
-                                        una vista general del estado de su negocio a través de varias tarjetas y
-                                        gráficos.</p>
-                                    <ul class="list-unstyled">
-                                        <li class="manual-list-item"><i
-                                                class="fas fa-chart-line me-2"></i><strong>Gráfico de
-                                                Ventas:</strong> Muestra las tendencias de ventas a lo largo del tiempo.
-                                        </li>
-                                        <li class="manual-list-item"><i
-                                                class="fas fa-chart-pie me-2"></i><strong>Ventas por
-                                                Estado:</strong> Un gráfico circular que desglosa los pedidos según su
-                                            estado actual (ej. Pendiente, Completado, Cancelado).</li>
-                                        <li class="manual-list-item"><i
-                                                class="fas fa-chart-bar me-2"></i><strong>Estadísticas
-                                                Clave:</strong> Tarjetas con métricas importantes como total de ventas,
-                                            número de clientes y cantidad de pedidos.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección Pedidos -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingTwo">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                    <i class="bi bi-box-seam me-2"></i>Gestión de Pedidos
-                                </button>
-                            </h2>
-                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>La sección de <strong>Pedidos</strong> le permite administrar todas las órdenes
-                                        de sus clientes.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i
-                                                class="bi bi-plus-circle-fill me-2"></i><strong>Crear Pedido:</strong>
-                                            Puede registrar nuevos pedidos asociándolos a un cliente y agregando
-                                            productos del inventario.</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-pencil-square me-2"></i><strong>Editar Pedido:</strong>
-                                            Modificar la información de un pedido existente, como su estado (pendiente,
-                                            en proceso, enviado, etc.).</li>
-                                        <li class="list-group-item"><i class="bi bi-search me-2"></i><strong>Buscar y
-                                                Filtrar:</strong> Localice pedidos rápidamente usando la barra de
-                                            búsqueda o los filtros disponibles.</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-file-earmark-pdf-fill me-2"></i><strong>Generar
-                                                Reportes:</strong> Es posible que desde aquí o la sección de reportes
-                                            pueda generar un PDF con los detalles del pedido.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección Clientes -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingThree">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                    <i class="bi bi-people-fill me-2"></i>Gestión de Clientes
-                                </button>
-                            </h2>
-                            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>Administre la información de todos sus clientes de forma centralizada.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i
-                                                class="bi bi-person-plus-fill me-2"></i><strong>Añadir Cliente:</strong>
-                                            Registre nuevos clientes con su información de contacto y fiscal.</li>
-                                        <li class="list-group-item"><i class="bi bi-pencil-fill me-2"></i><strong>Editar
-                                                Cliente:</strong> Actualice los datos de cualquier cliente registrado.
-                                        </li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-trash-fill me-2"></i><strong>Eliminar Cliente:</strong>
-                                            Borre clientes que ya no estén activos.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección Inventario -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingFour">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                    <i class="bi bi-bookshelf me-2"></i>Inventario
-                                </button>
-                            </h2>
-                            <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>Controle todos los productos de su negocio.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i
-                                                class="bi bi-plus-square-fill me-2"></i><strong>Añadir
-                                                Producto:</strong> Ingrese nuevos productos al sistema con detalles como
-                                            SKU, nombre, descripción y stock inicial.</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-pencil-square me-2"></i><strong>Editar Producto:</strong>
-                                            Modifique la información y el stock de los productos existentes.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección Importación -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingFive">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                                    <i class="bi bi-file-earmark-arrow-up-fill me-2"></i>Importación de Datos
-                                </button>
-                            </h2>
-                            <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>Esta potente herramienta le permite cargar datos de forma masiva utilizando
-                                        archivos de Excel.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i class="bi bi-download me-2"></i><strong>Descargar
-                                                Plantilla:</strong> Obtenga el archivo <code>template_buzz.xlsx</code>
-                                            que sirve como guía para la importación.</li>
-                                        <li class="list-group-item"><i class="bi bi-upload me-2"></i><strong>Procesar
-                                                Importación:</strong> Suba el archivo Excel con sus datos para cargarlos
-                                            automáticamente en el sistema (ej. nuevos productos, clientes o pedidos).
-                                        </li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-clock-history me-2"></i><strong>Historial de
-                                                Importaciones:</strong> Revise las importaciones que se han realizado
-                                            anteriormente.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Sección Administración -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header" id="headingSix">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                                    <i class="bi bi-person-badge-fill me-2"></i>Administración
-                                </button>
-                            </h2>
-                            <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix"
-                                data-bs-parent="#manualAccordion">
-                                <div class="accordion-body">
-                                    <p>Sección dedicada a la configuración y gestión de alto nivel del sistema.</p>
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><i
-                                                class="bi bi-person-fill-gear me-2"></i><strong>Gestión de
-                                                Usuarios:</strong> Permite crear, editar y eliminar los usuarios que
-                                            tienen acceso al sistema.</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-building-fill-gear me-2"></i><strong>Configuración de la
-                                                Empresa:</strong> Actualice los datos de su empresa, como el nombre, RIF
-                                            y el logo que aparece en los reportes.</li>
-                                        <li class="list-group-item"><i
-                                                class="bi bi-shield-lock-fill me-2"></i><strong>Backups:</strong> Genere
-                                            y descargue copias de seguridad de la base de datos.</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-                <!-- No Results Message -->
-                <div id="noResults" class="no-results" style="display: none;">
-                    <i class="fas fa-search"></i>
-                    <p class="font-mono">No se encontraron resultados para su búsqueda</p>
-                    <small class="text-muted">Intente con otros términos de búsqueda</small>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/common.js"></script>
-    <script>
-        // Search functionality for manual
-        const searchInput = document.getElementById('manualSearch');
-        const accordionItems = document.querySelectorAll('.accordion-item');
-        const noResults = document.getElementById('noResults');
-
-        searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            let visibleCount = 0;
-
-            accordionItems.forEach(item => {
-                const button = item.querySelector('.accordion-button');
-                const body = item.querySelector('.accordion-body');
-                const buttonText = button.textContent.toLowerCase();
-                const bodyText = body.textContent.toLowerCase();
-
-                // Check if search term is in title or content
-                if (searchTerm === '' || buttonText.includes(searchTerm) || bodyText.includes(searchTerm)) {
-                    item.style.display = '';
-                    visibleCount++;
-
-                    // If searching and found, expand the section
-                    if (searchTerm !== '' && (buttonText.includes(searchTerm) || bodyText.includes(searchTerm))) {
-                        const collapse = item.querySelector('.accordion-collapse');
-                        if (!collapse.classList.contains('show')) {
-                            button.click();
-                        }
-                    }
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-
-            // Show/hide no results message
-            if (visibleCount === 0 && searchTerm !== '') {
-                noResults.style.display = 'block';
-            } else {
-                noResults.style.display = 'none';
-            }
-        });
-
-        // Smooth scroll for better UX
-        document.querySelectorAll('.accordion-button').forEach(button => {
-            button.addEventListener('click', function() {
-                setTimeout(() => {
-                    this.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }, 350);
-            });
-        });
-    </script>
-</body>
-
 </html>
