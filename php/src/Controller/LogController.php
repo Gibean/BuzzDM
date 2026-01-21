@@ -45,7 +45,8 @@ class LogController {
         $filters = [
             'search' => $_GET['search'] ?? '',
             'dateFrom' => $_GET['dateFrom'] ?? '',
-            'dateTo' => $_GET['dateTo'] ?? ''
+            'dateTo' => $_GET['dateTo'] ?? '',
+            'action' => $_GET['action'] ?? ''
         ];
 
         $result = $this->service->getSystemLogs($filters, $page, $limit);

@@ -229,12 +229,8 @@
         document.getElementById("logSearch").value = "";
         document.getElementById("logDateFrom").value = "";
         document.getElementById("logDateTo").value = "";
-
-        // Reset toggle button state if needed (not strictly necessary but good UX)
-        // const toggleBtn = document.getElementById("toggleAdvancedFilters");
-        // if (toggleBtn && toggleBtn.classList.contains('active')) {
-             // Optional: collapse advanced filters or keep them open? Keeping them is fine.
-        // }
+        const logActionFilter = document.getElementById("logActionFilter");
+        if (logActionFilter) logActionFilter.value = "";
 
         // Reset badge
         const activeBadge = document.getElementById("activeFiltersBadge");
@@ -302,9 +298,11 @@ function setupAdvancedFilters() {
     // Attach listener to advanced filters to update badge
     const logDateFrom = document.getElementById("logDateFrom");
     const logDateTo = document.getElementById("logDateTo");
+    const logActionFilter = document.getElementById("logActionFilter");
 
     if(logDateFrom) logDateFrom.addEventListener('change', updateActiveFiltersCount);
     if(logDateTo) logDateTo.addEventListener('change', updateActiveFiltersCount);
+    if(logActionFilter) logActionFilter.addEventListener('change', updateActiveFiltersCount);
 }
 
 function updateActiveFiltersCount() {
@@ -315,9 +313,11 @@ function updateActiveFiltersCount() {
     // Only count filters in the advanced section
     const logDateFrom = document.getElementById("logDateFrom");
     const logDateTo = document.getElementById("logDateTo");
+    const logActionFilter = document.getElementById("logActionFilter");
 
     if (logDateFrom && logDateFrom.value !== "") activeFilters++;
     if (logDateTo && logDateTo.value !== "") activeFilters++;
+    if (logActionFilter && logActionFilter.value !== "") activeFilters++;
 
     if (activeFilters > 0) {
         activeBadge.textContent = activeFilters;
@@ -492,15 +492,18 @@ function updateActiveFiltersCount() {
     const logSearchEl = document.getElementById("logSearch")
     const logDateFromEl = document.getElementById("logDateFrom")
     const logDateToEl = document.getElementById("logDateTo")
+    const logActionFilterEl = document.getElementById("logActionFilter")
 
     const logSearch = logSearchEl ? logSearchEl.value : ''
     const logDateFrom = logDateFromEl ? logDateFromEl.value : ''
     const logDateTo = logDateToEl ? logDateToEl.value : ''
+    const logActionFilter = logActionFilterEl ? logActionFilterEl.value : ''
 
     let queryParams = `page=${page}&limit=${LOGS_PER_PAGE}`
     if (logSearch) queryParams += `&search=${logSearch}`
     if (logDateFrom) queryParams += `&dateFrom=${logDateFrom}`
     if (logDateTo) queryParams += `&dateTo=${logDateTo}`
+    if (logActionFilter) queryParams += `&action=${logActionFilter}`
 
     try {
       const response = await fetchJSON(`php/api_logs.php?${queryParams}`)

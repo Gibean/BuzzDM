@@ -15,22 +15,35 @@ class ClienteRepository {
     }
 
     public function findAll($filters = []) {
-        $sql = "SELECT * FROM clientes WHERE (id LIKE ? OR nombre LIKE ? OR email LIKE ?)";
-        $params = [
-            $filters['search'] ?? '%',
-            $filters['search'] ?? '%',
-            $filters['search'] ?? '%'
-        ];
+        $searchParam = isset($filters['search']) && $filters['search'] !== '' ? '%' . $filters['search'] . '%' : '%';
+        $sql = "SELECT * FROM clientes WHERE (id LIKE ? OR nombre LIKE ? OR email LIKE ? OR telefono LIKE ?)";
+        $params = [$searchParam, $searchParam, $searchParam, $searchParam];
 
         if (empty($filters['show_deleted'])) {
             $sql .= " AND deleted_at IS NULL";
         }
 
-        if (!empty($filters['vip'])) {
-            $sql .= " AND vip = 1";
-        } elseif (isset($filters['vip']) && $filters['vip'] === '0') {
-            $sql .= " AND vip = 0";
+        // Type filter: 'vip' or 'regular'
+        if (!empty($filters['type'])) {
+            if ($filters['type'] === 'vip') {
+                $sql .= " AND vip = 1";
+            } elseif ($filters['type'] === 'regular') {
+                $sql .= " AND vip = 0";
+            }
         }
+
+        // Date filters
+        if (!empty($filters['dateFrom'])) {
+            $sql .= " AND DATE(creado_at) >= ?";
+            $params[] = $filters['dateFrom'];
+        }
+
+        if (!empty($filters['dateTo'])) {
+            $sql .= " AND DATE(creado_at) <= ?";
+            $params[] = $filters['dateTo'];
+        }
+
+        $sql .= " ORDER BY creado_at DESC";
 
         // Add Pagination limits if needed here
         if (isset($filters['limit']) && isset($filters['offset'])) {

@@ -157,6 +157,16 @@
                             <label class="text-muted">Hasta</label>
                             <input type="date" class="form-control form-control-buzz" id="logDateTo">
                         </div>
+                        <div class="filter-group filter-select">
+                            <label class="text-muted">Tipo de Acción</label>
+                            <select class="form-control form-control-buzz" id="logActionFilter">
+                                <option value="">Todas</option>
+                                <option value="exitoso">Login Exitoso</option>
+                                <option value="denegado">Login Denegado</option>
+                                <option value="backup">Backup</option>
+                                <option value="importacion">Importación</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <div class="table-responsive">

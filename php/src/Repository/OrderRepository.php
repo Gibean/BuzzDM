@@ -58,6 +58,11 @@ class OrderRepository {
             $params[] = $filters['dateTo'] . ' 23:59:59';
         }
 
+        if (!empty($filters['shippingStatus'])) {
+            $where[] = "p.estado_envio = ?";
+            $params[] = $filters['shippingStatus'];
+        }
+
         $whereClause = implode(' AND ', $where);
 
         // Count Total
