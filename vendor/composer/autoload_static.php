@@ -121,9 +121,11 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
             'Psr\\Container\\' => 14,
+            'PragmaRX\\Google2FA\\' => 19,
             'PhpParser\\' => 10,
             'PhpOption\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPStan\\PhpDocParser\\' => 21,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -149,11 +151,16 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             'Dotenv\\' => 7,
             'Dompdf\\' => 7,
+            'DASPRiD\\Enum\\' => 13,
         ),
         'C' => 
         array (
             'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
+        ),
+        'B' => 
+        array (
+            'BaconQrCode\\' => 12,
         ),
     );
 
@@ -219,6 +226,10 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             0 => __DIR__ . '/..' . '/psr/container/src',
         ),
+        'PragmaRX\\Google2FA\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/pragmarx/google2fa/src',
+        ),
         'PhpParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/nikic/php-parser/lib/PhpParser',
@@ -230,6 +241,10 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
+        ),
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
         ),
         'PHPStan\\PhpDocParser\\' => 
         array (
@@ -271,6 +286,10 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
+        'DASPRiD\\Enum\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
         'Composer\\Pcre\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/pcre/src',
@@ -278,6 +297,10 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'Complex\\' => 
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
+        ),
+        'BaconQrCode\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
@@ -415,6 +438,8 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'SupplierController' => __DIR__ . '/../..' . '/php/src/Controller/SupplierController.php',
         'SupplierRepository' => __DIR__ . '/../..' . '/php/src/Repository/SupplierRepository.php',
         'SupplierService' => __DIR__ . '/../..' . '/php/src/Service/SupplierService.php',
+        'TwoFactorController' => __DIR__ . '/../..' . '/php/src/Controller/TwoFactorController.php',
+        'TwoFactorService' => __DIR__ . '/../..' . '/php/src/Service/TwoFactorService.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
         'UserController' => __DIR__ . '/../..' . '/php/src/Controller/UserController.php',
         'UserRepository' => __DIR__ . '/../..' . '/php/src/Repository/UserRepository.php',
