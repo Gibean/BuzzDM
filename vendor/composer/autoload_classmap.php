@@ -139,6 +139,8 @@ return array(
     'SupplierController' => $baseDir . '/php/src/Controller/SupplierController.php',
     'SupplierRepository' => $baseDir . '/php/src/Repository/SupplierRepository.php',
     'SupplierService' => $baseDir . '/php/src/Service/SupplierService.php',
+    'TwoFactorController' => $baseDir . '/php/src/Controller/TwoFactorController.php',
+    'TwoFactorService' => $baseDir . '/php/src/Service/TwoFactorService.php',
     'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
     'UserController' => $baseDir . '/php/src/Controller/UserController.php',
     'UserRepository' => $baseDir . '/php/src/Repository/UserRepository.php',

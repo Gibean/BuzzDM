@@ -89,4 +89,53 @@ class UserRepository {
         $stmt->execute();
         return $stmt->fetchColumn();
     }
+
+    // =========================================
+    // Two-Factor Authentication Methods
+    // =========================================
+
+    /**
+     * Enable 2FA for a user
+     * @param int $userId User ID
+     * @param string $secret Base32 encoded secret
+     * @return bool Success
+     */
+    public function enable2FA(int $userId, string $secret): bool {
+        $stmt = $this->pdo->prepare("
+            UPDATE usuarios SET
+                two_factor_secret = ?,
+                two_factor_enabled = 1,
+                two_factor_confirmed_at = NOW()
+            WHERE id = ?
+        ");
+        return $stmt->execute([$secret, $userId]);
+    }
+
+    /**
+     * Disable 2FA for a user
+     * @param int $userId User ID
+     * @return bool Success
+     */
+    public function disable2FA(int $userId): bool {
+        $stmt = $this->pdo->prepare("
+            UPDATE usuarios SET
+                two_factor_secret = NULL,
+                two_factor_enabled = 0,
+                two_factor_confirmed_at = NULL
+            WHERE id = ?
+        ");
+        return $stmt->execute([$userId]);
+    }
+
+    /**
+     * Get user's 2FA secret
+     * @param int $userId User ID
+     * @return string|null Secret or null if not set
+     */
+    public function get2FASecret(int $userId): ?string {
+        $stmt = $this->pdo->prepare("SELECT two_factor_secret FROM usuarios WHERE id = ?");
+        $stmt->execute([$userId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result['two_factor_secret'] ?? null;
+    }
 }

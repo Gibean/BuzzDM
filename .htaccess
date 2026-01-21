@@ -1,0 +1,84 @@
+# ============================================================================
+# BuzzDM - Apache Security Configuration
+# ============================================================================
+# This file provides security headers and access restrictions
+# ============================================================================
+
+# ----------------------------------------------------------------------
+# Security Headers
+# ----------------------------------------------------------------------
+<IfModule mod_headers.c>
+    # Prevent MIME type sniffing
+    Header set X-Content-Type-Options "nosniff"
+
+    # Prevent clickjacking
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # Enable XSS Filter
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Referrer Policy
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Disable caching for API responses
+    <FilesMatch "\.(php)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Protect Sensitive Files
+# ----------------------------------------------------------------------
+
+# Block access to .env files
+<FilesMatch "^\.env">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to debug logs
+<Files "debug_log.txt">
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# Block access to composer files
+<FilesMatch "^composer\.(json|lock)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Block access to .git directory
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^\.git - [F,L]
+</IfModule>
+
+# ----------------------------------------------------------------------
+# PHP Settings (if allowed by hosting)
+# ----------------------------------------------------------------------
+<IfModule mod_php.c>
+    # Hide PHP version
+    php_flag expose_php Off
+
+    # Disable error display in production
+    # php_flag display_errors Off
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Prevent Directory Listing
+# ----------------------------------------------------------------------
+Options -Indexes
+
+# ----------------------------------------------------------------------
+# Block access to backup files
+# ----------------------------------------------------------------------
+<FilesMatch "\.(sql|sql\.gz|bak|backup)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# ----------------------------------------------------------------------
+# Default charset
+# ----------------------------------------------------------------------
+AddDefaultCharset UTF-8
