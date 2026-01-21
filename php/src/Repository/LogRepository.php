@@ -44,6 +44,13 @@ class LogRepository {
             $params[] = $filters['dateTo'];
         }
 
+        if (!empty($filters['action'])) {
+            $condition = " AND ll.accion LIKE ?";
+            $sql .= $condition;
+            $countSql .= $condition;
+            $params[] = '%' . $filters['action'] . '%';
+        }
+
         // Get total count
         $countStmt = $this->pdo->prepare($countSql);
         $countStmt->execute($params);

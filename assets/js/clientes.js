@@ -10,16 +10,28 @@ async function fetchAndRenderCustomers() {
   try {
     const searchInput = document.getElementById("customerSearchInput").value
     const typeFilter = document.getElementById("customerTypeFilter").value
+    const dateFrom = document.getElementById("customerDateFrom")
+      ? document.getElementById("customerDateFrom").value
+      : ""
+    const dateTo = document.getElementById("customerDateTo")
+      ? document.getElementById("customerDateTo").value
+      : ""
     const showDeleted = document.getElementById("showDeletedFilter")
       ? document.getElementById("showDeletedFilter").checked
       : false
 
     let url = `php/api_clientes.php?page=${currentCustomerPage}&limit=${customersPerPage}`
     if (searchInput) {
-      url += `&search=${searchInput}`
+      url += `&search=${encodeURIComponent(searchInput)}`
     }
     if (typeFilter) {
-      url += `&type=${typeFilter}`
+      url += `&type=${encodeURIComponent(typeFilter)}`
+    }
+    if (dateFrom) {
+      url += `&dateFrom=${encodeURIComponent(dateFrom)}`
+    }
+    if (dateTo) {
+      url += `&dateTo=${encodeURIComponent(dateTo)}`
     }
     if (showDeleted) {
       url += `&show_deleted=true`
@@ -351,6 +363,33 @@ document
   .getElementById("showDeletedFilter")
   .addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
 
+// Date filter event listeners
+if (document.getElementById("customerDateFrom")) {
+  document.getElementById("customerDateFrom").addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+}
+if (document.getElementById("customerDateTo")) {
+  document.getElementById("customerDateTo").addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+}
+
+// Clear filters function
+window.clearFilters = function() {
+  document.getElementById('customerSearchInput').value = '';
+  document.getElementById('customerTypeFilter').value = '';
+  if (document.getElementById('customerDateFrom')) {
+    document.getElementById('customerDateFrom').value = '';
+  }
+  if (document.getElementById('customerDateTo')) {
+    document.getElementById('customerDateTo').value = '';
+  }
+  const showDeletedFilter = document.getElementById('showDeletedFilter');
+  if (showDeletedFilter) {
+    showDeletedFilter.checked = false;
+  }
+  currentCustomerPage = 1;
+  fetchAndRenderCustomers();
+  updateActiveFiltersCount();
+};
+
 // Advanced filters toggle logic
 function setupAdvancedFilters() {
     const toggleBtn = document.getElementById("toggleAdvancedFilters");
@@ -390,9 +429,13 @@ function updateActiveFiltersCount() {
     let activeFilters = 0;
     // Only count filters in the advanced section
     const customerTypeFilter = document.getElementById("customerTypeFilter");
+    const customerDateFrom = document.getElementById("customerDateFrom");
+    const customerDateTo = document.getElementById("customerDateTo");
     const showDeletedFilter = document.getElementById("showDeletedFilter");
 
     if (customerTypeFilter && customerTypeFilter.value !== "") activeFilters++;
+    if (customerDateFrom && customerDateFrom.value !== "") activeFilters++;
+    if (customerDateTo && customerDateTo.value !== "") activeFilters++;
     if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
 
     if (activeFilters > 0) {
@@ -402,13 +445,6 @@ function updateActiveFiltersCount() {
         activeBadge.classList.add("d-none");
     }
 }
-
-// Initialize advanced filters
-document.addEventListener('DOMContentLoaded', () => {
-    if (typeof setupAdvancedFilters === 'function') {
-        setupAdvancedFilters();
-    }
-});
 
 // Initial load
 document.addEventListener("DOMContentLoaded", () => {

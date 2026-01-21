@@ -92,6 +92,14 @@
                                 <option value="regular">Regular</option>
                             </select>
                         </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Registrado desde</label>
+                            <input type="date" class="form-control form-control-buzz" id="customerDateFrom">
+                        </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Registrado hasta</label>
+                            <input type="date" class="form-control form-control-buzz" id="customerDateTo">
+                        </div>
                         <div class="filter-group filter-check d-flex align-items-center mb-0 mt-3 mt-md-0">
                             <div class="form-check form-switch custom-switch-buzz">
                                 <input class="form-check-input" type="checkbox" id="showDeletedFilter">

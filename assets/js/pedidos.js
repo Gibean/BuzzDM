@@ -10,6 +10,15 @@ async function fetchAndRenderOrders() {
   try {
     const searchInput = document.getElementById("searchInput").value
     const paymentFilter = document.getElementById("paymentFilter").value
+    const shippingFilter = document.getElementById("shippingFilter")
+      ? document.getElementById("shippingFilter").value
+      : ""
+    const dateFrom = document.getElementById("dateFrom")
+      ? document.getElementById("dateFrom").value
+      : ""
+    const dateTo = document.getElementById("dateTo")
+      ? document.getElementById("dateTo").value
+      : ""
     const showDeleted = document.getElementById("showDeletedFilter")
       ? document.getElementById("showDeletedFilter").checked
       : false
@@ -26,6 +35,9 @@ async function fetchAndRenderOrders() {
     }
     if (paymentFilter) {
       url += `&paymentStatus=${encodeURIComponent(paymentFilter)}`
+    }
+    if (shippingFilter) {
+      url += `&shippingStatus=${encodeURIComponent(shippingFilter)}`
     }
     if (dateFrom) {
       url += `&dateFrom=${encodeURIComponent(dateFrom)}`
@@ -1017,6 +1029,10 @@ window.clearFilters = function() {
   document.getElementById('paymentFilter').value = '';
   document.getElementById('dateFrom').value = '';
   document.getElementById('dateTo').value = '';
+  const shippingFilter = document.getElementById('shippingFilter');
+  if (shippingFilter) {
+    shippingFilter.value = '';
+  }
   const showDeletedFilter = document.getElementById('showDeletedFilter');
   if (showDeletedFilter) {
     showDeletedFilter.checked = false;
@@ -1053,6 +1069,13 @@ document.getElementById('showDeletedFilter').addEventListener('change', () => {
     currentPage = 1;
     fetchAndRenderOrders();
 });
+
+if (document.getElementById('shippingFilter')) {
+    document.getElementById('shippingFilter').addEventListener('change', () => {
+        currentPage = 1;
+        fetchAndRenderOrders();
+    });
+}
 
 // Event listener for "Nuevo Pedido" button
 document.getElementById('newOrderBtn').addEventListener('click', openOrderModal);
@@ -1091,10 +1114,12 @@ function setupAdvancedFilters() {
     // Attach listener to advanced filters to update badge
     const dateFrom = document.getElementById("dateFrom");
     const dateTo = document.getElementById("dateTo");
+    const shippingFilter = document.getElementById("shippingFilter");
     const showDeletedFilter = document.getElementById("showDeletedFilter");
 
     if(dateFrom) dateFrom.addEventListener('change', updateActiveFiltersCount);
     if(dateTo) dateTo.addEventListener('change', updateActiveFiltersCount);
+    if(shippingFilter) shippingFilter.addEventListener('change', updateActiveFiltersCount);
     if(showDeletedFilter) showDeletedFilter.addEventListener('change', updateActiveFiltersCount);
 }
 
@@ -1106,10 +1131,12 @@ function updateActiveFiltersCount() {
     // Only count filters in the advanced section
     const dateFrom = document.getElementById("dateFrom");
     const dateTo = document.getElementById("dateTo");
+    const shippingFilter = document.getElementById("shippingFilter");
     const showDeletedFilter = document.getElementById("showDeletedFilter");
 
     if (dateFrom && dateFrom.value !== "") activeFilters++;
     if (dateTo && dateTo.value !== "") activeFilters++;
+    if (shippingFilter && shippingFilter.value !== "") activeFilters++;
     if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
 
     if (activeFilters > 0) {

@@ -104,6 +104,15 @@
                             <label class="text-muted">Hasta</label>
                             <input type="date" class="form-control form-control-buzz" id="dateTo">
                         </div>
+                        <div class="filter-group filter-select">
+                            <label class="text-muted">Estado de envío</label>
+                            <select class="form-control form-control-buzz" id="shippingFilter">
+                                <option value="">Todos</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="enviado">Enviado</option>
+                                <option value="recibido">Recibido</option>
+                            </select>
+                        </div>
                         <div class="filter-group filter-check d-flex align-items-center mb-0 mt-3 mt-md-0">
                             <div class="form-check form-switch custom-switch-buzz">
                                 <input class="form-check-input" type="checkbox" id="showDeletedFilter">

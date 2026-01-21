@@ -29,7 +29,7 @@
                 <span class="text-muted ms-2 font-mono">/ ENTRADA DE INVENTARIO</span>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-outline-buzz" onclick="verHistorial()">
+                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()">
                     <i class="fas fa-history"></i> Historial
                 </button>
                 <button class="btn btn-buzz" onclick="nuevoCargo()">
