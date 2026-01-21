@@ -9,6 +9,36 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Generate CSRF token if not exists
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+/**
+ * Get CSRF token for forms
+ * @return string CSRF token
+ */
+function getCsrfToken(): string {
+    return $_SESSION['csrf_token'] ?? '';
+}
+
+/**
+ * Validate CSRF token
+ * @param string $token Token from form/request
+ * @return bool Whether token is valid
+ */
+function validateCsrfToken(string $token): bool {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Get CSRF input field HTML
+ * @return string Hidden input HTML
+ */
+function csrfField(): string {
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(getCsrfToken()) . '">';
+}
+
 // List of API scripts that should return JSON on auth/access failure
 $api_scripts = [
     'api_sales_chart.php',
@@ -128,7 +158,8 @@ $fallback_pages = [
         'cargos_existencias.php', 'almacenes.php',
         'proveedores.php', 'todo.php', 'notas_actions.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
-        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
+        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php',
+        'api_2fa.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',

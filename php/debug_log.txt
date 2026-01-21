@@ -1,0 +1,4 @@
+Request: GET Params: []
+Request: GET Params: {"action":"get_sessions"}
+Request: GET Params: []
+Request: GET Params: {"action":"get_sessions"}
