@@ -5,6 +5,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/styles.css?v=3">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
 </head>
@@ -184,20 +185,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div id="logsPagination" class="d-flex justify-content-between align-items-center mt-3" style="display: none !important;">
-                    <div>
-                        <span id="logsInfoText" class="text-muted"></span>
-                    </div>
-                    <div class="d-flex gap-2 align-items-center">
-                        <button class="btn btn-outline-buzz btn-sm" id="logsPrevPage">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <span id="logsCurrentPage" class="text-muted"></span>
-                        <button class="btn btn-outline-buzz btn-sm" id="logsNextPage">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
+                <!-- Unified Pagination -->
+                <div id="logsPagination" class="buzz-pagination"></div>
             </div>
         </div>
 
@@ -294,13 +283,15 @@
         <div class="tab-content" id="settingsTab" style="display: none;">
             <div class="row">
                 <!-- Company Information Form -->
-                <div class="col-lg-7">
+                <div class="col-12 col-lg-7 mb-4 mb-lg-0">
                     <div class="buzz-card h-100">
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <h5 class="font-primary text-primary mb-0">DATOS DE LA EMPRESA</h5>
                             <i class="fas fa-building text-primary"></i>
                         </div>
                         <form id="companyInfoForm">
+                            <?= csrfField() ?>
+
                             <div class="row g-3">
                                 <div class="col-md-4">
                                     <label class="form-label text-muted small">Tipo RIF</label>
@@ -351,7 +342,7 @@
                 </div>
 
                 <!-- Logo and Security Placeholder -->
-                <div class="col-lg-5">
+                <div class="col-12 col-lg-5">
                     <!-- Logo Management -->
                     <div class="buzz-card mb-4">
                         <h6 class="font-primary text-primary mb-3">LOGO DE LA EMPRESA (SVG)</h6>
@@ -380,20 +371,120 @@
                         </div>
                     </div>
 
-                    <!-- Security (Visual only for now as in JS) -->
+                    <!-- Security Settings - Functional -->
                     <div class="buzz-card">
-                        <h6 class="font-primary text-primary mb-3">SEGURIDAD</h6>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="twoFactor">
-                            <label class="form-check-label text-muted small" for="twoFactor">Autenticación de 2 Factores</label>
+                        <h6 class="font-primary text-primary mb-3">
+                            <i class="fas fa-shield-alt"></i> SEGURIDAD DE CUENTA
+                        </h6>
+
+                        <!-- 2FA Section -->
+                        <div class="security-item mb-4 pb-3 border-bottom border-secondary">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <h6 class="mb-1 text-light">Autenticación de 2 Factores (2FA)</h6>
+                                    <small class="text-muted">Añade una capa extra de seguridad usando Google Authenticator</small>
+                                </div>
+                                <span id="twoFactorStatus" class="badge bg-secondary">Cargando...</span>
+                            </div>
+
+                            <!-- 2FA Disabled - Show button to start setup -->
+                            <div id="twoFactorDisabledArea" style="display: none;">
+                                <p class="small text-muted mb-3">
+                                    <i class="fas fa-info-circle"></i> La verificación de dos pasos no está activada.
+                                    Al activarla, necesitarás un código de tu app autenticadora además de tu contraseña.
+                                </p>
+                                <button class="btn btn-outline-buzz" id="start2FASetupBtn" type="button">
+                                    <i class="fas fa-qrcode me-2"></i>Configurar Autenticador
+                                </button>
+                            </div>
+
+                            <!-- 2FA Setup Area (shown only when configuring) -->
+                            <div id="twoFactorSetupArea" style="display: none;">
+                                <div class="alert alert-info py-2 mb-3">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <strong>Paso 1:</strong> Abre Google Authenticator en tu teléfono
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 text-center mb-3">
+                                        <p class="small text-muted mb-2"><strong>Paso 2:</strong> Escanea este código QR</p>
+                                        <div id="twoFactorQR" class="bg-white p-3 rounded d-inline-block mb-2" style="min-height: 180px;">
+                                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                                        </div>
+                                        <p class="small text-muted">
+                                            ¿No puedes escanear? <a href="#" id="showManualCode" class="text-primary">Ver código manual</a>
+                                        </p>
+                                        <code id="twoFactorSecretCode" class="d-none bg-dark p-2 rounded text-break small"></code>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="small text-muted mb-2"><strong>Paso 3:</strong> Ingresa el código de 6 dígitos</p>
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center"
+                                                   maxlength="6" pattern="[0-9]{6}" placeholder="000000" style="font-size: 1.3rem; letter-spacing: 0.3rem;">
+                                        </div>
+                                        <button class="btn btn-success w-100 mb-2" id="enable2FABtn" type="button">
+                                            <i class="fas fa-check me-2"></i>Verificar y Activar
+                                        </button>
+                                        <button class="btn btn-outline-secondary w-100" id="cancel2FASetupBtn" type="button">
+                                            <i class="fas fa-times me-2"></i>Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 2FA Enabled Area -->
+                            <div id="twoFactorEnabledArea" style="display: none;">
+                                <div class="d-flex align-items-center gap-3 mb-3">
+                                    <div class="text-success">
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                    </div>
+                                    <div>
+                                        <p class="mb-0 text-light">La verificación de dos pasos está <strong class="text-success">activada</strong></p>
+                                        <small class="text-muted">Tu cuenta está protegida con Google Authenticator</small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-danger btn-sm" id="disable2FABtn">
+                                    <i class="fas fa-times me-2"></i>Desactivar 2FA
+                                </button>
+                            </div>
                         </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" id="sessionTimeout" checked>
-                            <label class="form-check-label text-muted small" for="sessionTimeout">Timeout de sesión automático</label>
+
+                        <!-- Session Timeout -->
+                        <div class="security-item mb-4 pb-3 border-bottom border-secondary">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 text-light">Timeout de Sesión</h6>
+                                    <small class="text-muted">Cierre automático por inactividad</small>
+                                </div>
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="sessionTimeout" checked>
+                                </div>
+                            </div>
+                            <div id="sessionTimeoutConfig" class="mt-3">
+                                <label class="small text-muted">Minutos de inactividad:</label>
+                                <select class="form-select form-control-buzz form-select-sm w-auto" id="sessionTimeoutMinutes">
+                                    <option value="15">15 minutos</option>
+                                    <option value="30" selected>30 minutos</option>
+                                    <option value="60">1 hora</option>
+                                    <option value="120">2 horas</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="loginLogs" checked>
-                            <label class="form-check-label text-muted small" for="loginLogs">Logs de inicio de sesión</label>
+
+                        <!-- Login Logs Info -->
+                        <div class="security-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1 text-light">Logs de Inicio de Sesión</h6>
+                                    <small class="text-muted">Registro de accesos al sistema</small>
+                                </div>
+                                <span class="badge bg-success"><i class="fas fa-check"></i> Siempre activo</span>
+                            </div>
+                            <p class="small text-muted mt-2 mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                Los logs de sesión se registran automáticamente por seguridad.
+                                Puedes verlos en la pestaña "Logs de Sesión".
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -541,6 +632,8 @@
                 <button class="close-buzz" onclick="closeUserModal()" aria-label="Cerrar">&times;</button>
             </div>
             <form id="userForm">
+                <?= csrfField() ?>
+
                 <div class="modal-body-buzz">
                     <!-- Basic Information Section -->
                     <div class="modal-section">

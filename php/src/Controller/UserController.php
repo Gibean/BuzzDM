@@ -26,6 +26,14 @@ class UserController {
         if (is_null($input) && $method === 'POST' && !empty($_POST)) $input = $_POST;
         $input = $input ?? [];
 
+        // CSRF Validation for state-changing methods
+        if ($method !== 'GET') {
+            $token = $input['csrf_token'] ?? '';
+            if (!validateCsrfToken($token)) {
+                $this->jsonResponse(false, null, 'Error de seguridad: Token CSRF inválido o ausente.');
+            }
+        }
+
         try {
             switch ($method) {
                 case 'GET':
@@ -65,7 +73,10 @@ class UserController {
     )]
     private function getAllUsers() {
         $users = $this->service->getAllUsers();
-        $this->jsonResponse(true, $users);
+        // Return with 'users' key as expected by frontend
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true, 'users' => $users]);
+        exit;
     }
 
     private function getUser($id) {

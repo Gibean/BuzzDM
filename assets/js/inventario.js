@@ -157,55 +157,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updatePaginationInfo() {
-    const start = (currentPage - 1) * productsPerPage + 1
-    const end = Math.min(currentPage * productsPerPage, totalProducts)
-    showingFromSpan.textContent = totalProducts === 0 ? 0 : start
-    showingToSpan.textContent = end
-    totalProductsSpan.textContent = totalProducts
+    const totalPages = Math.ceil(totalProducts / productsPerPage)
+
+    renderPaginationControls({
+      containerId: 'productsPagination',
+      currentPage: currentPage,
+      totalPages: totalPages,
+      totalItems: totalProducts,
+      itemsPerPage: productsPerPage,
+      onPageChange: (page) => {
+        currentPage = page
+        fetchProducts()
+      }
+    })
   }
 
   function renderPagination() {
-    paginationContainer.innerHTML = ""
-    const totalPages = Math.ceil(totalProducts / productsPerPage)
-
-    if (totalPages <= 1) return
-
-    const createPageItem = (
-      content,
-      page,
-      isDisabled = false,
-      isActive = false
-    ) => {
-      const li = document.createElement("li")
-      li.className = `page-item ${isDisabled ? "disabled" : ""} ${
-        isActive ? "active" : ""
-      }`
-      const a = document.createElement("a")
-      a.className = "page-link"
-      a.href = "#"
-      a.innerHTML = content
-      a.addEventListener("click", (e) => {
-        e.preventDefault()
-        if (!isDisabled) {
-          currentPage = page
-          fetchProducts()
-        }
-      })
-      li.appendChild(a)
-      return li
-    }
-
-    paginationContainer.appendChild(
-      createPageItem("&laquo;", currentPage - 1, currentPage === 1)
-    )
-    for (let i = 1; i <= totalPages; i++) {
-      paginationContainer.appendChild(
-        createPageItem(i, i, false, i === currentPage)
-      )
-    }
-    paginationContainer.appendChild(
-      createPageItem("&raquo;", currentPage + 1, currentPage === totalPages)
-    )
+    // Now handled by updatePaginationInfo
   }
 
   window.openProductModal = function (product = null) {
