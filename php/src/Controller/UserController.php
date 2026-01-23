@@ -13,8 +13,6 @@ class UserController {
     }
 
     public function handleRequest() {
-        file_put_contents(__DIR__ . '/../../debug_log.txt', "Request: " . $_SERVER['REQUEST_METHOD'] . " Params: " . json_encode($_GET) . "\n", FILE_APPEND);
-
         // Basic Admin Auth
         if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'admin') {
             $this->jsonResponse(false, null, 'Acceso denegado');
