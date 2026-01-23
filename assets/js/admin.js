@@ -12,7 +12,8 @@
   })
 
   function initAdmin() {
-    switchTab("users")
+    const savedTab = localStorage.getItem('adminActiveTab') || "users"
+    switchTab(savedTab)
     setupAdvancedFilters()
   }
 
@@ -348,6 +349,9 @@ function updateActiveFiltersCount() {
   }
 
   function switchTab(tabName) {
+    // Save to localStorage
+    localStorage.setItem('adminActiveTab', tabName)
+
     // Update active tab
     document.querySelectorAll("[data-tab]").forEach((tab) => {
       tab.classList.remove("active", "text-primary")
@@ -392,6 +396,10 @@ function updateActiveFiltersCount() {
         break
       case "settings":
         loadCompanyInfo()
+        // Initialize security settings (2FA, session timeout)
+        if (typeof window.initSecuritySettings === 'function') {
+          window.initSecuritySettings()
+        }
         break
     }
   }
@@ -529,38 +537,23 @@ function updateActiveFiltersCount() {
   }
 
   function updatePaginationControls(pagination) {
-      const paginationContainer = document.getElementById('logsPagination')
-      const infoText = document.getElementById('logsInfoText')
-      const prevBtn = document.getElementById('logsPrevPage')
-      const nextBtn = document.getElementById('logsNextPage')
-      const currentPageSpan = document.getElementById('logsCurrentPage')
-
-      if (!paginationContainer || !pagination) return
-
-      // Check if all required elements exist
-      if (!infoText || !prevBtn || !nextBtn || !currentPageSpan) {
-          console.warn('Pagination elements not found')
+      if (!pagination || pagination.total_records <= 0) {
+          const container = document.getElementById('logsPagination')
+          if (container) container.style.display = 'none'
           return
       }
 
-      if (pagination.total_records > 0) {
-          paginationContainer.style.display = 'flex'
-          paginationContainer.style.setProperty('display', 'flex', 'important')
+      currentLogPage = pagination.current_page
 
-          const start = (pagination.current_page - 1) * pagination.per_page + 1
-          const end = Math.min(pagination.current_page * pagination.per_page, pagination.total_records)
-
-          infoText.textContent = `Mostrando ${start}-${end} de ${pagination.total_records} registros`
-          currentPageSpan.textContent = `Página ${pagination.current_page}`
-
-          prevBtn.disabled = !pagination.has_prev
-          nextBtn.disabled = !pagination.has_next
-
-          currentLogPage = pagination.current_page
-      } else {
-          paginationContainer.style.display = 'none'
-          return // Added return statement here
-      }
+      // Use the new unified pagination helper
+      renderPaginationControls({
+          containerId: 'logsPagination',
+          currentPage: pagination.current_page,
+          totalPages: pagination.total_pages,
+          totalItems: pagination.total_records,
+          itemsPerPage: pagination.per_page,
+          onPageChange: (page) => loadLogs(page)
+      })
   }
 
   // Alias for backward compatibility or if I missed any renderPagination calls
@@ -791,7 +784,10 @@ function updateActiveFiltersCount() {
         const data = await fetchJSON('php/api_backups.php?action=toggle', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled: enabled })
+          body: JSON.stringify({
+            enabled: enabled,
+            csrf_token: document.querySelector('[name="csrf_token"]')?.value
+          })
         })
 
         if (data.success) {
@@ -832,7 +828,9 @@ function updateActiveFiltersCount() {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+            csrf_token: document.querySelector('[name="csrf_token"]')?.value
+        })
       })
 
       if (data.success) {
@@ -877,7 +875,10 @@ function updateActiveFiltersCount() {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ id: backupId })
+            body: JSON.stringify({
+                id: backupId,
+                csrf_token: document.querySelector('[name="csrf_token"]')?.value
+            })
           })
 
           if (data.success) {
@@ -911,7 +912,10 @@ function updateActiveFiltersCount() {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ id: backupId })
+            body: JSON.stringify({
+                id: backupId,
+                csrf_token: document.querySelector('[name="csrf_token"]')?.value
+            })
           })
 
           if (data.success) {
@@ -1012,7 +1016,8 @@ function updateActiveFiltersCount() {
       nombre: document.getElementById("userName").value,
       email: document.getElementById("userEmail").value,
       rol: document.getElementById("userRole").value,
-      estado: document.getElementById("userStatus").value
+      estado: document.getElementById("userStatus").value,
+      csrf_token: document.querySelector('#userForm [name="csrf_token"]')?.value
     }
 
     const password = document.getElementById("userPassword").value
@@ -1309,6 +1314,320 @@ function updateActiveFiltersCount() {
     if (uploadLogoBtn) uploadLogoBtn.disabled = true
   }
 
+  // =========================================
+  // Two-Factor Authentication (2FA)
+  // =========================================
+
+  async function load2FAStatus() {
+    try {
+      const response = await fetch('php/api_2fa.php')
+      const data = await response.json()
+
+      const statusBadge = document.getElementById('twoFactorStatus')
+      const disabledArea = document.getElementById('twoFactorDisabledArea')
+      const setupArea = document.getElementById('twoFactorSetupArea')
+      const enabledArea = document.getElementById('twoFactorEnabledArea')
+
+      if (!statusBadge) return
+
+      // Hide all areas first
+      if (disabledArea) disabledArea.style.display = 'none'
+      if (setupArea) setupArea.style.display = 'none'
+      if (enabledArea) enabledArea.style.display = 'none'
+
+      if (data.data && data.data.is_enabled) {
+        statusBadge.className = 'badge bg-success'
+        statusBadge.textContent = 'Activado'
+        if (enabledArea) enabledArea.style.display = 'block'
+      } else {
+        statusBadge.className = 'badge bg-warning text-dark'
+        statusBadge.textContent = 'Desactivado'
+        // Show the disabled area with the "Configure" button
+        if (disabledArea) disabledArea.style.display = 'block'
+
+        // Cache the 2FA setup data for when user clicks to configure
+        if (data.data && data.data.qr_svg) {
+          window._2faSetupData = {
+            qr_svg: data.data.qr_svg,
+            secret: data.data.secret
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading 2FA status:', error)
+      const statusBadge = document.getElementById('twoFactorStatus')
+      if (statusBadge) {
+        statusBadge.className = 'badge bg-danger'
+        statusBadge.textContent = 'Error'
+      }
+    }
+  }
+
+  function start2FASetup() {
+    const disabledArea = document.getElementById('twoFactorDisabledArea')
+    const setupArea = document.getElementById('twoFactorSetupArea')
+    const qrContainer = document.getElementById('twoFactorQR')
+    const secretCode = document.getElementById('twoFactorSecretCode')
+
+    if (disabledArea) disabledArea.style.display = 'none'
+    if (setupArea) setupArea.style.display = 'block'
+
+    // Display the cached QR code
+    if (window._2faSetupData) {
+      if (qrContainer) {
+        qrContainer.innerHTML = atob(window._2faSetupData.qr_svg)
+      }
+      if (secretCode) {
+        secretCode.textContent = window._2faSetupData.secret
+      }
+    }
+
+    // Clear the verification input
+    const verifyInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyInput) verifyInput.value = ''
+  }
+
+  function cancel2FASetup() {
+    const disabledArea = document.getElementById('twoFactorDisabledArea')
+    const setupArea = document.getElementById('twoFactorSetupArea')
+
+    if (setupArea) setupArea.style.display = 'none'
+    if (disabledArea) disabledArea.style.display = 'block'
+
+    // Clear the verification input
+    const verifyInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyInput) verifyInput.value = ''
+  }
+
+  function showManualCode(e) {
+    e.preventDefault()
+    const secretCode = document.getElementById('twoFactorSecretCode')
+    if (secretCode) {
+      secretCode.classList.toggle('d-none')
+    }
+  }
+
+  async function enable2FA() {
+    const code = document.getElementById('twoFactorVerifyCode')?.value || ''
+
+    if (!code || code.length !== 6) {
+      showToast('Ingresa un código de 6 dígitos', 'warning')
+      return
+    }
+
+    try {
+      const response = await fetch('php/api_2fa.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'enable', code })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.message || '2FA activado exitosamente', 'success')
+        load2FAStatus()
+      } else {
+        showToast(data.message || 'Error al activar 2FA', 'error')
+      }
+    } catch (error) {
+      console.error('Error enabling 2FA:', error)
+      showToast('Error de conexión', 'error')
+    }
+  }
+
+  async function disable2FA() {
+    const password = prompt('Ingresa tu contraseña para desactivar 2FA:')
+
+    if (!password) return
+
+    try {
+      const response = await fetch('php/api_2fa.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'disable', password })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.message || '2FA desactivado', 'success')
+        load2FAStatus()
+      } else {
+        showToast(data.message || 'Error al desactivar 2FA', 'error')
+      }
+    } catch (error) {
+      console.error('Error disabling 2FA:', error)
+      showToast('Error de conexión', 'error')
+    }
+  }
+
+  // =========================================
+  // Session Timeout
+  // =========================================
+
+  let sessionTimeoutId = null
+  let sessionWarningId = null
+  const SESSION_WARNING_BEFORE = 60000 // 1 minute warning before logout
+
+  function initSessionTimeout() {
+    const toggle = document.getElementById('sessionTimeout')
+    const minutesSelect = document.getElementById('sessionTimeoutMinutes')
+
+    // Load saved settings
+    const savedEnabled = localStorage.getItem('sessionTimeoutEnabled') !== 'false'
+    const savedMinutes = localStorage.getItem('sessionTimeoutMinutes') || '30'
+
+    if (toggle) toggle.checked = savedEnabled
+    if (minutesSelect) minutesSelect.value = savedMinutes
+
+    if (savedEnabled) {
+      startSessionTimeout(parseInt(savedMinutes))
+    }
+
+    // Event listeners
+    if (toggle) {
+      toggle.addEventListener('change', function() {
+        localStorage.setItem('sessionTimeoutEnabled', this.checked)
+        if (this.checked) {
+          startSessionTimeout(parseInt(minutesSelect?.value || 30))
+        } else {
+          clearSessionTimeout()
+        }
+      })
+    }
+
+    if (minutesSelect) {
+      minutesSelect.addEventListener('change', function() {
+        localStorage.setItem('sessionTimeoutMinutes', this.value)
+        if (toggle?.checked) {
+          startSessionTimeout(parseInt(this.value))
+        }
+      })
+    }
+
+    // Reset timeout on user activity
+    document.addEventListener('click', resetSessionTimeout)
+    document.addEventListener('keypress', resetSessionTimeout)
+    document.addEventListener('scroll', resetSessionTimeout)
+  }
+
+  function startSessionTimeout(minutes) {
+    clearSessionTimeout()
+
+    const timeoutMs = minutes * 60 * 1000
+
+    // Warning before logout
+    sessionWarningId = setTimeout(() => {
+      showSessionWarning()
+    }, timeoutMs - SESSION_WARNING_BEFORE)
+
+    // Actual logout
+    sessionTimeoutId = setTimeout(() => {
+      sessionLogout()
+    }, timeoutMs)
+  }
+
+  function clearSessionTimeout() {
+    if (sessionTimeoutId) clearTimeout(sessionTimeoutId)
+    if (sessionWarningId) clearTimeout(sessionWarningId)
+  }
+
+  function resetSessionTimeout() {
+    const toggle = document.getElementById('sessionTimeout')
+    const minutesSelect = document.getElementById('sessionTimeoutMinutes')
+
+    if (toggle?.checked) {
+      startSessionTimeout(parseInt(minutesSelect?.value || 30))
+    }
+  }
+
+  function showSessionWarning() {
+    // Create warning modal if not exists
+    let warningModal = document.getElementById('sessionWarningModal')
+    if (!warningModal) {
+      warningModal = document.createElement('div')
+      warningModal.id = 'sessionWarningModal'
+      warningModal.className = 'modal-buzz-overlay'
+      warningModal.style.cssText = 'display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;justify-content:center;align-items:center;'
+      warningModal.innerHTML = `
+        <div class="modal-buzz" style="max-width:400px;padding:30px;text-align:center;">
+          <i class="fas fa-clock fa-3x text-warning mb-3"></i>
+          <h4 class="text-light">Sesión por expirar</h4>
+          <p class="text-muted mb-4">Tu sesión se cerrará en <strong id="sessionCountdown">60</strong> segundos por inactividad.</p>
+          <button class="btn btn-buzz" onclick="window.continueSession()">
+            <i class="fas fa-check"></i> Continuar trabajando
+          </button>
+        </div>
+      `
+      document.body.appendChild(warningModal)
+    }
+
+    warningModal.style.display = 'flex'
+
+    // Countdown
+    let seconds = 60
+    const countdownEl = document.getElementById('sessionCountdown')
+    const countdownInterval = setInterval(() => {
+      seconds--
+      if (countdownEl) countdownEl.textContent = seconds
+      if (seconds <= 0) {
+        clearInterval(countdownInterval)
+      }
+    }, 1000)
+
+    warningModal.dataset.countdownInterval = countdownInterval
+  }
+
+  window.continueSession = function() {
+    const warningModal = document.getElementById('sessionWarningModal')
+    if (warningModal) {
+      warningModal.style.display = 'none'
+      if (warningModal.dataset.countdownInterval) {
+        clearInterval(parseInt(warningModal.dataset.countdownInterval))
+      }
+    }
+    resetSessionTimeout()
+    showToast('Sesión extendida', 'success')
+  }
+
+  function sessionLogout() {
+    showToast('Sesión cerrada por inactividad', 'warning')
+    setTimeout(() => {
+      window.location.href = 'logout.php'
+    }, 1500)
+  }
+
+  // Initialize 2FA and session timeout - call this when settings tab loads
+  function initSecuritySettings() {
+    load2FAStatus()
+    initSessionTimeout()
+
+    // 2FA buttons
+    const start2FASetupBtn = document.getElementById('start2FASetupBtn')
+    const cancel2FASetupBtn = document.getElementById('cancel2FASetupBtn')
+    const showManualCodeLink = document.getElementById('showManualCode')
+    const enable2FABtn = document.getElementById('enable2FABtn')
+    const disable2FABtn = document.getElementById('disable2FABtn')
+
+    if (start2FASetupBtn) {
+      start2FASetupBtn.addEventListener('click', start2FASetup)
+    }
+    if (cancel2FASetupBtn) {
+      cancel2FASetupBtn.addEventListener('click', cancel2FASetup)
+    }
+    if (showManualCodeLink) {
+      showManualCodeLink.addEventListener('click', showManualCode)
+    }
+    if (enable2FABtn) {
+      enable2FABtn.addEventListener('click', enable2FA)
+    }
+    if (disable2FABtn) {
+      disable2FABtn.addEventListener('click', disable2FA)
+    }
+  }
+
+  // Expose initSecuritySettings globally for switchTab to call
+  window.initSecuritySettings = initSecuritySettings
+
   // Make functions globally accessible for inline event handlers
   window.editUser = editUser
   window.deleteUser = deleteUser
@@ -1321,4 +1640,9 @@ function updateActiveFiltersCount() {
   window.clearLogsFilters = clearLogsFilters
   window.openUserModal = openUserModal
   window.closeUserModal = closeUserModal
+  window.enable2FA = enable2FA
+  window.disable2FA = disable2FA
+  window.start2FASetup = start2FASetup
+  window.cancel2FASetup = cancel2FASetup
 })()
+

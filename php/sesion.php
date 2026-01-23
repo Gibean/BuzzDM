@@ -61,7 +61,8 @@ $api_scripts = [
     'api_kits.php', // Standardized API - Kit Components
     // Notificaciones y estadísticas
     'api_notifications.php',
-    'api_stats.php'
+    'api_stats.php',
+    'api_2fa.php' // Two-Factor Authentication
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -195,7 +196,8 @@ $always_allowed_apis = [
     'api_notifications.php',
     'api_stats.php',
     'search_api.php',
-    'sidebar.php'
+    'sidebar.php',
+    'api_2fa.php' // 2FA is available for all authenticated users
 ];
 
 // Merge always-allowed APIs into current user's permissions

@@ -26,6 +26,14 @@ class BackupController {
              $input = json_decode($raw, true) ?? [];
         }
 
+        // CSRF Validation for state-changing methods
+        if ($method === 'POST' || $method === 'DELETE') {
+            $token = $input['csrf_token'] ?? '';
+            if (!validateCsrfToken($token)) {
+                $this->jsonResponse(false, null, 'Error de seguridad: Token CSRF inválido o ausente.');
+            }
+        }
+
         try {
             switch ($method) {
                 case 'GET':
