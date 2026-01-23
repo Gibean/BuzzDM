@@ -28,6 +28,14 @@ class SettingsController {
                  $input = $_POST;
             }
 
+            // CSRF Validation for write operations
+            if ($action === 'update_company_info' || $action === 'upload_logo') {
+                $token = $input['csrf_token'] ?? '';
+                if (!validateCsrfToken($token)) {
+                    $this->jsonResponse(false, null, 'Error de seguridad: Token CSRF inválido o ausente.');
+                }
+            }
+
             switch ($action) {
                 case 'get_company_info':
                     $this->getCompanyInfo();

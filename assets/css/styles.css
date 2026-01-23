@@ -204,7 +204,7 @@ body {
   margin-left: 280px;
   min-height: 100vh;
   padding: 2rem;
-  padding-bottom: 4rem; /* Space for footer */
+  padding-bottom: 80px; /* Increased space for fixed footer */
   position: relative;
   /* Tactical grid background */
   background-image:
@@ -488,7 +488,7 @@ body {
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: 5rem;
+    padding-bottom: 100px; /* Extra space for stacked footer on mobile */
   }
 }
 
@@ -1183,6 +1183,63 @@ input:-webkit-autofill:active {
   display: flex;
   align-items: center;
 }
+
+/* ============================================
+   UNIFIED PAGINATION WRAPPER
+   ============================================ */
+
+.buzz-pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--buzz-border-color);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.buzz-pagination .pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.buzz-pagination .pagination-current {
+  color: var(--buzz-text-color);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.buzz-pagination .pagination-prev,
+.buzz-pagination .pagination-next {
+  padding: 0.4rem 0.65rem;
+  min-width: 36px;
+}
+
+.buzz-pagination .pagination-prev:disabled,
+.buzz-pagination .pagination-next:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+  .buzz-pagination {
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .buzz-pagination .pagination-info {
+    font-size: 0.8rem;
+  }
+
+  .buzz-pagination .pagination-current {
+    font-size: 0.85rem;
+  }
+}
+
 
 /* ============================================
    ACTION BUTTONS FOR TABLES

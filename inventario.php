@@ -145,23 +145,8 @@
                 </table>
             </div>
 
-             <!-- Pagination -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted font-mono">
-                    Mostrando <span id="showingFrom">1</span>-<span id="showingTo">10</span> de <span id="totalProducts">0</span> productos
-                </div>
-                <nav>
-                    <ul class="pagination pagination-sm" id="pagination">
-                        <li class="page-item" id="prevPage">
-                            <a class="page-link" href="#" onclick="changePage(-1)">&laquo; Anterior</a>
-                        </li>
-                        <li class="page-item active"><span class="page-link" id="currentPage">1</span></li>
-                        <li class="page-item" id="nextPage">
-                            <a class="page-link" href="#" onclick="changePage(1)">Siguiente &raquo;</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+             <!-- Unified Pagination -->
+            <div id="productsPagination" class="buzz-pagination"></div>
         </div>
 
         <!-- System Footer -->

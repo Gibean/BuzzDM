@@ -449,3 +449,80 @@ document.addEventListener('DOMContentLoaded', () => {
         window.history.replaceState({path: newUrl}, '', newUrl);
     }
 });
+
+// ============================================
+// UNIFIED PAGINATION CONTROLS
+// ============================================
+
+/**
+ * Renders unified pagination controls with "Página X de Y" format
+ * @param {object} options - Pagination configuration
+ * @param {string} options.containerId - ID of container element
+ * @param {number} options.currentPage - Current page (1-indexed)
+ * @param {number} options.totalPages - Total number of pages
+ * @param {number} options.totalItems - Total number of items (optional, for info text)
+ * @param {number} options.itemsPerPage - Items per page (optional, for info text)
+ * @param {function} options.onPageChange - Callback when page changes, receives new page number
+ */
+function renderPaginationControls(options) {
+    const { containerId, currentPage, totalPages, totalItems, itemsPerPage, onPageChange } = options;
+
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Don't show pagination if only 1 page
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        container.style.display = 'none';
+        return;
+    }
+
+    container.style.display = 'flex';
+
+    // Calculate item range
+    let infoHtml = '';
+    if (totalItems && itemsPerPage) {
+        const start = (currentPage - 1) * itemsPerPage + 1;
+        const end = Math.min(currentPage * itemsPerPage, totalItems);
+        infoHtml = `
+            <span class="pagination-info text-muted small">
+                Mostrando <span class="fw-bold text-primary">${start}-${end}</span> de <span class="fw-bold">${totalItems}</span>
+            </span>
+        `;
+    }
+
+    container.innerHTML = `
+        ${infoHtml}
+        <div class="pagination-controls d-flex align-items-center gap-2">
+            <button class="btn btn-outline-buzz btn-sm pagination-prev" ${currentPage <= 1 ? 'disabled' : ''} title="Página anterior">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="pagination-current font-mono px-2">
+                Página <span class="text-primary fw-bold">${currentPage}</span> de <span class="fw-bold">${totalPages}</span>
+            </span>
+            <button class="btn btn-outline-buzz btn-sm pagination-next" ${currentPage >= totalPages ? 'disabled' : ''} title="Siguiente página">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+    `;
+
+    // Attach event listeners
+    const prevBtn = container.querySelector('.pagination-prev');
+    const nextBtn = container.querySelector('.pagination-next');
+
+    if (prevBtn && currentPage > 1) {
+        prevBtn.addEventListener('click', () => {
+            if (onPageChange) onPageChange(currentPage - 1);
+        });
+    }
+
+    if (nextBtn && currentPage < totalPages) {
+        nextBtn.addEventListener('click', () => {
+            if (onPageChange) onPageChange(currentPage + 1);
+        });
+    }
+}
+
+// Export for global use
+window.renderPaginationControls = renderPaginationControls;
+

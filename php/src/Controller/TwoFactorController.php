@@ -49,7 +49,11 @@ class TwoFactorController {
     )]
     private function getSetupData() {
         $userId = $_SESSION['usuario_id'];
-        $email = $_SESSION['usuario_email'] ?? '';
+
+        // Get user email from database (more reliable than session)
+        $userRepo = new UserRepository();
+        $user = $userRepo->findById($userId);
+        $email = $user['email'] ?? '';
 
         $isEnabled = $this->service->isEnabled($userId);
 
@@ -61,11 +65,11 @@ class TwoFactorController {
             ]);
         }
 
-        // Generate new secret for setup
+        // Generate new secret for setup (unique per user request)
         $secret = $this->service->generateSecret();
 
-        // Store temporarily in session for verification
-        $_SESSION['2fa_temp_secret'] = $secret;
+        // Store temporarily in session for verification (keyed by user ID)
+        $_SESSION['2fa_temp_secret_' . $userId] = $secret;
 
         // Generate QR code
         $qrSvg = $this->service->getQRCodeSvg($email, $secret);
@@ -117,7 +121,7 @@ class TwoFactorController {
 
     private function enableTwoFactor($input) {
         $userId = $_SESSION['usuario_id'];
-        $secret = $_SESSION['2fa_temp_secret'] ?? '';
+        $secret = $_SESSION['2fa_temp_secret_' . $userId] ?? '';
         $code = $input['code'] ?? '';
 
         if (empty($secret)) {
@@ -130,7 +134,7 @@ class TwoFactorController {
 
         if ($this->service->enable($userId, $secret, $code)) {
             // Clear temp secret
-            unset($_SESSION['2fa_temp_secret']);
+            unset($_SESSION['2fa_temp_secret_' . $userId]);
 
             $this->jsonResponse(true, [
                 'is_enabled' => true
