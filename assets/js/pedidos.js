@@ -52,7 +52,6 @@ async function fetchAndRenderOrders() {
     const data = await fetchJSON(url)
 
     renderOrders(data.orders)
-    updateStats(data.orders)
     // renderPagination(data.total); // Pagination not implemented yet
   } catch (error) {
     console.error("Error fetching orders:", error)
@@ -201,23 +200,7 @@ async function restoreOrder(orderId) {
     )
 }
 
-function updateStats(orders) {
-  const totalOrders = orders.length
-  const pendingOrders = orders.filter(
-    (o) => o.paymentStatus === "no-pagado"
-  ).length
-  const paidOrders = orders.filter((o) => o.paymentStatus === "pagado").length
-  const totalRevenue = orders.reduce(
-    (sum, order) => sum + parseFloat(order.total),
-    0
-  )
-
-  document.getElementById("totalOrders").textContent = totalOrders
-  document.getElementById("pendingOrders").textContent = pendingOrders
-  document.getElementById("paidOrders").textContent = paidOrders
-  document.getElementById("totalRevenue").textContent =
-    formatCurrency(totalRevenue)
-}
+// Stats cards removed - function deprecated
 
 async function toggleOrderProducts(button, orderId) {
   const productsDiv = document.getElementById(`orderProducts_${orderId}`)

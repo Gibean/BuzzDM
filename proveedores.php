@@ -102,7 +102,7 @@
                 <span class="text-muted ms-2 font-mono">/ PROVEEDORES</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="abrirModalProveedor()">
+                <button class="btn btn-buzz" id="btnNewProveedor" onclick="abrirModalProveedor()">
                     <i class="fas fa-plus"></i> Nuevo Proveedor
                 </button>
             </div>

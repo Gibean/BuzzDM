@@ -14,14 +14,15 @@
         /* About Page Specific Styles */
         .about-header {
             text-align: center;
-            padding: 2rem 1rem;
+            padding: 1rem 1rem;
             border-bottom: 1px solid var(--buzz-border-color);
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .about-header .sidebar-logo {
-            max-width: 180px;
-            margin-bottom: 0.5rem;
+            max-width: 250px;
+            margin: 0 auto 1rem auto;
+            display: block;
         }
 
         .about-header .tagline {
@@ -37,6 +38,8 @@
             border-radius: 8px;
             padding: 1rem;
             margin-bottom: 1.5rem;
+            display: flex;
+            gap: 10px;
         }
 
         .manual-btn {
@@ -44,7 +47,7 @@
             align-items: center;
             justify-content: center;
             gap: 10px;
-            width: 100%;
+            flex: 1;
             padding: 12px 20px;
             background: var(--buzz-primary-color);
             color: var(--buzz-dark-bg);
@@ -55,6 +58,31 @@
             font-size: 0.95rem;
             text-decoration: none;
             transition: background 0.2s ease;
+        }
+
+        .tutorial-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex: 1;
+            padding: 12px 20px;
+            background: rgba(0, 242, 255, 0.1);
+            color: var(--buzz-info-color);
+            border: 1px solid var(--buzz-info-color);
+            border-radius: 6px;
+            font-family: var(--font-monospace);
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tutorial-btn:hover {
+            background: rgba(0, 242, 255, 0.2);
+            box-shadow: 0 0 10px rgba(0, 242, 255, 0.3);
+            color: #fff;
         }
 
         .manual-btn:hover {
@@ -563,8 +591,11 @@
                 <div class="manual-btn-container">
                     <a href="manual.php" class="manual-btn">
                         <i class="fas fa-book"></i>
-                        Manual de Usuario
+                        Manual
                     </a>
+                    <button class="tutorial-btn" onclick="tutorialManager.start()">
+                        <i class="fas fa-play-circle"></i> Tutorial
+                    </button>
                 </div>
 
                 <!-- System Info -->
@@ -613,14 +644,15 @@
                         Este software es para fines educativos y está protegido por derechos de autor.
                         No se permite la distribución sin autorización.
                     </p>
-                    <p class="license-text mb-0">
-                        Todos los derechos reservados a <b>Gisvel Aray V-30535128</b>,
-                        Estudiante del PNFI T4F1, desarrolladora full stack bajo el seudónimo de "HareBit"
-                    </p>
+
                     <img src="assets/img/harebit.png" alt="HareBit Development Logo" class="developer-logo">
+                </div>
                 </div>
             </div>
         </div>
+
+        <!-- System Footer (Includes Tutorial Scripts) -->
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

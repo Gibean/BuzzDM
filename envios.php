@@ -29,33 +29,7 @@
             </div>
         </nav>
 
-        <!--  Stats Cards  -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="pendingShipments">0</span>
-                    <span class="stats-label">Pendientes</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="shippedOrders">0</span>
-                    <span class="stats-label">Enviados</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="deliveredOrders">0</span>
-                    <span class="stats-label">Entregados</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalShipments">0</span>
-                    <span class="stats-label">Total Envíos</span>
-                </div>
-            </div>
-        </div>
+        <!-- Stats Removed -->
 
             <!-- Filtros -->
             <div class="buzz-card mb-4 pb-3">
@@ -109,6 +83,9 @@
              Shipments will be populated by JavaScript
         </div>
     </main>
+
+    <!-- System Footer (Includes Tutorial Scripts) -->
+    <?php require_once 'php/system_footer.php'; ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>

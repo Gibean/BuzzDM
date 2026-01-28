@@ -163,7 +163,7 @@ try {
         <div class="row">
             <!-- Top Products -->
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card tech-effect tactical-card h-100">
+                <div class="buzz-card tech-effect tactical-card h-100" id="topProductsCard">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="font-primary text-primary mb-0 section-header">
                             <i class="fas fa-trophy me-2"></i>TOP 5 PRODUCTOS

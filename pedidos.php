@@ -35,33 +35,6 @@
             </div>
         </nav>
 
-        <!--  Stats Cards  -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalOrders">0</span>
-                    <span class="stats-label">Total Pedidos</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="pendingOrders">0</span>
-                    <span class="stats-label">Pendientes</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="paidOrders">0</span>
-                    <span class="stats-label">Pagados</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalRevenue">€0</span>
-                    <span class="stats-label">Ingresos Totales</span>
-                </div>
-            </div>
-        </div>
 
             <!-- Filtros -->
             <div class="buzz-card mb-4 pb-3">
