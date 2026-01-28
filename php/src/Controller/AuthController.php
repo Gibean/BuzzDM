@@ -51,6 +51,15 @@ class AuthController {
                     $this->jsonResponse(true, $result);
                     break;
 
+                case 'verify_2fa':
+                    $code = trim($_POST['code'] ?? '');
+                    if (empty($code)) {
+                        throw new Exception('El código de verificación es obligatorio.');
+                    }
+                    $result = $this->service->verify2FA($code);
+                    $this->jsonResponse(true, $result);
+                    break;
+
                 default:
                     $this->jsonResponse(false, null, 'Acción no válida');
             }
