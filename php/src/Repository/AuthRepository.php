@@ -127,4 +127,13 @@ class AuthRepository {
         $stmt = $this->pdo->query("SELECT id FROM usuarios WHERE rol = 'admin'");
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Cleanup expired sessions to prevent table bloat
+     * Removes sessions that expired more than 24 hours ago
+     */
+    public function cleanupExpiredSessions() {
+        $stmt = $this->pdo->prepare("DELETE FROM sesiones_api WHERE expiracion < DATE_SUB(NOW(), INTERVAL 24 HOUR)");
+        return $stmt->execute();
+    }
 }

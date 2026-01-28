@@ -417,7 +417,7 @@
 
             async function validateToken(token) {
                 try {
-                    const response = await fetch('php/validate_token.php', {
+                    const response = await fetch('php/api_auth.php?action=validate_token', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
