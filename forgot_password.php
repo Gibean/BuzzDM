@@ -150,7 +150,7 @@
             </form>
 
             <div class="back-to-login">
-                <a href="login.php">
+                <a href="login">
                     <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
                 </a>
             </div>
@@ -203,7 +203,7 @@
 
                         // Redirigir al login después de 5 segundos
                         setTimeout(() => {
-                            window.location.href = 'login.php';
+                            window.location.href = 'login';
                         }, 5000);
                     } else {
                         showAlert(data.message || 'Error al procesar la solicitud', 'error');

@@ -90,7 +90,7 @@ class AuthService {
         return [
             'success' => true,
             'message' => 'Inicio de sesión exitoso.',
-            'redirect' => 'dashboard.php',
+            'redirect' => 'dashboard',
             'user' => [
                 'id' => $user['id'],
                 'nombre' => $user['nombre'],
@@ -106,7 +106,7 @@ class AuthService {
             $admins = $this->repository->getAdminUsers();
             foreach ($admins as $admin) {
                 $msg = "Usuario $email bloqueado tras 10 intentos fallidos.";
-                createNotification($pdo, $admin['id'], 'security', 'Usuario Bloqueado', $msg, 'admin.php');
+                createNotification($pdo, $admin['id'], 'security', 'Usuario Bloqueado', $msg, 'admin');
             }
         } catch (Exception $e) {
             error_log("Error notifying admins: " . $e->getMessage());
@@ -152,7 +152,7 @@ class AuthService {
     }
 
     private function sendPasswordResetEmail($user, $token) {
-        $resetLink = getAppBaseUrl() . '/reset_password.php?token=' . $token;
+        $resetLink = getAppBaseUrl() . '/reset_password?token=' . $token;
         $mail = new PHPMailer(true);
         $config = getMailerConfig();
 
@@ -270,6 +270,6 @@ class AuthService {
      */
     public function logout() {
         session_destroy();
-        return ['success' => true, 'message' => 'Sesión cerrada.', 'redirect' => 'login.php'];
+        return ['success' => true, 'message' => 'Sesión cerrada.', 'redirect' => 'login'];
     }
 }

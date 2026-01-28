@@ -80,7 +80,7 @@ if (!isset($_SESSION['usuario_id'])) {
     if ($is_api_call) {
         json_auth_error('No autenticado. Por favor, inicia sesión.');
     } else {
-        header('Location: login.php');
+        header('Location: login');
         exit();
     }
 }
@@ -110,7 +110,7 @@ if (isset($_SESSION['usuario_id'])) {
         if ($is_api_call) {
             json_auth_error('Usuario no encontrado. Sesión inválida.');
         } else {
-            header('Location: login.php');
+            header('Location: login');
             exit();
         }
     }
@@ -213,10 +213,10 @@ if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_page
         json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
     } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
         // Fix relative path redirect issues
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard.php' : 'dashboard.php';
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard' : 'dashboard';
         header("Location: $redirectPath?error=access_denied&code=403");
     } else {
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login.php' : 'login.php';
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login' : 'login';
         header("Location: $redirectPath?error=auth_required&code=401");
     }
     exit();
@@ -227,7 +227,7 @@ if ($current_page === 'admin.php' && ($user_role === 'supervisor' || $user_role 
     if ($is_api_call) {
         json_auth_error('Acceso denegado a la administración.');
     } else {
-        header('Location: dashboard.php');
+        header('Location: dashboard');
         exit();
     }
 }
@@ -237,7 +237,7 @@ if (($current_page === 'inventario.php' || $current_page === 'importacion.php') 
     if ($is_api_call) {
         json_auth_error('Acceso denegado al inventario/importación.');
     } else {
-        header('Location: dashboard.php');
+        header('Location: dashboard');
         exit();
     }
 }

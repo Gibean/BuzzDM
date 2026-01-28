@@ -30,7 +30,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <!-- Dashboard - Siempre visible -->
             <li class="nav-item">
                 <a class="nav-link-enhanced <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>"
-                    href="dashboard.php">
+                    href="dashboard">
                     <i class="fas fa-home nav-icon-enhanced"></i>
                     <span class="nav-text-enhanced">Dashboard</span>
                 </a>
@@ -53,25 +53,25 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <ul class="nav-dropdown-menu">
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
-                           href="inventario.php">
+                           href="inventario">
                             <i class="fas fa-box"></i> Inventario
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'catalogos.php' ? 'active' : ''; ?>"
-                           href="catalogos.php">
+                           href="catalogos">
                             <i class="fas fa-list"></i> Catálogos
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'almacenes.php' ? 'active' : ''; ?>"
-                           href="almacenes.php">
+                           href="almacenes">
                             <i class="fas fa-warehouse"></i> Almacenes
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'proveedores.php' ? 'active' : ''; ?>"
-                           href="proveedores.php">
+                           href="proveedores">
                             <i class="fas fa-truck-loading"></i> Proveedores
                         </a>
                     </li>
@@ -96,27 +96,27 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>"
-                           href="clientes.php">
+                           href="clientes">
                             <i class="fas fa-users"></i> Clientes
                         </a>
                     </li>
                     <?php endif; ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>"
-                           href="pedidos.php">
+                           href="pedidos">
                             <i class="fas fa-shopping-cart"></i> Pedidos
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>"
-                           href="envios.php">
+                           href="envios">
                             <i class="fas fa-truck"></i> Envíos
                         </a>
                     </li>
                     <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
-                           href="cargos_existencias.php">
+                           href="cargos_existencias">
                             <i class="fas fa-dolly"></i> Cargar Existencias
                         </a>
                     </li>
@@ -140,14 +140,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                 <ul class="nav-dropdown-menu">
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>"
-                           href="todo.php">
+                           href="todo">
                             <i class="fas fa-tasks"></i> Notas
                         </a>
                     </li>
                     <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
-                           href="importacion.php">
+                           href="importacion">
                             <i class="fas fa-upload"></i> Importación
                         </a>
                     </li>
@@ -172,14 +172,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                     <?php if ($usuarioRol === 'admin'): ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'admin.php' ? 'active' : ''; ?>"
-                           href="admin.php">
+                           href="admin">
                             <i class="fas fa-users-cog"></i> Administración
                         </a>
                     </li>
                     <?php endif; ?>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>"
-                           href="about.php">
+                           href="about">
                             <i class="fas fa-info-circle"></i> Acerca de
                         </a>
                     </li>

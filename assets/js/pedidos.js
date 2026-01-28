@@ -264,28 +264,28 @@ async function toggleOrderProducts(button, orderId) {
 
 async function viewOrderDetail(orderId) {
   try {
-    const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`)
+    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`)
     const order = data.order
 
     if (order) {
       // Assuming a modal with ID 'orderDetailModal' and elements to display info
       document.getElementById("detailOrderId").textContent = order.id
       document.getElementById("detailOrderReference").textContent =
-        order.referencia
+        order.referencia || 'N/A'
       document.getElementById("detailOrderCustomer").textContent =
-        order.customer_name || "N/A"
+        order.customer_name || order.customer || "N/A"
       document.getElementById("detailOrderEmail").textContent =
-        order.customer_email || "N/A"
+        order.customer_email || order.email || "N/A"
       document.getElementById("detailOrderDate").textContent = formatDateTime(
-        order.fecha_creacion
+        order.fecha_creacion || order.date
       )
       document.getElementById("detailOrderTotal").textContent = formatCurrency(
         order.total
       )
       document.getElementById("detailOrderPaymentStatus").textContent =
-        order.estado_pago
+        order.estado_pago || order.paymentStatus
       document.getElementById("detailOrderShippingStatus").textContent =
-        order.estado_envio
+        order.estado_envio || order.shippingStatus || 'N/A'
       document.getElementById("detailOrderShippingAddress").textContent =
         order.direccion_envio || "N/A"
       document.getElementById("detailOrderShippingNotes").textContent =

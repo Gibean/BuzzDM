@@ -589,7 +589,7 @@
             <div class="col-lg-4">
                 <!-- Manual Button - Prominent -->
                 <div class="manual-btn-container">
-                    <a href="manual.php" class="manual-btn">
+                    <a href="manual" class="manual-btn">
                         <i class="fas fa-book"></i>
                         Manual
                     </a>
