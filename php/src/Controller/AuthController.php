@@ -40,6 +40,12 @@ class AuthController {
                     $this->jsonResponse(true, $result);
                     break;
 
+                case 'validate_token':
+                    $token = filter_input(INPUT_POST, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+                    $result = $this->service->validateResetToken($token);
+                    $this->jsonResponse(true, $result);
+                    break;
+
                 case 'logout':
                     $result = $this->service->logout();
                     $this->jsonResponse(true, $result);

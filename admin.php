@@ -26,36 +26,30 @@
             </div>
         </nav>
 
-         <!-- Admin Tabs  -->
-        <div class="buzz-card mb-4">
-            <ul class="nav nav-tabs border-0" id="adminTabs">
-                <li class="nav-item">
-                    <button class="nav-link active bg-transparent border-0 text-primary font-mono" data-tab="users">
-                        <i class="fas fa-users"></i> Usuarios
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="logs">
-                        <i class="fas fa-list-alt"></i> Logs de Sesión
-                    </button>
-                </li>
-
-                <li class="nav-item">
-                    <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="settings">
-                        <i class="fas fa-cog"></i> Configuración
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="reports">
-                        <i class="fas fa-file-alt"></i> Obtener Reportes de Sistema
-                    </button>
-                </li>
-                <li class="nav-item">
-                    <button class="nav-link bg-transparent border-0 text-muted font-mono" data-tab="backups">
-                        <i class="fas fa-database"></i> Backups
-                    </button>
-                </li>
-            </ul>
+         <!-- Admin Tabs - Material Design Style -->
+        <div class="admin-tabs-container">
+            <div class="admin-tabs" id="adminTabs" role="tablist">
+                <button class="admin-tab active" data-tab="users">
+                    <i class="fas fa-users"></i>
+                    <span>Usuarios</span>
+                </button>
+                <button class="admin-tab" data-tab="logs">
+                    <i class="fas fa-list-alt"></i>
+                    <span>Logs</span>
+                </button>
+                <button class="admin-tab" data-tab="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Config</span>
+                </button>
+                <button class="admin-tab" data-tab="reports">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Reportes</span>
+                </button>
+                <button class="admin-tab" data-tab="backups">
+                    <i class="fas fa-database"></i>
+                    <span>Backups</span>
+                </button>
+            </div>
         </div>
 
          <!-- Users Tab  -->

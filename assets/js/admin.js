@@ -349,21 +349,18 @@ function updateActiveFiltersCount() {
   }
 
   function switchTab(tabName) {
-    // Save to localStorage
-    localStorage.setItem('adminActiveTab', tabName)
+  // Save to localStorage
+  localStorage.setItem('adminActiveTab', tabName)
 
-    // Update active tab
-    document.querySelectorAll("[data-tab]").forEach((tab) => {
-      tab.classList.remove("active", "text-primary")
-      tab.classList.add("text-muted")
-    })
+  // Update active tab - only toggle 'active' class (CSS handles styling)
+  document.querySelectorAll("[data-tab]").forEach((tab) => {
+    tab.classList.remove("active")
+  })
 
-    const activeTab = document.querySelector(`[data-tab="${tabName}"]`)
-    if (activeTab) {
-      activeTab.classList.add("active", "text-primary")
-      activeTab.classList.remove("text-muted")
-    }
-
+  const activeTab = document.querySelector(`[data-tab="${tabName}"]`)
+  if (activeTab) {
+    activeTab.classList.add("active")
+  }
     // Hide all tab contents
     document.querySelectorAll(".tab-content").forEach((content) => {
       content.style.display = "none"
