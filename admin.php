@@ -394,52 +394,75 @@
 
                             <!-- 2FA Setup Area (shown only when configuring) -->
                             <div id="twoFactorSetupArea" style="display: none;">
-                                <div class="alert alert-info py-2 mb-3">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    <strong>Paso 1:</strong> Abre Google Authenticator en tu teléfono
-                                </div>
+                                <div class="bg-dark p-4 rounded border border-secondary mb-4">
+                                    <h5 class="mb-4 text-warning">Configuración de Verificación de Dos Pasos</h5>
 
-                                <div class="row">
-                                    <div class="col-md-6 text-center mb-3">
-                                        <p class="small text-muted mb-2"><strong>Paso 2:</strong> Escanea este código QR</p>
-                                        <div id="twoFactorQR" class="bg-white p-3 rounded d-inline-block mb-2" style="min-height: 180px;">
-                                            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
-                                        </div>
-                                        <p class="small text-muted">
-                                            ¿No puedes escanear? <a href="#" id="showManualCode" class="text-primary">Ver código manual</a>
+                                    <!-- Step 1 -->
+                                    <div class="mb-4">
+                                        <h6 class="text-light mb-2"><span class="badge bg-primary me-2">Paso 1</span> Descarga la aplicación</h6>
+                                        <p class="text-muted small ms-4">
+                                            Descarga e instala <strong>Google Authenticator</strong> o cualquier aplicación similar (Authy, Microsoft Authenticator) en su dispositivo móvil.
                                         </p>
-                                        <code id="twoFactorSecretCode" class="d-none bg-dark p-2 rounded text-break small"></code>
                                     </div>
-                                    <div class="col-md-6">
-                                        <p class="small text-muted mb-2"><strong>Paso 3:</strong> Ingresa el código de 6 dígitos</p>
-                                        <div class="input-group mb-3">
-                                            <input type="text" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center"
-                                                   maxlength="6" pattern="[0-9]{6}" placeholder="000000" style="font-size: 1.3rem; letter-spacing: 0.3rem;">
+
+                                    <!-- Step 2 -->
+                                    <div class="mb-4">
+                                        <h6 class="text-light mb-2"><span class="badge bg-primary me-2">Paso 2</span> Escanea el código QR</h6>
+                                        <div class="ms-4">
+                                            <p class="text-muted small mb-2">Abre la aplicación y escanea el siguiente código:</p>
+                                            <div id="twoFactorQR" class="bg-white p-3 rounded d-inline-block mb-2 text-center" style="min-width: 200px; min-height: 200px;">
+                                                <i class="fas fa-spinner fa-spin fa-2x text-muted mt-5"></i>
+                                            </div>
+                                            <div class="mt-2">
+                                                <button class="btn btn-link btn-sm text-decoration-none p-0" id="showManualCode">
+                                                    <i class="fas fa-keyboard me-1"></i> No puedo escanear el código
+                                                </button>
+                                                <div id="manualCodeContainer" class="d-none mt-2">
+                                                    <p class="small text-muted mb-1">Ingresa este código manualmente en la app:</p>
+                                                    <code id="twoFactorSecretCode" class="d-block bg-black p-2 rounded text-warning text-center fw-bold letter-spacing-2"></code>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <button class="btn btn-success w-100 mb-2" id="enable2FABtn" type="button">
-                                            <i class="fas fa-check me-2"></i>Verificar y Activar
-                                        </button>
-                                        <button class="btn btn-outline-secondary w-100" id="cancel2FASetupBtn" type="button">
-                                            <i class="fas fa-times me-2"></i>Cancelar
-                                        </button>
+                                    </div>
+
+                                    <!-- Step 3 -->
+                                    <div class="mb-4">
+                                        <h6 class="text-light mb-2"><span class="badge bg-primary me-2">Paso 3</span> Verifica el código</h6>
+                                        <div class="ms-4" style="max-width: 300px;">
+                                            <p class="text-muted small mb-2">Ingresa el código de 6 dígitos que muestra tu aplicación:</p>
+                                            <div class="input-group mb-3">
+                                                <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fas fa-shield-alt"></i></span>
+                                                <input type="text" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center fs-4 letter-spacing-2"
+                                                       maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="off">
+                                            </div>
+
+                                            <div class="d-grid gap-2">
+                                                <button class="btn btn-success" id="enable2FABtn" type="button">
+                                                    <i class="fas fa-check me-2"></i>Verificar y Activar
+                                                </button>
+                                                <button class="btn btn-outline-secondary" id="cancel2FASetupBtn" type="button">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- 2FA Enabled Area -->
                             <div id="twoFactorEnabledArea" style="display: none;">
-                                <div class="d-flex align-items-center gap-3 mb-3">
-                                    <div class="text-success">
+                                <div class="alert alert-success d-flex align-items-center mb-0">
+                                    <div class="me-3">
                                         <i class="fas fa-check-circle fa-2x"></i>
                                     </div>
-                                    <div>
-                                        <p class="mb-0 text-light">La verificación de dos pasos está <strong class="text-success">activada</strong></p>
-                                        <small class="text-muted">Tu cuenta está protegida con Google Authenticator</small>
+                                    <div class="flex-grow-1">
+                                        <h5 class="alert-heading mb-1">2FA Activado</h5>
+                                        <p class="mb-0 small">Tu cuenta está protegida con verificación de dos pasos.</p>
                                     </div>
+                                    <button class="btn btn-danger btn-sm" id="disable2FABtn">
+                                        <i class="fas fa-trash-alt me-1"></i> Desactivar
+                                    </button>
                                 </div>
-                                <button class="btn btn-outline-danger btn-sm" id="disable2FABtn">
-                                    <i class="fas fa-times me-2"></i>Desactivar 2FA
-                                </button>
                             </div>
                         </div>
 

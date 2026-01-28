@@ -1365,9 +1365,11 @@ function updateActiveFiltersCount() {
     const setupArea = document.getElementById('twoFactorSetupArea')
     const qrContainer = document.getElementById('twoFactorQR')
     const secretCode = document.getElementById('twoFactorSecretCode')
+    const manualContainer = document.getElementById('manualCodeContainer')
 
     if (disabledArea) disabledArea.style.display = 'none'
     if (setupArea) setupArea.style.display = 'block'
+    if (manualContainer) manualContainer.classList.add('d-none')
 
     // Display the cached QR code
     if (window._2faSetupData) {
@@ -1398,9 +1400,9 @@ function updateActiveFiltersCount() {
 
   function showManualCode(e) {
     e.preventDefault()
-    const secretCode = document.getElementById('twoFactorSecretCode')
-    if (secretCode) {
-      secretCode.classList.toggle('d-none')
+    const container = document.getElementById('manualCodeContainer')
+    if (container) {
+      container.classList.toggle('d-none')
     }
   }
 
@@ -1458,139 +1460,44 @@ function updateActiveFiltersCount() {
   }
 
   // =========================================
-  // Session Timeout
+  // Session Timeout - Uses global SessionTimeout API
   // =========================================
-
-  let sessionTimeoutId = null
-  let sessionWarningId = null
-  const SESSION_WARNING_BEFORE = 60000 // 1 minute warning before logout
 
   function initSessionTimeout() {
     const toggle = document.getElementById('sessionTimeout')
     const minutesSelect = document.getElementById('sessionTimeoutMinutes')
 
-    // Load saved settings
-    const savedEnabled = localStorage.getItem('sessionTimeoutEnabled') !== 'false'
-    const savedMinutes = localStorage.getItem('sessionTimeoutMinutes') || '30'
-
-    if (toggle) toggle.checked = savedEnabled
-    if (minutesSelect) minutesSelect.value = savedMinutes
-
-    if (savedEnabled) {
-      startSessionTimeout(parseInt(savedMinutes))
+    // Load saved settings from global API or localStorage
+    const settings = window.SessionTimeout ? window.SessionTimeout.getSettings() : {
+      enabled: localStorage.getItem('sessionTimeoutEnabled') !== 'false',
+      minutes: parseInt(localStorage.getItem('sessionTimeoutMinutes') || '30', 10)
     }
 
-    // Event listeners
+    if (toggle) toggle.checked = settings.enabled
+    if (minutesSelect) minutesSelect.value = settings.minutes
+
+    // Event listeners - use global API if available
     if (toggle) {
       toggle.addEventListener('change', function() {
-        localStorage.setItem('sessionTimeoutEnabled', this.checked)
-        if (this.checked) {
-          startSessionTimeout(parseInt(minutesSelect?.value || 30))
+        if (window.SessionTimeout) {
+          window.SessionTimeout.setEnabled(this.checked)
         } else {
-          clearSessionTimeout()
+          localStorage.setItem('sessionTimeoutEnabled', this.checked)
         }
+        showToast(this.checked ? 'Timeout de sesión activado' : 'Timeout de sesión desactivado', this.checked ? 'success' : 'info')
       })
     }
 
     if (minutesSelect) {
       minutesSelect.addEventListener('change', function() {
-        localStorage.setItem('sessionTimeoutMinutes', this.value)
-        if (toggle?.checked) {
-          startSessionTimeout(parseInt(this.value))
+        if (window.SessionTimeout) {
+          window.SessionTimeout.setMinutes(parseInt(this.value, 10))
+        } else {
+          localStorage.setItem('sessionTimeoutMinutes', this.value)
         }
+        showToast(`Timeout configurado a ${this.value} minutos`, 'info')
       })
     }
-
-    // Reset timeout on user activity
-    document.addEventListener('click', resetSessionTimeout)
-    document.addEventListener('keypress', resetSessionTimeout)
-    document.addEventListener('scroll', resetSessionTimeout)
-  }
-
-  function startSessionTimeout(minutes) {
-    clearSessionTimeout()
-
-    const timeoutMs = minutes * 60 * 1000
-
-    // Warning before logout
-    sessionWarningId = setTimeout(() => {
-      showSessionWarning()
-    }, timeoutMs - SESSION_WARNING_BEFORE)
-
-    // Actual logout
-    sessionTimeoutId = setTimeout(() => {
-      sessionLogout()
-    }, timeoutMs)
-  }
-
-  function clearSessionTimeout() {
-    if (sessionTimeoutId) clearTimeout(sessionTimeoutId)
-    if (sessionWarningId) clearTimeout(sessionWarningId)
-  }
-
-  function resetSessionTimeout() {
-    const toggle = document.getElementById('sessionTimeout')
-    const minutesSelect = document.getElementById('sessionTimeoutMinutes')
-
-    if (toggle?.checked) {
-      startSessionTimeout(parseInt(minutesSelect?.value || 30))
-    }
-  }
-
-  function showSessionWarning() {
-    // Create warning modal if not exists
-    let warningModal = document.getElementById('sessionWarningModal')
-    if (!warningModal) {
-      warningModal = document.createElement('div')
-      warningModal.id = 'sessionWarningModal'
-      warningModal.className = 'modal-buzz-overlay'
-      warningModal.style.cssText = 'display:flex;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:9999;justify-content:center;align-items:center;'
-      warningModal.innerHTML = `
-        <div class="modal-buzz" style="max-width:400px;padding:30px;text-align:center;">
-          <i class="fas fa-clock fa-3x text-warning mb-3"></i>
-          <h4 class="text-light">Sesión por expirar</h4>
-          <p class="text-muted mb-4">Tu sesión se cerrará en <strong id="sessionCountdown">60</strong> segundos por inactividad.</p>
-          <button class="btn btn-buzz" onclick="window.continueSession()">
-            <i class="fas fa-check"></i> Continuar trabajando
-          </button>
-        </div>
-      `
-      document.body.appendChild(warningModal)
-    }
-
-    warningModal.style.display = 'flex'
-
-    // Countdown
-    let seconds = 60
-    const countdownEl = document.getElementById('sessionCountdown')
-    const countdownInterval = setInterval(() => {
-      seconds--
-      if (countdownEl) countdownEl.textContent = seconds
-      if (seconds <= 0) {
-        clearInterval(countdownInterval)
-      }
-    }, 1000)
-
-    warningModal.dataset.countdownInterval = countdownInterval
-  }
-
-  window.continueSession = function() {
-    const warningModal = document.getElementById('sessionWarningModal')
-    if (warningModal) {
-      warningModal.style.display = 'none'
-      if (warningModal.dataset.countdownInterval) {
-        clearInterval(parseInt(warningModal.dataset.countdownInterval))
-      }
-    }
-    resetSessionTimeout()
-    showToast('Sesión extendida', 'success')
-  }
-
-  function sessionLogout() {
-    showToast('Sesión cerrada por inactividad', 'warning')
-    setTimeout(() => {
-      window.location.href = 'login'
-    }, 1500)
   }
 
   // Initialize 2FA and session timeout - call this when settings tab loads
