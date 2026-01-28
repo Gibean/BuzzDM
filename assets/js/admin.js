@@ -1102,8 +1102,8 @@ function updateActiveFiltersCount() {
   async function editUser(id) {
     try {
       const response = await fetchJSON(`php/api_users.php?id=${id}`)
-      // Support both wrapped and unwrapped (legacy) just in case
-      const user = response.user || response
+      // Support wrapped format (response.data or response.user) and unwrapped
+      const user = response.data || response.user || response
 
       if (user && user.id) {
         openUserModal(user)
@@ -1589,7 +1589,7 @@ function updateActiveFiltersCount() {
   function sessionLogout() {
     showToast('Sesión cerrada por inactividad', 'warning')
     setTimeout(() => {
-      window.location.href = 'logout.php'
+      window.location.href = 'login'
     }, 1500)
   }
 

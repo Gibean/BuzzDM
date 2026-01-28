@@ -51,7 +51,32 @@
 # Block access to .git directory
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /BuzzDM/
     RewriteRule ^\.git - [F,L]
+
+    # ----------------------------------------------------------------------
+    # Pretty URLs - Remove .php extension
+    # ----------------------------------------------------------------------
+
+    # Don't apply to actual files/directories or API endpoints
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/php/ [NC]
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/assets/ [NC]
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/vendor/ [NC]
+
+    # If file.php exists, serve it for /file URLs
+    RewriteCond %{REQUEST_FILENAME}\.php -f
+    RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+    # Redirect /file.php to /file (301 redirect for SEO)
+    # Only for direct browser requests, not internal rewrites
+    # Exclude php/, assets/, vendor/ directories from redirect
+    RewriteCond %{THE_REQUEST} \s/+BuzzDM/([^\.]+)\.php[\s?] [NC]
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/php/ [NC]
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/assets/ [NC]
+    RewriteCond %{REQUEST_URI} !^/BuzzDM/vendor/ [NC]
+    RewriteRule ^ /BuzzDM/%1 [R=301,L]
 </IfModule>
 
 # ----------------------------------------------------------------------
