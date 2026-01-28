@@ -214,6 +214,89 @@
   animation: pulse-node 2s infinite;
 }
 
+/* Chart Period Selector Tabs - Google/Material Style */
+.chart-period-tabs {
+  display: flex;
+  gap: 0;
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0;
+  border-radius: 0;
+}
+
+.period-tab {
+  background: transparent;
+  border: none;
+  color: var(--buzz-text-muted);
+  font-family: var(--font-monospace);
+  font-size: 0.75rem;
+  padding: 8px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  position: relative;
+  border-radius: 0;
+}
+
+.period-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--tactical-orange);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+.period-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.period-tab:hover::after {
+  width: 50%;
+}
+
+.period-tab.active {
+  background: transparent;
+  color: var(--tactical-orange);
+}
+
+.period-tab.active::after {
+  width: 100%;
+}
+
+/* Live Status Indicator Badge */
+.live-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 200, 83, 0.1);
+  border: 1px solid rgba(0, 200, 83, 0.3);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--buzz-success);
+  border-radius: 50%;
+  animation: pulse-node 1.5s infinite;
+  box-shadow: 0 0 6px var(--buzz-success);
+}
+
+.live-text {
+  font-family: var(--font-monospace);
+  font-size: 0.65rem;
+  color: var(--buzz-success);
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
 /* Responsive Tactical Bar */
 @media (max-width: 992px) {
   .command-strip {

@@ -72,6 +72,9 @@ class AuthService {
 
         $this->repository->logLoginAttempt($user['id'], 'Exitoso', 'Login de ' . $user['rol']);
 
+        // Cleanup expired sessions before creating a new one (prevents table bloat)
+        $this->repository->cleanupExpiredSessions();
+
         // Create API session token
         $token = bin2hex(random_bytes(32));
         $expiration = date('Y-m-d H:i:s', strtotime('+8 hours'));
@@ -190,6 +193,33 @@ class AuthService {
             </div>
         </div>
         </body></html>";
+    }
+
+    /**
+     * Validate a password reset token (check if valid/not expired)
+     */
+    public function validateResetToken($token) {
+        if (!$token) {
+            return ['valid' => false, 'message' => 'Token no proporcionado.'];
+        }
+
+        $tokenData = $this->repository->getTokenData($token);
+
+        if (!$tokenData) {
+            return ['valid' => false, 'message' => 'Enlace inválido o ya utilizado.'];
+        }
+
+        if ($tokenData['usado'] == 1) {
+            return ['valid' => false, 'message' => 'Este enlace ya fue utilizado.'];
+        }
+
+        $now = new DateTime();
+        $expiration = new DateTime($tokenData['expiracion']);
+        if ($now > $expiration) {
+            return ['valid' => false, 'message' => 'El enlace ha expirado. Solicita uno nuevo.'];
+        }
+
+        return ['valid' => true, 'message' => 'Token válido.'];
     }
 
     /**

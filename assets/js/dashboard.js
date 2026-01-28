@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
-    initSalesChart();
+    initSalesChart(30); // Default to 30 days
+    setupPeriodTabs();
     initPaymentStatusChart(); // Initialize the new pie chart
     loadStats();
     // Las siguientes funciones quedan comentadas o eliminadas porque ahora los datos
@@ -8,6 +9,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // loadTopProducts();
     // loadLowStockProducts();
 });
+
+// Store chart instance globally for updates
+let salesChartInstance = null;
+
+function setupPeriodTabs() {
+    const tabs = document.querySelectorAll('.period-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Update active state
+            tabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Reload chart with new period
+            const period = parseInt(this.dataset.period);
+            initSalesChart(period);
+        });
+    });
+}
 
 async function loadStats() {
     try {
@@ -44,12 +63,22 @@ async function loadStats() {
     }
 }
 
-async function initSalesChart() {
+async function initSalesChart(days = 30) {
     const ctx = document.getElementById('salesChart');
     if (!ctx) return;
 
+    // Destroy existing chart if exists
+    if (salesChartInstance) {
+        salesChartInstance.destroy();
+        salesChartInstance = null;
+    }
+
+    // Remove any existing no-data message
+    const existingMessage = document.getElementById('salesChartNoData');
+    if (existingMessage) existingMessage.remove();
+
     try {
-        const response = await fetch('php/api_sales_chart.php');
+        const response = await fetch(`php/api_sales_chart.php?days=${days}`);
         if (!response.ok) {
             throw new Error(`Error de red: ${response.statusText}`);
         }
@@ -59,7 +88,28 @@ async function initSalesChart() {
             throw new Error(`Error en la API: ${chartData.error}`);
         }
 
-        new Chart(ctx, {
+        // Check if there's no data
+        const hasData = chartData.labels && chartData.labels.length > 0;
+
+        if (!hasData) {
+            // Show no-data message
+            const periodText = getPeriodText(days);
+            showNoDataMessage(ctx, periodText);
+            return;
+        }
+
+        // Determine time unit based on period
+        let timeUnit = 'day';
+        let displayFormat = 'MMM d';
+        if (days <= 7) {
+            timeUnit = 'day';
+            displayFormat = 'EEE d';
+        } else if (days > 60) {
+            timeUnit = 'week';
+            displayFormat = 'MMM d';
+        }
+
+        salesChartInstance = new Chart(ctx, {
             type: 'line',
             data: chartData,
             options: {
@@ -69,10 +119,11 @@ async function initSalesChart() {
                     x: {
                         type: 'time',
                         time: {
-                            unit: 'day',
+                            unit: timeUnit,
                             tooltipFormat: 'PPpp',
                             displayFormats: {
-                                day: 'MMM d'
+                                day: displayFormat,
+                                week: 'MMM d'
                             }
                         },
                         ticks: {
@@ -123,12 +174,41 @@ async function initSalesChart() {
 
     } catch (error) {
         console.error("No se pudo cargar el gráfico de ventas:", error);
-        const canvas = ctx.getContext('2d');
-        canvas.font = '16px Arial';
-        canvas.fillStyle = '#8b949e';
-        canvas.textAlign = 'center';
-        canvas.fillText('No se pudieron cargar los datos del gráfico.', ctx.width / 2, ctx.height / 2);
+        showNoDataMessage(ctx, 'Error al cargar datos');
     }
+}
+
+function getPeriodText(days) {
+    switch(days) {
+        case 7: return 'los últimos 7 días';
+        case 30: return 'el último mes';
+        case 180: return 'los últimos 6 meses';
+        default: return `los últimos ${days} días`;
+    }
+}
+
+function showNoDataMessage(canvas, periodText) {
+    const container = canvas.parentElement;
+
+    // Create styled message overlay
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'salesChartNoData';
+    messageDiv.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        color: #6c757d;
+        font-family: 'Roboto Mono', monospace;
+        pointer-events: none;
+    `;
+    messageDiv.innerHTML = `
+        <i class="fas fa-chart-line" style="font-size: 2rem; opacity: 0.3; margin-bottom: 10px; display: block;"></i>
+        <span style="font-size: 0.85rem;">Sin datos de ventas en ${periodText}</span>
+    `;
+
+    container.appendChild(messageDiv);
 }
 
 async function initPaymentStatusChart() {

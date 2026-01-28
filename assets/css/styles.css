@@ -796,7 +796,121 @@ input:-webkit-autofill:active {
   animation: fadeIn 0.5s ease-out;
 }
 
-/* Responsive */
+/* ============================================
+   ADMIN TABS - Material Design Style
+   ============================================ */
+
+.admin-tabs-container {
+  background: var(--buzz-card-bg);
+  border: 1px solid var(--buzz-border-color);
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.admin-tabs {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+  -ms-overflow-style: none; /* Hide scrollbar IE/Edge */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-tabs::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
+}
+
+.admin-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 20px;
+  background: transparent;
+  border: none;
+  color: var(--buzz-text-muted);
+  font-family: var(--font-monospace);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.admin-tab i {
+  font-size: 0.9rem;
+  transition: color 0.25s ease;
+}
+
+/* Underline indicator */
+.admin-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--buzz-primary-color);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(-50%);
+}
+
+.admin-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-tab:hover::after {
+  width: 60%;
+}
+
+.admin-tab.active {
+  color: var(--buzz-primary-color);
+}
+
+.admin-tab.active i {
+  color: var(--buzz-primary-color);
+}
+
+.admin-tab.active::after {
+  width: 100%;
+}
+
+/* Focus state for accessibility */
+.admin-tab:focus {
+  outline: none;
+  background: rgba(255, 160, 0, 0.05);
+}
+
+.admin-tab:focus-visible {
+  box-shadow: inset 0 0 0 2px rgba(255, 160, 0, 0.3);
+}
+
+/* Responsive - Show icons only on small screens */
+@media (max-width: 576px) {
+  .admin-tab {
+    padding: 12px 16px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-tab span {
+    font-size: 0.65rem;
+  }
+
+  .admin-tab i {
+    font-size: 1rem;
+  }
+}
+
+/* Tablet - Slightly smaller padding */
+@media (min-width: 577px) and (max-width: 768px) {
+  .admin-tab {
+    padding: 12px 16px;
+    font-size: 0.8rem;
+  }
+}
 @media (max-width: 992px) {
   .col-lg-3 {
     flex: 0 0 50%;
