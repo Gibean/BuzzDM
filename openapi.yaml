@@ -1000,6 +1000,37 @@ paths:
       responses:
         '200':
           description: 'Supplier deleted'
+  /php/api_2fa.php:
+    get:
+      tags:
+        - TwoFactor
+      summary: 'Get 2FA setup data (QR code and secret)'
+      operationId: 65dbaa92d20e8af119eb6cb27c79c294
+      responses:
+        '200':
+          description: 'Setup data with QR code'
+    post:
+      tags:
+        - TwoFactor
+      summary: 'Enable, disable, or verify 2FA'
+      operationId: 45bbfb7e63fe82f2d34fe4a29741d100
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                action:
+                  type: string
+                  enum: [enable, disable, verify]
+                code:
+                  type: string
+                password:
+                  type: string
+              type: object
+      responses:
+        '200':
+          description: 'Action result'
   /php/api_users.php:
     get:
       tags:
@@ -1214,6 +1245,9 @@ tags:
   -
     name: Suppliers
     description: 'Operations related to Suppliers'
+  -
+    name: TwoFactor
+    description: 'Two-Factor Authentication Management'
   -
     name: Users
     description: 'Operations related to Users'

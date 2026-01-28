@@ -585,14 +585,14 @@
                             </p>
                         </div>
 
-                        <!-- Cron Info -->
+                        <!-- Backup Storage Info -->
                         <div class="mb-3">
                             <div class="d-flex align-items-center gap-2 mb-1">
-                                <i class="fas fa-clock text-primary"></i>
-                                <strong class="small">Cron Job (Hosting)</strong>
+                                <i class="fas fa-folder-open text-primary"></i>
+                                <strong class="small">Almacenamiento</strong>
                             </div>
                             <p class="text-muted small mb-0">
-                                Para mayor fiabilidad, configure un cron job en su hosting que ejecute <code class="small">auto_backup.php</code>
+                                Los backups se guardan por defecto en su carpeta de <code class="small">descargas</code> y se retienen por 30 días máximo.
                             </p>
                         </div>
 

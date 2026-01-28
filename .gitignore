@@ -4,3 +4,8 @@ vendor/
 .env.development.local
 .env.test.local
 .env.production.local
+templates/Datos_Ejemplo_Catalogos.xlsx
+templates/Datos_Ejemplo_Productos.xlsx
+templates/Datos_Ejemplo_Clientes.xlsx
+templates/Datos_Ejemplo_Proveedores.xlsx
+

@@ -74,8 +74,16 @@ class ImportService {
 
                 $this->repository->beginTransaction();
 
+                // Validate that sheet has data rows (more than just header)
+                $highestRow = $sheet->getHighestRow();
+                if ($highestRow < 2) {
+                    $results[$entity] = ['processed' => 0, 'inserted' => 0, 'updated' => 0, 'failed' => 0, 'errors' => [['row' => 0, 'msg' => 'La hoja no contiene datos (solo encabezados)']]];
+                    $this->repository->commit();
+                    continue;
+                }
+
                 $rowIndex = 1;
-                foreach ($sheet->getRowIterator(2) as $row) {
+                foreach ($sheet->getRowIterator(2, $highestRow) as $row) {
                     $rowIndex++;
                     $rowData = [];
                     $skipRow = false;
@@ -143,7 +151,15 @@ class ImportService {
                                 $stats['updated']++;
                             }
                         } else {
-                            // Insert
+                            // Insert - apply entity defaults first
+                            if (isset($config['defaults'])) {
+                                foreach ($config['defaults'] as $defCol => $defVal) {
+                                    if (!isset($rowData[$defCol])) {
+                                        $rowData[$defCol] = $defVal;
+                                    }
+                                }
+                            }
+
                             $cols = array_keys($rowData);
                             $placeholders = array_fill(0, count($cols), '?');
                             $sql = "INSERT INTO {$tableName} (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $placeholders) . ")";
@@ -176,11 +192,9 @@ class ImportService {
             $response['message'] = "Procesamiento completado.";
             $response['results'] = $results;
 
-            // Final Log
+            // Final Log - Note: enum only allows 'pendiente', 'procesado', 'error'
             $finalStatus = 'procesado';
-             foreach ($results as $r) {
-                if ($r['failed'] > 0) $finalStatus = 'procesado_errores';
-            }
+            // Errors are tracked in detalles JSON, not in estado
             $this->repository->logFinish($importId, $finalStatus, $response);
 
         } catch (Exception $e) {
@@ -219,6 +233,13 @@ class ImportService {
                     'medidas' => ['db' => 'medidas'],
                     'peso' => ['db' => 'peso_kg', 'type' => 'float'],
                     'material' => ['db' => 'material'],
+                ],
+                'defaults' => [
+                    'estado' => 'activo',
+                    'tipo_producto' => 'fisico',
+                    'maneja_stock' => 1,
+                    'unidad_venta' => 'UND',
+                    'cantidad_presentacion' => 1
                 ]
             ],
             'Clientes' => [
