@@ -28,7 +28,7 @@
                 <span class="text-muted ms-2 font-mono">/ CLIENTES</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openModal('createCustomerModal')">
+                <button class="btn btn-buzz" id="btnNewCliente" onclick="openModal('createCustomerModal')">
                     <i class="fas fa-plus"></i> Nuevo Cliente
                 </button>
             </div>
@@ -116,6 +116,8 @@
                  Customers will be populated by JavaScript
             </div>
         </div>
+
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <!-- Create Customer Modal -->

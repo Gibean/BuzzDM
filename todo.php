@@ -29,7 +29,7 @@
                 <span class="text-muted ms-2 font-mono">/ GESTIÓN DE TAREAS</span>
             </div>
             <div>
-                <button class="btn btn-buzz" onclick="openNewNoteModal()">
+                <button class="btn btn-buzz" id="btnNewNote" onclick="openNewNoteModal()">
                     <i class="fas fa-plus"></i> Nueva Nota
                 </button>
             </div>

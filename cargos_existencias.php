@@ -32,7 +32,7 @@
                 <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()">
                     <i class="fas fa-history"></i> Historial
                 </button>
-                <button class="btn btn-buzz" onclick="nuevoCargo()">
+                <button class="btn btn-buzz" id="btnNewCargo" onclick="nuevoCargo()">
                     <i class="fas fa-plus"></i> Nuevo Cargo
                 </button>
             </div>
@@ -235,7 +235,7 @@
                 <div class="buzz-card mb-4">
                     <div class="card-header-buzz d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-boxes"></i> PRODUCTOS DEL CARGO</span>
-                        <button type="button" class="btn btn-outline-buzz btn-sm" onclick="agregarLineaProducto()">
+                        <button type="button" class="btn btn-outline-buzz btn-sm" id="btnAddProductLine" onclick="agregarLineaProducto()">
                             <i class="fas fa-plus"></i> Añadir Producto
                         </button>
                     </div>

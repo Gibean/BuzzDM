@@ -27,7 +27,7 @@
                 <span class="text-muted ms-2 font-mono">/ PRODUCTOS</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openProductModal()">
+                <button class="btn btn-buzz" id="btnNewProduct" onclick="openProductModal()">
                     <i class="fas fa-plus"></i> Nuevo Producto
                 </button>
             </div>

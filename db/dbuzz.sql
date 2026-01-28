@@ -66,18 +66,14 @@ CREATE TABLE IF NOT EXISTS `backups` (
   KEY `fecha` (`fecha`),
   KEY `tipo` (`tipo`),
   CONSTRAINT `FK_backups_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.backups: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.backups: ~2 rows (aproximadamente)
 DELETE FROM `backups`;
 INSERT INTO `backups` (`id`, `archivo`, `ruta_archivo`, `tamaño_bytes`, `fecha`, `tipo`, `estado`, `resultado`, `detalles`, `usuario_id`) VALUES
-	(1, 'dbuzzbackup_2026-01-07_22-01-17.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-07_22-01-17.sql', 111228, '2026-01-07 21:01:20', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":2800,"tamanio_mb":0.11,"tipo_ejecucion":"http","metodo":"fallback"}', 1),
-	(2, 'dbuzzbackup_2026-01-12_21-34-13.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-12_21-34-13.sql', 114905, '2026-01-12 20:34:19', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":6101,"tamanio_mb":0.11,"tipo_ejecucion":"http","metodo":"fallback"}', 1),
-	(3, 'dbuzzbackup_2026-01-13_22-17-33.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-13_22-17-33.sql', 117695, '2026-01-13 21:17:35', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":24,"duracion_ms":2371,"tamanio_mb":0.11,"tipo_ejecucion":"http","metodo":"fallback"}', 1),
-	(4, 'dbuzzbackup_2026-01-18_01-18-25.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/../backups/dbuzzbackup_2026-01-18_01-18-25.sql', 118821, '2026-01-18 00:18:26', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":1715,"tamanio_mb":0.11,"tipo_ejecucion":"http","metodo":"fallback"}', 1),
-	(5, 'dbuzzbackup_2026-01-19_01-38-29.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-19_01-38-29.sql', 124501, '2026-01-19 00:38:34', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":4733,"tamanio_mb":0.12,"metodo":"fallback"}', 1),
-	(6, 'dbuzzbackup_2026-01-19_23-43-10.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-19_23-43-10.sql', 124683, '2026-01-19 22:43:17', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":5900,"tamanio_mb":0.12,"metodo":"fallback"}', 1),
-	(7, 'dbuzzbackup_2026-01-21_00-27-05.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-21_00-27-05.sql', 125915, '2026-01-20 23:27:09', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":22,"duracion_ms":3325,"tamanio_mb":0.12,"metodo":"fallback"}', 1);
+	(7, 'dbuzzbackup_2026-01-21_00-27-05.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-21_00-27-05.sql', 125915, '2026-01-20 23:27:09', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":22,"duracion_ms":3325,"tamanio_mb":0.12,"metodo":"fallback"}', 1),
+	(8, 'dbuzzbackup_2026-01-23_02-55-24.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-23_02-55-24.sql', 125274, '2026-01-23 01:55:31', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":6388,"tamanio_mb":0.12,"metodo":"fallback"}', 1),
+	(9, 'dbuzzbackup_2026-01-28_01-44-00.sql', 'C:\\xampp\\htdocs\\BuzzDM\\php/backups/dbuzzbackup_2026-01-28_01-44-00.sql', 126293, '2026-01-28 00:44:10', 'automatico', 'completado', 'Backup automático creado exitosamente (fallback)', '{"tablas_exportadas":23,"duracion_ms":9775,"tamanio_mb":0.12,"metodo":"fallback"}', 1);
 
 -- Volcando estructura para tabla dbuzz.cargos_existencias
 DROP TABLE IF EXISTS `cargos_existencias`;
@@ -210,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `configuraciones` (
 -- Volcando datos para la tabla dbuzz.configuraciones: ~4 rows (aproximadamente)
 DELETE FROM `configuraciones`;
 INSERT INTO `configuraciones` (`id`, `clave`, `valor`, `descripcion`, `fecha_actualizacion`) VALUES
-	(1, 'backup_fallback_enabled', '1', 'Habilitar sistema de backup automático fallback', '2025-12-25 01:04:32'),
+	(1, 'backup_fallback_enabled', '1', 'Habilitar sistema de backup automático fallback', '2026-01-28 04:12:18'),
 	(8, 'store_name', 'Librería El Estudiante', 'Nombre mostrado en factura y sitio', '2026-01-07 21:01:09'),
 	(9, 'currency', 'VES', 'Moneda del sistema', '2026-01-07 21:01:09'),
 	(10, 'tax_percent', '12.00', 'Porcentaje de IVA aplicado a ventas', '2026-01-07 21:01:09');
@@ -416,9 +412,9 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs: ~14 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs: ~16 rows (aproximadamente)
 DELETE FROM `logs`;
 INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-07_22-01-17.sql | Tamaño: 0.11 MB', '2026-01-07 21:01:20'),
@@ -434,7 +430,11 @@ INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(11, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-19_23-43-10.sql | Tamaño: 0.12 MB', '2026-01-19 22:43:17'),
 	(12, 1, 'Backup Automático', '{"archivo":"dbuzzbackup_2026-01-19_23-43-10.sql","tamanio_mb":0.12,"duracion_ms":5900}', '2026-01-19 22:43:17'),
 	(13, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-21_00-27-05.sql | Tamaño: 0.12 MB', '2026-01-20 23:27:09'),
-	(14, 1, 'Backup Automático', '{"archivo":"dbuzzbackup_2026-01-21_00-27-05.sql","tamanio_mb":0.12,"duracion_ms":3325}', '2026-01-20 23:27:09');
+	(14, 1, 'Backup Automático', '{"archivo":"dbuzzbackup_2026-01-21_00-27-05.sql","tamanio_mb":0.12,"duracion_ms":3325}', '2026-01-20 23:27:09'),
+	(15, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-23_02-55-24.sql | Tamaño: 0.12 MB', '2026-01-23 01:55:31'),
+	(16, 1, 'Backup Automático', '{"archivo":"dbuzzbackup_2026-01-23_02-55-24.sql","tamanio_mb":0.12,"duracion_ms":6388}', '2026-01-23 01:55:31'),
+	(17, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-28_01-44-00.sql | Tamaño: 0.12 MB', '2026-01-28 00:44:10'),
+	(18, 1, 'Backup Automático', '{"archivo":"dbuzzbackup_2026-01-28_01-44-00.sql","tamanio_mb":0.12,"duracion_ms":9775}', '2026-01-28 00:44:10');
 
 -- Volcando estructura para tabla dbuzz.logs_login
 DROP TABLE IF EXISTS `logs_login`;
@@ -448,9 +448,9 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `FK_logs_login_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs_login: ~32 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs_login: ~34 rows (aproximadamente)
 DELETE FROM `logs_login`;
 INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, NULL, 'Denegado', 'Intento de inicio de sesión con email no existente: admin', '2026-01-07 21:57:27'),
@@ -484,7 +484,15 @@ INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VAL
 	(29, 1, 'Exitoso', 'Login de admin', '2026-01-18 17:54:21'),
 	(30, 1, 'Exitoso', 'Login de admin', '2026-01-18 18:15:06'),
 	(31, 1, 'Exitoso', 'Login de admin', '2026-01-19 22:43:08'),
-	(32, 1, 'Exitoso', 'Login de admin', '2026-01-20 23:27:04');
+	(32, 1, 'Exitoso', 'Login de admin', '2026-01-20 23:27:04'),
+	(33, 1, 'Exitoso', 'Login de admin', '2026-01-21 01:15:26'),
+	(34, 1, 'Exitoso', 'Login de admin', '2026-01-23 01:55:23'),
+	(35, 1, 'Exitoso', 'Login de admin', '2026-01-28 00:43:58'),
+	(36, 1, 'Exitoso', 'Login de admin', '2026-01-28 00:52:25'),
+	(37, 1, 'Exitoso', 'Login de admin', '2026-01-28 02:04:23'),
+	(38, 4, 'Exitoso', 'Login de operador', '2026-01-28 02:08:48'),
+	(39, 1, 'Exitoso', 'Login de admin', '2026-01-28 02:17:27'),
+	(40, 1, 'Exitoso', 'Login de admin', '2026-01-28 02:56:14');
 
 -- Volcando estructura para tabla dbuzz.marcas
 DROP TABLE IF EXISTS `marcas`;
@@ -693,7 +701,7 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
 -- Volcando datos para la tabla dbuzz.notificaciones: ~1 rows (aproximadamente)
 DELETE FROM `notificaciones`;
 INSERT INTO `notificaciones` (`id`, `usuario_id`, `tipo`, `titulo`, `mensaje`, `enlace`, `leido`, `creado_at`) VALUES
-	(7, 1, 'low_stock', 'Stock Crítico Detectado', 'Hay 1 productos con existencias críticas. Se recomienda reabastecer.', 'inventario.php?filter=low_stock', 0, '2026-01-20 19:27:06');
+	(7, 1, 'low_stock', 'Stock Crítico Detectado', 'Hay 1 productos con existencias críticas. Se recomienda reabastecer.', 'inventario.php?filter=low_stock', 0, '2026-01-27 22:17:27');
 
 -- Volcando estructura para tabla dbuzz.password_reset_tokens
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -709,14 +717,16 @@ CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
   KEY `usuario_id` (`usuario_id`),
   KEY `expiracion` (`expiracion`),
   CONSTRAINT `password_reset_tokens_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Volcando datos para la tabla dbuzz.password_reset_tokens: ~3 rows (aproximadamente)
 DELETE FROM `password_reset_tokens`;
 INSERT INTO `password_reset_tokens` (`id`, `usuario_id`, `token`, `expiracion`, `usado`, `creado_at`) VALUES
 	(1, 4, 'b5fcd2e5eb0989c84763f2407250fbedf7b942f56d63e91291cdffcc45b7b6c2', '2026-01-18 23:50:55', 1, '2026-01-18 17:50:55'),
 	(2, 4, '3c0bf0e9c6f6a558ca3dbe50d07bd5c4040c6cb2b1ab4a4274f47e000f2b59d3', '2026-01-18 23:51:47', 1, '2026-01-18 17:51:47'),
-	(3, 4, '885f0d23f663469025159ed6b248e72da8b84f0fa19b3b7cca17ba51fb2f422d', '2026-01-18 23:53:20', 0, '2026-01-18 17:53:20');
+	(3, 4, '885f0d23f663469025159ed6b248e72da8b84f0fa19b3b7cca17ba51fb2f422d', '2026-01-18 23:53:20', 1, '2026-01-18 17:53:20'),
+	(4, 4, '73398ea8a2b017f1192b9e74cf737c1b38f138ebd920d9de02a35ad245ef7d5b', '2026-01-28 08:04:36', 1, '2026-01-28 02:04:36'),
+	(5, 4, 'bd887400d8af4cb634ed09cdc605e0123c836493ba7695931ca43b7332159494', '2026-01-28 08:07:59', 1, '2026-01-28 02:07:59');
 
 -- Volcando estructura para tabla dbuzz.pedidos
 DROP TABLE IF EXISTS `pedidos`;
@@ -1042,63 +1052,19 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   UNIQUE KEY `token` (`token`),
   KEY `usuario_id` (`usuario_id`),
   KEY `sesiones_api_ibfk_2` (`creado_en`),
+  KEY `idx_expiracion` (`expiracion`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=75 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.sesiones_api: ~51 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.sesiones_api: ~53 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
 INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_en`) VALUES
-	(24, 1, '2584334646b54b429e0cb37b0a117cc1c01a1286563e5d6a6ddaa2631344080c', '2025-11-29 15:15:36', '2025-11-29 02:15:36'),
-	(25, 1, 'a96a5e9527b24c5b34bdb87096c97d5363c3699e6c2c408129358becc8da0ce8', '2025-11-29 15:19:37', '2025-11-29 02:19:37'),
-	(26, 1, '36c9bb7c50be0ebaf493efb91be1e3839510be8d82f59745429f9a9a5c75c01b', '2025-12-01 08:29:10', '2025-11-30 19:29:10'),
-	(27, 1, '9fa8b502ffb5bec33e2a07741d0d8ef60633a455e93a9df62ed3e8615e673104', '2025-12-01 08:55:01', '2025-11-30 19:55:01'),
-	(28, 1, '55e593fcabeead3d74241170aca64e63fc1fe8cb4b0f73e04382a8b4d8269e6c', '2025-12-01 09:40:11', '2025-11-30 20:40:11'),
-	(29, 1, 'df6572b52cb45dbf07511816048b4195f971400b1623b7f3ce00afbd992b521f', '2025-12-01 10:16:14', '2025-11-30 21:16:14'),
-	(30, 1, '41b5661a6cee2ec476a24d5b73a5a7454f8f3a8f980195819b162163914798af', '2025-12-01 10:31:31', '2025-11-30 21:31:31'),
-	(31, 1, '4e632767a6a363498e57886270f432bba108f81a9821647312c4c8a383bbef95', '2025-12-01 10:39:16', '2025-11-30 21:39:16'),
-	(32, 1, '0db331ff41c96615efa9ebb86de8528beed6cea8ee58dd3776965794827cf8cc', '2025-12-02 14:39:23', '2025-12-02 01:39:23'),
-	(33, 1, '4533fcf5e2577a372329f735bb373a06425398c6b8804356c8cd3795ab5261fb', '2025-12-02 15:34:27', '2025-12-02 02:34:27'),
-	(34, 1, '17278a17b2939bd41cfba3b6e3d24ff9e75d624cee96baf6fe055617646903d8', '2025-12-02 16:01:51', '2025-12-02 03:01:51'),
-	(35, 1, '0e2e4f2d2bad1e3f77048757b916f90d47877bad8348a3740515cb8c3a8e8ba0', '2025-12-02 17:02:31', '2025-12-02 04:02:31'),
-	(36, 1, '653bf563210c405b6bf8c4507b5ce6b66ace6e9bbe1b2fb21b2f259af76dcdc9', '2025-12-02 17:04:53', '2025-12-02 04:04:53'),
-	(37, 1, '37630fef1296bac2118d16d898cc9fed09c78e99a45d1725d6fabd53890c7fbb', '2025-12-02 17:07:09', '2025-12-02 04:07:09'),
-	(38, 1, '5c231789d443949d86e534e0099e99996480fa5a0bb60723581ae55693c6568e', '2025-12-02 17:10:30', '2025-12-02 04:10:30'),
-	(39, 1, '4c4f17cf49152c0015ae8bca4a0601ed96960f9846cac1be111ee3e4438c6f4b', '2025-12-25 04:24:08', '2025-12-24 15:24:08'),
-	(40, 36, '0f27a12af252cff6c5b522a6eec580ac02b1e8902e31c7390e65f37dc842cbae', '2025-12-25 04:34:58', '2025-12-24 15:34:58'),
-	(41, 1, '92d66929359557e770d3e16351214832bb9f9d6d254c29413db361a272180d87', '2025-12-25 09:45:00', '2025-12-24 20:45:00'),
-	(42, 1, '34b4c7eaa7d90a550e90b4be5f6862043cbea1b542ca0e760bdd0d50b7a2f633', '2025-12-25 11:07:28', '2025-12-24 22:07:28'),
-	(43, 1, 'dc0c4d5145af56435b5bfd4637fcb1aa196f8b2dd8e7bd087d8d12f4244df1b7', '2025-12-25 13:25:24', '2025-12-25 00:25:24'),
-	(44, 1, '9fda354b6010c9581164c04e56715afcd7045f9bae98e6df7d565fa6ef48685a', '2025-12-26 01:56:24', '2025-12-25 12:56:24'),
-	(45, 1, '98e6469c7274168207b52d7de22335a66418a30e1692b47e7a3d44b44044b64c', '2025-12-26 04:04:24', '2025-12-25 15:04:24'),
-	(46, 1, 'ac9fadc2fb8592ebad64390f580d6c481d0423665c70118b2d859857cd8659dd', '2025-12-26 04:33:54', '2025-12-25 15:33:54'),
-	(47, 1, '83606cbcd9b21bf70adb60e0c5f02f8d3178f191304fef543370ff527d8af75f', '2025-12-26 04:43:21', '2025-12-25 15:43:21'),
-	(48, 1, 'e2f6f1bde2f7a16327b7c99716bc2c49f2ffb9f739921180ae16b435682217a1', '2026-01-06 05:49:55', '2026-01-05 16:49:55'),
-	(49, 1, '7ec2228967d1b797d6b6d30568b946a2188418232e4b9a0a4fdd276584e1bf11', '2026-01-06 06:33:51', '2026-01-05 17:33:51'),
-	(50, 1, '204257285129225fe1906c0e1d33b8be4b76da2ca577be5e6399828db9f87cf8', '2026-01-06 09:43:26', '2026-01-05 20:43:26'),
-	(51, 1, '89e02598eecf4ebcd97db94a5bfe059c6a7559467b6c57ca531318d0e49824e2', '2026-01-06 15:37:24', '2026-01-06 02:37:24'),
-	(52, 1, '0cf30bc08eb8f0ac7ec7329c8ff535830bc26b41433d7d3ebc26b1f3887a397a', '2026-01-07 12:15:26', '2026-01-06 23:15:26'),
-	(53, 1, 'f027332c19532a595a3773ec22dbd8d7d75d39c375d600cf3246a15e6832f295', '2026-01-07 12:43:17', '2026-01-06 23:43:17'),
-	(54, 1, 'f8a228ca9344d9a46a8336f4f8d3152e9961ac6db2f59d29514df848f977386d', '2026-01-07 12:52:17', '2026-01-06 23:52:17'),
-	(55, 1, 'b1d670b84c1cbe75e922bf009798211f29ca83411207300e6c75b1fd7cacb7b2', '2026-01-07 13:30:15', '2026-01-07 00:30:15'),
-	(56, 1, 'eb2b9052a6ac09a28e242566acb7b9e1de7f74ab56552b415f953fa609d8696c', '2026-01-07 13:37:28', '2026-01-07 00:37:28'),
-	(57, 1, '12a2a6b854d1ea73807cdb15f6486826547246fe8d11cb76f31b57fdfbe8b01c', '2026-01-07 13:53:32', '2026-01-07 00:53:32'),
-	(58, 1, 'b280ffc3828f7560a6ee0ee1c6a7859be9ad9dfabb8aba5f9b95e0b6475d9a86', '2026-01-07 16:06:34', '2026-01-07 03:06:34'),
-	(59, 1, '4f590296ba314fce3b3d27b4ee248c499b7a4c8da3647eeeaa6a79b72041a3bf', '2026-01-07 16:09:41', '2026-01-07 03:09:41'),
-	(60, 1, '6b32052243a2f7d0e01564f7a0aa2055ba952c8456a2958a8699562befcd78f0', '2026-01-08 06:46:44', '2026-01-07 17:46:44'),
-	(61, 1, 'a7b8826ed7c9d0ce194e824a35042e3f8d8482cc77ae7cf6df8a93c205fc1396', '2026-01-08 07:12:20', '2026-01-07 18:12:20'),
-	(62, 1, '71d76eea3cdcc60eb5a2ea8c64a87e95a2e99c51d4b798a909e8b4ec800deca6', '2026-01-08 07:43:21', '2026-01-07 18:43:21'),
-	(63, 1, '4d0863ca40f40d8ee23ff66f636464d656301cb9c9603e68458e9ee623a1a2fd', '2026-01-08 11:44:18', '2026-01-07 22:44:18'),
-	(64, 1, 'd308f23ce98669979dcc72c0feafa723ccb3673382af81682061af880f024f51', '2026-01-08 12:58:51', '2026-01-07 23:58:51'),
-	(65, 1, 'c55f38d62996970021baf526ebaa9f59a1c857d6b8b69adc88b34a9e941c0d9c', '2026-01-13 09:34:12', '2026-01-12 20:34:12'),
-	(66, 1, '61803dc8ee183ee4fe9da194870d9e75b98cfa37a29ad409c003348af4044ae1', '2026-01-13 14:22:10', '2026-01-13 01:22:10'),
-	(67, 1, '27018222a6680abbdcaf33e8c3db751eeb312b5b7331221891bbac0114bc8a7a', '2026-01-14 10:17:32', '2026-01-13 21:17:32'),
-	(68, 1, '88d7ecd9beaaeea0b15673763d8c15d71172caf3f10b8175ba0940ff0510d67d', '2026-01-18 13:18:24', '2026-01-18 00:18:24'),
-	(69, 1, '52c25003d90ce8e25f18b20ce05cdfc345e80070c7944e4a3d94730f14cfc374', '2026-01-19 05:48:58', '2026-01-18 16:48:58'),
-	(70, 1, '6ea1d2b1dc7b08190a12fe7d318d27c8a9db9447a9f95a1deae1f743522fb2b1', '2026-01-19 06:50:35', '2026-01-18 17:50:35'),
-	(71, 1, '62eb8c7f2c3c690e4e10340055aa74316405b44d5e5e83bd0facdd09da098900', '2026-01-19 06:54:21', '2026-01-18 17:54:21'),
-	(72, 1, 'cb3572b4175077a09e20fbb8c56679eede4135876d8fa54a77a599d92cbddd46', '2026-01-19 07:15:06', '2026-01-18 18:15:06'),
-	(73, 1, '9567b2b94f5cbda9ec97899f6fc745f119d46d6133704925a63a867843fa1db4', '2026-01-20 11:43:08', '2026-01-19 22:43:08'),
-	(74, 1, 'fa569184f5d69ca441cfc055ccf7a41b156d414b5b0cdef4971ba8bdbc5b0d2f', '2026-01-21 12:27:04', '2026-01-20 23:27:04');
+	(77, 1, '8823a4f9a0d71ca41a7805ad35072a2b16e37078ac052a13ed877972de7a64da', '2026-01-28 13:43:58', '2026-01-28 00:43:58'),
+	(78, 1, '43d836a8ad3635d2791fafb745ca28fcd141a3848a5d0327c1e03f311ac2b58e', '2026-01-28 13:52:25', '2026-01-28 00:52:25'),
+	(79, 1, '875855c36b61f11100210d5471a4ada2c3e1d83dd26e965cd7afdddaf9c003f1', '2026-01-28 15:04:23', '2026-01-28 02:04:23'),
+	(80, 4, '94a5a21c493b6e80e9a21fc9f54cc70597348a449912c95653692202c322fcce', '2026-01-28 15:08:48', '2026-01-28 02:08:48'),
+	(81, 1, 'b8c66af6cd53c93c3068d4c6d39a4c135fec26ba219d2fdbdaac8ab3faba2e0c', '2026-01-28 15:17:27', '2026-01-28 02:17:27'),
+	(82, 1, '2734832c439dd70aff087808a1c6bbd64acabe2704d90c15681bb5b15e4163fd', '2026-01-28 15:56:14', '2026-01-28 02:56:14');
 
 -- Volcando estructura para tabla dbuzz.stock_ubicacion
 DROP TABLE IF EXISTS `stock_ubicacion`;
@@ -1151,9 +1117,9 @@ CREATE TABLE IF NOT EXISTS `tasas_cambio` (
   KEY `idx_fecha` (`fecha`),
   KEY `FK_tasa_usuario` (`usuario_id`),
   CONSTRAINT `FK_tasa_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tasa de cambio diaria USD para referencia de precios';
+) ENGINE=InnoDB AUTO_INCREMENT=58 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tasa de cambio diaria USD para referencia de precios';
 
--- Volcando datos para la tabla dbuzz.tasas_cambio: ~28 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.tasas_cambio: ~32 rows (aproximadamente)
 DELETE FROM `tasas_cambio`;
 INSERT INTO `tasas_cambio` (`id`, `tasa`, `fuente`, `fecha`, `creado_at`, `usuario_id`) VALUES
 	(1, 311.8800, 'bcv', '2026-01-07', '2026-01-08 01:40:29', NULL),
@@ -1183,7 +1149,19 @@ INSERT INTO `tasas_cambio` (`id`, `tasa`, `fuente`, `fecha`, `creado_at`, `usuar
 	(42, 344.5100, 'bcv', '2026-01-20', '2026-01-20 23:27:06', NULL),
 	(43, 435.7800, 'paralelo', '2026-01-20', '2026-01-20 23:27:07', NULL),
 	(44, 401.0594, 'bcv_euro', '2026-01-20', '2026-01-20 23:27:08', NULL),
-	(45, 433.6011, 'binance_usdt', '2026-01-20', '2026-01-20 23:27:08', NULL);
+	(45, 433.6011, 'binance_usdt', '2026-01-20', '2026-01-20 23:27:08', NULL),
+	(46, 344.5100, 'bcv', '2026-01-22', '2026-01-23 01:55:25', NULL),
+	(47, 435.7800, 'paralelo', '2026-01-22', '2026-01-23 01:55:26', NULL),
+	(48, 404.3545, 'bcv_euro', '2026-01-22', '2026-01-23 01:55:27', NULL),
+	(49, 433.6011, 'binance_usdt', '2026-01-22', '2026-01-23 01:55:27', NULL),
+	(50, 358.9247, 'bcv', '2026-01-27', '2026-01-28 00:44:00', NULL),
+	(51, 541.5600, 'paralelo', '2026-01-27', '2026-01-28 00:44:08', NULL),
+	(52, 429.3358, 'bcv_euro', '2026-01-27', '2026-01-28 00:44:09', NULL),
+	(53, 538.8522, 'binance_usdt', '2026-01-27', '2026-01-28 00:44:09', NULL),
+	(54, 358.9247, 'bcv', '2026-01-28', '2026-01-28 04:47:51', NULL),
+	(55, 541.5600, 'paralelo', '2026-01-28', '2026-01-28 04:47:51', NULL),
+	(56, 429.3358, 'bcv_euro', '2026-01-28', '2026-01-28 04:47:52', NULL),
+	(57, 538.8522, 'binance_usdt', '2026-01-28', '2026-01-28 04:47:52', NULL);
 
 -- Volcando estructura para tabla dbuzz.ubicaciones
 DROP TABLE IF EXISTS `ubicaciones`;
@@ -1214,23 +1192,26 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `nombre` varchar(120) NOT NULL,
   `email` varchar(150) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `two_factor_secret` varchar(64) DEFAULT NULL,
   `rol` enum('admin','operador','supervisor') NOT NULL DEFAULT 'operador',
   `estado` enum('activo','inactivo','bloqueado') NOT NULL DEFAULT 'activo',
   `creado_at` timestamp NULL DEFAULT current_timestamp(),
   `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
   `intentos_fallidos` int(11) DEFAULT 0,
+  `two_factor_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `two_factor_confirmed_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.usuarios: ~6 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.usuarios: ~5 rows (aproximadamente)
 DELETE FROM `usuarios`;
-INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `rol`, `estado`, `creado_at`, `actualizado_at`, `intentos_fallidos`) VALUES
-	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'admin', 'activo', '2025-08-09 17:43:16', '2026-01-13 21:17:32', 0),
-	(4, 'Gisvel', 'gisvelaray@gmail.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', 'operador', 'activo', '2025-11-30 18:13:22', '2026-01-07 22:43:30', 0),
-	(36, 'GiviSupervisor', 'supervisor@buzz.com', '$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna', 'supervisor', 'activo', '2025-08-14 01:32:53', NULL, 0),
-	(37, 'GiviOperador', 'operador@buzz.com', '$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC', 'operador', 'activo', '2025-08-14 01:33:00', NULL, 0),
-	(63, 'Juan Luis Chaurant', 'juanluischaurant@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin', 'activo', '2025-11-30 21:18:35', NULL, 0);
+INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `two_factor_secret`, `rol`, `estado`, `creado_at`, `actualizado_at`, `intentos_fallidos`, `two_factor_enabled`, `two_factor_confirmed_at`) VALUES
+	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', NULL, 'admin', 'activo', '2025-08-09 17:43:16', '2026-01-13 21:17:32', 0, 0, NULL),
+	(4, 'Gisvel', 'gisvelaray@gmail.com', '$2y$10$yjYWVs.8ODLr7CzI95RNresCNi9gJDOMKyviSoqb1gWfJxLTGjNiG', NULL, 'operador', 'activo', '2025-11-30 18:13:22', '2026-01-28 02:08:34', 0, 0, NULL),
+	(36, 'GiviSupervisor', 'supervisor@buzz.com', '$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna', NULL, 'supervisor', 'activo', '2025-08-14 01:32:53', NULL, 0, 0, NULL),
+	(37, 'GiviOperador', 'operador@buzz.com', '$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC', NULL, 'operador', 'activo', '2025-08-14 01:33:00', NULL, 0, 0, NULL),
+	(63, 'Juan Luis Chaurant', 'juanluischaurant@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'admin', 'activo', '2025-11-30 21:18:35', NULL, 0, 0, NULL);
 
 -- Volcando estructura para vista dbuzz.v_almacenes_resumen
 DROP VIEW IF EXISTS `v_almacenes_resumen`;

@@ -66,7 +66,7 @@ function updateActiveFiltersCount() {
 async function initShipments() {
   await loadShipments()
   renderShipments()
-  updateStats()
+  // updateStats() removed
   setupFilters()
 }
 
@@ -131,73 +131,86 @@ function renderShipments() {
   container.innerHTML = filteredShipments
     .map(
       (shipment) => `
-        <div class="buzz-card mb-3 shipment-card-enhanced">
-            <div class="shipment-grid">
-                <!-- Column 1: Order Recap -->
-                <div class="shipment-col shipment-col-id">
-                    <span class="text-muted small">ORDEN</span>
-                    <div class="shipment-id">#${shipment.id}</div>
-                    <div class="shipment-date">${formatDate(shipment.date)}</div>
+        <div class="buzz-card mb-3 shipment-card-enhanced p-3">
+            <div class="row g-2 align-items-center">
+                <!-- Row 1 Mobile: Order ID & Status -->
+                <div class="col-6 col-md-2 order-1">
+                    <div class="d-flex flex-column">
+                        <span class="text-muted x-small text-uppercase fw-bold">Orden</span>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <span class="shipment-id fs-5">#${shipment.id}</span>
+                            <span class="shipment-date text-muted x-small d-none d-md-inline">${formatDate(shipment.date)}</span>
+                        </div>
+                        <span class="shipment-date text-muted x-small d-md-none">${formatDate(shipment.date)}</span>
+                    </div>
                 </div>
 
-                <!-- Column 2: Customer Recap -->
-                <div class="shipment-col shipment-col-customer">
-                    <span class="text-muted small">CLIENTE</span>
-                    <div class="shipment-customer-name">${shipment.customer}</div>
-                    <div class="shipment-amount">${formatCurrency(shipment.amount)}</div>
-                </div>
-
-                <!-- Column 3: Status -->
-                <div class="shipment-col shipment-col-status">
-                    <span class="text-muted small mb-1">ESTADO</span>
+                <!-- Row 1 Mobile (Right): Status -->
+                <div class="col-6 col-md-2 order-2 text-end text-md-start">
+                    <span class="text-muted x-small text-uppercase fw-bold d-none d-md-block mb-1">Estado</span>
                     ${getStatusBadge(shipment.status)}
                 </div>
 
-                <!-- Column 4: Delivery Details -->
-                <div class="shipment-col shipment-col-address">
-                    <span class="text-muted small">DESTINO</span>
-                    <div class="shipment-address-text" title="${shipment.address}">
-                        ${shipment.address}
+                <!-- Row 2 Mobile: Client & Amount -->
+                <div class="col-7 col-md-3 order-3 order-md-2">
+                    <div class="d-flex flex-column">
+                        <span class="text-muted x-small text-uppercase fw-bold">Cliente</span>
+                        <div class="shipment-customer-name text-truncate fw-medium" title="${shipment.customer}">${shipment.customer}</div>
                     </div>
-                    ${
-                      shipment.trackingNumber
-                        ? `<div class="tracking-badge mt-2">
-                            <i class="fas fa-barcode"></i>
-                            <span>${shipment.trackingNumber}</span>
-                           </div>`
-                        : ""
-                    }
                 </div>
 
-                <!-- Column 5: Actions -->
-                <div class="shipment-col shipment-col-actions text-end">
-                    <span class="text-muted small mb-2 d-none d-xl-block">ACCIONES</span>
-                    ${getStatusActions(shipment)}
+                <div class="col-5 col-md-1 order-3 order-md-2 text-end text-md-start">
+                     <div class="d-flex flex-column">
+                        <span class="text-muted x-small text-uppercase fw-bold d-md-none">Total</span>
+                        <span class="shipment-amount fw-bold text-primary">${formatCurrency(shipment.amount)}</span>
+                    </div>
+                </div>
+
+                <!-- Row 3 Mobile: Destination -->
+                <div class="col-12 col-md-2 order-4 order-md-3">
+                     <div class="d-flex flex-column">
+                        <span class="text-muted x-small text-uppercase fw-bold mb-1">Destino</span>
+                        <div class="d-flex align-items-center gap-2">
+                             <div class="shipment-address-text small text-truncate flex-grow-1" title="${shipment.address}">
+                                ${shipment.address}
+                            </div>
+                        </div>
+                        ${
+                          shipment.trackingNumber
+                            ? `<div class="tracking-badge mt-1 d-inline-flex border rounded px-2 py-0 border-opacity-25 border-warning bg-warning bg-opacity-10 text-warning x-small">
+                                <i class="fas fa-barcode me-1"></i> ${shipment.trackingNumber}
+                               </div>`
+                            : ""
+                        }
+                    </div>
+                </div>
+
+                <!-- Row 4 Mobile: Actions -->
+                <div class="col-12 col-md-2 order-5 text-end order-md-last">
+                     <div class="d-grid d-md-block">
+                        ${getStatusActions(shipment)}
+                    </div>
                 </div>
             </div>
 
             ${
               shipment.status !== "recibido"
                 ? `
-                <div class="shipment-progress-row">
-                    <div class="shipment-meta-info">
-                        <i class="fas fa-calendar-alt text-muted"></i>
-                        <span>Entrega estimada: <strong>${
+                <div class="row mt-2 pt-2 border-top border-secondary border-opacity-10 align-items-center g-2">
+                    <div class="col-auto">
+                        <small class="text-muted x-small"><i class="fas fa-calendar-alt me-1"></i> Entrega: <strong>${
                           shipment.estimatedDelivery
                             ? formatDate(shipment.estimatedDelivery)
                             : "N/A"
-                        }</strong></span>
+                        }</strong></small>
                     </div>
-                    <div class="shipment-progress-container">
-                        <div class="progress-buzz">
-                            <div class="progress-buzz-bar" style="width: ${getProgressWidth(
-                              shipment.status
-                            )}%"></div>
+                    <div class="col">
+                         <div class="progress" style="height: 4px; background: rgba(255,255,255,0.05);">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: ${getProgressWidth(shipment.status)}%"></div>
                         </div>
-                        <div class="progress-text-enhanced">
-                            <i class="fas fa-truck-loading"></i>
-                            <span>${getProgressText(shipment.status)}</span>
-                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <small class="text-warning font-mono x-small">${getProgressText(shipment.status)}</small>
                     </div>
                 </div>
             `
@@ -263,24 +276,12 @@ function getProgressText(status) {
   return texts[status] || ""
 }
 
-async function updateStats() {
-  // Re-fetch data to get accurate stats from the backend
-  await loadShipments()
-  const pending = shipments.filter((s) => s.status === "pendiente").length
-  const shipped = shipments.filter((s) => s.status === "enviado").length
-  const delivered = shipments.filter((s) => s.status === "entregado").length
-  const total = shipments.length
-
-  document.getElementById("pendingShipments").textContent = pending
-  document.getElementById("shippedOrders").textContent = shipped
-  document.getElementById("deliveredOrders").textContent = delivered
-  document.getElementById("totalShipments").textContent = total
-}
+// updateStats function removed
 
 async function filterShipments() {
   await loadShipments() // Load shipments with current filters
   renderShipments()
-  updateStats()
+  // updateStats() removed
 }
 
 function setupFilters() {
@@ -345,7 +346,7 @@ async function updateShipmentStatus(shipmentId, newStatus) {
           shipment.status = newStatus
           shipment.trackingNumber = trackingNumber
           filterShipments() // Re-apply filters and re-render to reflect changes
-          updateStats()
+          // updateStats() removed
         } else {
           showToast(
             `Error al actualizar estado de envío: ${response.message}`,
@@ -369,7 +370,7 @@ function formatDate(date) {
 }
 
 function formatCurrency(amount) {
-  return 'Pref. ' + amount.toLocaleString("en-US", { style: "currency", currency: "USD" })
+  return amount.toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
 // Removed - using showToast from common.js
