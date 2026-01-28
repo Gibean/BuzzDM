@@ -19,7 +19,7 @@ class AuthRepository {
      * Find user by email
      */
     public function findUserByEmail($email) {
-        $stmt = $this->pdo->prepare("SELECT id, nombre, email, password, rol, estado, intentos_fallidos FROM usuarios WHERE email = ? LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT id, nombre, email, password, rol, estado, intentos_fallidos, two_factor_secret, two_factor_enabled FROM usuarios WHERE email = ? LIMIT 1");
         $stmt->execute([$email]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
@@ -28,7 +28,7 @@ class AuthRepository {
      * Find user by ID
      */
     public function findUserById($id) {
-        $stmt = $this->pdo->prepare("SELECT id, nombre, email, rol, estado FROM usuarios WHERE id = ? LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT id, nombre, email, rol, estado, two_factor_secret, two_factor_enabled FROM usuarios WHERE id = ? LIMIT 1");
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }

@@ -11,16 +11,90 @@ class LogController {
     }
 
     public function handleRequest() {
-        // Admin only check
-        if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'admin') {
-            $this->jsonResponse(false, null, 'Acceso denegado');
-        }
+        $method = $_SERVER['REQUEST_METHOD'];
 
         try {
-            $this->getLogs();
+            switch ($method) {
+                case 'GET':
+                    // Admin only for reading logs
+                    if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'admin') {
+                        $this->jsonResponse(false, null, 'Acceso denegado');
+                    }
+                    $this->getLogs();
+                    break;
+                case 'POST':
+                    $this->handlePost();
+                    break;
+                default:
+                    $this->jsonResponse(false, null, 'Método no permitido');
+            }
         } catch (Exception $e) {
             $this->jsonResponse(false, null, $e->getMessage());
         }
+    }
+
+    private function handlePost() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        $action = $input['action'] ?? '';
+
+        switch ($action) {
+            case 'log_inactivity_logout':
+                $this->logInactivityLogout($input);
+                break;
+            default:
+                $this->jsonResponse(false, null, 'Acción no válida');
+        }
+    }
+
+    #[OA\Post(
+        path: "/php/api_logs.php",
+        tags: ["Logs"],
+        summary: "Log inactivity logout",
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                properties: [
+                    new OA\Property(property: "action", type: "string", example: "log_inactivity_logout"),
+                    new OA\Property(property: "minutes", type: "integer", example: 30)
+                ]
+            )
+        ),
+        responses: [
+            new OA\Response(response: 200, description: "Log created successfully")
+        ]
+    )]
+    private function logInactivityLogout($input) {
+        // User must be logged in to log inactivity
+        if (!isset($_SESSION['usuario_id'])) {
+            $this->jsonResponse(false, null, 'Usuario no autenticado');
+            return;
+        }
+
+        $userId = $_SESSION['usuario_id'];
+        $userName = $_SESSION['usuario_nombre'] ?? 'Usuario';
+        $minutes = $input['minutes'] ?? 30;
+
+        // Log to database
+        global $pdo;
+
+        $stmt = $pdo->prepare("
+            INSERT INTO logs (usuario, accion, detalles, ip_address, user_agent, fecha_hora)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+
+        $details = "Cierre automático por inactividad ({$minutes} minutos)";
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+
+        $stmt->execute([
+            $userName,
+            'logout_inactivity',
+            $details,
+            $ip,
+            $userAgent
+        ]);
+
+        $this->jsonResponse(true, ['logged' => true], 'Log de inactividad registrado');
     }
 
     #[OA\Get(
@@ -68,6 +142,9 @@ class LogController {
                 // My repos returns ['data' => [], 'pagination' => []]
                 // So merged response: { success: true, data: [], pagination: [] }
                 $response = array_merge($response, $data);
+            }
+            if ($message) {
+                $response['message'] = $message;
             }
             echo json_encode($response);
         }

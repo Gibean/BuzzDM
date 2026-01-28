@@ -70,6 +70,31 @@ class AuthService {
             $this->repository->resetFailedAttempts($user['id']);
         }
 
+        // Check if user has 2FA enabled
+        if (!empty($user['two_factor_secret']) && isset($user['two_factor_enabled']) && $user['two_factor_enabled'] == 1) {
+            // Store pending login data in session for 2FA verification
+            $_SESSION['pending_2fa_user_id'] = $user['id'];
+            $_SESSION['pending_2fa_email'] = $email;
+            $_SESSION['pending_2fa_time'] = time();
+
+            return [
+                'success' => true,
+                'requires_2fa' => true,
+                'message' => 'Se requiere verificación de dos factores.',
+                'user' => [
+                    'id' => $user['id'],
+                    'nombre' => $user['nombre']
+                ]
+            ];
+        }
+
+        return $this->completeLogin($user, $email);
+    }
+
+    /**
+     * Complete login after password (and optional 2FA) verification
+     */
+    private function completeLogin($user, $email) {
         $this->repository->logLoginAttempt($user['id'], 'Exitoso', 'Login de ' . $user['rol']);
 
         // Cleanup expired sessions before creating a new one (prevents table bloat)
@@ -87,6 +112,11 @@ class AuthService {
         $_SESSION['rol'] = $user['rol'];
         $_SESSION['email'] = $email;
 
+        // Clear any pending 2FA data
+        unset($_SESSION['pending_2fa_user_id']);
+        unset($_SESSION['pending_2fa_email']);
+        unset($_SESSION['pending_2fa_time']);
+
         return [
             'success' => true,
             'message' => 'Inicio de sesión exitoso.',
@@ -98,6 +128,42 @@ class AuthService {
             ]
         ];
     }
+
+    /**
+     * Verify 2FA code and complete login
+     */
+    public function verify2FA($code) {
+        if (!isset($_SESSION['pending_2fa_user_id'])) {
+            throw new Exception('No hay una verificación 2FA pendiente.');
+        }
+
+        // Check timeout (5 minutes)
+        if (time() - ($_SESSION['pending_2fa_time'] ?? 0) > 300) {
+            unset($_SESSION['pending_2fa_user_id']);
+            unset($_SESSION['pending_2fa_email']);
+            unset($_SESSION['pending_2fa_time']);
+            throw new Exception('La verificación 2FA ha expirado. Inicia sesión nuevamente.');
+        }
+
+        $userId = $_SESSION['pending_2fa_user_id'];
+        $email = $_SESSION['pending_2fa_email'];
+
+        require_once __DIR__ . '/TwoFactorService.php';
+        $twoFactorService = new TwoFactorService();
+
+        if (!$twoFactorService->validateLogin($userId, $code)) {
+            throw new Exception('Código de verificación incorrecto.');
+        }
+
+        // 2FA verified, complete login
+        $user = $this->repository->findUserById($userId);
+        if (!$user) {
+            throw new Exception('Usuario no encontrado.');
+        }
+
+        return $this->completeLogin($user, $email);
+    }
+
 
     private function notifyAdminsOfBlock($email) {
         try {

@@ -87,3 +87,4 @@ if (document.readyState === 'loading') {
 <link rel="stylesheet" href="assets/css/driver-buzz.css">
 <script src="assets/js/driver.js"></script>
 <script src="assets/js/tutorial.js"></script>
+<script src="assets/js/session-timeout.js"></script>
