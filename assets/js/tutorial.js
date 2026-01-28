@@ -65,7 +65,7 @@ class TutorialManager {
         localStorage.setItem(this.STORAGE_KEY_ACTIVE, 'true');
         localStorage.setItem(this.STORAGE_KEY_MODULE, 'dashboard');
         localStorage.setItem(this.STORAGE_KEY_STEP, '0');
-        window.location.href = 'dashboard.php';
+        window.location.href = 'dashboard';
     }
 
     endTutorial() {
@@ -102,41 +102,43 @@ class TutorialManager {
     }
 
     isCorrectPage(module, page) {
+        // Support both .php and clean URLs during transition
+        const pageClean = page.replace('.php', '');
         const map = {
-            'dashboard': 'dashboard.php',
-            'inventario': 'inventario.php',
-            'catalogos': 'catalogos.php',
-            'almacenes': 'almacenes.php',
-            'proveedores': 'proveedores.php',
-            'clientes': 'clientes.php',
-            'pedidos': 'pedidos.php',
-            'envios': 'envios.php',
-            'cargos': 'cargos_existencias.php',
-            'notas': 'todo.php',
-            'importacion': 'importacion.php',
-            'admin': 'admin.php',
-            'config': 'company_settings.php',
-            'about': 'about.php'
+            'dashboard': 'dashboard',
+            'inventario': 'inventario',
+            'catalogos': 'catalogos',
+            'almacenes': 'almacenes',
+            'proveedores': 'proveedores',
+            'clientes': 'clientes',
+            'pedidos': 'pedidos',
+            'envios': 'envios',
+            'cargos': 'cargos_existencias',
+            'notas': 'todo',
+            'importacion': 'importacion',
+            'admin': 'admin',
+            'config': 'company_settings',
+            'about': 'about'
         };
-        return map[module] === page;
+        return map[module] === pageClean;
     }
 
     getPageForModule(module) {
         const map = {
-            'dashboard': 'dashboard.php',
-            'inventario': 'inventario.php',
-            'catalogos': 'catalogos.php',
-            'almacenes': 'almacenes.php',
-            'proveedores': 'proveedores.php',
-            'clientes': 'clientes.php',
-            'pedidos': 'pedidos.php',
-            'envios': 'envios.php',
-            'cargos': 'cargos_existencias.php',
-            'notas': 'todo.php',
-            'importacion': 'importacion.php',
-            'admin': 'admin.php',
-            'config': 'company_settings.php',
-            'about': 'about.php'
+            'dashboard': 'dashboard',
+            'inventario': 'inventario',
+            'catalogos': 'catalogos',
+            'almacenes': 'almacenes',
+            'proveedores': 'proveedores',
+            'clientes': 'clientes',
+            'pedidos': 'pedidos',
+            'envios': 'envios',
+            'cargos': 'cargos_existencias',
+            'notas': 'todo',
+            'importacion': 'importacion',
+            'admin': 'admin',
+            'config': 'company_settings',
+            'about': 'about'
         };
         return map[module];
     }

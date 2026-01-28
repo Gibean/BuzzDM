@@ -275,7 +275,7 @@
             </div>
 
             <div class="back-to-login">
-                <a href="login.php">
+                <a href="login">
                     <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
                 </a>
             </div>
@@ -400,7 +400,7 @@
 
                         // Redirigir al login después de 3 segundos
                         setTimeout(() => {
-                            window.location.href = 'login.php';
+                            window.location.href = 'login';
                         }, 3000);
                     } else {
                         showAlert(data.message || 'Error al restablecer la contraseña', 'error');

@@ -317,7 +317,7 @@
         </form>
 
         <!-- Forgot Password Link -->
-        <a href="forgot_password.php" class="forgot-password">
+        <a href="forgot_password" class="forgot-password">
             ¿Olvidaste tu contraseña?
         </a>
     </div>
