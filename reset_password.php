@@ -275,7 +275,7 @@
             </div>
 
             <div class="back-to-login">
-                <a href="login.php">
+                <a href="login">
                     <i class="fas fa-arrow-left"></i> Volver al inicio de sesión
                 </a>
             </div>
@@ -380,7 +380,7 @@
                 submitBtn.disabled = true;
 
                 try {
-                    const response = await fetch('php/reset_password_action.php', {
+                    const response = await fetch('php/api_auth.php?action=reset_password', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'
@@ -400,7 +400,7 @@
 
                         // Redirigir al login después de 3 segundos
                         setTimeout(() => {
-                            window.location.href = 'login.php';
+                            window.location.href = 'login';
                         }, 3000);
                     } else {
                         showAlert(data.message || 'Error al restablecer la contraseña', 'error');
@@ -417,7 +417,7 @@
 
             async function validateToken(token) {
                 try {
-                    const response = await fetch('php/validate_token.php', {
+                    const response = await fetch('php/api_auth.php?action=validate_token', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/x-www-form-urlencoded'

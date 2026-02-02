@@ -27,7 +27,7 @@
                 <span class="text-muted ms-2 font-mono">/ UBICACIONES</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openAlmacenModal()">
+                <button class="btn btn-buzz" id="btnNewAlmacen" onclick="openAlmacenModal()">
                     <i class="fas fa-plus"></i> Nuevo Almacén
                 </button>
             </div>
@@ -332,8 +332,8 @@
 
     <div id="toast-container"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/common.js"></script>
+    <!-- System Footer (Includes Tutorial Scripts) -->
+    <?php require_once 'php/system_footer.php'; ?>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/almacenes.js"></script>
 </body>

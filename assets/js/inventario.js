@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
   let currentPage = 1
   const productsPerPage = 10
   let totalProducts = 0
-  const product_actions_url = "php/product_actions.php"
+  const product_actions_url = "php/api_products.php"
 
   // Catalogs cache
   let catalogos = { marcas: [], categorias: [], proveedores: [] }
@@ -157,55 +157,23 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updatePaginationInfo() {
-    const start = (currentPage - 1) * productsPerPage + 1
-    const end = Math.min(currentPage * productsPerPage, totalProducts)
-    showingFromSpan.textContent = totalProducts === 0 ? 0 : start
-    showingToSpan.textContent = end
-    totalProductsSpan.textContent = totalProducts
+    const totalPages = Math.ceil(totalProducts / productsPerPage)
+
+    renderPaginationControls({
+      containerId: 'productsPagination',
+      currentPage: currentPage,
+      totalPages: totalPages,
+      totalItems: totalProducts,
+      itemsPerPage: productsPerPage,
+      onPageChange: (page) => {
+        currentPage = page
+        fetchProducts()
+      }
+    })
   }
 
   function renderPagination() {
-    paginationContainer.innerHTML = ""
-    const totalPages = Math.ceil(totalProducts / productsPerPage)
-
-    if (totalPages <= 1) return
-
-    const createPageItem = (
-      content,
-      page,
-      isDisabled = false,
-      isActive = false
-    ) => {
-      const li = document.createElement("li")
-      li.className = `page-item ${isDisabled ? "disabled" : ""} ${
-        isActive ? "active" : ""
-      }`
-      const a = document.createElement("a")
-      a.className = "page-link"
-      a.href = "#"
-      a.innerHTML = content
-      a.addEventListener("click", (e) => {
-        e.preventDefault()
-        if (!isDisabled) {
-          currentPage = page
-          fetchProducts()
-        }
-      })
-      li.appendChild(a)
-      return li
-    }
-
-    paginationContainer.appendChild(
-      createPageItem("&laquo;", currentPage - 1, currentPage === 1)
-    )
-    for (let i = 1; i <= totalPages; i++) {
-      paginationContainer.appendChild(
-        createPageItem(i, i, false, i === currentPage)
-      )
-    }
-    paginationContainer.appendChild(
-      createPageItem("&raquo;", currentPage + 1, currentPage === totalPages)
-    )
+    // Now handled by updatePaginationInfo
   }
 
   window.openProductModal = function (product = null) {
@@ -397,14 +365,14 @@ document.addEventListener("DOMContentLoaded", function () {
       try {
         if (comp.id) {
           // Update existing
-          await fetch(`php/kit_actions.php?id=${comp.id}`, {
+          await fetch(`php/api_kits.php?id=${comp.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ cantidad: comp.cantidad })
           })
         } else {
           // Add new
-          await fetch('php/kit_actions.php', {
+          await fetch('php/api_kits.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -705,7 +673,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function cargarCatalogos() {
     try {
-      const response = await fetch('php/catalogos_actions.php?type=resumen')
+      const response = await fetch('php/api_catalogs.php?type=resumen')
       const data = await response.json()
 
       if (data.success) {
@@ -842,7 +810,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   async function cargarComponentesKit(kitId) {
     try {
-      const response = await fetch(`php/kit_actions.php?kit_id=${kitId}`)
+      const response = await fetch(`php/api_kits.php?kit_id=${kitId}`)
       const data = await response.json()
 
       if (data.success) {
@@ -932,47 +900,156 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   window.agregarComponenteKit = function() {
-    // Show a simple prompt to search for product
-    const sku = prompt('Ingresa el SKU o nombre del producto a agregar:')
-    if (!sku) return
-
-    // Search for product
-    buscarProductoComponente(sku)
+    // Open the kit component search modal
+    const modal = document.getElementById('kitComponentModal')
+    if (modal) {
+      modal.style.display = 'flex'
+      document.getElementById('kitComponentSearch').value = ''
+      document.getElementById('kitComponentResults').innerHTML = `
+        <div class="text-center text-muted py-4" id="kitComponentPlaceholder">
+          <i class="fas fa-search fa-2x mb-2"></i>
+          <p class="mb-0">Escribe para buscar productos</p>
+        </div>
+      `
+      document.getElementById('kitComponentSelected').style.display = 'none'
+      document.getElementById('kitComponentQuantityRow').style.display = 'none'
+      document.getElementById('kitComponentQuantity').value = '1'
+      setTimeout(() => document.getElementById('kitComponentSearch').focus(), 100)
+    }
   }
 
-  async function buscarProductoComponente(search) {
+  window.closeKitComponentModal = function() {
+    const modal = document.getElementById('kitComponentModal')
+    if (modal) modal.style.display = 'none'
+  }
+
+  // Debounce for search
+  let kitSearchTimeout = null
+  const kitSearchInput = document.getElementById('kitComponentSearch')
+  if (kitSearchInput) {
+    kitSearchInput.addEventListener('input', function() {
+      clearTimeout(kitSearchTimeout)
+      const query = this.value.trim()
+
+      if (query.length < 2) {
+        document.getElementById('kitComponentResults').innerHTML = `
+          <div class="text-center text-muted py-4">
+            <i class="fas fa-search fa-2x mb-2"></i>
+            <p class="mb-0">Escribe al menos 2 caracteres</p>
+          </div>
+        `
+        return
+      }
+
+      document.getElementById('kitComponentSpinner').style.display = 'block'
+
+      kitSearchTimeout = setTimeout(() => {
+        buscarProductosParaKit(query)
+      }, 300)
+    })
+  }
+
+  async function buscarProductosParaKit(search) {
     try {
-      const response = await fetch(`php/productos_search.php?q=${encodeURIComponent(search)}&limit=5`)
+      const response = await fetch(`php/search_api.php?action=search_products&query=${encodeURIComponent(search)}`)
       const data = await response.json()
 
-      if (data.success && data.productos.length > 0) {
-        const producto = data.productos[0]
+      document.getElementById('kitComponentSpinner').style.display = 'none'
 
-        // Check if already in list
-        if (kitComponentes.some(c => c.componenteId == producto.id)) {
-          showToast('Este producto ya está en el kit', 'warning')
-          return
-        }
+      const resultsContainer = document.getElementById('kitComponentResults')
 
-        kitComponentes.push({
-          id: null,
-          componenteId: producto.id,
-          sku: producto.sku,
-          nombre: producto.nombre,
-          cantidad: 1,
-          precio: parseFloat(producto.precio || 0),
-          stock: parseInt(producto.stock || 0)
-        })
-
-        renderKitComponentes()
-        showToast('Componente agregado', 'success')
+      if (data.success && data.products && data.products.length > 0) {
+        resultsContainer.innerHTML = data.products.map(p => {
+          const alreadyInKit = kitComponentes.some(c => c.componenteId == p.id)
+          return `
+            <div class="kit-search-result p-2 mb-2 border-bottom border-secondary ${alreadyInKit ? 'opacity-50' : ''}"
+                 style="cursor: ${alreadyInKit ? 'not-allowed' : 'pointer'}; background: var(--buzz-card-bg); border-radius: 6px;"
+                 ${alreadyInKit ? '' : `onclick="selectKitComponent(${p.id}, '${p.sku}', '${(p.nombre || '').replace(/'/g, "\\'")}', ${p.precio || 0}, ${p.stock || 0})"`}>
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <span class="font-mono text-accent">${p.sku}</span>
+                  <span class="ms-2">${p.nombre}</span>
+                  ${alreadyInKit ? '<span class="badge bg-warning ms-2">Ya en kit</span>' : ''}
+                </div>
+                <div class="text-end">
+                  <div class="text-accent">$${parseFloat(p.precio || 0).toFixed(2)}</div>
+                  <small class="text-muted">Stock: ${p.stock || 0}</small>
+                </div>
+              </div>
+            </div>
+          `
+        }).join('')
       } else {
-        showToast('Producto no encontrado', 'warning')
+        resultsContainer.innerHTML = `
+          <div class="text-center text-muted py-4">
+            <i class="fas fa-box-open fa-2x mb-2"></i>
+            <p class="mb-0">No se encontraron productos</p>
+          </div>
+        `
       }
     } catch (error) {
-      console.error('Error buscando producto:', error)
-      showToast('Error al buscar producto', 'danger')
+      console.error('Error buscando productos:', error)
+      document.getElementById('kitComponentSpinner').style.display = 'none'
+      document.getElementById('kitComponentResults').innerHTML = `
+        <div class="text-center text-danger py-4">
+          <i class="fas fa-exclamation-triangle fa-2x mb-2"></i>
+          <p class="mb-0">Error al buscar productos</p>
+        </div>
+      `
     }
+  }
+
+  window.selectKitComponent = function(id, sku, nombre, precio, stock) {
+    document.getElementById('selectedComponentId').value = id
+    document.getElementById('selectedComponentSku').textContent = sku
+    document.getElementById('selectedComponentName').textContent = nombre
+    document.getElementById('selectedComponentPrice').textContent = parseFloat(precio).toFixed(2)
+    document.getElementById('selectedComponentStock').textContent = stock
+
+    document.getElementById('kitComponentSelected').style.display = 'block'
+    document.getElementById('kitComponentQuantityRow').style.display = 'block'
+    document.getElementById('kitComponentResults').innerHTML = ''
+    document.getElementById('kitComponentSearch').value = ''
+    document.getElementById('kitComponentQuantity').focus()
+  }
+
+  window.clearSelectedComponent = function() {
+    document.getElementById('kitComponentSelected').style.display = 'none'
+    document.getElementById('kitComponentQuantityRow').style.display = 'none'
+    document.getElementById('kitComponentSearch').focus()
+  }
+
+  window.confirmAddKitComponent = function() {
+    const id = parseInt(document.getElementById('selectedComponentId').value)
+    const sku = document.getElementById('selectedComponentSku').textContent
+    const nombre = document.getElementById('selectedComponentName').textContent
+    const precio = parseFloat(document.getElementById('selectedComponentPrice').textContent)
+    const stock = parseInt(document.getElementById('selectedComponentStock').textContent)
+    const cantidad = parseFloat(document.getElementById('kitComponentQuantity').value) || 1
+
+    if (cantidad <= 0) {
+      showToast('La cantidad debe ser mayor a 0', 'warning')
+      return
+    }
+
+    if (kitComponentes.some(c => c.componenteId == id)) {
+      showToast('Este producto ya está en el kit', 'warning')
+      return
+    }
+
+    kitComponentes.push({
+      id: null,
+      componenteId: id,
+      sku: sku,
+      nombre: nombre,
+      cantidad: cantidad,
+      precio: precio,
+      stock: stock
+    })
+
+    renderKitComponentes()
+    showToast('Componente agregado al kit', 'success')
+    closeKitComponentModal()
   }
 
   window.actualizarCantidadComponente = function(idx, cantidad) {

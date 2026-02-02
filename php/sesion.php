@@ -1,41 +1,68 @@
 <?php
 // Inicia la sesión en cada página que lo requiera
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use function PHPSTORM_META\map;
 
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// Generate CSRF token if not exists
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+/**
+ * Get CSRF token for forms
+ * @return string CSRF token
+ */
+function getCsrfToken(): string {
+    return $_SESSION['csrf_token'] ?? '';
+}
+
+/**
+ * Validate CSRF token
+ * @param string $token Token from form/request
+ * @return bool Whether token is valid
+ */
+function validateCsrfToken(string $token): bool {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+/**
+ * Get CSRF input field HTML
+ * @return string Hidden input HTML
+ */
+function csrfField(): string {
+    return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars(getCsrfToken()) . '">';
+}
+
 // List of API scripts that should return JSON on auth/access failure
 $api_scripts = [
     'api_sales_chart.php',
-    'clientes_actions.php',
-    'get_import_history.php',
-    'pedidos_actions.php',
-    'product_actions.php',
-    'search_api.php',
-    'process_import.php',
-    'settings_actions.php',
-    'logs.php',
-    'users.php',
-    'backups.php',
-    'backup_status.php',
-    // Phase 1 - Cargos de existencias
-    'cargos_actions.php',
-    'productos_search.php',
-    'proveedores_search.php',
-    // Phase 1.7 - Product types and kits
-    'catalogos_actions.php',
-    'kit_actions.php',
-    // Phase 2 - Multi-warehouse
-    'almacenes_actions.php',
-    'ubicaciones_actions.php',
-    // Proveedores
-    'proveedores_actions.php',
+    'api_clientes.php', // Standardized API
+    'api_products.php', // Standardized API
+    'api_orders.php', // Standardized API
+    'api_warehouses.php', // Standardized API
+    'api_import.php', // Standardized API
+    'api_cargos.php', // Standardized API
+    'api_notes.php', // Standardized API
+    'api_suppliers.php', // Standardized API
+    'api_settings.php', // Standardized API
+    'api_backups.php', // Standardized API
+    'api_users.php', // Standardized API
+    'api_catalogs.php', // Standardized API
+    'api_logs.php', // Standardized API - Logs
+    'api_auth.php', // Standardized API - Authentication
+    'api_shipments.php', // Standardized API - Shipments
+    'api_locations.php', // Standardized API - Locations
+    'api_kits.php', // Standardized API - Kit Components
     // Notificaciones y estadísticas
     'api_notifications.php',
-    'api_stats.php'
+    'api_stats.php',
+    'api_2fa.php' // Two-Factor Authentication
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -53,13 +80,13 @@ if (!isset($_SESSION['usuario_id'])) {
     if ($is_api_call) {
         json_auth_error('No autenticado. Por favor, inicia sesión.');
     } else {
-        header('Location: login.php');
+        header('Location: login');
         exit();
     }
 }
 
 // Conexión a la base de datos
-require_once 'db.php'; // This now provides the getDbConnection() function
+require_once __DIR__ . '/db.php'; // This now provides the getDbConnection() function
 $pdo = getDbConnection(); // Call the function to get the PDO object
 
 // Verificar si el usuario está logeado y obtener su rol
@@ -83,7 +110,7 @@ if (isset($_SESSION['usuario_id'])) {
         if ($is_api_call) {
             json_auth_error('Usuario no encontrado. Sesión inválida.');
         } else {
-            header('Location: login.php');
+            header('Location: login');
             exit();
         }
     }
@@ -125,33 +152,30 @@ $fallback_pages = [
     'admin' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
         'admin.php', 'about.php', 'manual.php', 'login.php', 'logout.php',
-        'api_sales_chart.php', 'create_admin.php', 'get_import_history.php', 'product_actions.php',
-        'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'pedidos_actions.php',
-        'search_api.php', 'clientes.php', 'clientes_actions.php', 'api_sales_by_status_chart.php',
-        'envios_actions.php', 'company_settings.php', 'company_settings_actions.php', 'backup.php',
-        'backups.php', 'backup_status.php', 'logs.php', 'process_import.php', 'settings_actions.php',
-        'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php', 'productos_search.php',
-        'catalogos_actions.php', 'kit_actions.php', 'almacenes_actions.php', 'ubicaciones_actions.php',
-        'proveedores.php', 'proveedores_actions.php', 'proveedores_search.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php'
+        'api_sales_chart.php', 'create_admin.php', 'get_import_history.php',
+        'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'api_orders.php',
+        'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
+        'backup_status.php', 'api_logs.php',
+        'cargos_existencias.php', 'almacenes.php',
+        'proveedores.php', 'todo.php', 'notas_actions.php',
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
+        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php',
+        'api_2fa.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
         'about.php', 'manual.php', 'login.php', 'logout.php', 'api_sales_chart.php',
-        'get_import_history.php', 'product_actions.php', 'users.php', 'sesion.php', 'db.php',
-        'sidebar.php', 'reports.php', 'pedidos_actions.php', 'search_api.php', 'clientes.php',
-        'clientes_actions.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
-        'process_import.php', 'cargos_existencias.php', 'almacenes.php', 'cargos_actions.php',
-        'productos_search.php', 'proveedores_search.php', 'catalogos_actions.php', 'kit_actions.php',
-        'almacenes_actions.php', 'ubicaciones_actions.php', 'proveedores.php', 'proveedores_actions.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php'
+        'api_products.php', 'sesion.php', 'db.php',
+        'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
+        'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
-        'pedidos_actions.php', 'search_api.php', 'api_sales_by_status_chart.php',
-        'envios_actions.php', 'product_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php'
+        'api_orders.php', 'api_sales_by_status_chart.php',
+        'envios_actions.php', 'todo.php', 'notas_actions.php',
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php'
     ]
 ];
 
@@ -162,12 +186,18 @@ if (!empty($db_permissions)) {
     $allowed_pages = $fallback_pages;
 }
 
+// HOTFIX: Ensure api_logs.php is allowed for admin even if not in DB yet (failed migration protection)
+if ($user_role === 'admin' && isset($allowed_pages['admin']) && !in_array('api_logs.php', $allowed_pages['admin'])) {
+    $allowed_pages['admin'][] = 'api_logs.php';
+}
+
 // Always-allowed APIs for any authenticated user (core system functionality)
 $always_allowed_apis = [
     'api_notifications.php',
     'api_stats.php',
     'search_api.php',
-    'sidebar.php'
+    'sidebar.php',
+    'api_2fa.php' // 2FA is available for all authenticated users
 ];
 
 // Merge always-allowed APIs into current user's permissions
@@ -183,10 +213,10 @@ if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_page
         json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
     } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
         // Fix relative path redirect issues
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard.php' : 'dashboard.php';
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard' : 'dashboard';
         header("Location: $redirectPath?error=access_denied&code=403");
     } else {
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login.php' : 'login.php';
+        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login' : 'login';
         header("Location: $redirectPath?error=auth_required&code=401");
     }
     exit();
@@ -197,7 +227,7 @@ if ($current_page === 'admin.php' && ($user_role === 'supervisor' || $user_role 
     if ($is_api_call) {
         json_auth_error('Acceso denegado a la administración.');
     } else {
-        header('Location: dashboard.php');
+        header('Location: dashboard');
         exit();
     }
 }
@@ -207,7 +237,7 @@ if (($current_page === 'inventario.php' || $current_page === 'importacion.php') 
     if ($is_api_call) {
         json_auth_error('Acceso denegado al inventario/importación.');
     } else {
-        header('Location: dashboard.php');
+        header('Location: dashboard');
         exit();
     }
 }

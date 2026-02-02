@@ -68,7 +68,7 @@ if (isset($_SESSION['message'])) {
         <!-- Company Settings Form -->
         <div class="buzz-card mb-4">
             <h5 class="font-primary text-primary mb-3">DATOS DE LA EMPRESA</h5>
-            <form id="companySettingsForm" action="php/company_settings_actions.php" method="POST" enctype="multipart/form-data">
+            <form id="companySettingsForm" action="php/api_settings.php" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">

@@ -121,11 +121,20 @@ try {
         <div class="row">
             <div class="col-lg-8 mb-4 dashboard-item">
                 <div class="buzz-card chart-container tactical-card">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                         <h5 class="font-primary text-primary mb-0 section-header">FLUJO DE VENTAS</h5>
-                        <div class="real-time-indicator">
-                            <i class="status-indicator-live"></i>
-                            <span class="font-mono text-muted" style="font-size: 0.8rem;">LIVE_SYSTEM</span>
+                        <div class="d-flex align-items-center gap-3">
+                            <!-- Period Selector Tabs -->
+                            <div class="chart-period-tabs" role="tablist">
+                                <button class="period-tab" data-period="7" title="Última semana">7D</button>
+                                <button class="period-tab active" data-period="30" title="Último mes">1M</button>
+                                <button class="period-tab" data-period="180" title="Últimos 6 meses">6M</button>
+                            </div>
+                            <!-- Live Indicator -->
+                            <div class="live-indicator">
+                                <span class="live-dot"></span>
+                                <span class="live-text">EN VIVO</span>
+                            </div>
                         </div>
                     </div>
                     <div style="position: relative; height: 320px;">
@@ -154,7 +163,7 @@ try {
         <div class="row">
             <!-- Top Products -->
             <div class="col-lg-4 mb-4 dashboard-item">
-                <div class="buzz-card tech-effect tactical-card h-100">
+                <div class="buzz-card tech-effect tactical-card h-100" id="topProductsCard">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="font-primary text-primary mb-0 section-header">
                             <i class="fas fa-trophy me-2"></i>TOP 5 PRODUCTOS

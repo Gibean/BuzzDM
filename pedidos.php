@@ -35,70 +35,66 @@
             </div>
         </nav>
 
-        <!--  Stats Cards  -->
-        <div class="row mb-4">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalOrders">0</span>
-                    <span class="stats-label">Total Pedidos</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="pendingOrders">0</span>
-                    <span class="stats-label">Pendientes</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="paidOrders">0</span>
-                    <span class="stats-label">Pagados</span>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="stats-card">
-                    <span class="stats-number" id="totalRevenue">€0</span>
-                    <span class="stats-label">Ingresos Totales</span>
-                </div>
-            </div>
-        </div>
 
-        <!--  Filters  -->
-        <div class="buzz-card mb-4">
-            <div class="filter-wrapper">
-                <div class="filter-group filter-search">
-                    <label class="text-muted">Buscar pedido</label>
-                    <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID, cliente...">
+            <!-- Filtros -->
+            <div class="buzz-card mb-4 pb-3">
+                <div class="filter-wrapper">
+                    <!-- Basic Filters (Always Visible) -->
+                    <div class="filter-group filter-search">
+                        <label class="text-muted">Buscar</label>
+                        <input type="text" class="form-control form-control-buzz" id="searchInput" placeholder="ID, cliente...">
+                    </div>
+                    <div class="filter-group filter-select">
+                        <label class="text-muted">Estado de pago</label>
+                        <select class="form-control form-control-buzz" id="paymentFilter">
+                            <option value="">Todos</option>
+                            <option value="pagado">Pagado</option>
+                            <option value="no-pagado">No Pagado</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group filter-actions">
+                        <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                            <i class="fas fa-filter"></i>
+                            <span class="btn-text">Filtros Avanzados</span>
+                            <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                        </button>
+                        <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar">
+                            <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="filter-group filter-select">
-                    <label class="text-muted">Estado de pago</label>
-                    <select class="form-control form-control-buzz" id="paymentFilter">
-                        <option value="">Todos</option>
-                        <option value="pagado">Pagado</option>
-                        <option value="no-pagado">No Pagado</option>
-                    </select>
-                </div>
-                <div class="filter-group filter-date">
-                    <label class="text-muted">Fecha desde</label>
-                    <input type="date" class="form-control form-control-buzz" id="dateFrom">
-                </div>
-                <div class="filter-group filter-date">
-                    <label class="text-muted">Fecha hasta</label>
-                    <input type="date" class="form-control form-control-buzz" id="dateTo">
-                </div>
-                <div class="filter-group filter-checkbox">
-                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                    <label class="form-check-label text-muted" for="showDeletedFilter">
-                        Ver eliminados
-                    </label>
-                </div>
-                <div class="filter-group filter-actions">
-                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
-                    </button>
+
+                <!-- Advanced Filters (Collapsible) -->
+                <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                    <hr class="border-secondary opacity-25">
+                    <div class="filter-wrapper">
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Desde</label>
+                            <input type="date" class="form-control form-control-buzz" id="dateFrom">
+                        </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Hasta</label>
+                            <input type="date" class="form-control form-control-buzz" id="dateTo">
+                        </div>
+                        <div class="filter-group filter-select">
+                            <label class="text-muted">Estado de envío</label>
+                            <select class="form-control form-control-buzz" id="shippingFilter">
+                                <option value="">Todos</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="enviado">Enviado</option>
+                                <option value="recibido">Recibido</option>
+                            </select>
+                        </div>
+                        <div class="filter-group filter-check d-flex align-items-center mb-0 mt-3 mt-md-0">
+                            <div class="form-check form-switch custom-switch-buzz">
+                                <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                                <label class="form-check-label text-muted" for="showDeletedFilter">Ver eliminados</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <!--  Orders List  -->
         <div class="buzz-card">

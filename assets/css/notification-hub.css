@@ -131,37 +131,56 @@
 /* ============================================
    OFFCANVAS ACTIONS
    ============================================ */
+/* ============================================
+   OFFCANVAS ACTIONS
+   ============================================ */
 .notification-offcanvas .offcanvas-actions {
-  padding: 10px 20px;
+  padding: 15px 20px;
   display: flex;
   justify-content: space-between;
+  gap: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 0.75rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.2);
 }
 
 .notification-offcanvas .action-link {
-  color: var(--notif-blue);
-  background: none;
-  border: none;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--buzz-text-muted);
   cursor: pointer;
   text-decoration: none;
   transition: all 0.2s;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-family: var(--font-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .notification-offcanvas .action-link:hover {
+  background: rgba(255, 255, 255, 0.1);
   color: #fff;
-  background: rgba(0, 242, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.notification-offcanvas .action-link:active {
+  transform: translateY(0);
 }
 
 .notification-offcanvas .action-link.text-danger {
-  color: #dc3545;
+  color: #ff6b6b;
+  border-color: rgba(220, 53, 69, 0.3);
 }
 
 .notification-offcanvas .action-link.text-danger:hover {
-  background: rgba(220, 53, 69, 0.1);
+  background: rgba(220, 53, 69, 0.15);
+  color: #ff8787;
+  border-color: rgba(220, 53, 69, 0.5);
 }
 
 /* ============================================
@@ -170,7 +189,7 @@
 .notification-offcanvas .offcanvas-body {
   flex: 1;
   overflow-y: auto;
-  padding: 0;
+  padding: 10px;
 }
 
 /* Custom scrollbar */
@@ -179,44 +198,71 @@
 }
 
 .notification-offcanvas .offcanvas-body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 
 .notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb {
-  background: rgba(255, 160, 0, 0.3);
+  background: rgba(255, 160, 0, 0.2);
   border-radius: 3px;
 }
 
 .notification-offcanvas .offcanvas-body::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 160, 0, 0.5);
+  background: var(--notif-accent);
 }
 
 /* ============================================
    NOTIFICATION ITEMS
    ============================================ */
 .notif-item {
-  padding: 15px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  transition: all 0.2s;
+  padding: 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   cursor: pointer;
+  overflow: hidden;
+}
+
+.notif-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.2s;
 }
 
 .notif-item:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateX(4px);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .notif-item.unread {
-  background: rgba(0, 242, 255, 0.03);
-  border-left: 3px solid var(--notif-blue);
+  background: linear-gradient(90deg, rgba(0, 242, 255, 0.05) 0%, rgba(0, 242, 255, 0.01) 100%);
+  border: 1px solid rgba(0, 242, 255, 0.1);
+}
+
+.notif-item.unread::before {
+  background: var(--notif-blue);
 }
 
 .notif-icon {
-  font-size: 1.2rem;
-  margin-right: 12px;
-  width: 28px;
-  text-align: center;
-  opacity: 0.9;
+  font-size: 1.1rem;
+  margin-right: 15px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .notif-content {
@@ -230,12 +276,13 @@
   color: #fff;
   margin-bottom: 4px;
   line-height: 1.3;
+  font-family: var(--font-secondary);
 }
 
 .notif-message {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
-  line-height: 1.4;
+  color: var(--buzz-text-muted);
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   line-clamp: 2;
@@ -246,18 +293,19 @@
 .notif-time {
   font-size: 0.7rem;
   color: rgba(255, 255, 255, 0.3);
-  margin-top: 6px;
+  margin-top: 8px;
   display: block;
   font-family: var(--font-monospace, monospace);
+  letter-spacing: 0.5px;
 }
 
 /* Notification Types */
-.notif-item.type-success .notif-icon { color: var(--notif-success); }
-.notif-item.type-error .notif-icon { color: var(--notif-red); }
-.notif-item.type-warning .notif-icon { color: var(--notif-accent); }
-.notif-item.type-info .notif-icon { color: var(--notif-blue); }
-.notif-item.type-task_assign .notif-icon { color: #d63384; }
-.notif-item.type-security .notif-icon { color: #dc3545; }
+.notif-item.type-success .notif-icon { color: var(--notif-success); background: rgba(40, 167, 69, 0.1); }
+.notif-item.type-error .notif-icon { color: var(--notif-red); background: rgba(220, 53, 69, 0.1); }
+.notif-item.type-warning .notif-icon { color: var(--notif-accent); background: rgba(255, 160, 0, 0.1); }
+.notif-item.type-info .notif-icon { color: var(--notif-blue); background: rgba(0, 242, 255, 0.1); }
+.notif-item.type-task_assign .notif-icon { color: #d63384; background: rgba(214, 51, 132, 0.1); }
+.notif-item.type-security .notif-icon { color: #dc3545; background: rgba(220, 53, 69, 0.1); }
 
 /* ============================================
    EMPTY STATE
