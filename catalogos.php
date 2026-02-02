@@ -137,7 +137,7 @@
         <div class="modal-content-buzz modal-catalog">
             <div class="modal-header-buzz">
                 <h5 class="font-primary text-primary" id="itemModalTitle">
-                    <i id="modalIconClass" class="fas fa-edit"></i>
+                    <span id="modalIcon"><i class="fas fa-edit"></i></span>
                     <span id="modalTitleText">Editar Item</span>
                 </h5>
                 <button type="button" class="close-buzz" onclick="closeItemModal()">&times;</button>

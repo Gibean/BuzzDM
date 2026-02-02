@@ -49,7 +49,7 @@ async function fetchAllCatalogs() {
 
     try {
         await Promise.all(catalogs.map(async (catalog) => {
-            const response = await fetch(`php/catalogos_actions.php?catalog=${catalog}`);
+            const response = await fetch(`php/api_catalogs.php?catalog=${catalog}`);
             const result = await response.json();
             if (result.success) {
                 catalogsData[catalog] = result.data || [];
@@ -354,7 +354,7 @@ window.saveItem = async function() {
     }
 
     try {
-        const response = await fetch('php/catalogos_actions.php', {
+        const response = await fetch('php/api_catalogs.php', {
             method: id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
@@ -380,7 +380,7 @@ window.deleteItem = async function(catalog, id) {
     if (!confirm('¿Estás seguro de eliminar este registro?')) return;
 
     try {
-        const response = await fetch(`php/catalogos_actions.php?catalog=${catalog}&id=${id}`, {
+        const response = await fetch(`php/api_catalogs.php?catalog=${catalog}&id=${id}`, {
             method: 'DELETE'
         });
 

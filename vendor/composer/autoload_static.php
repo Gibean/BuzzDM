@@ -90,14 +90,15 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         '320cde22f66dd4f5d3fd621d3e88b98f' => __DIR__ . '/..' . '/symfony/polyfill-ctype/bootstrap.php',
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
+        'dddd44608da72a00b57f77096a4b21b7' => __DIR__ . '/../..' . '/php/api_docs_config.php',
     );
 
     public static $prefixLengthsPsr4 = array (
-        'Z' => 
+        'Z' =>
         array (
             'ZipStream\\' => 10,
         ),
-        'S' => 
+        'S' =>
         array (
             'Symfony\\Polyfill\\Php80\\' => 23,
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -105,139 +106,198 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
             'Svg\\' => 4,
             'Sabberworm\\CSS\\' => 15,
         ),
-        'P' => 
+        'P' =>
         array (
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Log\\' => 8,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'PragmaRX\\Google2FA\\' => 19,
             'PhpOption\\' => 10,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
+            'ParagonIE\\ConstantTime\\' => 23,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
-        'M' => 
+        'M' =>
         array (
             'Monolog\\' => 8,
             'Matrix\\' => 7,
             'Masterminds\\' => 12,
         ),
-        'G' => 
+        'G' =>
         array (
             'GrahamCampbell\\ResultType\\' => 26,
         ),
-        'F' => 
+        'F' =>
         array (
             'FontLib\\' => 8,
         ),
-        'D' => 
+        'D' =>
         array (
             'Dotenv\\' => 7,
             'Dompdf\\' => 7,
+            'DASPRiD\\Enum\\' => 13,
         ),
-        'C' => 
+        'C' =>
         array (
             'Composer\\Pcre\\' => 14,
             'Complex\\' => 8,
         ),
+        'B' =>
+        array (
+            'BaconQrCode\\' => 12,
+        ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'ZipStream\\' => 
+        'ZipStream\\' =>
         array (
             0 => __DIR__ . '/..' . '/maennchen/zipstream-php/src',
         ),
-        'Symfony\\Polyfill\\Php80\\' => 
+        'Symfony\\Polyfill\\Php80\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-php80',
         ),
-        'Symfony\\Polyfill\\Mbstring\\' => 
+        'Symfony\\Polyfill\\Mbstring\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
         ),
-        'Symfony\\Polyfill\\Ctype\\' => 
+        'Symfony\\Polyfill\\Ctype\\' =>
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-ctype',
         ),
-        'Svg\\' => 
+        'Svg\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-svg-lib/src/Svg',
         ),
-        'Sabberworm\\CSS\\' => 
+        'Sabberworm\\CSS\\' =>
         array (
             0 => __DIR__ . '/..' . '/sabberworm/php-css-parser/src',
         ),
-        'Psr\\SimpleCache\\' => 
+        'Psr\\SimpleCache\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/simple-cache/src',
         ),
-        'Psr\\Log\\' => 
+        'Psr\\Log\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/log/src',
         ),
-        'Psr\\Http\\Message\\' => 
+        'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
             1 => __DIR__ . '/..' . '/psr/http-message/src',
         ),
-        'Psr\\Http\\Client\\' => 
+        'Psr\\Http\\Client\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
-        'PhpOption\\' => 
+        'PragmaRX\\Google2FA\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/pragmarx/google2fa/src',
+        ),
+        'PhpOption\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoption/phpoption/src/PhpOption',
         ),
-        'PhpOffice\\PhpSpreadsheet\\' => 
+        'PhpOffice\\PhpSpreadsheet\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpoffice/phpspreadsheet/src/PhpSpreadsheet',
         ),
-        'PHPMailer\\PHPMailer\\' => 
+        'ParagonIE\\ConstantTime\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
+        'PHPMailer\\PHPMailer\\' =>
         array (
             0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
-        'Monolog\\' => 
+        'Monolog\\' =>
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
-        'Matrix\\' => 
+        'Matrix\\' =>
         array (
             0 => __DIR__ . '/..' . '/markbaker/matrix/classes/src',
         ),
-        'Masterminds\\' => 
+        'Masterminds\\' =>
         array (
             0 => __DIR__ . '/..' . '/masterminds/html5/src',
         ),
-        'GrahamCampbell\\ResultType\\' => 
+        'GrahamCampbell\\ResultType\\' =>
         array (
             0 => __DIR__ . '/..' . '/graham-campbell/result-type/src',
         ),
-        'FontLib\\' => 
+        'FontLib\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/php-font-lib/src/FontLib',
         ),
-        'Dotenv\\' => 
+        'Dotenv\\' =>
         array (
             0 => __DIR__ . '/..' . '/vlucas/phpdotenv/src',
         ),
-        'Dompdf\\' => 
+        'Dompdf\\' =>
         array (
             0 => __DIR__ . '/..' . '/dompdf/dompdf/src',
         ),
-        'Composer\\Pcre\\' => 
+        'DASPRiD\\Enum\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/dasprid/enum/src',
+        ),
+        'Composer\\Pcre\\' =>
         array (
             0 => __DIR__ . '/..' . '/composer/pcre/src',
         ),
-        'Complex\\' => 
+        'Complex\\' =>
         array (
             0 => __DIR__ . '/..' . '/markbaker/complex/classes/src',
+        ),
+        'BaconQrCode\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/bacon/bacon-qr-code/src',
         ),
     );
 
     public static $classMap = array (
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
+        'AuthController' => __DIR__ . '/../..' . '/php/src/Controller/AuthController.php',
+        'AuthRepository' => __DIR__ . '/../..' . '/php/src/Repository/AuthRepository.php',
+        'AuthService' => __DIR__ . '/../..' . '/php/src/Service/AuthService.php',
+        'BackupController' => __DIR__ . '/../..' . '/php/src/Controller/BackupController.php',
+        'BackupRepository' => __DIR__ . '/../..' . '/php/src/Repository/BackupRepository.php',
+        'BackupService' => __DIR__ . '/../..' . '/php/src/Service/BackupService.php',
+        'CargoController' => __DIR__ . '/../..' . '/php/src/Controller/CargoController.php',
+        'CargoRepository' => __DIR__ . '/../..' . '/php/src/Repository/CargoRepository.php',
+        'CargoService' => __DIR__ . '/../..' . '/php/src/Service/CargoService.php',
+        'CatalogController' => __DIR__ . '/../..' . '/php/src/Controller/CatalogController.php',
+        'CatalogRepository' => __DIR__ . '/../..' . '/php/src/Repository/CatalogRepository.php',
+        'CatalogService' => __DIR__ . '/../..' . '/php/src/Service/CatalogService.php',
+        'ClienteController' => __DIR__ . '/../..' . '/php/src/Controller/ClienteController.php',
+        'ClienteRepository' => __DIR__ . '/../..' . '/php/src/Repository/ClienteRepository.php',
+        'ClienteService' => __DIR__ . '/../..' . '/php/src/Service/ClienteService.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Dompdf\\Cpdf' => __DIR__ . '/..' . '/dompdf/dompdf/lib/Cpdf.php',
+        'ImportController' => __DIR__ . '/../..' . '/php/src/Controller/ImportController.php',
+        'ImportRepository' => __DIR__ . '/../..' . '/php/src/Repository/ImportRepository.php',
+        'ImportService' => __DIR__ . '/../..' . '/php/src/Service/ImportService.php',
+        'KitController' => __DIR__ . '/../..' . '/php/src/Controller/KitController.php',
+        'KitRepository' => __DIR__ . '/../..' . '/php/src/Repository/KitRepository.php',
+        'KitService' => __DIR__ . '/../..' . '/php/src/Service/KitService.php',
+        'LocationController' => __DIR__ . '/../..' . '/php/src/Controller/LocationController.php',
+        'LocationRepository' => __DIR__ . '/../..' . '/php/src/Repository/LocationRepository.php',
+        'LocationService' => __DIR__ . '/../..' . '/php/src/Service/LocationService.php',
+        'LogController' => __DIR__ . '/../..' . '/php/src/Controller/LogController.php',
+        'LogRepository' => __DIR__ . '/../..' . '/php/src/Repository/LogRepository.php',
+        'LogService' => __DIR__ . '/../..' . '/php/src/Service/LogService.php',
+        'NoteController' => __DIR__ . '/../..' . '/php/src/Controller/NoteController.php',
+        'NoteRepository' => __DIR__ . '/../..' . '/php/src/Repository/NoteRepository.php',
+        'NoteService' => __DIR__ . '/../..' . '/php/src/Service/NoteService.php',
+        'OrderController' => __DIR__ . '/../..' . '/php/src/Controller/OrderController.php',
+        'OrderRepository' => __DIR__ . '/../..' . '/php/src/Repository/OrderRepository.php',
+        'OrderService' => __DIR__ . '/../..' . '/php/src/Service/OrderService.php',
         'PhpToken' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+        'ProductController' => __DIR__ . '/../..' . '/php/src/Controller/ProductController.php',
+        'ProductRepository' => __DIR__ . '/../..' . '/php/src/Repository/ProductRepository.php',
+        'ProductService' => __DIR__ . '/../..' . '/php/src/Service/ProductService.php',
         'Safe\\DateTime' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTime.php',
         'Safe\\DateTimeImmutable' => __DIR__ . '/..' . '/thecodingmachine/safe/lib/DateTimeImmutable.php',
         'Safe\\Exceptions\\ApacheException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ApacheException.php',
@@ -321,9 +381,26 @@ class ComposerStaticInit5fcd097d580619b7ade124f385609135
         'Safe\\Exceptions\\YazException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/YazException.php',
         'Safe\\Exceptions\\ZipException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZipException.php',
         'Safe\\Exceptions\\ZlibException' => __DIR__ . '/..' . '/thecodingmachine/safe/generated/Exceptions/ZlibException.php',
+        'SettingsController' => __DIR__ . '/../..' . '/php/src/Controller/SettingsController.php',
+        'SettingsRepository' => __DIR__ . '/../..' . '/php/src/Repository/SettingsRepository.php',
+        'SettingsService' => __DIR__ . '/../..' . '/php/src/Service/SettingsService.php',
+        'ShipmentController' => __DIR__ . '/../..' . '/php/src/Controller/ShipmentController.php',
+        'ShipmentRepository' => __DIR__ . '/../..' . '/php/src/Repository/ShipmentRepository.php',
+        'ShipmentService' => __DIR__ . '/../..' . '/php/src/Service/ShipmentService.php',
         'Stringable' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+        'SupplierController' => __DIR__ . '/../..' . '/php/src/Controller/SupplierController.php',
+        'SupplierRepository' => __DIR__ . '/../..' . '/php/src/Repository/SupplierRepository.php',
+        'SupplierService' => __DIR__ . '/../..' . '/php/src/Service/SupplierService.php',
+        'TwoFactorController' => __DIR__ . '/../..' . '/php/src/Controller/TwoFactorController.php',
+        'TwoFactorService' => __DIR__ . '/../..' . '/php/src/Service/TwoFactorService.php',
         'UnhandledMatchError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+        'UserController' => __DIR__ . '/../..' . '/php/src/Controller/UserController.php',
+        'UserRepository' => __DIR__ . '/../..' . '/php/src/Repository/UserRepository.php',
+        'UserService' => __DIR__ . '/../..' . '/php/src/Service/UserService.php',
         'ValueError' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
+        'WarehouseController' => __DIR__ . '/../..' . '/php/src/Controller/WarehouseController.php',
+        'WarehouseRepository' => __DIR__ . '/../..' . '/php/src/Repository/WarehouseRepository.php',
+        'WarehouseService' => __DIR__ . '/../..' . '/php/src/Service/WarehouseService.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

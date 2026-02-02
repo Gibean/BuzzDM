@@ -28,7 +28,7 @@
                 <span class="text-muted ms-2 font-mono">/ CLIENTES</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openModal('createCustomerModal')">
+                <button class="btn btn-buzz" id="btnNewCliente" onclick="openModal('createCustomerModal')">
                     <i class="fas fa-plus"></i> Nuevo Cliente
                 </button>
             </div>
@@ -55,37 +55,60 @@
             </div>
         </div>
 
-        <!--  Filters  -->
-        <div class="buzz-card mb-4">
-            <div class="filter-wrapper">
-                <div class="filter-group filter-search">
-                    <label class="text-muted">Buscar cliente</label>
-                    <input type="text" class="form-control form-control-buzz" id="customerSearchInput" placeholder="ID, nombre, email...">
+            <!-- Filtros -->
+            <div class="buzz-card mb-4 pb-3">
+                <div class="filter-wrapper">
+                    <!-- Basic Filters (Always Visible) -->
+                    <div class="filter-group filter-search">
+                        <label class="text-muted">Buscar</label>
+                        <input type="text" class="form-control form-control-buzz" id="customerSearchInput"
+                               placeholder="Nombre, email, teléfono, ID...">
+                    </div>
+
+                    <div class="filter-group filter-actions">
+                        <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                            <i class="fas fa-filter"></i>
+                            <span class="btn-text">Filtros Avanzados</span>
+                            <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                        </button>
+                        <button class="btn btn-outline-buzz btn-filter-action" id="applyCustomerFilters" title="Aplicar">
+                            <i class="fas fa-search"></i><span class="btn-text">Buscar</span>
+                        </button>
+                         <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar">
+                            <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
+                        </button>
+                    </div>
                 </div>
-                <div class="filter-group filter-select">
-                    <label class="text-muted">Tipo de Cliente</label>
-                    <select class="form-control form-control-buzz" id="customerTypeFilter">
-                        <option value="">Todos</option>
-                        <option value="vip">VIP</option>
-                        <option value="regular">Regular</option>
-                    </select>
-                </div>
-                <div class="filter-group filter-checkbox">
-                    <input class="form-check-input" type="checkbox" id="showDeletedFilter">
-                    <label class="form-check-label text-muted" for="showDeletedFilter">
-                        Ver eliminados
-                    </label>
-                </div>
-                <div class="filter-group filter-actions">
-                    <button class="btn btn-buzz btn-filter-action" id="applyCustomerFilters" title="Buscar">
-                        <i class="fas fa-search"></i><span class="btn-text">Buscar</span>
-                    </button>
-                    <button class="btn btn-outline-buzz btn-filter-action" onclick="clearFilters()" title="Limpiar filtros">
-                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
-                    </button>
+
+                 <!-- Advanced Filters (Collapsible) -->
+                <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                    <hr class="border-secondary opacity-25">
+                    <div class="filter-wrapper">
+                         <div class="filter-group filter-select">
+                            <label class="text-muted">Tipo</label>
+                            <select class="form-control form-control-buzz" id="customerTypeFilter">
+                                <option value="">Todos</option>
+                                <option value="vip">VIP</option>
+                                <option value="regular">Regular</option>
+                            </select>
+                        </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Registrado desde</label>
+                            <input type="date" class="form-control form-control-buzz" id="customerDateFrom">
+                        </div>
+                        <div class="filter-group filter-date">
+                            <label class="text-muted">Registrado hasta</label>
+                            <input type="date" class="form-control form-control-buzz" id="customerDateTo">
+                        </div>
+                        <div class="filter-group filter-check d-flex align-items-center mb-0 mt-3 mt-md-0">
+                            <div class="form-check form-switch custom-switch-buzz">
+                                <input class="form-check-input" type="checkbox" id="showDeletedFilter">
+                                <label class="form-check-label text-muted" for="showDeletedFilter">Ver inactivos</label>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
         <!--  Customers List  -->
         <div class="buzz-card">
@@ -93,6 +116,8 @@
                  Customers will be populated by JavaScript
             </div>
         </div>
+
+        <?php require_once 'php/system_footer.php'; ?>
     </main>
 
     <!-- Create Customer Modal -->

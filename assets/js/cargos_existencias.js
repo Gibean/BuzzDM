@@ -34,10 +34,40 @@ function inicializarFecha() {
 function configurarEventos() {
     // Filtros
     document.getElementById('searchCargos').addEventListener('input', debounce(cargarCargos, 300));
-    document.getElementById('filterEstado').addEventListener('change', cargarCargos);
-    document.getElementById('filterConcepto').addEventListener('change', cargarCargos);
+    document.getElementById('filterEstado').addEventListener('change', () => { cargarCargos(); updateActiveFiltersCount(); });
+    document.getElementById('filterConcepto').addEventListener('change', () => { cargarCargos(); updateActiveFiltersCount(); });
     document.getElementById('filterFechaDesde').addEventListener('change', cargarCargos);
     document.getElementById('filterFechaHasta').addEventListener('change', cargarCargos);
+
+    // Advanced filters toggle logic
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_cargos") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_cargos", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_cargos", "false");
+            }
+        });
+    }
 
     // Concepto change handler (también llamado desde onchange en HTML)
     document.getElementById('cargoConcepto').addEventListener('change', function() {
@@ -56,6 +86,26 @@ function configurarEventos() {
             cerrarTodosAutocomplete();
         }
     });
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section (Estado, Concepto)
+    const filterEstado = document.getElementById("filterEstado");
+    const filterConcepto = document.getElementById("filterConcepto");
+
+    if (filterEstado && filterEstado.value !== "") activeFilters++;
+    if (filterConcepto && filterConcepto.value !== "") activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
 }
 
 // =====================================================
@@ -91,6 +141,8 @@ function verHistorial() {
     cargoActualId = null;
     cargarCargos();
 }
+// Expose to window to ensure HTML onclick works
+window.verHistorial = verHistorial;
 
 function nuevoCargo() {
     cargoActualId = null;
@@ -147,7 +199,7 @@ async function cargarCargos() {
     });
 
     try {
-        const response = await fetch(`php/cargos_actions.php?${params.toString()}`);
+        const response = await fetch(`php/api_cargos.php?${params.toString()}`);
         const data = await response.json();
 
         if (data.success) {
@@ -389,12 +441,15 @@ async function buscarProductos(query, resultsContainer, lineaId) {
     const productosEnCargo = obtenerProductosEnCargo(lineaId);
 
     try {
-        const response = await fetch(`php/productos_search.php?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`php/api_products.php?search=${encodeURIComponent(query)}&limit=10`);
         const data = await response.json();
 
-        if (data.success && data.productos && data.productos.length > 0) {
+        // api_products returns 'products' (English), previously 'productos' (Spanish)
+        const productsList = data.products || [];
+
+        if (data.success && productsList.length > 0) {
             // Filtrar productos ya agregados
-            const productosFiltrados = data.productos.filter(p => !productosEnCargo.includes(p.id.toString()));
+            const productosFiltrados = productsList.filter(p => !productosEnCargo.includes(p.id.toString()));
 
             if (productosFiltrados.length > 0) {
                 resultsContainer.innerHTML = productosFiltrados.map(p => `
@@ -501,7 +556,7 @@ async function buscarProveedor(query) {
     }
 
     try {
-        const response = await fetch(`php/proveedores_search.php?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`php/api_suppliers.php?action=search&q=${encodeURIComponent(query)}`);
         const data = await response.json();
 
         if (data.success && data.proveedores && data.proveedores.length > 0) {
@@ -604,8 +659,8 @@ async function guardarCargo(confirmar) {
 
     try {
         const url = data.id
-            ? `php/cargos_actions.php?id=${data.id}`
-            : 'php/cargos_actions.php';
+            ? `php/api_cargos.php?id=${data.id}`
+            : 'php/api_cargos.php';
         const method = data.id ? 'PUT' : 'POST';
 
         const response = await fetch(url, {
@@ -652,7 +707,7 @@ function obtenerLineasValidas() {
 
 async function editarCargo(id) {
     try {
-        const response = await fetch(`php/cargos_actions.php?id=${id}`);
+        const response = await fetch(`php/api_cargos.php?id=${id}`);
         const data = await response.json();
 
         if (data.success && data.cargo) {
@@ -719,7 +774,7 @@ function cargarFormularioDesdeData(cargo) {
 
 async function verDetalleCargo(id) {
     try {
-        const response = await fetch(`php/cargos_actions.php?id=${id}`);
+        const response = await fetch(`php/api_cargos.php?id=${id}`);
         const data = await response.json();
 
         if (data.success && data.cargo) {
@@ -926,7 +981,7 @@ async function cargarAlmacenes() {
     if (!select) return;
 
     try {
-        const response = await fetch('php/almacenes_actions.php');
+        const response = await fetch('php/api_warehouses.php');
         const data = await response.json();
 
         if (data.success && data.almacenes) {
@@ -1006,7 +1061,7 @@ async function guardarNuevoProveedor() {
     };
 
     try {
-        const response = await fetch('php/proveedores_actions.php', {
+        const response = await fetch('php/api_suppliers.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)

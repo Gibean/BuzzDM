@@ -81,3 +81,10 @@ if (document.readyState === 'loading') {
     setInterval(updateFooterTime, 1000);
 }
 </script>
+
+<!-- Global Tutorial Mode Dependencies -->
+<link rel="stylesheet" href="assets/css/driver.css">
+<link rel="stylesheet" href="assets/css/driver-buzz.css">
+<script src="assets/js/driver.js"></script>
+<script src="assets/js/tutorial.js"></script>
+<script src="assets/js/session-timeout.js"></script>

@@ -6,11 +6,12 @@
 // Determine base path for API calls (works from root or subdirectories)
 const notifApiBase = (() => {
     const path = window.location.pathname;
-    // If we're in /php/ directory, go up one level
-    if (path.includes('/php/')) {
-        return '../php/';
+    // Extract base path up to and including BuzzDM (or similar app folder)
+    const match = path.match(/^(\/[^\/]+\/)/);
+    if (match) {
+        return match[1] + 'php/';
     }
-    // Default: relative to root
+    // Fallback for direct access
     return 'php/';
 })();
 
@@ -78,7 +79,7 @@ function injectNavbarButtons() {
     const infoBtn = document.createElement('a');
     infoBtn.className = 'navbar-icon-btn navbar-info-btn';
     infoBtn.id = 'navInfoBtn';
-    infoBtn.href = 'manual.php';
+    infoBtn.href = 'manual';
     infoBtn.title = 'Manual de Usuario';
     infoBtn.innerHTML = '<i class="fas fa-info-circle"></i>';
 

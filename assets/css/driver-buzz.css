@@ -1,0 +1,94 @@
+/* Driver.js Dark Mode Theme for BuzzDM */
+.driver-popover.driver-theme-buzz {
+    background-color: var(--buzz-card-bg, #1a1f28);
+    color: var(--buzz-text-color, #dfe5eb);
+    border: 1px solid var(--buzz-primary-color, #ffa000);
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 160, 0, 0.2);
+    border-radius: 8px;
+    font-family: var(--font-secondary, "Inter", sans-serif);
+    padding: 15px;
+    max-width: 350px;
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-title {
+    font-family: var(--font-primary, "Orbitron", sans-serif);
+    color: var(--buzz-primary-color, #ffa000);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-description {
+    color: var(--buzz-text-color, #dfe5eb);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-footer {
+    margin-top: 10px;
+}
+
+.driver-popover.driver-theme-buzz button {
+    background-color: rgba(255, 160, 0, 0.1);
+    color: var(--buzz-primary-color, #ffa000);
+    border: 1px solid var(--buzz-primary-color, #ffa000);
+    border-radius: 4px;
+    padding: 6px 12px;
+    font-family: var(--font-monospace, "Roboto Mono", monospace);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-shadow: none;
+}
+
+.driver-popover.driver-theme-buzz button:hover {
+    background-color: var(--buzz-primary-color, #ffa000);
+    color: #000;
+    box-shadow: 0 0 8px rgba(255, 160, 0, 0.4);
+}
+
+.driver-popover.driver-theme-buzz button.driver-popover-close-btn {
+    color: var(--buzz-text-muted, #c5ccd5);
+    background: transparent;
+    border: none;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    font-size: 1.2rem;
+    z-index: 1000;
+}
+
+.driver-popover.driver-theme-buzz button.driver-popover-close-btn:hover {
+    color: var(--buzz-danger, #dc3545);
+    background: transparent;
+    box-shadow: none;
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-progress-text {
+    color: var(--buzz-text-muted, #c5ccd5);
+    font-family: var(--font-monospace, "Roboto Mono", monospace);
+    font-size: 0.75rem;
+}
+
+/* Arrow Styling */
+.driver-popover.driver-theme-buzz .driver-popover-arrow-side-left.driver-popover-arrow {
+    border-left-color: var(--buzz-primary-color, #ffa000);
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-arrow-side-right.driver-popover-arrow {
+    border-right-color: var(--buzz-primary-color, #ffa000);
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-arrow-side-top.driver-popover-arrow {
+    border-top-color: var(--buzz-primary-color, #ffa000);
+}
+
+.driver-popover.driver-theme-buzz .driver-popover-arrow-side-bottom.driver-popover-arrow {
+    border-bottom-color: var(--buzz-primary-color, #ffa000);
+}

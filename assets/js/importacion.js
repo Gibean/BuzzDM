@@ -183,7 +183,7 @@ async function handleFormSubmit(event) {
 async function loadImportHistory() {
   console.log('Attempting to load import history...');
   try {
-    const response = await fetch('php/get_import_history.php');
+    const response = await fetch('php/api_import.php');
     const result = await response.json();
     console.log('Response from get_import_history.php:', result);
 
@@ -309,6 +309,7 @@ window.downloadTemplate = async (type) => {
     let toastId = showToast("Descargando plantilla...", "info")
 
     try {
+        // Keeping download_template.php as per original file
         const response = await fetch(`php/download_template.php?type=${type}`)
         if (!response.ok) throw new Error("Error en el servidor al descargar")
 
