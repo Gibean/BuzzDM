@@ -158,7 +158,7 @@ composer update
 
 ## 🚀 Ejecutar la Aplicación
 
-1. Inicia **Apache** desde el panel de **XAMPP** y **MariaDB** desde el HeidiSQL.
+1. Inicia **Apache** desde el panel de **XAMPP** y **MariaDB** desde HeidiSQL.
 
 2. Accede a la aplicación en tu navegador:
    ```
