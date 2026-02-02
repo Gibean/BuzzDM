@@ -27,7 +27,7 @@
                 <span class="text-muted ms-2 font-mono">/ PRODUCTOS</span>
             </div>
             <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" onclick="openProductModal()">
+                <button class="btn btn-buzz" id="btnNewProduct" onclick="openProductModal()">
                     <i class="fas fa-plus"></i> Nuevo Producto
                 </button>
             </div>
@@ -145,23 +145,8 @@
                 </table>
             </div>
 
-             <!-- Pagination -->
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="text-muted font-mono">
-                    Mostrando <span id="showingFrom">1</span>-<span id="showingTo">10</span> de <span id="totalProducts">0</span> productos
-                </div>
-                <nav>
-                    <ul class="pagination pagination-sm" id="pagination">
-                        <li class="page-item" id="prevPage">
-                            <a class="page-link" href="#" onclick="changePage(-1)">&laquo; Anterior</a>
-                        </li>
-                        <li class="page-item active"><span class="page-link" id="currentPage">1</span></li>
-                        <li class="page-item" id="nextPage">
-                            <a class="page-link" href="#" onclick="changePage(1)">Siguiente &raquo;</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
+             <!-- Unified Pagination -->
+            <div id="productsPagination" class="buzz-pagination"></div>
         </div>
 
         <!-- System Footer -->
@@ -433,6 +418,73 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Kit Component Search Modal -->
+    <div class="modal-buzz" id="kitComponentModal" style="z-index: 9999;">
+        <div class="modal-content-buzz" style="max-width: 600px;">
+            <div class="modal-header-buzz">
+                <h5 class="font-primary text-primary">
+                    <i class="fas fa-puzzle-piece"></i> Agregar Componente al Kit
+                </h5>
+                <button class="close-buzz" onclick="closeKitComponentModal()" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body-buzz">
+                <!-- Search Field -->
+                <div class="mb-4">
+                    <label class="form-label" for="kitComponentSearch"><i class="fas fa-search"></i> Buscar Producto</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-buzz" id="kitComponentSearch"
+                               placeholder="Escribe SKU o nombre del producto..." autocomplete="off">
+                        <div id="kitComponentSpinner" class="position-absolute end-0 top-50 translate-middle-y me-3" style="display: none;">
+                            <i class="fas fa-spinner fa-spin text-primary"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="kitComponentResults" class="mb-4" style="max-height: 300px; overflow-y: auto;">
+                    <div class="text-center text-muted py-4" id="kitComponentPlaceholder">
+                        <i class="fas fa-search fa-2x mb-2"></i>
+                        <p class="mb-0">Escribe para buscar productos</p>
+                    </div>
+                </div>
+
+                <!-- Selected Product Preview -->
+                <div id="kitComponentSelected" class="buzz-card p-3 mb-3" style="display: none; background: var(--buzz-card-bg-alt);">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="font-mono text-accent" id="selectedComponentSku"></span>
+                            <span class="ms-2" id="selectedComponentName"></span>
+                            <div class="text-muted small mt-1">
+                                <span>Precio: $<span id="selectedComponentPrice">0.00</span></span>
+                                <span class="ms-3">Stock: <span id="selectedComponentStock">0</span></span>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearSelectedComponent()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="selectedComponentId">
+                </div>
+
+                <!-- Quantity Input -->
+                <div id="kitComponentQuantityRow" style="display: none;">
+                    <div class="row align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label" for="kitComponentQuantity"><i class="fas fa-sort-numeric-up"></i> Cantidad</label>
+                            <input type="number" class="form-control form-control-buzz" id="kitComponentQuantity"
+                                   value="1" min="0.001" step="0.001">
+                        </div>
+                        <div class="col-md-6">
+                            <button type="button" class="btn btn-buzz w-100" onclick="confirmAddKitComponent()">
+                                <i class="fas fa-plus"></i> Agregar al Kit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

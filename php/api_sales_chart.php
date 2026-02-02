@@ -4,19 +4,25 @@ require_once 'db.php'; // Provides $pdo
 
 try {
     $pdo = getDbConnection();
-    // Consulta para obtener las ventas diarias de los últimos 30 días
+
+    // Get days parameter (default 30, max 365)
+    $days = isset($_GET['days']) ? intval($_GET['days']) : 30;
+    $days = max(1, min($days, 365)); // Clamp between 1 and 365
+
+    // Consulta para obtener las ventas diarias del período especificado
     $query = "
-        SELECT 
+        SELECT
             DATE(p.fecha_creacion) as fecha,
             SUM(dp.subtotal) as total_ventas
         FROM pedidos p
         JOIN detalle_pedido dp ON p.id = dp.pedido_id
-        WHERE p.fecha_creacion >= CURDATE() - INTERVAL 30 DAY
+        WHERE p.fecha_creacion >= CURDATE() - INTERVAL :days DAY
         GROUP BY DATE(p.fecha_creacion)
         ORDER BY fecha ASC;
     ";
 
-    $stmt = $pdo->query($query);
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['days' => $days]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $data = [

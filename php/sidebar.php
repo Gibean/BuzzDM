@@ -27,111 +27,163 @@ $currentPage = basename($_SERVER['PHP_SELF']);
 
     <div class="sidebar-nav-enhanced">
         <ul class="nav flex-column">
+            <!-- Dashboard - Siempre visible -->
             <li class="nav-item">
                 <a class="nav-link-enhanced <?php echo $currentPage === 'dashboard.php' ? 'active' : ''; ?>"
-                    href="dashboard.php">
+                    href="dashboard">
                     <i class="fas fa-home nav-icon-enhanced"></i>
                     <span class="nav-text-enhanced">Dashboard</span>
                 </a>
             </li>
 
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!-- PRODUCTOS - Solo admin/supervisor -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
             <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
             <?php
-            $inventarioPages = ['inventario.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php'];
-            $inventarioActive = in_array($currentPage, $inventarioPages);
+            $productosPages = ['inventario.php', 'catalogos.php', 'almacenes.php', 'proveedores.php'];
+            $productosActive = in_array($currentPage, $productosPages);
             ?>
-            <li class="nav-item nav-dropdown <?php echo $inventarioActive ? 'open' : ''; ?>">
-                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $inventarioActive ? 'active' : ''; ?>">
+            <li class="nav-item nav-dropdown <?php echo $productosActive ? 'open' : ''; ?>">
+                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $productosActive ? 'active' : ''; ?>">
                     <i class="fas fa-boxes nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Inventario</span>
+                    <span class="nav-text-enhanced">Productos</span>
                     <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
                 </a>
                 <ul class="nav-dropdown-menu">
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'inventario.php' ? 'active' : ''; ?>"
-                           href="inventario.php">
-                            <i class="fas fa-box"></i> Productos
+                           href="inventario">
+                            <i class="fas fa-box"></i> Inventario
                         </a>
                     </li>
                     <li>
-                        <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
-                           href="cargos_existencias.php">
-                            <i class="fas fa-dolly"></i> Cargar Existencias
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'catalogos.php' ? 'active' : ''; ?>"
+                           href="catalogos">
+                            <i class="fas fa-list"></i> Catálogos
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'almacenes.php' ? 'active' : ''; ?>"
-                           href="almacenes.php">
+                           href="almacenes">
                             <i class="fas fa-warehouse"></i> Almacenes
                         </a>
                     </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'proveedores.php' ? 'active' : ''; ?>"
-                           href="proveedores.php">
-                            <i class="fas fa-truck"></i> Proveedores
-                        </a>
-                    </li>
-                    <li>
-                        <a class="nav-dropdown-item <?php echo $currentPage === 'catalogos.php' ? 'active' : ''; ?>"
-                           href="catalogos.php">
-                            <i class="fas fa-list"></i> Catálogos
+                           href="proveedores">
+                            <i class="fas fa-truck-loading"></i> Proveedores
                         </a>
                     </li>
                 </ul>
             </li>
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>" href="clientes.php">
-                    <i class="fas fa-users nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Clientes</span>
-                </a>
-            </li>
             <?php endif; ?>
 
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>" href="pedidos.php">
-                    <i class="fas fa-shopping-cart nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Pedidos</span>
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!-- OPERACIONES - Mixto (permisos por item) -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <?php
+            $operacionesPages = ['clientes.php', 'pedidos.php', 'envios.php', 'cargos_existencias.php'];
+            $operacionesActive = in_array($currentPage, $operacionesPages);
+            ?>
+            <li class="nav-item nav-dropdown <?php echo $operacionesActive ? 'open' : ''; ?>">
+                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $operacionesActive ? 'active' : ''; ?>">
+                    <i class="fas fa-briefcase nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Operaciones</span>
+                    <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
                 </a>
+                <ul class="nav-dropdown-menu">
+                    <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'clientes.php' ? 'active' : ''; ?>"
+                           href="clientes">
+                            <i class="fas fa-users"></i> Clientes
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'pedidos.php' ? 'active' : ''; ?>"
+                           href="pedidos">
+                            <i class="fas fa-shopping-cart"></i> Pedidos
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>"
+                           href="envios">
+                            <i class="fas fa-truck"></i> Envíos
+                        </a>
+                    </li>
+                    <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
+                           href="cargos_existencias">
+                            <i class="fas fa-dolly"></i> Cargar Existencias
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>" href="todo.php">
-                    <i class="fas fa-tasks nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">To-Do</span>
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!-- HERRAMIENTAS - Mixto (permisos por item) -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <?php
+            $herramientasPages = ['todo.php', 'importacion.php'];
+            $herramientasActive = in_array($currentPage, $herramientasPages);
+            ?>
+            <li class="nav-item nav-dropdown <?php echo $herramientasActive ? 'open' : ''; ?>">
+                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $herramientasActive ? 'active' : ''; ?>">
+                    <i class="fas fa-tools nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Herramientas</span>
+                    <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
                 </a>
+                <ul class="nav-dropdown-menu">
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'todo.php' ? 'active' : ''; ?>"
+                           href="todo">
+                            <i class="fas fa-tasks"></i> Notas
+                        </a>
+                    </li>
+                    <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
+                           href="importacion">
+                            <i class="fas fa-upload"></i> Importación
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
             </li>
 
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'envios.php' ? 'active' : ''; ?>" href="envios.php">
-                    <i class="fas fa-truck nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Envíos</span>
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <!-- SISTEMA - Visible para todos, items con permisos -->
+            <!-- ═══════════════════════════════════════════════════════════ -->
+            <?php
+            $sistemaPages = ['admin.php', 'about.php'];
+            $sistemaActive = in_array($currentPage, $sistemaPages);
+            ?>
+            <li class="nav-item nav-dropdown <?php echo $sistemaActive ? 'open' : ''; ?>">
+                <a class="nav-link-enhanced nav-dropdown-toggle <?php echo $sistemaActive ? 'active' : ''; ?>">
+                    <i class="fas fa-cog nav-icon-enhanced"></i>
+                    <span class="nav-text-enhanced">Sistema</span>
+                    <i class="fas fa-chevron-down nav-dropdown-arrow"></i>
                 </a>
-            </li>
-
-            <?php if ($usuarioRol === 'admin' || $usuarioRol === 'supervisor'): ?>
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'importacion.php' ? 'active' : ''; ?>"
-                    href="importacion.php">
-                    <i class="fas fa-upload nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Importación</span>
-                </a>
-            </li>
-            <?php endif; ?>
-
-            <?php if ($usuarioRol === 'admin'): ?>
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'admin.php' ? 'active' : ''; ?>" href="admin.php">
-                    <i class="fas fa-users-cog nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Administración</span>
-                </a>
-            </li>
-            <?php endif; ?>
-
-            <li class="nav-item">
-                <a class="nav-link-enhanced <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>" href="about.php">
-                    <i class="fas fa-info-circle nav-icon-enhanced"></i>
-                    <span class="nav-text-enhanced">Acerca de</span>
-                </a>
+                <ul class="nav-dropdown-menu">
+                    <?php if ($usuarioRol === 'admin'): ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'admin.php' ? 'active' : ''; ?>"
+                           href="admin">
+                            <i class="fas fa-users-cog"></i> Administración
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>"
+                           href="about">
+                            <i class="fas fa-info-circle"></i> Acerca de
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </div>
@@ -175,8 +227,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
         </button>
     </div>
     <div class="offcanvas-actions">
-        <button class="action-link" id="markAllRead">Marcar todo como leído</button>
-        <button class="action-link text-danger" id="clearHistory">Borrar historial</button>
+        <button class="action-link" id="markAllRead">
+            <i class="fas fa-check-double"></i> Marcar todo leído
+        </button>
+        <button class="action-link text-danger" id="clearHistory">
+            <i class="fas fa-trash-alt"></i> Borrar historial
+        </button>
     </div>
     <div class="offcanvas-body" id="notifList">
         <!-- Notificaciones inyectadas por JS -->

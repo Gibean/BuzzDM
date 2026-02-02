@@ -2,16 +2,22 @@
 /**
  * Backup Configuration
  * Settings for automatic backup system
+ * PRODUCTION-READY: Uses .env for sensitive data
  */
 
-// Secret token for cron/API access - CHANGE THIS IN PRODUCTION!
-define('BACKUP_SECRET_TOKEN', 'buzz_backup_' . md5('BuzzDM_AutoBackup_2024'));
+// Load environment variables
+require_once __DIR__ . '/../vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+$dotenv->safeLoad();
+
+// Secret token for cron/API access - FROM .ENV
+define('BACKUP_SECRET_TOKEN', $_ENV['BACKUP_SECRET_TOKEN'] ?? 'INSECURE_DEFAULT_CHANGE_ME');
 
 // Interval between automatic backups (in hours)
 define('AUTO_BACKUP_INTERVAL_HOURS', 24);
 
-// Enable/disable fallback "Poor Man's Cron" system
-define('BACKUP_FALLBACK_ENABLED', true);
+// DISABLED for hosting - Use real Cron Jobs instead
+define('BACKUP_FALLBACK_ENABLED', false);
 
 // Maximum number of automatic backups to keep (rotation)
 define('MAX_AUTO_BACKUPS', 30);
@@ -19,12 +25,11 @@ define('MAX_AUTO_BACKUPS', 30);
 // Backup directory (relative to project root)
 define('BACKUP_DIRECTORY', __DIR__ . '/../backups/');
 
-// Database configuration for backups
-// These should match your db.php settings
-define('BACKUP_DB_HOST', 'localhost');
-define('BACKUP_DB_USER', 'root');
-define('BACKUP_DB_PASS', '35128');
-define('BACKUP_DB_NAME', 'dbuzz');
+// Database configuration - FROM .ENV
+define('BACKUP_DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('BACKUP_DB_USER', $_ENV['DB_USER'] ?? 'root');
+define('BACKUP_DB_PASS', $_ENV['DB_PASS'] ?? '');
+define('BACKUP_DB_NAME', $_ENV['DB_NAME'] ?? 'dbuzz');
 
 // Path to mysqldump executable
 // For Windows/XAMPP: 'c:\\xampp\\mysql\\bin\\mysqldump.exe'
@@ -34,6 +39,4 @@ define('MYSQLDUMP_PATH', PHP_OS_FAMILY === 'Windows'
     : 'mysqldump');
 
 // Minimum time between fallback backup checks (seconds)
-// Prevents multiple backups if many users load pages simultaneously
 define('BACKUP_CHECK_COOLDOWN', 300); // 5 minutes
-?>

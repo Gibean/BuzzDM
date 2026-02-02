@@ -317,7 +317,7 @@
         </form>
 
         <!-- Forgot Password Link -->
-        <a href="forgot_password.php" class="forgot-password">
+        <a href="forgot_password" class="forgot-password">
             ¿Olvidaste tu contraseña?
         </a>
     </div>
@@ -402,18 +402,20 @@
         const passwordToggle = document.getElementById('passwordToggle');
         const toggleIcon = document.getElementById('toggleIcon');
 
-        passwordToggle.addEventListener('click', function() {
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+        if(passwordToggle){
+            passwordToggle.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
 
-            if (type === 'text') {
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        });
+                if (type === 'text') {
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
+            });
+        }
 
         // Login form submission
         const loginForm = document.getElementById('loginForm');
@@ -429,10 +431,14 @@
                 const originalText = loginButton.innerHTML;
                 loginButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
 
+                // Hide any previous alert
+                const existingAlert = document.querySelector('.alert-login');
+                if(existingAlert) existingAlert.style.display = 'none';
+
                 const formData = new FormData(loginForm);
 
                 try {
-                    const response = await fetch('php/login_guard.php', {
+                    const response = await fetch('php/api_auth.php?action=login', {
                         method: 'POST',
                         body: formData
                     });
@@ -440,23 +446,33 @@
                     const data = await response.json();
 
                     if (data.success) {
-                        // Success - redirect to dashboard
-                        loginButton.innerHTML = '<i class="fas fa-check"></i> ¡Éxito!';
-                        setTimeout(() => {
-                            window.location.href = data.redirect;
-                        }, 300);
+                        if (data.requires_2fa) {
+                             // Show 2FA Modal
+                             const modal = document.getElementById('twoFactorModal');
+                             modal.style.display = 'flex';
+                             setTimeout(() => document.getElementById('twoFactorCode').focus(), 100);
+
+                             // Restore login button
+                             loginButton.disabled = false;
+                             loginButton.innerHTML = originalText;
+                        } else {
+                            // Success - redirect to dashboard
+                            loginButton.innerHTML = '<i class="fas fa-check"></i> ¡Éxito!';
+                            setTimeout(() => {
+                                window.location.href = data.redirect;
+                            }, 300);
+                        }
                     } else {
                         // Error - show message and re-enable button
-                        alert(data.message);
-                        // Clear fields on incorrect login
-                        document.getElementById('email').value = '';
+                        showAlert(data.message);
+                        // Clear password field
                         document.getElementById('password').value = '';
                         loginButton.disabled = false;
                         loginButton.innerHTML = originalText;
                     }
                 } catch (error) {
                     console.error('Error:', error);
-                    alert('Ha ocurrido un error al intentar iniciar sesión. Por favor, intenta nuevamente.');
+                    showAlert('Ha ocurrido un error de conexión. Por favor, intenta nuevamente.');
                     loginButton.disabled = false;
                     loginButton.innerHTML = originalText;
                 }
@@ -464,9 +480,248 @@
                 return false;
             });
 
-            // Extra prevention
-            loginForm.onsubmit = () => false;
+            // Helper to show alert
+            function showAlert(msg) {
+                let alertDiv = document.querySelector('.alert-login');
+                if (!alertDiv) {
+                    alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert-login';
+                    alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span></span>';
+                    const logoDiv = document.querySelector('.login-logo');
+                    logoDiv.after(alertDiv);
+                } else {
+                    alertDiv.style.display = 'flex';
+                }
+                alertDiv.querySelector('span').textContent = msg;
+            }
+        }
+
+        // 2FA Handling
+        function close2FAModal() {
+            document.getElementById('twoFactorModal').style.display = 'none';
+            document.getElementById('twoFactorCode').value = '';
+            document.getElementById('twoFactorError').style.display = 'none';
+        }
+
+        // Initialize 2FA listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const verifyBtn = document.getElementById('verify2FABtn');
+            if(verifyBtn) {
+                verifyBtn.addEventListener('click', verify2FA);
+            }
+
+            // Allow Enter key in 2FA input
+            const codeInput = document.getElementById('twoFactorCode');
+            if(codeInput) {
+                codeInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') verify2FA();
+                });
+
+                // Auto-submit on 6 digits
+                codeInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                    if(this.value.length === 6) verify2FA();
+                });
+            }
+        });
+
+        async function verify2FA() {
+            const codeInput = document.getElementById('twoFactorCode');
+            const btn = document.getElementById('verify2FABtn');
+            const errorDiv = document.getElementById('twoFactorError');
+            const code = codeInput.value.trim();
+
+            if (code.length !== 6) {
+                errorDiv.textContent = 'Ingresa un código válido de 6 dígitos';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            errorDiv.style.display = 'none';
+
+            try {
+                const formData = new FormData();
+                formData.append('code', code);
+
+                const response = await fetch('php/api_auth.php?action=verify_2fa', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Success! Redirect
+                    window.location.href = data.redirect || 'dashboard';
+                } else {
+                    errorDiv.textContent = data.message || 'Código incorrecto';
+                    errorDiv.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                    codeInput.value = '';
+                    codeInput.focus();
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Error de conexión';
+                errorDiv.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
     </script>
+
+    <!-- 2FA Modal HTML -->
+    <div id="twoFactorModal" class="login-2fa-overlay" style="display: none;">
+        <div class="login-2fa-content" style="max-width: 400px; width: 90%;">
+            <div class="login-2fa-header">
+                <h5 class="font-primary text-primary mb-0">
+                    <i class="fas fa-shield-alt"></i> Verificación de Dos Pasos
+                </h5>
+                <button type="button" class="login-2fa-close" onclick="close2FAModal()">&times;</button>
+            </div>
+            <div class="login-2fa-body text-center">
+                <p class="text-muted mb-4">
+                    Ingresa el código de 6 dígitos de tu aplicación autenticadora para continuar.
+                </p>
+
+                <div class="mb-4">
+                    <input type="text" id="twoFactorCode" class="form-control text-center"
+                           maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="one-time-code"
+                           style="font-size: 1.5rem; letter-spacing: 0.5rem; background: rgba(0,0,0,0.3); color: var(--buzz-primary-color) !important; border-color: var(--buzz-primary-color); height: 60px;">
+                </div>
+
+                <div id="twoFactorError" class="alert alert-danger py-2 mb-3" style="display: none; font-size: 0.9rem;"></div>
+
+                <button type="button" class="btn btn-buzz w-100" id="verify2FABtn">
+                    <i class="fas fa-check"></i> Verificar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-buzz-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-buzz {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid rgba(255, 160, 0, 0.2);
+            border-radius: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header-buzz {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 160, 0, 0.05);
+        }
+
+        .modal-body-buzz {
+            padding: 2rem;
+        }
+
+        .close-buzz {
+            background: none;
+            border: none;
+            color: var(--buzz-text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+
+        .close-buzz:hover {
+            color: #fff;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    </style>
+    <style>
+        /* Scoped 2FA Styles */
+        .login-2fa-overlay {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9) !important;
+            backdrop-filter: blur(5px);
+            z-index: 10000 !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .login-2fa-content {
+            background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+            border: 1px solid rgba(255, 160, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 0 50px rgba(255, 160, 0, 0.1);
+            overflow: hidden;
+            animation: slideUp 0.3s ease;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            display: block !important;
+        }
+
+        .login-2fa-header {
+            padding: 1.2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 160, 0, 0.05);
+        }
+
+        .login-2fa-body {
+            padding: 2rem;
+        }
+
+        .login-2fa-close {
+            background: none;
+            border: none;
+            color: var(--buzz-text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+            line-height: 1;
+            padding: 0;
+            margin: 0;
+        }
+
+        .login-2fa-close:hover {
+            color: #fff;
+        }
+
+        #twoFactorCode {
+            background: rgba(0, 0, 0, 0.3) !important;
+            color: var(--buzz-primary-color) !important;
+            border-color: var(--buzz-primary-color) !important;
+        }
+    </style>
 </body>
 </html>

@@ -12,7 +12,9 @@
   })
 
   function initAdmin() {
-    switchTab("users")
+    const savedTab = localStorage.getItem('adminActiveTab') || "users"
+    switchTab(savedTab)
+    setupAdvancedFilters()
   }
 
   function setupEventListeners() {
@@ -222,10 +224,21 @@
       }
     }
 
-    const logFilterButton = document.querySelector("#logsTab button")
-    if (logFilterButton) {
-      logFilterButton.addEventListener("click", () => loadLogs(1))
-    }
+    // Expose functions to window for HTML onclick attributes
+    window.filterLogs = () => loadLogs(1);
+    window.clearLogsFilters = () => {
+        document.getElementById("logSearch").value = "";
+        document.getElementById("logDateFrom").value = "";
+        document.getElementById("logDateTo").value = "";
+        const logActionFilter = document.getElementById("logActionFilter");
+        if (logActionFilter) logActionFilter.value = "";
+
+        // Reset badge
+        const activeBadge = document.getElementById("activeFiltersBadge");
+        if(activeBadge) activeBadge.classList.add("d-none");
+
+        loadLogs(1);
+    };
 
     const prevLogBtn = document.getElementById('logsPrevPage')
     const nextLogBtn = document.getElementById('logsNextPage')
@@ -241,7 +254,79 @@
             loadLogs(currentLogPage + 1)
         })
     }
+
+    const logFilterButton = document.querySelector("#logsTab button[onclick='filterLogs()']")
+    if (logFilterButton) {
+      // Remove onclick attribute to avoid double firing if we attach listener
+      // logFilterButton.removeAttribute("onclick");
+      // Actually, since we exposed window.filterLogs, the onclick works.
+      // We don't need this listener if onclick is present.
+      // But let's keep it safe.
+    }
   }
+
+// Advanced filters toggle logic for Logs
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_admin_logs") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_admin_logs", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_admin_logs", "false");
+            }
+        });
+    }
+
+    // Attach listener to advanced filters to update badge
+    const logDateFrom = document.getElementById("logDateFrom");
+    const logDateTo = document.getElementById("logDateTo");
+    const logActionFilter = document.getElementById("logActionFilter");
+
+    if(logDateFrom) logDateFrom.addEventListener('change', updateActiveFiltersCount);
+    if(logDateTo) logDateTo.addEventListener('change', updateActiveFiltersCount);
+    if(logActionFilter) logActionFilter.addEventListener('change', updateActiveFiltersCount);
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const logDateFrom = document.getElementById("logDateFrom");
+    const logDateTo = document.getElementById("logDateTo");
+    const logActionFilter = document.getElementById("logActionFilter");
+
+    if (logDateFrom && logDateFrom.value !== "") activeFilters++;
+    if (logDateTo && logDateTo.value !== "") activeFilters++;
+    if (logActionFilter && logActionFilter.value !== "") activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
 
   function preventDefaults(e) {
     e.preventDefault()
@@ -264,18 +349,18 @@
   }
 
   function switchTab(tabName) {
-    // Update active tab
-    document.querySelectorAll("[data-tab]").forEach((tab) => {
-      tab.classList.remove("active", "text-primary")
-      tab.classList.add("text-muted")
-    })
+  // Save to localStorage
+  localStorage.setItem('adminActiveTab', tabName)
 
-    const activeTab = document.querySelector(`[data-tab="${tabName}"]`)
-    if (activeTab) {
-      activeTab.classList.add("active", "text-primary")
-      activeTab.classList.remove("text-muted")
-    }
+  // Update active tab - only toggle 'active' class (CSS handles styling)
+  document.querySelectorAll("[data-tab]").forEach((tab) => {
+    tab.classList.remove("active")
+  })
 
+  const activeTab = document.querySelector(`[data-tab="${tabName}"]`)
+  if (activeTab) {
+    activeTab.classList.add("active")
+  }
     // Hide all tab contents
     document.querySelectorAll(".tab-content").forEach((content) => {
       content.style.display = "none"
@@ -308,14 +393,18 @@
         break
       case "settings":
         loadCompanyInfo()
+        // Initialize security settings (2FA, session timeout)
+        if (typeof window.initSecuritySettings === 'function') {
+          window.initSecuritySettings()
+        }
         break
     }
   }
 
   async function loadUsers() {
     try {
-      const data = await fetchJSON("php/users.php")
-      users = data
+      const response = await fetchJSON("php/api_users.php")
+      users = response.users || []
       renderUsers()
       updateUserStats()
     } catch (error) {
@@ -387,7 +476,7 @@
     const admins = users.filter((u) => u.rol === "admin").length
 
     try {
-      const sessionData = await fetchJSON("php/users.php?action=get_sessions")
+      const sessionData = await fetchJSON("php/api_users.php?action=get_sessions")
       const todaySessions = sessionData.session_count
       document.getElementById("todaySessions").textContent = todaySessions
     } catch (error) {
@@ -408,27 +497,35 @@
     const logSearchEl = document.getElementById("logSearch")
     const logDateFromEl = document.getElementById("logDateFrom")
     const logDateToEl = document.getElementById("logDateTo")
+    const logActionFilterEl = document.getElementById("logActionFilter")
 
     const logSearch = logSearchEl ? logSearchEl.value : ''
     const logDateFrom = logDateFromEl ? logDateFromEl.value : ''
     const logDateTo = logDateToEl ? logDateToEl.value : ''
+    const logActionFilter = logActionFilterEl ? logActionFilterEl.value : ''
 
     let queryParams = `page=${page}&limit=${LOGS_PER_PAGE}`
     if (logSearch) queryParams += `&search=${logSearch}`
     if (logDateFrom) queryParams += `&dateFrom=${logDateFrom}`
     if (logDateTo) queryParams += `&dateTo=${logDateTo}`
+    if (logActionFilter) queryParams += `&action=${logActionFilter}`
 
     try {
-      const response = await fetchJSON(`php/logs.php?${queryParams}`)
+      const response = await fetchJSON(`php/api_logs.php?${queryParams}`)
 
       // Handle both old format (array) and new format (object with data & pagination)
       if (Array.isArray(response)) {
           logs = response
           renderLogs()
-      } else {
+      } else if (response.success && response.data) { // New API structure
           logs = response.data
+          // Fixed ReferenceError: use updatePaginationControls instead of renderPagination (or alias it)
+          if (response.pagination) updatePaginationControls(response.pagination)
           renderLogs()
-          updatePaginationControls(response.pagination)
+      } else { // Standard direct structure if any
+          logs = response.data || []
+          if(response.pagination) updatePaginationControls(response.pagination)
+          renderLogs()
       }
     } catch (error) {
       console.error("Error al cargar logs:", error)
@@ -437,39 +534,30 @@
   }
 
   function updatePaginationControls(pagination) {
-      const paginationContainer = document.getElementById('logsPagination')
-      const infoText = document.getElementById('logsInfoText')
-      const prevBtn = document.getElementById('logsPrevPage')
-      const nextBtn = document.getElementById('logsNextPage')
-      const currentPageSpan = document.getElementById('logsCurrentPage')
-
-      if (!paginationContainer || !pagination) return
-
-      // Check if all required elements exist
-      if (!infoText || !prevBtn || !nextBtn || !currentPageSpan) {
-          console.warn('Pagination elements not found')
+      if (!pagination || pagination.total_records <= 0) {
+          const container = document.getElementById('logsPagination')
+          if (container) container.style.display = 'none'
           return
       }
 
-      if (pagination.total_records > 0) {
-          paginationContainer.style.display = 'flex'
-          paginationContainer.style.setProperty('display', 'flex', 'important')
+      currentLogPage = pagination.current_page
 
-          const start = (pagination.current_page - 1) * pagination.per_page + 1
-          const end = Math.min(pagination.current_page * pagination.per_page, pagination.total_records)
-
-          infoText.textContent = `Mostrando ${start}-${end} de ${pagination.total_records} registros`
-          currentPageSpan.textContent = `Página ${pagination.current_page}`
-
-          prevBtn.disabled = !pagination.has_prev
-          nextBtn.disabled = !pagination.has_next
-
-          currentLogPage = pagination.current_page
-      } else {
-          paginationContainer.style.display = 'none'
-          return // Added return statement here
-      }
+      // Use the new unified pagination helper
+      renderPaginationControls({
+          containerId: 'logsPagination',
+          currentPage: pagination.current_page,
+          totalPages: pagination.total_pages,
+          totalItems: pagination.total_records,
+          itemsPerPage: pagination.per_page,
+          onPageChange: (page) => loadLogs(page)
+      })
   }
+
+  // Alias for backward compatibility or if I missed any renderPagination calls
+  function renderPagination(pagination) {
+      updatePaginationControls(pagination);
+  }
+
   function formatLogDetails(detalles) {
       if (!detalles) return "N/A"
       if (typeof detalles !== 'string' || !detalles.trim().startsWith('{')) return detalles
@@ -537,7 +625,7 @@
     tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando backups...</td></tr>'
 
     try {
-      const data = await fetchJSON("php/backups.php")
+      const data = await fetchJSON("php/api_backups.php")
 
       if (!data.success) {
         tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error al cargar backups</td></tr>'
@@ -630,7 +718,7 @@
 
     try {
       console.log('loadAutoBackupStatus: Fetching data...')
-      const data = await fetchJSON('php/backup_status.php')
+      const data = await fetchJSON('php/api_backups.php?action=status')
       console.log('loadAutoBackupStatus: Data received:', data)
 
       if (!data.success) {
@@ -690,10 +778,13 @@
       const enabled = this.checked
 
       try {
-        const data = await fetchJSON('php/backup_status.php?action=toggle', {
+        const data = await fetchJSON('php/api_backups.php?action=toggle', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ enabled: enabled })
+          body: JSON.stringify({
+            enabled: enabled,
+            csrf_token: document.querySelector('[name="csrf_token"]')?.value
+          })
         })
 
         if (data.success) {
@@ -729,12 +820,14 @@
     }
 
     try {
-      const data = await fetchJSON("php/backups.php?action=create", {
+      const data = await fetchJSON("php/api_backups.php?action=create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({})
+        body: JSON.stringify({
+            csrf_token: document.querySelector('[name="csrf_token"]')?.value
+        })
       })
 
       if (data.success) {
@@ -759,7 +852,7 @@
   async function downloadBackup(backupId) {
     try {
       // Use direct link approach to preserve server filename
-      window.location.href = `php/backups.php?action=download&id=${backupId}`;
+      window.location.href = `php/api_backups.php?action=download&id=${backupId}`;
       showToast("Descargando backup...", "success");
     } catch (error) {
       console.error("Error downloading backup:", error);
@@ -774,12 +867,15 @@
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/backups.php", {
+          const data = await fetchJSON("php/api_backups.php", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ id: backupId })
+            body: JSON.stringify({
+                id: backupId,
+                csrf_token: document.querySelector('[name="csrf_token"]')?.value
+            })
           })
 
           if (data.success) {
@@ -808,12 +904,15 @@
         showToast("Iniciando restauración... Por favor espere.", "info", 5000)
 
         try {
-          const data = await fetchJSON("php/backups.php?action=restore", {
+          const data = await fetchJSON("php/api_backups.php?action=restore", {
             method: "POST",
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({ id: backupId })
+            body: JSON.stringify({
+                id: backupId,
+                csrf_token: document.querySelector('[name="csrf_token"]')?.value
+            })
           })
 
           if (data.success) {
@@ -884,7 +983,12 @@
       document.getElementById("userName").value = user.nombre
       document.getElementById("userEmail").value = user.email
       document.getElementById("userRole").value = user.rol
-      document.getElementById("userStatus").value = user.estado
+      // Map DB state (active/inactive) to Dropdown values (activo/inactivo)
+      let displayStatus = user.estado;
+      if (displayStatus === 'active') displayStatus = 'activo';
+      if (displayStatus === 'inactive') displayStatus = 'inactivo';
+      document.getElementById("userStatus").value = displayStatus
+
       userPassword.required = false
       userPasswordConfirm.required = false
     } else {
@@ -909,7 +1013,8 @@
       nombre: document.getElementById("userName").value,
       email: document.getElementById("userEmail").value,
       rol: document.getElementById("userRole").value,
-      estado: document.getElementById("userStatus").value
+      estado: document.getElementById("userStatus").value,
+      csrf_token: document.querySelector('#userForm [name="csrf_token"]')?.value
     }
 
     const password = document.getElementById("userPassword").value
@@ -965,7 +1070,7 @@
     }
 
     let method = "POST"
-    let url = "php/users.php"
+    let url = "php/api_users.php"
 
     if (currentUserId) {
       user.id = currentUserId
@@ -996,14 +1101,19 @@
 
   async function editUser(id) {
     try {
-      const user = await fetchJSON(`php/users.php?id=${id}`)
-      if (user) {
+      const response = await fetchJSON(`php/api_users.php?id=${id}`)
+      // Support wrapped format (response.data or response.user) and unwrapped
+      const user = response.data || response.user || response
+
+      if (user && user.id) {
         openUserModal(user)
       } else {
-        showToast("Usuario no encontrado.", "error")
+        showToast("Error: No se pudieron cargar los datos del usuario", "error")
+        console.error("Invalid user data received:", response)
       }
     } catch (error) {
       console.error("Error al obtener usuario para edición:", error)
+      showToast("Error al obtener usuario.", "error")
     }
   }
 
@@ -1014,7 +1124,7 @@
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/users.php", {
+          const data = await fetchJSON("php/api_users.php", {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json"
@@ -1053,7 +1163,7 @@
   async function loadCompanyInfo() {
     try {
       const data = await fetchJSON(
-        "php/settings_actions.php?action=get_company_info"
+        "php/api_settings.php?action=get_company_info"
       )
 
       // Ensure we have the target elements before trying to set values
@@ -1111,7 +1221,7 @@
     formData.append("action", "update_company_info")
 
     try {
-      const data = await fetchJSON("php/settings_actions.php", {
+      const data = await fetchJSON("php/api_settings.php", {
         method: "POST",
         body: formData
       })
@@ -1168,7 +1278,7 @@
     }
 
     try {
-      const data = await fetchJSON("php/settings_actions.php", {
+      const data = await fetchJSON("php/api_settings.php", {
         method: "POST",
         body: formData
       })
@@ -1201,6 +1311,227 @@
     if (uploadLogoBtn) uploadLogoBtn.disabled = true
   }
 
+  // =========================================
+  // Two-Factor Authentication (2FA)
+  // =========================================
+
+  async function load2FAStatus() {
+    try {
+      const response = await fetch('php/api_2fa.php')
+      const data = await response.json()
+
+      const statusBadge = document.getElementById('twoFactorStatus')
+      const disabledArea = document.getElementById('twoFactorDisabledArea')
+      const setupArea = document.getElementById('twoFactorSetupArea')
+      const enabledArea = document.getElementById('twoFactorEnabledArea')
+
+      if (!statusBadge) return
+
+      // Hide all areas first
+      if (disabledArea) disabledArea.style.display = 'none'
+      if (setupArea) setupArea.style.display = 'none'
+      if (enabledArea) enabledArea.style.display = 'none'
+
+      if (data.data && data.data.is_enabled) {
+        statusBadge.className = 'badge bg-success'
+        statusBadge.textContent = 'Activado'
+        if (enabledArea) enabledArea.style.display = 'block'
+      } else {
+        statusBadge.className = 'badge bg-warning text-dark'
+        statusBadge.textContent = 'Desactivado'
+        // Show the disabled area with the "Configure" button
+        if (disabledArea) disabledArea.style.display = 'block'
+
+        // Cache the 2FA setup data for when user clicks to configure
+        if (data.data && data.data.qr_svg) {
+          window._2faSetupData = {
+            qr_svg: data.data.qr_svg,
+            secret: data.data.secret
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error loading 2FA status:', error)
+      const statusBadge = document.getElementById('twoFactorStatus')
+      if (statusBadge) {
+        statusBadge.className = 'badge bg-danger'
+        statusBadge.textContent = 'Error'
+      }
+    }
+  }
+
+  function start2FASetup() {
+    const disabledArea = document.getElementById('twoFactorDisabledArea')
+    const setupArea = document.getElementById('twoFactorSetupArea')
+    const qrContainer = document.getElementById('twoFactorQR')
+    const secretCode = document.getElementById('twoFactorSecretCode')
+    const manualContainer = document.getElementById('manualCodeContainer')
+
+    if (disabledArea) disabledArea.style.display = 'none'
+    if (setupArea) setupArea.style.display = 'block'
+    if (manualContainer) manualContainer.classList.add('d-none')
+
+    // Display the cached QR code
+    if (window._2faSetupData) {
+      if (qrContainer) {
+        qrContainer.innerHTML = atob(window._2faSetupData.qr_svg)
+      }
+      if (secretCode) {
+        secretCode.textContent = window._2faSetupData.secret
+      }
+    }
+
+    // Clear the verification input
+    const verifyInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyInput) verifyInput.value = ''
+  }
+
+  function cancel2FASetup() {
+    const disabledArea = document.getElementById('twoFactorDisabledArea')
+    const setupArea = document.getElementById('twoFactorSetupArea')
+
+    if (setupArea) setupArea.style.display = 'none'
+    if (disabledArea) disabledArea.style.display = 'block'
+
+    // Clear the verification input
+    const verifyInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyInput) verifyInput.value = ''
+  }
+
+  function showManualCode(e) {
+    e.preventDefault()
+    const container = document.getElementById('manualCodeContainer')
+    if (container) {
+      container.classList.toggle('d-none')
+    }
+  }
+
+  async function enable2FA() {
+    const code = document.getElementById('twoFactorVerifyCode')?.value || ''
+
+    if (!code || code.length !== 6) {
+      showToast('Ingresa un código de 6 dígitos', 'warning')
+      return
+    }
+
+    try {
+      const response = await fetch('php/api_2fa.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'enable', code })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.message || '2FA activado exitosamente', 'success')
+        load2FAStatus()
+      } else {
+        showToast(data.message || 'Error al activar 2FA', 'error')
+      }
+    } catch (error) {
+      console.error('Error enabling 2FA:', error)
+      showToast('Error de conexión', 'error')
+    }
+  }
+
+  async function disable2FA() {
+    const password = prompt('Ingresa tu contraseña para desactivar 2FA:')
+
+    if (!password) return
+
+    try {
+      const response = await fetch('php/api_2fa.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'disable', password })
+      })
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.message || '2FA desactivado', 'success')
+        load2FAStatus()
+      } else {
+        showToast(data.message || 'Error al desactivar 2FA', 'error')
+      }
+    } catch (error) {
+      console.error('Error disabling 2FA:', error)
+      showToast('Error de conexión', 'error')
+    }
+  }
+
+  // =========================================
+  // Session Timeout - Uses global SessionTimeout API
+  // =========================================
+
+  function initSessionTimeout() {
+    const toggle = document.getElementById('sessionTimeout')
+    const minutesSelect = document.getElementById('sessionTimeoutMinutes')
+
+    // Load saved settings from global API or localStorage
+    const settings = window.SessionTimeout ? window.SessionTimeout.getSettings() : {
+      enabled: localStorage.getItem('sessionTimeoutEnabled') !== 'false',
+      minutes: parseInt(localStorage.getItem('sessionTimeoutMinutes') || '30', 10)
+    }
+
+    if (toggle) toggle.checked = settings.enabled
+    if (minutesSelect) minutesSelect.value = settings.minutes
+
+    // Event listeners - use global API if available
+    if (toggle) {
+      toggle.addEventListener('change', function() {
+        if (window.SessionTimeout) {
+          window.SessionTimeout.setEnabled(this.checked)
+        } else {
+          localStorage.setItem('sessionTimeoutEnabled', this.checked)
+        }
+        showToast(this.checked ? 'Timeout de sesión activado' : 'Timeout de sesión desactivado', this.checked ? 'success' : 'info')
+      })
+    }
+
+    if (minutesSelect) {
+      minutesSelect.addEventListener('change', function() {
+        if (window.SessionTimeout) {
+          window.SessionTimeout.setMinutes(parseInt(this.value, 10))
+        } else {
+          localStorage.setItem('sessionTimeoutMinutes', this.value)
+        }
+        showToast(`Timeout configurado a ${this.value} minutos`, 'info')
+      })
+    }
+  }
+
+  // Initialize 2FA and session timeout - call this when settings tab loads
+  function initSecuritySettings() {
+    load2FAStatus()
+    initSessionTimeout()
+
+    // 2FA buttons
+    const start2FASetupBtn = document.getElementById('start2FASetupBtn')
+    const cancel2FASetupBtn = document.getElementById('cancel2FASetupBtn')
+    const showManualCodeLink = document.getElementById('showManualCode')
+    const enable2FABtn = document.getElementById('enable2FABtn')
+    const disable2FABtn = document.getElementById('disable2FABtn')
+
+    if (start2FASetupBtn) {
+      start2FASetupBtn.addEventListener('click', start2FASetup)
+    }
+    if (cancel2FASetupBtn) {
+      cancel2FASetupBtn.addEventListener('click', cancel2FASetup)
+    }
+    if (showManualCodeLink) {
+      showManualCodeLink.addEventListener('click', showManualCode)
+    }
+    if (enable2FABtn) {
+      enable2FABtn.addEventListener('click', enable2FA)
+    }
+    if (disable2FABtn) {
+      disable2FABtn.addEventListener('click', disable2FA)
+    }
+  }
+
+  // Expose initSecuritySettings globally for switchTab to call
+  window.initSecuritySettings = initSecuritySettings
+
   // Make functions globally accessible for inline event handlers
   window.editUser = editUser
   window.deleteUser = deleteUser
@@ -1213,4 +1544,9 @@
   window.clearLogsFilters = clearLogsFilters
   window.openUserModal = openUserModal
   window.closeUserModal = closeUserModal
+  window.enable2FA = enable2FA
+  window.disable2FA = disable2FA
+  window.start2FASetup = start2FASetup
+  window.cancel2FASetup = cancel2FASetup
 })()
+

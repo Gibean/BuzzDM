@@ -10,16 +10,28 @@ async function fetchAndRenderCustomers() {
   try {
     const searchInput = document.getElementById("customerSearchInput").value
     const typeFilter = document.getElementById("customerTypeFilter").value
+    const dateFrom = document.getElementById("customerDateFrom")
+      ? document.getElementById("customerDateFrom").value
+      : ""
+    const dateTo = document.getElementById("customerDateTo")
+      ? document.getElementById("customerDateTo").value
+      : ""
     const showDeleted = document.getElementById("showDeletedFilter")
       ? document.getElementById("showDeletedFilter").checked
       : false
 
-    let url = `php/clientes_actions.php?page=${currentCustomerPage}&limit=${customersPerPage}`
+    let url = `php/api_clientes.php?page=${currentCustomerPage}&limit=${customersPerPage}`
     if (searchInput) {
-      url += `&search=${searchInput}`
+      url += `&search=${encodeURIComponent(searchInput)}`
     }
     if (typeFilter) {
-      url += `&type=${typeFilter}`
+      url += `&type=${encodeURIComponent(typeFilter)}`
+    }
+    if (dateFrom) {
+      url += `&dateFrom=${encodeURIComponent(dateFrom)}`
+    }
+    if (dateTo) {
+      url += `&dateTo=${encodeURIComponent(dateTo)}`
     }
     if (showDeleted) {
       url += `&show_deleted=true`
@@ -125,7 +137,7 @@ async function fetchAndRenderFrequentCustomers() {
   )
   frequentCustomersListContainer.innerHTML = `<p class="text-muted">Cargando clientes frecuentes...</p>`
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?action=frequent`)
+    const data = await fetchJSON(`php/api_clientes.php?action=frequent`)
     const frequentCustomers = data.data.frequentCustomers
 
     if (frequentCustomers && frequentCustomers.length > 0) {
@@ -150,7 +162,7 @@ async function fetchAndRenderFrequentCustomers() {
 
 async function viewCustomerDetail(customerId) {
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
+    const data = await fetchJSON(`php/api_clientes.php?id=${customerId}`)
     const customer = data.data.customer
 
     if (customer) {
@@ -181,7 +193,7 @@ async function viewCustomerDetail(customerId) {
 
 async function editCustomer(customerId) {
   try {
-    const data = await fetchJSON(`php/clientes_actions.php?id=${customerId}`)
+    const data = await fetchJSON(`php/api_clientes.php?id=${customerId}`)
     const customer = data.data.customer
 
     if (customer) {
@@ -209,7 +221,7 @@ async function editCustomer(customerId) {
         }
 
         try {
-          await fetchJSON(`php/clientes_actions.php?id=${updatedCustomer.id}`, {
+          await fetchJSON(`php/api_clientes.php?id=${updatedCustomer.id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedCustomer)
@@ -238,7 +250,7 @@ async function deleteCustomer(customerId) {
     type: "confirm",
     onConfirm: async () => {
       try {
-        await fetchJSON(`php/clientes_actions.php?id=${customerId}`, {
+        await fetchJSON(`php/api_clientes.php?id=${customerId}`, {
           method: "DELETE"
         })
         showToast("Cliente eliminado exitosamente.", "success")
@@ -253,7 +265,7 @@ async function deleteCustomer(customerId) {
 
 async function restoreCustomer(customerId) {
   try {
-    const response = await fetchJSON("php/clientes_actions.php", {
+    const response = await fetchJSON("php/api_clientes.php", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "restore", id: customerId })
@@ -300,7 +312,7 @@ async function setupCreateCustomerForm() {
     }
 
     try {
-      const response = await fetchJSON("php/clientes_actions.php", {
+      const response = await fetchJSON("php/api_clientes.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newCustomer)
@@ -346,13 +358,97 @@ document
   })
 document
   .getElementById("customerTypeFilter")
-  .addEventListener("change", fetchAndRenderCustomers)
+  .addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
 document
   .getElementById("showDeletedFilter")
-  .addEventListener("change", fetchAndRenderCustomers)
+  .addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+
+// Date filter event listeners
+if (document.getElementById("customerDateFrom")) {
+  document.getElementById("customerDateFrom").addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+}
+if (document.getElementById("customerDateTo")) {
+  document.getElementById("customerDateTo").addEventListener("change", () => { fetchAndRenderCustomers(); updateActiveFiltersCount(); });
+}
+
+// Clear filters function
+window.clearFilters = function() {
+  document.getElementById('customerSearchInput').value = '';
+  document.getElementById('customerTypeFilter').value = '';
+  if (document.getElementById('customerDateFrom')) {
+    document.getElementById('customerDateFrom').value = '';
+  }
+  if (document.getElementById('customerDateTo')) {
+    document.getElementById('customerDateTo').value = '';
+  }
+  const showDeletedFilter = document.getElementById('showDeletedFilter');
+  if (showDeletedFilter) {
+    showDeletedFilter.checked = false;
+  }
+  currentCustomerPage = 1;
+  fetchAndRenderCustomers();
+  updateActiveFiltersCount();
+};
+
+// Advanced filters toggle logic
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_clientes") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_clientes", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_clientes", "false");
+            }
+        });
+    }
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const customerTypeFilter = document.getElementById("customerTypeFilter");
+    const customerDateFrom = document.getElementById("customerDateFrom");
+    const customerDateTo = document.getElementById("customerDateTo");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if (customerTypeFilter && customerTypeFilter.value !== "") activeFilters++;
+    if (customerDateFrom && customerDateFrom.value !== "") activeFilters++;
+    if (customerDateTo && customerDateTo.value !== "") activeFilters++;
+    if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
 
 // Initial load
 document.addEventListener("DOMContentLoaded", () => {
   fetchAndRenderCustomers()
   setupCreateCustomerForm()
+  setupAdvancedFilters()
 })

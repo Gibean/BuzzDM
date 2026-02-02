@@ -10,16 +10,34 @@ async function fetchAndRenderOrders() {
   try {
     const searchInput = document.getElementById("searchInput").value
     const paymentFilter = document.getElementById("paymentFilter").value
-    const dateFrom = document.getElementById("dateFrom").value
-    const dateTo = document.getElementById("dateTo").value
-    const showDeleted = document.getElementById("showDeletedFilter") ? document.getElementById("showDeletedFilter").checked : false;
+    const shippingFilter = document.getElementById("shippingFilter")
+      ? document.getElementById("shippingFilter").value
+      : ""
+    const dateFrom = document.getElementById("dateFrom")
+      ? document.getElementById("dateFrom").value
+      : ""
+    const dateTo = document.getElementById("dateTo")
+      ? document.getElementById("dateTo").value
+      : ""
+    const showDeleted = document.getElementById("showDeletedFilter")
+      ? document.getElementById("showDeletedFilter").checked
+      : false
 
-    let url = `php/pedidos_actions.php?page=${currentPage}&limit=${ordersPerPage}`
+    // Call updateActiveFiltersCount here to ensure badge is correct on every fetch
+    // Ensure function exists before calling to avoid initial errors if script order issues
+    if (typeof updateActiveFiltersCount === 'function') {
+        updateActiveFiltersCount();
+    }
+
+    let url = `php/api_orders.php?page=${currentPage}&limit=${ordersPerPage}`
     if (searchInput) {
       url += `&search=${encodeURIComponent(searchInput)}`
     }
     if (paymentFilter) {
       url += `&paymentStatus=${encodeURIComponent(paymentFilter)}`
+    }
+    if (shippingFilter) {
+      url += `&shippingStatus=${encodeURIComponent(shippingFilter)}`
     }
     if (dateFrom) {
       url += `&dateFrom=${encodeURIComponent(dateFrom)}`
@@ -34,7 +52,6 @@ async function fetchAndRenderOrders() {
     const data = await fetchJSON(url)
 
     renderOrders(data.orders)
-    updateStats(data.orders)
     // renderPagination(data.total); // Pagination not implemented yet
   } catch (error) {
     console.error("Error fetching orders:", error)
@@ -148,7 +165,7 @@ async function deleteOrder(orderId) {
         `¿Estás seguro de que deseas eliminar el pedido #${orderId}? Esta acción no se puede deshacer.`,
         async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
+                await fetchJSON(`php/api_orders.php?id=${orderId}`, {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json" }
                 })
@@ -168,7 +185,7 @@ async function restoreOrder(orderId) {
         `¿Estás seguro de que deseas restaurar el pedido #${orderId}?`,
         async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php`, {
+                await fetchJSON(`php/api_orders.php`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ action: 'restore', id: orderId })
@@ -183,23 +200,7 @@ async function restoreOrder(orderId) {
     )
 }
 
-function updateStats(orders) {
-  const totalOrders = orders.length
-  const pendingOrders = orders.filter(
-    (o) => o.paymentStatus === "no-pagado"
-  ).length
-  const paidOrders = orders.filter((o) => o.paymentStatus === "pagado").length
-  const totalRevenue = orders.reduce(
-    (sum, order) => sum + parseFloat(order.total),
-    0
-  )
-
-  document.getElementById("totalOrders").textContent = totalOrders
-  document.getElementById("pendingOrders").textContent = pendingOrders
-  document.getElementById("paidOrders").textContent = paidOrders
-  document.getElementById("totalRevenue").textContent =
-    formatCurrency(totalRevenue)
-}
+// Stats cards removed - function deprecated
 
 async function toggleOrderProducts(button, orderId) {
   const productsDiv = document.getElementById(`orderProducts_${orderId}`)
@@ -216,7 +217,7 @@ async function toggleOrderProducts(button, orderId) {
       productsDiv.innerHTML = `<div class="text-center p-3"><i class="fas fa-spinner fa-spin text-muted"></i> Cargando productos...</div>`
       try {
         const data = await fetchJSON(
-          `php/pedidos_actions.php?action=get_products&order_id=${orderId}`
+          `php/api_orders.php?action=get_products&order_id=${orderId}`
         )
         if (data.products && data.products.length > 0) {
           productsDiv.innerHTML = `
@@ -263,28 +264,28 @@ async function toggleOrderProducts(button, orderId) {
 
 async function viewOrderDetail(orderId) {
   try {
-    const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`)
+    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`)
     const order = data.order
 
     if (order) {
       // Assuming a modal with ID 'orderDetailModal' and elements to display info
       document.getElementById("detailOrderId").textContent = order.id
       document.getElementById("detailOrderReference").textContent =
-        order.referencia
+        order.referencia || 'N/A'
       document.getElementById("detailOrderCustomer").textContent =
-        order.customer_name || "N/A"
+        order.customer_name || order.customer || "N/A"
       document.getElementById("detailOrderEmail").textContent =
-        order.customer_email || "N/A"
+        order.customer_email || order.email || "N/A"
       document.getElementById("detailOrderDate").textContent = formatDateTime(
-        order.fecha_creacion
+        order.fecha_creacion || order.date
       )
       document.getElementById("detailOrderTotal").textContent = formatCurrency(
         order.total
       )
       document.getElementById("detailOrderPaymentStatus").textContent =
-        order.estado_pago
+        order.estado_pago || order.paymentStatus
       document.getElementById("detailOrderShippingStatus").textContent =
-        order.estado_envio
+        order.estado_envio || order.shippingStatus || 'N/A'
       document.getElementById("detailOrderShippingAddress").textContent =
         order.direccion_envio || "N/A"
       document.getElementById("detailOrderShippingNotes").textContent =
@@ -340,7 +341,7 @@ async function viewOrderDetail(orderId) {
 
 async function editOrder(orderId) {
   try {
-    const data = await fetchJSON(`php/pedidos_actions.php?id=${orderId}`)
+    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`)
     const order = data.order
 
     if (order) {
@@ -634,7 +635,7 @@ async function editOrder(orderId) {
         }
 
         try {
-          await fetchJSON(`php/pedidos_actions.php?id=${orderId}`, {
+          await fetchJSON(`php/api_orders.php?id=${orderId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedOrder)
@@ -963,8 +964,8 @@ async function openOrderModal() {
     }
 
     try {
-      await fetchJSON(`php/pedidos_actions.php`, {
-        method: "POST",
+      await fetchJSON("php/api_orders.php", {
+          method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newOrder)
       })
@@ -990,7 +991,7 @@ async function deleteOrder(orderId) {
         type: "confirm",
         onConfirm: async () => {
             try {
-                await fetchJSON(`php/pedidos_actions.php`, {
+                await fetchJSON(`php/api_orders.php?id=${orderId}`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: orderId })
@@ -1011,6 +1012,10 @@ window.clearFilters = function() {
   document.getElementById('paymentFilter').value = '';
   document.getElementById('dateFrom').value = '';
   document.getElementById('dateTo').value = '';
+  const shippingFilter = document.getElementById('shippingFilter');
+  if (shippingFilter) {
+    shippingFilter.value = '';
+  }
   const showDeletedFilter = document.getElementById('showDeletedFilter');
   if (showDeletedFilter) {
     showDeletedFilter.checked = false;
@@ -1048,6 +1053,85 @@ document.getElementById('showDeletedFilter').addEventListener('change', () => {
     fetchAndRenderOrders();
 });
 
+if (document.getElementById('shippingFilter')) {
+    document.getElementById('shippingFilter').addEventListener('change', () => {
+        currentPage = 1;
+        fetchAndRenderOrders();
+    });
+}
+
 // Event listener for "Nuevo Pedido" button
 document.getElementById('newOrderBtn').addEventListener('click', openOrderModal);
+
+// Advanced filters toggle logic
+function setupAdvancedFilters() {
+    const toggleBtn = document.getElementById("toggleAdvancedFilters");
+    const advancedCollapse = document.getElementById("advancedFiltersCollapse");
+    const activeBadge = document.getElementById("activeFiltersBadge");
+
+    if (toggleBtn && advancedCollapse) {
+        // Restore state from localStorage
+        const isAdvVisible = localStorage.getItem("advFiltersVisible_pedidos") === "true";
+        if (isAdvVisible) {
+            advancedCollapse.classList.remove("d-none");
+            toggleBtn.classList.add("active");
+        }
+
+         // Initial count update
+        updateActiveFiltersCount();
+
+        toggleBtn.addEventListener("click", () => {
+            const isHidden = advancedCollapse.classList.contains("d-none");
+            if (isHidden) {
+                advancedCollapse.classList.remove("d-none");
+                toggleBtn.classList.add("active");
+                localStorage.setItem("advFiltersVisible_pedidos", "true");
+            } else {
+                advancedCollapse.classList.add("d-none");
+                toggleBtn.classList.remove("active");
+                localStorage.setItem("advFiltersVisible_pedidos", "false");
+            }
+        });
+    }
+
+    // Attach listener to advanced filters to update badge
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const shippingFilter = document.getElementById("shippingFilter");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if(dateFrom) dateFrom.addEventListener('change', updateActiveFiltersCount);
+    if(dateTo) dateTo.addEventListener('change', updateActiveFiltersCount);
+    if(shippingFilter) shippingFilter.addEventListener('change', updateActiveFiltersCount);
+    if(showDeletedFilter) showDeletedFilter.addEventListener('change', updateActiveFiltersCount);
+}
+
+function updateActiveFiltersCount() {
+    const activeBadge = document.getElementById("activeFiltersBadge");
+    if (!activeBadge) return;
+
+    let activeFilters = 0;
+    // Only count filters in the advanced section
+    const dateFrom = document.getElementById("dateFrom");
+    const dateTo = document.getElementById("dateTo");
+    const shippingFilter = document.getElementById("shippingFilter");
+    const showDeletedFilter = document.getElementById("showDeletedFilter");
+
+    if (dateFrom && dateFrom.value !== "") activeFilters++;
+    if (dateTo && dateTo.value !== "") activeFilters++;
+    if (shippingFilter && shippingFilter.value !== "") activeFilters++;
+    if (showDeletedFilter && showDeletedFilter.checked) activeFilters++;
+
+    if (activeFilters > 0) {
+        activeBadge.textContent = activeFilters;
+        activeBadge.classList.remove("d-none");
+    } else {
+        activeBadge.classList.add("d-none");
+    }
+}
+
+// Initialize advanced filters
+document.addEventListener('DOMContentLoaded', () => {
+    setupAdvancedFilters();
+});
 

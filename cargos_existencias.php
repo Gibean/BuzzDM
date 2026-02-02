@@ -29,10 +29,10 @@
                 <span class="text-muted ms-2 font-mono">/ ENTRADA DE INVENTARIO</span>
             </div>
             <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-outline-buzz" onclick="verHistorial()">
+                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()">
                     <i class="fas fa-history"></i> Historial
                 </button>
-                <button class="btn btn-buzz" onclick="nuevoCargo()">
+                <button class="btn btn-buzz" id="btnNewCargo" onclick="nuevoCargo()">
                     <i class="fas fa-plus"></i> Nuevo Cargo
                 </button>
             </div>
@@ -41,33 +41,12 @@
         <!-- Vista de Historial (por defecto) -->
         <div id="vistaHistorial">
             <!-- Filtros -->
-            <div class="buzz-card mb-4">
+            <div class="buzz-card mb-4 pb-3">
                 <div class="filter-wrapper">
                     <div class="filter-group filter-search">
                         <label class="text-muted">Buscar</label>
                         <input type="text" class="form-control form-control-buzz" id="searchCargos"
                                placeholder="Código, proveedor, referencia...">
-                    </div>
-                    <div class="filter-group filter-select">
-                        <label class="text-muted">Estado</label>
-                        <select class="form-control form-control-buzz" id="filterEstado">
-                            <option value="">Todos</option>
-                            <option value="borrador">Borrador</option>
-                            <option value="confirmado">Confirmado</option>
-                            <option value="anulado">Anulado</option>
-                        </select>
-                    </div>
-                    <div class="filter-group filter-select">
-                        <label class="text-muted">Concepto</label>
-                        <select class="form-control form-control-buzz" id="filterConcepto">
-                            <option value="">Todos</option>
-                            <option value="compra">Compra</option>
-                            <option value="donacion">Donación</option>
-                            <option value="ajuste_positivo">Ajuste Positivo</option>
-                            <option value="devolucion_cliente">Devolución</option>
-                            <option value="inventario_inicial">Inv. Inicial</option>
-                            <option value="otro">Otro</option>
-                        </select>
                     </div>
                     <div class="filter-group filter-date">
                         <label class="text-muted">Desde</label>
@@ -77,10 +56,44 @@
                         <label class="text-muted">Hasta</label>
                         <input type="date" class="form-control form-control-buzz" id="filterFechaHasta">
                     </div>
+
                     <div class="filter-group filter-actions">
+                        <button class="btn btn-outline-buzz btn-filter-action" id="toggleAdvancedFilters" title="Más filtros">
+                            <i class="fas fa-filter"></i>
+                            <span class="btn-text">Filtros Avanzados</span>
+                            <span class="badge bg-primary ms-1 d-none" id="activeFiltersBadge">0</span>
+                        </button>
                         <button class="btn btn-outline-buzz btn-filter-action" onclick="limpiarFiltros()" title="Limpiar">
                             <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Advanced Filters (Collapsible) -->
+                <div id="advancedFiltersCollapse" class="advanced-filters-section mt-3 d-none">
+                    <hr class="border-secondary opacity-25">
+                    <div class="filter-wrapper">
+                        <div class="filter-group filter-select">
+                            <label class="text-muted">Estado</label>
+                            <select class="form-control form-control-buzz" id="filterEstado">
+                                <option value="">Todos</option>
+                                <option value="borrador">Borrador</option>
+                                <option value="confirmado">Confirmado</option>
+                                <option value="anulado">Anulado</option>
+                            </select>
+                        </div>
+                        <div class="filter-group filter-select">
+                            <label class="text-muted">Concepto</label>
+                            <select class="form-control form-control-buzz" id="filterConcepto">
+                                <option value="">Todos</option>
+                                <option value="compra">Compra</option>
+                                <option value="donacion">Donación</option>
+                                <option value="ajuste_positivo">Ajuste Positivo</option>
+                                <option value="devolucion_cliente">Devolución</option>
+                                <option value="inventario_inicial">Inv. Inicial</option>
+                                <option value="otro">Otro</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -222,7 +235,7 @@
                 <div class="buzz-card mb-4">
                     <div class="card-header-buzz d-flex justify-content-between align-items-center">
                         <span><i class="fas fa-boxes"></i> PRODUCTOS DEL CARGO</span>
-                        <button type="button" class="btn btn-outline-buzz btn-sm" onclick="agregarLineaProducto()">
+                        <button type="button" class="btn btn-outline-buzz btn-sm" id="btnAddProductLine" onclick="agregarLineaProducto()">
                             <i class="fas fa-plus"></i> Añadir Producto
                         </button>
                     </div>
