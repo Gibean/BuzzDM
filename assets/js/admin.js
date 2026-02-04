@@ -174,10 +174,30 @@
           `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando ${count} reporte${count > 1 ? 's' : ''}...`
         generateReportBtn.disabled = true
 
-        // Open consolidated report in one tab to avoid popup blocking
+        // Use POST form submission to avoid password in URL (security)
         const typesParam = selectedReportTypes.join(',')
-        const reportUrl = `php/reports.php?tipo=${typesParam}&password=${encodeURIComponent(password)}`
-        window.open(reportUrl, "_blank")
+
+        // Create hidden form for POST submission
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'php/reports.php';
+        form.target = '_blank';
+
+        const tipoInput = document.createElement('input');
+        tipoInput.type = 'hidden';
+        tipoInput.name = 'tipo';
+        tipoInput.value = typesParam;
+        form.appendChild(tipoInput);
+
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'hidden';
+        passwordInput.name = 'password';
+        passwordInput.value = password;
+        form.appendChild(passwordInput);
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
 
         // Reset after a short delay
         setTimeout(() => {

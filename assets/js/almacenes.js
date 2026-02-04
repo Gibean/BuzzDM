@@ -210,6 +210,7 @@ window.openAlmacenModal = function(almacenId = null) {
     if (almacenId) {
         // Edit mode
         window.setTitle('almacenModal', 'Editar Almacén');
+        almacenCodigoInput.readOnly = false; // Allow editing existing code
         const almacen = almacenes.find(a => a.id == almacenId);
         if (almacen) {
             almacenIdInput.value = almacen.id;
@@ -224,6 +225,7 @@ window.openAlmacenModal = function(almacenId = null) {
         }
     } else {
         window.setTitle('almacenModal', 'Nuevo Almacén');
+        almacenCodigoInput.readOnly = true; // Auto-generated for new
     }
 
     window.openModal('almacenModal');
@@ -238,8 +240,8 @@ window.saveAlmacen = async function() {
     const codigo = almacenCodigoInput.value.trim();
     const nombre = almacenNombreInput.value.trim();
 
-    if (!codigo || !nombre) {
-        showToast('Código y nombre son requeridos', 'warning');
+    if (!nombre) {
+        showToast('El nombre es requerido', 'warning');
         return;
     }
 

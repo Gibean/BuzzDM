@@ -56,14 +56,14 @@ class WarehouseRepository {
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            $data['codigo'],
+            !empty($data['codigo']) ? $data['codigo'] : null, // Allow null for trigger auto-generation
             $data['nombre'],
-            $data['direccion'],
-            $data['telefono'],
-            $data['tipo'],
+            $data['direccion'] ?? null,
+            $data['telefono'] ?? null,
+            $data['tipo'] ?? 'almacen',
             $data['es_principal'] ? 1 : 0,
             $data['activo'] ? 1 : 0,
-            $data['notas']
+            $data['notas'] ?? null
         ]);
         return $this->pdo->lastInsertId();
     }

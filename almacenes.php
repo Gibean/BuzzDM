@@ -142,11 +142,11 @@
                         </div>
                         <div class="row g-3">
                             <div class="col-md-4 mb-3">
-                                <label class="form-label">Código *</label>
+                                <label class="form-label">Código <small class="text-muted">(auto)</small></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-barcode"></i></span>
                                     <input type="text" class="form-control form-control-buzz" id="almacenCodigo"
-                                           placeholder="ALM-001" maxlength="20" required>
+                                           placeholder="Se genera automáticamente" maxlength="20" readonly>
                                 </div>
                             </div>
                             <div class="col-md-8 mb-3">
@@ -334,6 +334,7 @@
 
     <!-- System Footer (Includes Tutorial Scripts) -->
     <?php require_once 'php/system_footer.php'; ?>
+    <script src="assets/js/common.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/almacenes.js"></script>
 </body>

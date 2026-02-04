@@ -1,5 +1,7 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
+
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Clients", description: "Operations related to Clients")]
@@ -94,12 +96,16 @@ class ClienteController {
         ]
     )]
     private function handlePost($input) {
+        global $pdo;
         if (isset($input['action']) && $input['action'] === 'restore') {
             $id = $input['id'] ?? null;
+            $customer = $this->service->getCustomer($id);
             $this->service->restoreCustomer($id);
+            logSystemAction($pdo, getCurrentUserId(), 'Cliente restaurado', '#' . $id . ' | ' . ($customer['cedula'] ?? 'S/C') . ' - ' . ($customer['nombre'] ?? ''));
             $this->jsonResponse(true, [], 'Cliente restaurado exitosamente');
         } else {
             $id = $this->service->createCustomer($input);
+            logSystemAction($pdo, getCurrentUserId(), 'Cliente creado', '#' . $id . ' | ' . ($input['cedula'] ?? 'S/C') . ' - ' . ($input['nombre'] ?? ''));
             $this->jsonResponse(true, ['id' => $id], 'Cliente creado exitosamente');
         }
     }
@@ -117,11 +123,14 @@ class ClienteController {
         ]
     )]
     private function handlePut($input) {
+        global $pdo;
         $id = $_GET['id'] ?? $input['id'] ?? null;
         if (!$id) {
             throw new Exception("ID Requerido para actualizar");
         }
+        $customer = $this->service->getCustomer($id);
         $this->service->updateCustomer($id, $input);
+        logSystemAction($pdo, getCurrentUserId(), 'Cliente actualizado', '#' . $id . ' | ' . ($customer['cedula'] ?? 'S/C') . ' - ' . ($input['nombre'] ?? $customer['nombre'] ?? ''));
         $this->jsonResponse(true, [], 'Cliente actualizado exitosamente');
     }
 
@@ -137,11 +146,15 @@ class ClienteController {
         ]
     )]
     private function handleDelete() {
+        global $pdo;
         $id = $_GET['id'] ?? null;
         if (!$id) {
             throw new Exception("ID Requerido para eliminar");
         }
+        // Get customer name before soft-delete for logging
+        $customer = $this->service->getCustomer($id);
         $this->service->deleteCustomer($id);
+        logSystemAction($pdo, getCurrentUserId(), 'Cliente eliminado', '#' . $id . ' | ' . ($customer['cedula'] ?? 'S/C') . ' - ' . ($customer['nombre'] ?? ''));
         $this->jsonResponse(true, [], 'Cliente eliminado exitosamente');
     }
 }

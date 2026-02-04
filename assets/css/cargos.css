@@ -26,7 +26,7 @@
 /* Líneas de Productos */
 .cargo-lineas-header {
     display: grid;
-    grid-template-columns: 160px 1fr 100px 120px 120px 50px;
+    grid-template-columns: 160px 1fr 100px 50px;
     gap: 10px;
     padding: 10px 15px;
     background: rgba(0, 255, 136, 0.05);
@@ -41,7 +41,7 @@
 
 .cargo-linea-row {
     display: grid;
-    grid-template-columns: 160px 1fr 100px 120px 120px 50px;
+    grid-template-columns: 160px 1fr 100px 50px;
     gap: 10px;
     padding: 12px 15px;
     border-bottom: 1px solid var(--buzz-border);
@@ -76,6 +76,15 @@
 .col-costo,
 .col-subtotal {
     min-width: 100px;
+}
+
+.col-precio-compra-input {
+    min-width: 100px;
+}
+
+.col-precio-compra-input input {
+    font-family: var(--font-mono);
+    text-align: right;
 }
 
 .col-acciones {
