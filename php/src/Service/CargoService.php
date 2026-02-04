@@ -52,6 +52,10 @@ class CargoService {
 
             if ($estado === 'confirmado') {
                 $this->repository->updateConfirmation($cargoId, $userId);
+                // Register purchase prices when cargo is confirmed with proveedor
+                if (!empty($data['proveedor_id'])) {
+                    $this->repository->registerPurchasePrices($cargoId, $data['proveedor_id'], $data['fecha']);
+                }
             }
 
             $this->repository->commit();
@@ -97,6 +101,11 @@ class CargoService {
 
             if ($estado === 'confirmado') {
                 $this->repository->updateConfirmation($id, $userId);
+                // Register purchase prices when cargo is confirmed with proveedor
+                $proveedor_id = !empty($data['proveedor_id']) ? $data['proveedor_id'] : null;
+                if ($proveedor_id) {
+                    $this->repository->registerPurchasePrices($id, $proveedor_id, $data['fecha']);
+                }
             }
 
             $this->repository->commit();
@@ -126,6 +135,12 @@ class CargoService {
         try {
             $this->repository->updateStatus($id, 'confirmado');
             $this->repository->updateConfirmation($id, $userId);
+
+            // Register purchase prices when cargo is confirmed with proveedor
+            if (!empty($current['proveedor_id'])) {
+                $this->repository->registerPurchasePrices($id, $current['proveedor_id'], $current['fecha']);
+            }
+
             $this->repository->commit();
         } catch (Exception $e) {
             $this->repository->rollBack();

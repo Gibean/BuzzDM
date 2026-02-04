@@ -1,5 +1,6 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
 
 use OpenApi\Attributes as OA;
 
@@ -108,14 +109,18 @@ class ProductController {
         ]
     )]
     private function handlePost($input) {
+        global $pdo;
         if (isset($input['action']) && $input['action'] === 'restore') {
             $id = $input['id'] ?? null;
             if (!$id) throw new Exception("ID Requerido para restaurar");
 
+            $product = $this->service->getProduct($id);
             $this->service->restoreProduct($id);
+            logSystemAction($pdo, getCurrentUserId(), 'Producto restaurado', '#' . $id . ' | ' . ($product['sku'] ?? '') . ' - ' . ($product['nombre'] ?? ''));
             $this->jsonResponse(true, [], 'Producto restaurado exitosamente');
         } else {
             $id = $this->service->createProduct($input);
+            logSystemAction($pdo, getCurrentUserId(), 'Producto creado', '#' . $id . ' | ' . ($input['sku'] ?? '') . ' - ' . ($input['nombre'] ?? ''));
             $this->jsonResponse(true, ['id' => $id], 'Producto creado exitosamente');
         }
     }
@@ -133,10 +138,13 @@ class ProductController {
         ]
     )]
     private function handlePut($input) {
+        global $pdo;
         $id = $_GET['id'] ?? $input['id'] ?? null;
         if (!$id) throw new Exception("ID Requerido para actualizar");
 
+        $product = $this->service->getProduct($id);
         $this->service->updateProduct($id, $input);
+        logSystemAction($pdo, getCurrentUserId(), 'Producto actualizado', '#' . $id . ' | ' . ($product['sku'] ?? '') . ' - ' . ($input['nombre'] ?? $product['nombre'] ?? ''));
         $this->jsonResponse(true, [], 'Producto actualizado exitosamente');
     }
 
@@ -152,10 +160,14 @@ class ProductController {
         ]
     )]
     private function handleDelete($input) {
+        global $pdo;
         $id = $_GET['id'] ?? $input['id'] ?? null;
         if (!$id) throw new Exception("ID Requerido para eliminar");
 
+        // Get product info before delete for logging
+        $product = $this->service->getProduct($id);
         $this->service->deleteProduct($id);
+        logSystemAction($pdo, getCurrentUserId(), 'Producto eliminado', '#' . $id . ' | ' . ($product['sku'] ?? '') . ' - ' . ($product['nombre'] ?? ''));
         $this->jsonResponse(true, [], 'Producto eliminado exitosamente');
     }
 }
