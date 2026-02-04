@@ -264,78 +264,97 @@ async function toggleOrderProducts(button, orderId) {
 
 async function viewOrderDetail(orderId) {
   try {
-    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`)
-    const order = data.order
+    const data = await fetchJSON(`php/api_orders.php?id=${orderId}`);
+    const order = data.order;
+    const rateData = data.tasa;
 
     if (order) {
-      // Assuming a modal with ID 'orderDetailModal' and elements to display info
-      document.getElementById("detailOrderId").textContent = order.id
-      document.getElementById("detailOrderReference").textContent =
-        order.referencia || 'N/A'
-      document.getElementById("detailOrderCustomer").textContent =
-        order.customer_name || order.customer || "N/A"
-      document.getElementById("detailOrderEmail").textContent =
-        order.customer_email || order.email || "N/A"
-      document.getElementById("detailOrderDate").textContent = formatDateTime(
-        order.fecha_creacion || order.date
-      )
-      document.getElementById("detailOrderTotal").textContent = formatCurrency(
-        order.total
-      )
-      document.getElementById("detailOrderPaymentStatus").textContent =
-        order.estado_pago || order.paymentStatus
-      document.getElementById("detailOrderShippingStatus").textContent =
-        order.estado_envio || order.shippingStatus || 'N/A'
-      document.getElementById("detailOrderShippingAddress").textContent =
-        order.direccion_envio || "N/A"
-      document.getElementById("detailOrderShippingNotes").textContent =
-        order.notas_envio || "N/A"
+      // Populate basic order info
+      document.getElementById("detailOrderId").textContent = order.id;
+      document.getElementById("detailOrderReference").textContent = order.referencia || `#${order.id}`;
+      document.getElementById("detailOrderCustomer").textContent = order.customer_name || order.customer || "N/A";
+      document.getElementById("detailOrderEmail").textContent = order.customer_email || order.email || "No especificado";
+      document.getElementById("detailOrderDate").textContent = formatDateTime(order.fecha_creacion || order.date);
 
-      const productsHtml =
-        order.products && order.products.length > 0
-          ? `
-                <h6>Productos:</h6>
-                <table class="table table-sm table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${order.products
-                          .map(
-                            (p) => `
-                            <tr>
-                                <td>${p.product_name}</td>
-                                <td>${p.cantidad}</td>
-                                <td>${formatCurrency(p.precio_unitario)}</td>
-                                <td>${formatCurrency(
-                                  p.cantidad * p.precio_unitario
-                                )}</td>
-                            </tr>
-                        `
-                          )
-                          .join("")}
-                    </tbody>
-                </table>
-            `
-          : "<p>No hay productos asociados a este pedido.</p>"
-      document.getElementById("detailOrderProducts").innerHTML = productsHtml
+      // Format payment status with badge
+      const paymentStatus = order.estado_pago || order.paymentStatus;
+      const paymentBadge = paymentStatus === 'pagado'
+        ? '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Pagado</span>'
+        : '<span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i>No Pagado</span>';
+      document.getElementById("detailOrderPaymentStatus").innerHTML = paymentBadge;
 
-      // Show the modal (assuming Bootstrap 5 modal)
-      const detailModal = new bootstrap.Modal(
-        document.getElementById("orderDetailModal")
-      )
-      detailModal.show()
+      // Format shipping status with badge
+      const shippingStatus = order.estado_envio || order.shippingStatus || 'pendiente';
+      let shippingBadge = '';
+      switch(shippingStatus) {
+        case 'recibido':
+          shippingBadge = '<span class="badge bg-success"><i class="fas fa-check-double me-1"></i>Recibido</span>';
+          break;
+        case 'enviado':
+          shippingBadge = '<span class="badge bg-info"><i class="fas fa-shipping-fast me-1"></i>Enviado</span>';
+          break;
+        default:
+          shippingBadge = '<span class="badge bg-secondary"><i class="fas fa-hourglass-half me-1"></i>Pendiente</span>';
+      }
+      document.getElementById("detailOrderShippingStatus").innerHTML = shippingBadge;
+
+      document.getElementById("detailOrderShippingAddress").textContent = order.direccion_envio || "No especificada";
+      document.getElementById("detailOrderShippingNotes").textContent = order.notas_envio || "Sin notas";
+
+      // Products table (compact)
+      const tasa = rateData && rateData.tasa_actual ? parseFloat(rateData.tasa_actual) : 0;
+
+      const productsHtml = order.products && order.products.length > 0
+        ? `<table class="table-compact mb-0">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th class="text-center">Cant</th>
+                <th class="text-end">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${order.products.map(p => {
+                const subtotalUsd = p.cantidad * p.precio_unitario;
+                const subtotalVes = subtotalUsd * tasa;
+                return `
+                <tr>
+                  <td>${p.product_name}</td>
+                  <td class="text-center">x${p.cantidad}</td>
+                  <td class="text-end font-mono">
+                    <span class="d-block">${formatCurrency(subtotalUsd)}</span>
+                    ${tasa > 0 ? `<span class="subtotal-ves">Bs. ${subtotalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>` : ''}
+                  </td>
+                </tr>
+              `}).join('')}
+            </tbody>
+          </table>`
+        : '<p class="text-muted text-center mb-0">No hay productos</p>';
+      document.getElementById("detailOrderProducts").innerHTML = productsHtml;
+
+      // Calculate totals
+      const totalUsd = parseFloat(order.total) || 0;
+      document.getElementById("detailOrderTotalUsd").textContent = formatCurrency(totalUsd);
+
+      // Convert to VES using exchange rate
+      if (rateData && rateData.tasa_actual) {
+        const tasa = parseFloat(rateData.tasa_actual);
+        const totalVes = totalUsd * tasa;
+        document.getElementById("detailOrderTotalVes").textContent = `Bs. ${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        document.getElementById("detailOrderRateInfo").textContent = `Tasa ${rateData.fuente.toUpperCase()}: ${tasa.toFixed(2)} Bs/$ (${rateData.fecha_tasa})`;
+      } else {
+        document.getElementById("detailOrderTotalVes").textContent = 'No disponible';
+        document.getElementById("detailOrderRateInfo").textContent = 'Tasa de cambio no configurada';
+      }
+
+      // Show the modal using our custom modal system
+      openModal('orderDetailModal');
     } else {
-      showToast("Pedido no encontrado.", "error")
+      showToast("Pedido no encontrado.", "error");
     }
   } catch (error) {
-    console.error("Error fetching order details:", error)
-    showToast(`Error al cargar detalles del pedido: ${error.message}`, "error")
+    console.error("Error fetching order details:", error);
+    showToast(`Error al cargar detalles del pedido: ${error.message}`, "error");
   }
 }
 
@@ -375,9 +394,9 @@ async function editOrder(orderId) {
       const addEditOrderProductRowButton = document.getElementById(
         "addEditOrderProductRow"
       )
-      const editOrderCalculatedTotalSpan = document.getElementById(
-        "editOrderCalculatedTotal"
-      )
+      const editOrderCalculatedTotalSpan = document.getElementById("editOrderCalculatedTotal");
+      const editOrderCalculatedTotalVesSpan = document.getElementById("editOrderCalculatedTotalVes");
+      const currentRate = data.tasa;
 
       // Clear previous products and reset counter
       editProductsContainer.innerHTML = ""
@@ -396,12 +415,25 @@ async function editOrder(orderId) {
             total += quantity * price
           })
         editOrderCalculatedTotalSpan.textContent = formatCurrency(total)
+
+        if (currentRate && currentRate.tasa_actual) {
+            const totalVes = total * parseFloat(currentRate.tasa_actual);
+            editOrderCalculatedTotalVesSpan.textContent = `Bs. ${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
       }
 
       const addEditProductRow = (product = null) => {
         editProductRowCounter++
         const newRow = document.createElement("div")
         newRow.classList.add("row", "mb-2", "product-row")
+
+        const initialSubtotal = product ? (product.cantidad * product.precio_unitario) : 0;
+        let subtotalVesHtml = '';
+        if (currentRate && currentRate.tasa_actual) {
+            const subtotalVes = initialSubtotal * parseFloat(currentRate.tasa_actual);
+            subtotalVesHtml = `<div class="subtotal-ves-display text-muted" style="font-size: 0.75rem;">Bs. ${subtotalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+        }
+
         newRow.innerHTML = `
                     <div class="col-md-5">
                         <input type="text" class="form-control form-control-buzz product-search-input" placeholder="Nombre o SKU del producto" value="${
@@ -421,11 +453,10 @@ async function editOrder(orderId) {
                         }" min="1">
                     </div>
                     <div class="col-md-3">
-                        <input type="text" class="form-control form-control-buzz product-subtotal-display" value="${formatCurrency(
-                          product
-                            ? product.cantidad * product.precio_unitario
-                            : 0
-                        )}" readonly>
+                        <div class="product-subtotal-container">
+                            <input type="text" class="form-control form-control-buzz product-subtotal-display" value="${formatCurrency(initialSubtotal)}" readonly>
+                            <div class="product-subtotal-ves mt-1">${subtotalVesHtml}</div>
+                        </div>
                     </div>
                     <div class="col-md-2 d-flex align-items-center">
                         <button type="button" class="btn-action btn-delete remove-product-row"><i class="fas fa-trash"></i></button>
@@ -546,7 +577,15 @@ async function editOrder(orderId) {
         const updateProductSubtotal = () => {
           const quantity = parseFloat(productQuantityInput.value) || 0
           const price = parseFloat(productPriceInput.value) || 0
-          productSubtotalDisplay.value = formatCurrency(quantity * price)
+          const subtotalUsd = quantity * price;
+          productSubtotalDisplay.value = formatCurrency(subtotalUsd)
+
+          if (currentRate && currentRate.tasa_actual) {
+            const subtotalVes = subtotalUsd * parseFloat(currentRate.tasa_actual);
+            newRow.querySelector(".product-subtotal-ves").innerHTML =
+              `<div class="subtotal-ves-display text-muted" style="font-size: 0.75rem;">Bs. ${subtotalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+          }
+
           updateEditCalculatedTotal()
         }
 
@@ -660,6 +699,18 @@ async function editOrder(orderId) {
 async function openOrderModal() {
   const createModalElement = document.getElementById("createOrderModal")
   const createModal = new bootstrap.Modal(createModalElement)
+
+  // Fetch current rate when opening modal
+  let currentRate = null;
+  try {
+      const response = await fetchJSON('php/api_tasa.php');
+      if (response.success) {
+          currentRate = response.tasa;
+      }
+  } catch (e) {
+      console.warn("Could not fetch rate for creation modal", e);
+  }
+
   createModal.show()
 
   const clientSearchInput = document.getElementById("createOrderClientSearch")
@@ -750,6 +801,9 @@ async function openOrderModal() {
   const calculatedTotalSpan = document.getElementById(
     "createOrderCalculatedTotal"
   )
+  const calculatedTotalVesSpan = document.getElementById(
+    "createOrderCalculatedTotalVes"
+  )
 
   let productRowCounter = 0
 
@@ -763,6 +817,11 @@ async function openOrderModal() {
       total += quantity * price
     })
     calculatedTotalSpan.textContent = formatCurrency(total)
+
+    if (currentRate && currentRate.tasa_actual) {
+        const totalVes = total * parseFloat(currentRate.tasa_actual);
+        calculatedTotalVesSpan.textContent = `Bs. ${totalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
   }
 
   const addProductRow = () => {
@@ -780,9 +839,10 @@ async function openOrderModal() {
                 <input type="number" class="form-control form-control-buzz product-quantity-input" value="1" min="1">
             </div>
             <div class="col-md-3">
-                <input type="text" class="form-control form-control-buzz product-subtotal-display" value="${formatCurrency(
-                  0
-                )}" readonly>
+                <div class="product-subtotal-container">
+                    <input type="text" class="form-control form-control-buzz product-subtotal-display" value="${formatCurrency(0)}" readonly>
+                    <div class="product-subtotal-ves mt-1"></div>
+                </div>
             </div>
             <div class="col-md-2 d-flex align-items-center">
                 <button type="button" class="btn-action btn-delete remove-product-row"><i class="fas fa-trash"></i></button>
@@ -890,7 +950,15 @@ async function openOrderModal() {
     const updateProductSubtotal = () => {
       const quantity = parseFloat(productQuantityInput.value) || 0
       const price = parseFloat(productPriceInput.value) || 0
-      productSubtotalDisplay.value = formatCurrency(quantity * price)
+      const subtotalUsd = quantity * price;
+      productSubtotalDisplay.value = formatCurrency(subtotalUsd)
+
+      if (currentRate && currentRate.tasa_actual) {
+        const subtotalVes = subtotalUsd * parseFloat(currentRate.tasa_actual);
+        newRow.querySelector(".product-subtotal-ves").innerHTML =
+          `<div class="subtotal-ves-display text-muted" style="font-size: 0.75rem;">Bs. ${subtotalVes.toLocaleString('es-VE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>`;
+      }
+
       updateCalculatedTotal()
     }
 

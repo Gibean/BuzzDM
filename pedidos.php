@@ -153,9 +153,16 @@
                                     <i class="fas fa-plus"></i> Añadir Producto
                                 </button>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <div class="buzz-card p-3">
-                                    <h5 class="font-primary text-primary mb-0">Total: <span id="createOrderCalculatedTotal">€0.00</span></h5>
+                            <div class="col-md-6">
+                                <div class="totals-box py-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="view-label mb-0">Total USD</span>
+                                        <span class="total-value usd" id="createOrderCalculatedTotal">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="view-label mb-0">Total VES</span>
+                                        <span class="total-value ves" id="createOrderCalculatedTotalVes" style="font-size: 1rem;">Bs. 0,00</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -190,29 +197,122 @@
     </div>
 
     <!-- Order Detail Modal -->
-    <div class="modal fade" id="orderDetailModal" tabindex="-1" aria-labelledby="orderDetailModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title font-primary text-primary" id="orderDetailModalLabel">Detalle del Pedido #<span id="detailOrderId"></span></h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p><strong>Referencia:</strong> <span id="detailOrderReference"></span></p>
-                    <p><strong>Cliente:</strong> <span id="detailOrderCustomer"></span> (<span id="detailOrderEmail"></span>)</p>
-                    <p><strong>Fecha Creación:</strong> <span id="detailOrderDate"></span></p>
-                    <p><strong>Total:</strong> <span id="detailOrderTotal"></span></p>
-                    <p><strong>Estado Pago:</strong> <span id="detailOrderPaymentStatus"></span></p>
-                    <p><strong>Estado Envío:</strong> <span id="detailOrderShippingStatus"></span></p>
-                    <p><strong>Dirección Envío:</strong> <span id="detailOrderShippingAddress"></span></p>
-                    <p><strong>Notas Envío:</strong> <span id="detailOrderShippingNotes"></span></p>
-                    <div id="detailOrderProducts">
-                        <!-- Products will be loaded here -->
+    <div class="modal-buzz" id="orderDetailModal">
+        <div class="modal-content-buzz modal-lg">
+            <div class="modal-header-buzz">
+                <h5 class="font-primary text-primary">
+                    <i class="fas fa-file-invoice"></i> Pedido <span id="detailOrderReference" class="font-mono"></span>
+                </h5>
+                <button class="close-buzz" onclick="closeModal('orderDetailModal')" aria-label="Cerrar">&times;</button>
+            </div>
+            <div class="modal-body-buzz">
+                <div class="row">
+                    <!-- Left Column: Order Info -->
+                    <div class="col-md-6">
+                        <!-- Customer Info Section -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="fas fa-user"></i> CLIENTE
+                            </div>
+                            <div class="view-field">
+                                <span class="view-label">Nombre</span>
+                                <span class="view-value" id="detailOrderCustomer">-</span>
+                            </div>
+                            <div class="view-field">
+                                <span class="view-label"><i class="fas fa-envelope me-1"></i> Email</span>
+                                <span class="view-value" id="detailOrderEmail">-</span>
+                            </div>
+                        </div>
+
+                        <!-- Order Status Section -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="fas fa-clock"></i> ESTADO DEL PEDIDO
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="view-field">
+                                        <span class="view-label">Fecha</span>
+                                        <span class="view-value" id="detailOrderDate">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="view-field">
+                                        <span class="view-label">ID Pedido</span>
+                                        <span class="view-value font-mono" id="detailOrderId">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row g-2 mt-1">
+                                <div class="col-6">
+                                    <div class="view-field">
+                                        <span class="view-label">Estado Pago</span>
+                                        <span class="view-value" id="detailOrderPaymentStatus">-</span>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="view-field">
+                                        <span class="view-label">Estado Envío</span>
+                                        <span class="view-value" id="detailOrderShippingStatus">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Shipping Section -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="fas fa-truck"></i> ENVÍO
+                            </div>
+                            <div class="view-field">
+                                <span class="view-label">Dirección</span>
+                                <span class="view-value" id="detailOrderShippingAddress">-</span>
+                            </div>
+                            <div class="view-field">
+                                <span class="view-label">Notas</span>
+                                <span class="view-value text-muted fst-italic" id="detailOrderShippingNotes">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Products & Totals -->
+                    <div class="col-md-6">
+                        <!-- Products Section -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="fas fa-boxes"></i> PRODUCTOS
+                            </div>
+                            <div id="detailOrderProducts" style="max-height: 200px; overflow-y: auto;">
+                                <!-- Products table will be loaded here -->
+                            </div>
+                        </div>
+
+                        <!-- Totals Section -->
+                        <div class="modal-section">
+                            <div class="modal-section-title">
+                                <i class="fas fa-calculator"></i> TOTALES
+                            </div>
+                            <div class="totals-box">
+                                <div class="total-row">
+                                    <span class="total-label">Total USD</span>
+                                    <span class="total-value usd" id="detailOrderTotalUsd">$0.00</span>
+                                </div>
+                                <div class="total-row">
+                                    <span class="total-label">Total Bolívares</span>
+                                    <span class="total-value ves" id="detailOrderTotalVes">Bs. 0,00</span>
+                                </div>
+                                <div class="rate-info" id="detailOrderRateInfo">
+                                    Tasa BCV: Cargando...
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-buzz" data-bs-dismiss="modal">Cerrar</button>
-                </div>
+            </div>
+            <div class="modal-footer-buzz">
+                <button type="button" class="btn btn-outline-buzz" onclick="closeModal('orderDetailModal')">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
             </div>
         </div>
     </div>
@@ -265,9 +365,16 @@
                                     <i class="fas fa-plus"></i> Añadir Producto
                                 </button>
                             </div>
-                            <div class="col-md-6 text-end">
-                                <div class="buzz-card p-3">
-                                    <h5 class="font-primary text-primary mb-0">Total: <span id="editOrderCalculatedTotal">€0.00</span></h5>
+                            <div class="col-md-6">
+                                <div class="totals-box py-2">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="view-label mb-0">Total USD</span>
+                                        <span class="total-value usd" id="editOrderCalculatedTotal">$0.00</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="view-label mb-0">Total VES</span>
+                                        <span class="total-value ves" id="editOrderCalculatedTotalVes" style="font-size: 1rem;">Bs. 0,00</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
