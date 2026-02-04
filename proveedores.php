@@ -151,11 +151,26 @@
                                     <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9">
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <select class="form-select form-control-buzz" id="proveedorPais">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Teléfono</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="+58 412 1234567">
+                                    <input type="tel" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="412 1234567">
                                 </div>
                             </div>
                         </div>
@@ -295,7 +310,7 @@
             document.getElementById('proveedorId').value = proveedor.id;
             document.getElementById('proveedorNombre').value = proveedor.nombre || '';
             document.getElementById('proveedorRif').value = proveedor.rif || '';
-            document.getElementById('proveedorTelefono').value = proveedor.telefono || '';
+            parseAndSetPhoneFields(proveedor.telefono, 'proveedorPais', 'proveedorTelefono');
             document.getElementById('proveedorEmail').value = proveedor.email || '';
             document.getElementById('proveedorDireccion').value = proveedor.direccion || '';
             document.getElementById('proveedorNotas').value = proveedor.notas || '';
@@ -315,7 +330,7 @@
             const data = {
                 nombre: nombre,
                 rif: document.getElementById('proveedorRif').value.trim(),
-                telefono: document.getElementById('proveedorTelefono').value.trim(),
+                telefono: combinePhoneNumber('proveedorPais', 'proveedorTelefono'),
                 email: document.getElementById('proveedorEmail').value.trim(),
                 direccion: document.getElementById('proveedorDireccion').value.trim(),
                 notas: document.getElementById('proveedorNotas').value.trim()
@@ -369,6 +384,37 @@
                     }
                 }
             );
+        }
+
+        // Helper function to combine country code and phone number
+        function combinePhoneNumber(countryCodeId, phoneId) {
+            const countryCode = document.getElementById(countryCodeId).value;
+            let phoneNumber = document.getElementById(phoneId).value.trim();
+            // Remove leading zero if present
+            if (phoneNumber.startsWith("0")) {
+                phoneNumber = phoneNumber.substring(1);
+            }
+            return countryCode + phoneNumber;
+        }
+
+        // Helper function to parse stored phone and set fields
+        function parseAndSetPhoneFields(fullPhone, countryCodeId, phoneId) {
+            if (!fullPhone) return;
+
+            const countryCodes = ["+58", "+1", "+57", "+54", "+34", "+52", "+55"];
+            let matchedCode = "+58"; // Default
+            let localNumber = fullPhone;
+
+            for (const code of countryCodes) {
+                if (fullPhone.startsWith(code)) {
+                    matchedCode = code;
+                    localNumber = fullPhone.substring(code.length);
+                    break;
+                }
+            }
+
+            document.getElementById(countryCodeId).value = matchedCode;
+            document.getElementById(phoneId).value = localNumber;
         }
     </script>
 </body>
