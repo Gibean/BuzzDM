@@ -194,6 +194,7 @@
     margin-bottom: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     z-index: 10000;
+    pointer-events: auto; /* Enable clicks - container has pointer-events: none */
 }
 
 .clear-all-btn:hover {

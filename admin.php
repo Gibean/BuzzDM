@@ -339,7 +339,7 @@
                 <div class="col-12 col-lg-5">
                     <!-- Logo Management -->
                     <div class="buzz-card mb-4">
-                        <h6 class="font-primary text-primary mb-3">LOGO DE LA EMPRESA (SVG)</h6>
+                        <h6 class="font-primary text-primary mb-3">LOGO DE LA EMPRESA (PNG/JPG)</h6>
                         <div id="currentLogoPreview" class="text-center mb-3 p-3 rounded" style="background: rgba(0,0,0,0.2); min-height: 100px; display: flex; align-items: center; justify-content: center;">
                             <!-- JS will populate current logo here -->
                             <i class="fas fa-image fa-3x text-muted opacity-25"></i>
@@ -347,8 +347,8 @@
 
                         <div class="logo-upload-box p-3 border border-dashed rounded text-center" id="logoUploadArea" style="border-color: rgba(255,160,0,0.3) !important;">
                             <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
-                            <p class="small text-muted mb-2">Suelte el archivo SVG aquí o</p>
-                            <input type="file" id="logoFileInput" accept=".svg" style="display: none;">
+                            <p class="small text-muted mb-2">Suelte el archivo PNG o JPG aquí o</p>
+                            <input type="file" id="logoFileInput" accept=".png,.jpg,.jpeg" style="display: none;">
                             <button type="button" class="btn btn-sm btn-outline-buzz" onclick="document.getElementById('logoFileInput').click()">
                                 <i class="fas fa-search me-1"></i>Buscar Archivo
                             </button>

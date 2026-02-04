@@ -42,8 +42,8 @@ try {
     $scriptRoot = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
     $baseUrl = $protocol . "://" . $host . rtrim($scriptRoot, '/') . '/';
 
-    // Logo path
-    $logoFile = $empresa['logo_svg'] ?? 'assets/img/logov1.png';
+    // Logo path - use company logo if available, otherwise default
+    $logoFile = (!empty($empresa['logo_svg'])) ? $empresa['logo_svg'] : 'assets/img/logov1.png';
     $rutaLogo = $baseUrl . $logoFile;
 
     // Handle multiple report types
@@ -65,6 +65,21 @@ try {
         $reportData = fetchReportData($pdo, $tipo);
         $fullHtml .= generateReportSection($tipo, $reportData, $empresa, $rutaLogo);
     }
+
+    // Add footer script ONCE at the end (not per report section)
+    $generationDateTime = date('d/m/Y H:i:s');
+    $fullHtml .= '
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->getFont("Helvetica", "normal");
+            $size = 8;
+            $pageText = "pág " . $PAGE_NUM . " de " . $PAGE_COUNT;
+            $x = 520;
+            $y = 815;
+            $pdf->page_text($x, $y, $pageText, $font, $size, array(0.4, 0.4, 0.4));
+            $pdf->page_text(50, $y, "Generado: ' . $generationDateTime . ' | BuzzDM", $font, $size, array(0.4, 0.4, 0.4));
+        }
+    </script>';
 
     $fullHtml .= '</body></html>';
 
@@ -180,24 +195,7 @@ function generateReportSection($tipo, $datos, $empresa, $rutaLogo) {
     } else {
         $html .= generateDefaultTable($tipo, $datos);
     }
-
-    // Dynamic page counter using DomPDF inline script
-    $generationDateTime = date('d/m/Y H:i:s');
-    $html .= '
-    <script type="text/php">
-        if (isset($pdf)) {
-            $font = $fontMetrics->getFont("Helvetica", "normal");
-            $size = 8;
-            $pageText = "pág " . $PAGE_NUM . " de " . $PAGE_COUNT;
-            $width = $fontMetrics->getTextWidth($pageText, $font, $size);
-            $x = 520;  // Right side
-            $y = 815;  // Footer position
-            $pdf->page_text($x, $y, $pageText, $font, $size, array(0.4, 0.4, 0.4));
-
-            // Left side - generation date
-            $pdf->page_text(50, $y, "Generado: ' . $generationDateTime . ' | BuzzDM", $font, $size, array(0.4, 0.4, 0.4));
-        }
-    </script>';
+    // Dynamic page counter removed - now handled globally in reports.php main loop
 
     return $html;
 }
