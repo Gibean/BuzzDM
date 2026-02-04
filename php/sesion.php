@@ -197,7 +197,8 @@ $always_allowed_apis = [
     'api_stats.php',
     'search_api.php',
     'sidebar.php',
-    'api_2fa.php' // 2FA is available for all authenticated users
+    'api_2fa.php', // 2FA is available for all authenticated users
+    'api_tasa.php'
 ];
 
 // Merge always-allowed APIs into current user's permissions

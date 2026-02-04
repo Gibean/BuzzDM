@@ -1,14 +1,30 @@
 <?php
 /**
  * System Footer Component
- * Displays system information: date, time, last update, and version
+ * Displays system information: date, time, last update, company name, and version
  */
+
+require_once __DIR__ . '/db.php';
 
 // Get current time for display
 $currentTime = date('H:i');
 $currentDate = date('d/m/Y');
 $lastUpdate = date('H:i');
 $systemVersion = 'v1.3.2.0';
+
+// Get company name from database
+$companyName = '';
+try {
+    $pdo = getDbConnection();
+    $stmtCompany = $pdo->query("SELECT nombre FROM empresa LIMIT 1");
+    $companyInfo = $stmtCompany->fetch(PDO::FETCH_ASSOC);
+    if ($companyInfo && !empty($companyInfo['nombre'])) {
+        $companyName = $companyInfo['nombre'];
+    }
+} catch (Exception $e) {
+    // Silently fail - company name won't be shown
+    $companyName = '';
+}
 ?>
 <footer class="system-footer">
     <div class="system-footer-left">
@@ -27,13 +43,15 @@ $systemVersion = 'v1.3.2.0';
         </div>
     </div>
     <div class="system-footer-right">
+        <?php if (!empty($companyName)): ?>
+        <div class="system-footer-item">
+            <i class="fas fa-building"></i>
+            <span class="footer-value" title="<?php echo htmlspecialchars($companyName); ?>"><?php echo htmlspecialchars($companyName); ?></span>
+        </div>
+        <?php endif; ?>
         <div class="system-footer-item">
             <i class="fas fa-code-branch"></i>
             <span class="footer-value"><?php echo $systemVersion; ?></span>
-        </div>
-        <div class="status-indicator">
-            <div class="status-dot"></div>
-            <span class="status-text">Online</span>
         </div>
     </div>
 </footer>

@@ -72,7 +72,8 @@ class OrderController {
             $this->jsonResponse(true, ['products' => $products]);
         } elseif (isset($_GET['id'])) {
             $order = $this->service->getOrder($_GET['id']);
-            $this->jsonResponse(true, ['order' => $order]);
+            $tasa = getTasaCambioHoy(); // Function from db.php (included in sesion.php)
+            $this->jsonResponse(true, ['order' => $order, 'tasa' => $tasa]);
         } else {
             $result = $this->service->listOrders($_GET);
             $this->jsonResponse(true, $result);

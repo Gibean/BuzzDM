@@ -169,17 +169,26 @@ async function viewCustomerDetail(customerId) {
       document.getElementById("viewCustomerId").textContent = customer.id
       document.getElementById("viewCustomerName").textContent = customer.nombre
       document.getElementById("viewCustomerEmail").textContent =
-        customer.email || "N/A"
+        customer.email || "No especificado"
       document.getElementById("viewCustomerPhone").textContent =
-        customer.telefono || "N/A"
+        customer.telefono || "No especificado"
       document.getElementById("viewCustomerAddress").textContent =
-        customer.direccion || "N/A"
+        customer.direccion || "No especificada"
       document.getElementById("viewCustomerNotes").textContent =
-        customer.notas || "N/A"
-      document.getElementById("viewCustomerVip").textContent =
-        customer.vip == 1 ? "Sí" : "No"
+        customer.notas || "Sin notas"
+
+      // Handle VIP badge visibility
+      const vipBadge = document.getElementById("viewCustomerVip")
+      if (customer.vip == 1) {
+        vipBadge.style.display = "inline-block"
+      } else {
+        vipBadge.style.display = "none"
+      }
+
       document.getElementById("viewCustomerCreatedAt").textContent =
         formatDateTime(customer.creado_at)
+      document.getElementById("viewCustomerTotalOrders").textContent =
+        customer.total_orders || "0"
 
       openModal('viewCustomerModal')
     } else {
