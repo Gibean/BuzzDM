@@ -11,8 +11,8 @@ use Dompdf\Options;
 try {
     $pdo = getDbConnection();
 
-    // Verify Admin Password
-    $password = $_GET['password'] ?? '';
+    // Verify Admin Password (POST for security - password not in URL)
+    $password = $_POST['password'] ?? '';
     if (empty($password)) {
         die("<h1 style='color:#003366; font-family:sans-serif;'>Acceso Denegado</h1><p>Se requiere contraseña de administrador.</p>");
     }
@@ -46,8 +46,8 @@ try {
     $logoFile = (!empty($empresa['logo_svg'])) ? $empresa['logo_svg'] : 'assets/img/logov1.png';
     $rutaLogo = $baseUrl . $logoFile;
 
-    // Handle multiple report types
-    $tiposRaw = $_GET['tipo'] ?? '';
+    // Handle multiple report types (from POST form)
+    $tiposRaw = $_POST['tipo'] ?? '';
     $tiposArr = array_filter(explode(',', $tiposRaw));
 
     if (empty($tiposArr)) {

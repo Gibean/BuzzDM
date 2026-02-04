@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Service/UserService.php';
+require_once __DIR__ . '/../helpers/logger.php';
 
 // Autoload handled by composer
 use OpenApi\Attributes as OA;
@@ -93,7 +94,9 @@ class UserController {
         ]
     )]
     private function createUser($data) {
+        global $pdo;
         $id = $this->service->createUser($data);
+        logSystemAction($pdo, getCurrentUserId(), 'Usuario creado', '#' . $id . ' | ' . ($data['nombre'] ?? '') . ' (' . ($data['email'] ?? '') . ') | Rol: ' . ($data['rol'] ?? ''));
         $this->jsonResponse(true, ['id' => $id], 'Usuario creado exitosamente');
     }
 
@@ -110,9 +113,12 @@ class UserController {
         ]
     )]
     private function updateUser($data) {
+        global $pdo;
         $id = $_GET['id'] ?? $data['id'] ?? null;
         if (!$id) throw new Exception("ID requerido");
+        $user = $this->service->getUserById($id);
         $this->service->updateUser($id, $data);
+        logSystemAction($pdo, getCurrentUserId(), 'Usuario actualizado', '#' . $id . ' | ' . ($user['nombre'] ?? '') . ' (' . ($user['email'] ?? '') . ')');
         $this->jsonResponse(true, null, 'Usuario actualizado exitosamente');
     }
 
@@ -128,9 +134,13 @@ class UserController {
         ]
     )]
     private function deleteUser() {
+        global $pdo;
         $id = $_GET['id'] ?? null;
         if (!$id) throw new Exception("ID requerido");
+        // Get user info before delete
+        $user = $this->service->getUserById($id);
         $this->service->deleteUser($id);
+        logSystemAction($pdo, getCurrentUserId(), 'Usuario eliminado', '#' . $id . ' | ' . ($user['nombre'] ?? '') . ' (' . ($user['email'] ?? '') . ')');
         $this->jsonResponse(true, null, 'Usuario eliminado exitosamente');
     }
 

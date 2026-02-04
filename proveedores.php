@@ -59,6 +59,26 @@
             padding: 3rem;
             color: var(--buzz-text-muted, #888);
         }
+        /* Products table in modal */
+        .productos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .productos-table th,
+        .productos-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--buzz-border-color, #333);
+        }
+        .productos-table th {
+            background: rgba(255, 160, 0, 0.1);
+            font-weight: 600;
+        }
+        .precio-compra {
+            color: var(--buzz-primary-color, #ffa000);
+            font-weight: 600;
+        }
         .empty-state i {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -272,6 +292,9 @@
                             ${p.email ? `<div class="proveedor-info"><i class="fas fa-envelope"></i> ${escapeHtml(p.email)}</div>` : ''}
                             ${p.direccion ? `<div class="proveedor-info"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.direccion)}</div>` : ''}
                             <div class="proveedor-actions">
+                                <button class="btn btn-outline-info btn-sm" onclick="verProductosProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-boxes"></i> Productos
+                                </button>
                                 <button class="btn btn-outline-buzz btn-sm" onclick="editarProveedor(${p.id})">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
@@ -285,11 +308,68 @@
             `;
         }
 
+
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        async function verProductosProveedor(id, nombre) {
+            try {
+                const response = await fetch(`php/api_suppliers.php?action=productos&id=${id}`);
+                const data = await response.json();
+
+                let html = `<div class="modal-buzz">
+                    <div class="modal-content-buzz" style="max-width: 700px;">
+                        <div class="modal-header-buzz">
+                            <h3><i class="fas fa-boxes me-2"></i>Productos de ${nombre}</h3>
+                            <button type="button" class="btn-close-buzz" onclick="this.closest('.modal-buzz').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body-buzz">`;
+
+                if (data.success && data.productos && data.productos.length > 0) {
+                    html += `<table class="productos-table">
+                        <thead><tr>
+                            <th>SKU</th>
+                            <th>Producto</th>
+                            <th>Último Precio</th>
+                            <th>Fecha</th>
+                            <th>Cargo</th>
+                        </tr></thead>
+                        <tbody>`;
+                    data.productos.forEach(p => {
+                        html += `<tr>
+                            <td>${escapeHtml(p.sku)}</td>
+                            <td>${escapeHtml(p.producto_nombre)}</td>
+                            <td class="precio-compra">$${parseFloat(p.precio_compra).toFixed(2)}</td>
+                            <td>${p.fecha_registro}</td>
+                            <td>${escapeHtml(p.cargo_codigo || '-')}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                } else {
+                    html += `<div class="empty-state"><i class="fas fa-box-open"></i>
+                        <h5>Sin productos registrados</h5>
+                        <p>Este proveedor aún no tiene precios de compra registrados.</p>
+                    </div>`;
+                }
+
+                html += `</div>
+                        <div class="modal-footer-buzz">
+                            <button type="button" class="btn btn-outline-buzz" onclick="this.closest('.modal-buzz').remove()">
+                                <i class="fas fa-times me-2"></i>Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+                document.body.insertAdjacentHTML('beforeend', html);
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar productos del proveedor', 'danger');
+            }
         }
 
         function abrirModalProveedor() {
