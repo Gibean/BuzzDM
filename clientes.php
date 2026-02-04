@@ -184,12 +184,14 @@
                                 <label class="form-label">País</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                    <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode" required>
-                                        <option value="+58">+58</option>
-                                        <option value="+1">+1</option>
-                                        <option value="+57">+57</option>
-                                        <option value="+54">+54</option>
-                                        <option value="+34">+34</option>
+                                    <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
                                     </select>
                                 </div>
                             </div>
@@ -197,7 +199,7 @@
                                 <label class="form-label">Teléfono *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="createCustomerPhone" required>
+                                    <input type="tel" class="form-control form-control-buzz" id="createCustomerPhone" placeholder="412 1234567" required>
                                 </div>
                             </div>
                         </div>
@@ -361,9 +363,29 @@
                         <div class="modal-section-title">
                             <i class="fas fa-phone"></i> CONTACTO
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Teléfono *</label>
-                            <input type="text" class="form-control form-control-buzz" id="editCustomerPhone" required>
+                        <div class="row mb-3 g-3">
+                            <div class="col-md-4">
+                                <label class="form-label text-muted">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <select class="form-select form-control-buzz" id="editCustomerPhoneCountryCode">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label text-muted">Teléfono *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control form-control-buzz" id="editCustomerPhone" placeholder="412 1234567" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Dirección</label>
@@ -392,7 +414,7 @@
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js?v=2"></script>
     <script src="assets/js/confirmation_modal.js?v=2"></script>
-    <script src="assets/js/clientes.js?v=2"></script>
+    <script src="assets/js/clientes.js?v=3"></script>
 </body>
 </html>
 
