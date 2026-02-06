@@ -184,12 +184,14 @@
                                 <label class="form-label">País</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-globe"></i></span>
-                                    <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode" required>
-                                        <option value="+58">+58</option>
-                                        <option value="+1">+1</option>
-                                        <option value="+57">+57</option>
-                                        <option value="+54">+54</option>
-                                        <option value="+34">+34</option>
+                                    <select class="form-select form-control-buzz" id="createCustomerPhoneCountryCode">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
                                     </select>
                                 </div>
                             </div>
@@ -197,7 +199,7 @@
                                 <label class="form-label">Teléfono *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="createCustomerPhone" required>
+                                    <input type="tel" class="form-control form-control-buzz" id="createCustomerPhone" placeholder="412 1234567" required>
                                 </div>
                             </div>
                         </div>
@@ -234,26 +236,85 @@
         <div class="modal-content-buzz">
             <div class="modal-header-buzz">
                 <h5 class="font-primary text-primary">
-                    <i class="fas fa-eye"></i> Detalle del Cliente #<span id="viewCustomerId"></span>
+                    <i class="fas fa-user"></i> Cliente <span id="viewCustomerId" class="font-mono"></span>
                 </h5>
                 <button class="close-buzz" onclick="closeModal('viewCustomerModal')" aria-label="Cerrar">&times;</button>
             </div>
             <div class="modal-body-buzz">
+                <!-- Basic Information Section -->
                 <div class="modal-section">
                     <div class="modal-section-title">
-                        <i class="fas fa-info-circle"></i> INFORMACIÓN DEL CLIENTE
+                        <i class="fas fa-id-card"></i> INFORMACIÓN BÁSICA
                     </div>
-                    <p><strong>Nombre:</strong> <span id="viewCustomerName"></span></p>
-                    <p><strong>Email:</strong> <span id="viewCustomerEmail"></span></p>
-                    <p><strong>Teléfono:</strong> <span id="viewCustomerPhone"></span></p>
-                    <p><strong>Dirección:</strong> <span id="viewCustomerAddress"></span></p>
-                    <p><strong>Notas:</strong> <span id="viewCustomerNotes"></span></p>
-                    <p><strong>VIP:</strong> <span id="viewCustomerVip"></span></p>
-                    <p><strong>Creado en:</strong> <span id="viewCustomerCreatedAt"></span></p>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <div class="view-field">
+                                <span class="view-label">Nombre</span>
+                                <span class="view-value" id="viewCustomerName">-</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <span id="viewCustomerVip" class="badge-vip" style="display: none;">
+                                <i class="fas fa-crown"></i> VIP
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6">
+                            <div class="view-field">
+                                <span class="view-label"><i class="fas fa-envelope me-1"></i> Email</span>
+                                <span class="view-value" id="viewCustomerEmail">-</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="view-field">
+                                <span class="view-label"><i class="fas fa-phone me-1"></i> Teléfono</span>
+                                <span class="view-value" id="viewCustomerPhone">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <i class="fas fa-map-marker-alt"></i> DIRECCIÓN Y NOTAS
+                    </div>
+                    <div class="view-field">
+                        <span class="view-label">Dirección</span>
+                        <span class="view-value" id="viewCustomerAddress">-</span>
+                    </div>
+                    <div class="view-field mt-2">
+                        <span class="view-label">Notas</span>
+                        <span class="view-value text-muted fst-italic" id="viewCustomerNotes">-</span>
+                    </div>
+                </div>
+
+                <!-- Stats Section -->
+                <div class="modal-section">
+                    <div class="modal-section-title">
+                        <i class="fas fa-chart-bar"></i> ESTADÍSTICAS
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="view-field">
+                                <span class="view-label"><i class="fas fa-calendar-plus me-1"></i> Registrado</span>
+                                <span class="view-value" id="viewCustomerCreatedAt">-</span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="view-field">
+                                <span class="view-label"><i class="fas fa-shopping-cart me-1"></i> Total Pedidos</span>
+                                <span class="view-value" id="viewCustomerTotalOrders">-</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer-buzz">
-                <button type="button" class="btn btn-outline-buzz" onclick="closeModal('viewCustomerModal')">Cerrar</button>
+                <button type="button" class="btn btn-outline-buzz" onclick="closeModal('viewCustomerModal')">
+                    <i class="fas fa-times me-2"></i>Cerrar
+                </button>
             </div>
         </div>
     </div>
@@ -302,9 +363,29 @@
                         <div class="modal-section-title">
                             <i class="fas fa-phone"></i> CONTACTO
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label text-muted">Teléfono *</label>
-                            <input type="text" class="form-control form-control-buzz" id="editCustomerPhone" required>
+                        <div class="row mb-3 g-3">
+                            <div class="col-md-4">
+                                <label class="form-label text-muted">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <select class="form-select form-control-buzz" id="editCustomerPhoneCountryCode">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label text-muted">Teléfono *</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                    <input type="tel" class="form-control form-control-buzz" id="editCustomerPhone" placeholder="412 1234567" required>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label text-muted">Dirección</label>
@@ -333,7 +414,7 @@
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js?v=2"></script>
     <script src="assets/js/confirmation_modal.js?v=2"></script>
-    <script src="assets/js/clientes.js?v=2"></script>
+    <script src="assets/js/clientes.js?v=3"></script>
 </body>
 </html>
 

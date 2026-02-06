@@ -1,5 +1,7 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
+
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Cargos", description: "Operations related to Stock Cargos")]
@@ -87,20 +89,26 @@ class CargoController {
         ]
     )]
     private function handlePost($input) {
+        global $pdo;
         $action = $_GET['action'] ?? 'create';
 
         if ($action === 'confirm' && isset($_GET['id'])) {
+            $cargo = $this->service->getCargo(intval($_GET['id']));
             $this->service->confirmCargo(intval($_GET['id']), $_SESSION['usuario_id']);
+            logSystemAction($pdo, getCurrentUserId(), 'Cargo confirmado', '#' . $_GET['id'] . ' | ' . ($cargo['codigo'] ?? '') . ' | ' . ($cargo['total_unidades'] ?? 0) . ' unidades');
             $this->jsonResponse(true, [], 'Cargo confirmado y stock actualizado.');
         }
         elseif ($action === 'cancel' && isset($_GET['id'])) {
+            $cargo = $this->service->getCargo(intval($_GET['id']));
             $this->service->cancelCargo(intval($_GET['id']), $input['motivo'] ?? '', $_SESSION['usuario_id']);
+            logSystemAction($pdo, getCurrentUserId(), 'Cargo anulado', '#' . $_GET['id'] . ' | ' . ($cargo['codigo'] ?? '') . ($input['motivo'] ? ' | Motivo: ' . $input['motivo'] : ''));
             $this->jsonResponse(true, [], 'Cargo anulado. Stock revertido correctamente.');
         }
         else {
             if (isset($_GET['id'])) throw new Exception("ID no esperado para creación");
 
             $result = $this->service->createCargo($input, $_SESSION['usuario_id']);
+            logSystemAction($pdo, getCurrentUserId(), 'Cargo creado', '#' . $result['id'] . ' | ' . $result['codigo'] . ' | ' . count($input['productos'] ?? []) . ' productos | Estado: ' . $result['estado']);
             $msg = $result['estado'] === 'confirmado'
                 ? 'Cargo confirmado y stock actualizado'
                 : 'Cargo guardado como borrador';
@@ -125,9 +133,12 @@ class CargoController {
         ]
     )]
     private function handlePut($input) {
+        global $pdo;
         if (!isset($_GET['id'])) throw new Exception('ID de cargo requerido');
 
+        $cargo = $this->service->getCargo(intval($_GET['id']));
         $result = $this->service->updateCargo(intval($_GET['id']), $input, $_SESSION['usuario_id']);
+        logSystemAction($pdo, getCurrentUserId(), 'Cargo actualizado', '#' . $_GET['id'] . ' | ' . ($cargo['codigo'] ?? '') . ' | Estado: ' . $result['estado']);
         $msg = $result['estado'] === 'confirmado'
                 ? 'Cargo confirmado y stock actualizado'
                 : 'Cargo actualizado correctamente';
@@ -147,9 +158,12 @@ class CargoController {
         ]
     )]
     private function handleDelete($input) {
+        global $pdo;
         if (!isset($_GET['id'])) throw new Exception('ID de cargo requerido');
 
+        $cargo = $this->service->getCargo(intval($_GET['id']));
         $this->service->deleteCargo(intval($_GET['id']));
+        logSystemAction($pdo, getCurrentUserId(), 'Cargo eliminado', '#' . $_GET['id'] . ' | ' . ($cargo['codigo'] ?? ''));
         $this->jsonResponse(true, [], 'Cargo eliminado correctamente');
     }
 }

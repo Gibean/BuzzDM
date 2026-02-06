@@ -59,6 +59,26 @@
             padding: 3rem;
             color: var(--buzz-text-muted, #888);
         }
+        /* Products table in modal */
+        .productos-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        .productos-table th,
+        .productos-table td {
+            padding: 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--buzz-border-color, #333);
+        }
+        .productos-table th {
+            background: rgba(255, 160, 0, 0.1);
+            font-weight: 600;
+        }
+        .precio-compra {
+            color: var(--buzz-primary-color, #ffa000);
+            font-weight: 600;
+        }
         .empty-state i {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -151,11 +171,26 @@
                                     <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9">
                                 </div>
                             </div>
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-3 mb-3">
+                                <label class="form-label">País</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                    <select class="form-select form-control-buzz" id="proveedorPais">
+                                        <option value="+58">🇻🇪 +58</option>
+                                        <option value="+1">🇺🇸 +1</option>
+                                        <option value="+57">🇨🇴 +57</option>
+                                        <option value="+54">🇦🇷 +54</option>
+                                        <option value="+34">🇪🇸 +34</option>
+                                        <option value="+52">🇲🇽 +52</option>
+                                        <option value="+55">🇧🇷 +55</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
                                 <label class="form-label">Teléfono</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="+58 412 1234567">
+                                    <input type="tel" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="412 1234567">
                                 </div>
                             </div>
                         </div>
@@ -257,6 +292,9 @@
                             ${p.email ? `<div class="proveedor-info"><i class="fas fa-envelope"></i> ${escapeHtml(p.email)}</div>` : ''}
                             ${p.direccion ? `<div class="proveedor-info"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.direccion)}</div>` : ''}
                             <div class="proveedor-actions">
+                                <button class="btn btn-outline-info btn-sm" onclick="verProductosProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\'")}')">
+                                    <i class="fas fa-boxes"></i> Productos
+                                </button>
                                 <button class="btn btn-outline-buzz btn-sm" onclick="editarProveedor(${p.id})">
                                     <i class="fas fa-edit"></i> Editar
                                 </button>
@@ -270,11 +308,68 @@
             `;
         }
 
+
         function escapeHtml(text) {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        async function verProductosProveedor(id, nombre) {
+            try {
+                const response = await fetch(`php/api_suppliers.php?action=productos&id=${id}`);
+                const data = await response.json();
+
+                let html = `<div class="modal-buzz">
+                    <div class="modal-content-buzz" style="max-width: 700px;">
+                        <div class="modal-header-buzz">
+                            <h3><i class="fas fa-boxes me-2"></i>Productos de ${nombre}</h3>
+                            <button type="button" class="btn-close-buzz" onclick="this.closest('.modal-buzz').remove()">&times;</button>
+                        </div>
+                        <div class="modal-body-buzz">`;
+
+                if (data.success && data.productos && data.productos.length > 0) {
+                    html += `<table class="productos-table">
+                        <thead><tr>
+                            <th>SKU</th>
+                            <th>Producto</th>
+                            <th>Último Precio</th>
+                            <th>Fecha</th>
+                            <th>Cargo</th>
+                        </tr></thead>
+                        <tbody>`;
+                    data.productos.forEach(p => {
+                        html += `<tr>
+                            <td>${escapeHtml(p.sku)}</td>
+                            <td>${escapeHtml(p.producto_nombre)}</td>
+                            <td class="precio-compra">$${parseFloat(p.precio_compra).toFixed(2)}</td>
+                            <td>${p.fecha_registro}</td>
+                            <td>${escapeHtml(p.cargo_codigo || '-')}</td>
+                        </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                } else {
+                    html += `<div class="empty-state"><i class="fas fa-box-open"></i>
+                        <h5>Sin productos registrados</h5>
+                        <p>Este proveedor aún no tiene precios de compra registrados.</p>
+                    </div>`;
+                }
+
+                html += `</div>
+                        <div class="modal-footer-buzz">
+                            <button type="button" class="btn btn-outline-buzz" onclick="this.closest('.modal-buzz').remove()">
+                                <i class="fas fa-times me-2"></i>Cerrar
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+
+                document.body.insertAdjacentHTML('beforeend', html);
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Error al cargar productos del proveedor', 'danger');
+            }
         }
 
         function abrirModalProveedor() {
@@ -295,7 +390,7 @@
             document.getElementById('proveedorId').value = proveedor.id;
             document.getElementById('proveedorNombre').value = proveedor.nombre || '';
             document.getElementById('proveedorRif').value = proveedor.rif || '';
-            document.getElementById('proveedorTelefono').value = proveedor.telefono || '';
+            parseAndSetPhoneFields(proveedor.telefono, 'proveedorPais', 'proveedorTelefono');
             document.getElementById('proveedorEmail').value = proveedor.email || '';
             document.getElementById('proveedorDireccion').value = proveedor.direccion || '';
             document.getElementById('proveedorNotas').value = proveedor.notas || '';
@@ -315,7 +410,7 @@
             const data = {
                 nombre: nombre,
                 rif: document.getElementById('proveedorRif').value.trim(),
-                telefono: document.getElementById('proveedorTelefono').value.trim(),
+                telefono: combinePhoneNumber('proveedorPais', 'proveedorTelefono'),
                 email: document.getElementById('proveedorEmail').value.trim(),
                 direccion: document.getElementById('proveedorDireccion').value.trim(),
                 notas: document.getElementById('proveedorNotas').value.trim()
@@ -369,6 +464,37 @@
                     }
                 }
             );
+        }
+
+        // Helper function to combine country code and phone number
+        function combinePhoneNumber(countryCodeId, phoneId) {
+            const countryCode = document.getElementById(countryCodeId).value;
+            let phoneNumber = document.getElementById(phoneId).value.trim();
+            // Remove leading zero if present
+            if (phoneNumber.startsWith("0")) {
+                phoneNumber = phoneNumber.substring(1);
+            }
+            return countryCode + phoneNumber;
+        }
+
+        // Helper function to parse stored phone and set fields
+        function parseAndSetPhoneFields(fullPhone, countryCodeId, phoneId) {
+            if (!fullPhone) return;
+
+            const countryCodes = ["+58", "+1", "+57", "+54", "+34", "+52", "+55"];
+            let matchedCode = "+58"; // Default
+            let localNumber = fullPhone;
+
+            for (const code of countryCodes) {
+                if (fullPhone.startsWith(code)) {
+                    matchedCode = code;
+                    localNumber = fullPhone.substring(code.length);
+                    break;
+                }
+            }
+
+            document.getElementById(countryCodeId).value = matchedCode;
+            document.getElementById(phoneId).value = localNumber;
         }
     </script>
 </body>

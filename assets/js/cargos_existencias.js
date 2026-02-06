@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     cargarAlmacenes();
     cargarCargos();
     configurarEventos();
+    // Initialize concepto change to set up proper columns
+    onConceptoChange();
 });
 
 // =====================================================
@@ -29,6 +31,40 @@ let productosBuscados = {};
 function inicializarFecha() {
     const hoy = new Date().toISOString().split('T')[0];
     document.getElementById('cargoFecha').value = hoy;
+}
+
+async function cargarAlmacenes() {
+    try {
+        const response = await fetch('php/api_warehouses.php');
+        const data = await response.json();
+
+        if (data.success) {
+            // Support both 'warehouses' and 'almacenes' keys
+            const almacenes = data.warehouses || data.almacenes || [];
+            const select = document.getElementById('cargoAlmacenId');
+
+            if (select) {
+                // Clear and add options - use textContent for safety
+                select.innerHTML = '<option value="">Seleccionar almacén...</option>';
+                almacenes.forEach(function(a) {
+                    var option = document.createElement('option');
+                    option.value = a.id;
+                    option.textContent = (a.codigo || '') + ' - ' + a.nombre;
+                    select.appendChild(option);
+                });
+
+                // Auto-select principal warehouse if exists
+                const principal = almacenes.find(a => a.es_principal == 1);
+                if (principal) {
+                    select.value = principal.id;
+                }
+            }
+        } else {
+            console.error('Error cargando almacenes:', data.message);
+        }
+    } catch (error) {
+        console.error('Error cargando almacenes:', error);
+    }
 }
 
 function configurarEventos() {
@@ -348,8 +384,13 @@ function agregarLineaProducto(producto = null) {
 
     document.getElementById('sinProductos').style.display = 'none';
 
+    // Check if concept is 'compra' to show price field
+    const concepto = document.getElementById('cargoConcepto').value;
+    const esCompra = concepto === 'compra';
+    const gridCols = esCompra ? '160px 1fr 120px 100px 50px' : '160px 1fr 100px 50px';
+
     const html = `
-        <div class="cargo-linea-row" id="${lineaId}" data-producto-id="${producto?.id || ''}">
+        <div class="cargo-linea-row" id="${lineaId}" data-producto-id="${producto?.id || ''}" style="grid-template-columns: ${gridCols}">
             <div class="sku-container">
                 <input type="text"
                        class="form-control form-control-buzz sku-input"
@@ -364,6 +405,14 @@ function agregarLineaProducto(producto = null) {
                     ${producto?.nombre || 'Selecciona un producto...'}
                 </span>
             </div>
+            <div class="linea-col col-precio-compra-input" style="display: ${esCompra ? 'block' : 'none'};">
+                <input type="number"
+                       class="form-control form-control-buzz costo-input"
+                       step="0.01"
+                       min="0"
+                       placeholder="0.00"
+                       value="${producto?.costo || ''}">
+            </div>
             <div class="linea-col col-cantidad">
                 <div class="input-group input-group-sm">
                     <input type="number"
@@ -377,8 +426,6 @@ function agregarLineaProducto(producto = null) {
                     <i class="fas fa-trash-alt"></i>
                 </button>
             </div>
-            <!-- Campo oculto para mantener compatibilidad con el backend si es necesario -->
-            <input type="hidden" class="costo-input" value="${producto?.costo || 0}">
         </div>
     `;
 
@@ -469,9 +516,17 @@ async function buscarProductos(query, resultsContainer, lineaId) {
             }
             resultsContainer.classList.add('show');
         } else {
-            resultsContainer.innerHTML = '<div class="autocomplete-empty">No se encontraron productos</div>';
+            // No products found - show option to create new product
+            resultsContainer.innerHTML = `
+                <div class="autocomplete-empty">
+                    No se encontraron productos
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="abrirModalNuevoProducto('${lineaId}', '${escapeHtml(query)}')">
+                        <i class="fas fa-plus"></i> Crear "${escapeHtml(query)}"
+                    </button>
+                </div>`;
             resultsContainer.classList.add('show');
         }
+
     } catch (error) {
         console.error('Error buscando productos:', error);
     }
@@ -1081,5 +1136,144 @@ async function guardarNuevoProveedor() {
     } catch (error) {
         console.error('Error:', error);
         showToast('Error al crear proveedor', 'danger');
+    }
+}
+
+// =====================================================
+// FUNCIONES MODAL NUEVO PRODUCTO (Rápido)
+// =====================================================
+
+function abrirModalNuevoProducto(lineaId, searchQuery = '') {
+    document.getElementById('nuevoProductoLineaId').value = lineaId;
+    document.getElementById('nuevoProductoSku').value = '';
+    // Pre-fill name with search query if it looks like a product name
+    document.getElementById('nuevoProductoNombre').value = searchQuery.length > 3 ? searchQuery : '';
+    document.getElementById('nuevoProductoPrecio').value = '';
+    document.getElementById('nuevoProductoMinStock').value = '10';
+
+    document.getElementById('modalNuevoProducto').style.display = 'block';
+
+    // Auto-focus on SKU field
+    setTimeout(() => document.getElementById('nuevoProductoSku').focus(), 100);
+}
+window.abrirModalNuevoProducto = abrirModalNuevoProducto;
+
+function cerrarModalNuevoProducto() {
+    document.getElementById('modalNuevoProducto').style.display = 'none';
+}
+window.cerrarModalNuevoProducto = cerrarModalNuevoProducto;
+
+async function guardarNuevoProducto() {
+    const sku = document.getElementById('nuevoProductoSku').value.trim();
+    const nombre = document.getElementById('nuevoProductoNombre').value.trim();
+    const precio = parseFloat(document.getElementById('nuevoProductoPrecio').value) || 0;
+    const minStock = parseInt(document.getElementById('nuevoProductoMinStock').value) || 10;
+    const lineaId = document.getElementById('nuevoProductoLineaId').value;
+
+    if (!sku) {
+        showToast('El SKU/Código es obligatorio', 'warning');
+        document.getElementById('nuevoProductoSku').focus();
+        return;
+    }
+
+    if (!nombre) {
+        showToast('El nombre del producto es obligatorio', 'warning');
+        document.getElementById('nuevoProductoNombre').focus();
+        return;
+    }
+
+    const data = {
+        sku: sku,
+        nombre: nombre,
+        precio: precio,
+        min_stock: minStock,
+        stock: 0, // New product starts with 0 stock
+        estado: 'activo',
+        tipo_producto: 'fisico',
+        maneja_stock: true
+    };
+
+    try {
+        const response = await fetch('php/api_products.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showToast('Producto creado correctamente', 'success');
+            cerrarModalNuevoProducto();
+
+            // Auto-add product to the cargo line
+            if (lineaId) {
+                const linea = document.getElementById(lineaId);
+                if (linea) {
+                    linea.dataset.productoId = result.id;
+                    linea.querySelector('.sku-input').value = sku;
+                    linea.querySelector('.sku-input').readOnly = true;
+                    linea.querySelector('.nombre-display').textContent = nombre;
+                    linea.querySelector('.nombre-display').classList.remove('placeholder');
+                    linea.querySelector('.costo-input').value = precio.toFixed(2);
+                    linea.querySelector('.autocomplete-results').classList.remove('show');
+
+                    actualizarTotales();
+                    linea.querySelector('.cantidad-input').focus();
+                    linea.querySelector('.cantidad-input').select();
+                }
+            }
+        } else {
+            showToast('Error: ' + result.message, 'danger');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Error al crear producto', 'danger');
+    }
+}
+window.guardarNuevoProducto = guardarNuevoProducto;
+
+// =====================================================
+// CONCEPTO CHANGE - Show/Hide precio compra column
+// =====================================================
+
+function onConceptoChange() {
+    const concepto = document.getElementById('cargoConcepto').value;
+    const esCompra = concepto === 'compra';
+
+    // Show/hide the "Otro" input field
+    const otroContainer = document.getElementById('conceptoOtroContainer');
+    if (otroContainer) {
+        otroContainer.style.display = concepto === 'otro' ? 'block' : 'none';
+    }
+
+    // Show/hide precio compra header
+    const headerPrecio = document.getElementById('headerPrecioCompra');
+    if (headerPrecio) {
+        headerPrecio.style.display = esCompra ? 'block' : 'none';
+    }
+
+    // Show/hide precio inputs in all lines
+    document.querySelectorAll('.col-precio-compra-input').forEach(col => {
+        col.style.display = esCompra ? 'block' : 'none';
+    });
+
+    // Update grid columns based on concept
+    updateGridColumns(esCompra);
+}
+window.onConceptoChange = onConceptoChange;
+
+function updateGridColumns(showPrecio) {
+    const header = document.querySelector('.cargo-lineas-header');
+    const rows = document.querySelectorAll('.cargo-linea-row');
+
+    if (showPrecio) {
+        // 5 columns: SKU, Nombre, Precio, Cantidad, Acciones
+        if (header) header.style.gridTemplateColumns = '160px 1fr 120px 100px 50px';
+        rows.forEach(row => row.style.gridTemplateColumns = '160px 1fr 120px 100px 50px');
+    } else {
+        // 4 columns: SKU, Nombre, Cantidad, Acciones
+        if (header) header.style.gridTemplateColumns = '160px 1fr 100px 50px';
+        rows.forEach(row => row.style.gridTemplateColumns = '160px 1fr 100px 50px');
     }
 }

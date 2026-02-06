@@ -83,7 +83,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <!-- OPERACIONES - Mixto (permisos por item) -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <?php
-            $operacionesPages = ['clientes.php', 'pedidos.php', 'envios.php', 'cargos_existencias.php'];
+            $operacionesPages = ['clientes.php', 'pedidos.php', 'envios.php', 'cargos_existencias.php', 'transferencias.php'];
             $operacionesActive = in_array($currentPage, $operacionesPages);
             ?>
             <li class="nav-item nav-dropdown <?php echo $operacionesActive ? 'open' : ''; ?>">
@@ -118,6 +118,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         <a class="nav-dropdown-item <?php echo $currentPage === 'cargos_existencias.php' ? 'active' : ''; ?>"
                            href="cargos_existencias">
                             <i class="fas fa-dolly"></i> Cargar Existencias
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'transferencias.php' ? 'active' : ''; ?>"
+                           href="transferencias">
+                            <i class="fas fa-exchange-alt"></i> Transferencias
                         </a>
                     </li>
                     <?php endif; ?>

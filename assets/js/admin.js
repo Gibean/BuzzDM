@@ -174,10 +174,30 @@
           `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generando ${count} reporte${count > 1 ? 's' : ''}...`
         generateReportBtn.disabled = true
 
-        // Open consolidated report in one tab to avoid popup blocking
+        // Use POST form submission to avoid password in URL (security)
         const typesParam = selectedReportTypes.join(',')
-        const reportUrl = `php/reports.php?tipo=${typesParam}&password=${encodeURIComponent(password)}`
-        window.open(reportUrl, "_blank")
+
+        // Create hidden form for POST submission
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'php/reports.php';
+        form.target = '_blank';
+
+        const tipoInput = document.createElement('input');
+        tipoInput.type = 'hidden';
+        tipoInput.name = 'tipo';
+        tipoInput.value = typesParam;
+        form.appendChild(tipoInput);
+
+        const passwordInput = document.createElement('input');
+        passwordInput.type = 'hidden';
+        passwordInput.name = 'password';
+        passwordInput.value = password;
+        form.appendChild(passwordInput);
+
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
 
         // Reset after a short delay
         setTimeout(() => {
@@ -1183,11 +1203,22 @@ function updateActiveFiltersCount() {
 
         let phoneCode = ""
         let phoneNumber = ""
-        if (info.telefono && info.telefono.includes(" ")) {
-            phoneCode = info.telefono.substring(0, info.telefono.indexOf(" "))
-            phoneNumber = info.telefono.substring(info.telefono.indexOf(" ") + 1)
-        } else {
-            phoneNumber = info.telefono || ""
+        if (info.telefono) {
+            // List of known country codes to detect
+            const countryCodes = ["+58", "+1", "+57", "+54", "+34", "+52", "+55"]
+            let found = false
+            for (const code of countryCodes) {
+                if (info.telefono.startsWith(code)) {
+                    phoneCode = code
+                    phoneNumber = info.telefono.substring(code.length).trim()
+                    found = true
+                    break
+                }
+            }
+            if (!found) {
+                // If no known code, put everything in phoneNumber
+                phoneNumber = info.telefono
+            }
         }
 
         if (rifTypeEl) rifTypeEl.value = rifType
@@ -1216,6 +1247,52 @@ function updateActiveFiltersCount() {
 
   async function saveCompanyInfo(e) {
     e.preventDefault()
+
+    // Get field values for validation
+    const rifNumberEl = document.getElementById("rifNumber")
+    const phoneCodeEl = document.getElementById("phoneCode")
+    const phoneNumberEl = document.getElementById("phoneNumber")
+    const companyEmailEl = document.getElementById("companyEmail")
+
+    // 1. RIF Validation - only numbers and optional hyphen at end
+    const rifNumber = rifNumberEl ? rifNumberEl.value.trim() : ""
+    if (rifNumber && !/^[0-9]+(-[0-9])?$/.test(rifNumber)) {
+      showToast("El RIF/Cédula debe contener solo números (formato: 123456789 o 123456789-0)", "warning")
+      rifNumberEl.focus()
+      return
+    }
+
+    // 2. Phone Validation - clean the number
+    let phoneNumber = phoneNumberEl ? phoneNumberEl.value.trim() : ""
+    // Remove any + prefix if user accidentally typed it
+    phoneNumber = phoneNumber.replace(/^\+\d+\s*/, "")
+    // Remove leading zero
+    if (phoneNumber.startsWith("0")) {
+      phoneNumber = phoneNumber.substring(1)
+    }
+    // Only allow numbers and spaces
+    phoneNumber = phoneNumber.replace(/[^0-9\s]/g, "")
+    if (phoneNumberEl) phoneNumberEl.value = phoneNumber
+
+    // 3. Email Validation - valid format, no accents
+    const email = companyEmailEl ? companyEmailEl.value.trim() : ""
+    if (email) {
+      // Check for accents/special chars
+      const accentRegex = /[áéíóúñÁÉÍÓÚÑàèìòùÀÈÌÒÙ]/
+      if (accentRegex.test(email)) {
+        showToast("El email no puede contener acentos ni caracteres especiales", "warning")
+        companyEmailEl.focus()
+        return
+      }
+      // Basic email format validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        showToast("Por favor, ingrese un email válido (ej: admin@empresa.com)", "warning")
+        companyEmailEl.focus()
+        return
+      }
+    }
+
     const form = e.target
     const formData = new FormData(form)
     formData.append("action", "update_company_info")
@@ -1271,6 +1348,7 @@ function updateActiveFiltersCount() {
     const formData = new FormData()
     formData.append("action", "upload_logo")
     formData.append("logoFile", file)
+    formData.append("csrf_token", document.querySelector('[name="csrf_token"]')?.value || '')
 
     if (uploadLogoBtn) {
         uploadLogoBtn.disabled = true

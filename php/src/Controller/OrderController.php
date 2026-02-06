@@ -1,5 +1,7 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
+
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Orders", description: "Operations related to Orders")]
@@ -72,7 +74,8 @@ class OrderController {
             $this->jsonResponse(true, ['products' => $products]);
         } elseif (isset($_GET['id'])) {
             $order = $this->service->getOrder($_GET['id']);
-            $this->jsonResponse(true, ['order' => $order]);
+            $tasa = getTasaCambioHoy(); // Function from db.php (included in sesion.php)
+            $this->jsonResponse(true, ['order' => $order, 'tasa' => $tasa]);
         } else {
             $result = $this->service->listOrders($_GET);
             $this->jsonResponse(true, $result);
@@ -89,16 +92,20 @@ class OrderController {
         ]
     )]
     private function handlePost($input) {
+        global $pdo;
         // Check for Restore Action
         if (isset($input['action']) && $input['action'] === 'restore') {
             if (empty($input['id'])) throw new Exception("ID necesario para restaurar");
+            $order = $this->service->getOrder($input['id']);
             $this->service->restoreOrder($input['id']);
+            logSystemAction($pdo, getCurrentUserId(), 'Pedido restaurado', '#' . $input['id'] . ' | Ref: ' . ($order['referencia'] ?? ''));
             $this->jsonResponse(true, [], 'Pedido restaurado exitosamente.');
             return;
         }
 
         // Create Order
         $result = $this->service->createOrder($input);
+        logSystemAction($pdo, getCurrentUserId(), 'Pedido creado', '#' . $result['id'] . ' | Ref: ' . ($input['referencia'] ?? '') . ' | Total: $' . number_format($input['total'] ?? 0, 2));
         $this->jsonResponse(true, ['id' => $result['id']], 'Pedido creado exitosamente.');
     }
 
@@ -115,11 +122,13 @@ class OrderController {
         ]
     )]
     private function handlePut($input) {
+        global $pdo;
         if (!isset($_GET['id'])) throw new Exception("ID de pedido requerido");
 
-        // Merge ID into input for convenience if needed, or just pass separately
         $id = intval($_GET['id']);
+        $order = $this->service->getOrder($id);
         $this->service->updateOrder($id, $input);
+        logSystemAction($pdo, getCurrentUserId(), 'Pedido actualizado', '#' . $id . ' | Ref: ' . ($order['referencia'] ?? ''));
 
         $this->jsonResponse(true, [], 'Pedido actualizado exitosamente.');
     }
@@ -136,13 +145,14 @@ class OrderController {
         ]
     )]
     private function handleDelete($input) {
-        // DELETE usually comes with ID in query string for strict REST, but legacy might send body
-        // Original code: $input['id'] form body
-        // Let's support both
+        global $pdo;
         $id = $input['id'] ?? $_GET['id'] ?? null;
         if (!$id) throw new Exception("ID de pedido requerido");
 
+        // Get order info before delete for logging
+        $order = $this->service->getOrder($id);
         $this->service->deleteOrder($id);
+        logSystemAction($pdo, getCurrentUserId(), 'Pedido eliminado', '#' . $id . ' | Ref: ' . ($order['referencia'] ?? ''));
         $this->jsonResponse(true, [], 'Pedido eliminado exitosamente.');
     }
 }

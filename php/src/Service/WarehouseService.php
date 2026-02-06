@@ -29,8 +29,8 @@ class WarehouseService {
     public function createWarehouse($data) {
         $this->validateWarehouseData($data);
 
-        // Check Unique Code
-        if ($this->repository->findWarehouseByCode($data['codigo'])) {
+        // Check Unique Code (only if codigo is provided)
+        if (!empty($data['codigo']) && $this->repository->findWarehouseByCode($data['codigo'])) {
             throw new Exception("El código de almacén ya existe.");
         }
 
@@ -72,8 +72,8 @@ class WarehouseService {
     }
 
     private function validateWarehouseData($data) {
-        if (empty($data['codigo']) || empty($data['nombre'])) {
-            throw new Exception("Código y nombre son obligatorios.");
+        if (empty($data['nombre'])) {
+            throw new Exception("El nombre es obligatorio.");
         }
     }
 

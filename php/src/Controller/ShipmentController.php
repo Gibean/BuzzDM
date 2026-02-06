@@ -1,5 +1,7 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
+
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Shipments", description: "Operations related to Shipments")]
@@ -62,12 +64,14 @@ class ShipmentController {
         ]
     )]
     private function updateShipmentStatus() {
+        global $pdo;
         $input = json_decode(file_get_contents('php://input'), true);
         $result = $this->service->updateShipmentStatus(
             $input['id'] ?? null,
             $input['status'] ?? '',
             $input['trackingNumber'] ?? null
         );
+        logSystemAction($pdo, getCurrentUserId(), 'Envío actualizado', '#' . ($input['id'] ?? '') . ' | Estado: ' . ($input['status'] ?? '') . ($input['trackingNumber'] ? ' | Tracking: ' . $input['trackingNumber'] : ''));
         $this->jsonResponse(true, $result);
     }
 

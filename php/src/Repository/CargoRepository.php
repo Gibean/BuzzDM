@@ -259,4 +259,82 @@ class CargoRepository {
         $stmt->execute([$id]);
         return $stmt->fetchColumn() > 0;
     }
+
+    /**
+     * Register purchase prices in precios_proveedor table
+     * Called when a cargo is confirmed
+     */
+    public function registerPurchasePrices($cargoId, $proveedorId, $fecha) {
+        if (!$proveedorId) return; // No proveedor, no price history
+
+        // Get all detail lines for this cargo
+        $sqlDetails = "SELECT producto_id, costo_unitario FROM detalle_cargo_existencias WHERE cargo_id = ?";
+        $stmtDetails = $this->pdo->prepare($sqlDetails);
+        $stmtDetails->execute([$cargoId]);
+        $detalles = $stmtDetails->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($detalles as $detalle) {
+            if (empty($detalle['costo_unitario']) || $detalle['costo_unitario'] <= 0) continue;
+
+            // Mark previous prices as not latest
+            $sqlUpdateOld = "UPDATE precios_proveedor SET es_ultimo = 0
+                             WHERE producto_id = ? AND proveedor_id = ? AND es_ultimo = 1";
+            $stmtOld = $this->pdo->prepare($sqlUpdateOld);
+            $stmtOld->execute([$detalle['producto_id'], $proveedorId]);
+
+            // Insert new price (use INSERT IGNORE to handle duplicate key on same date)
+            $sqlInsert = "INSERT INTO precios_proveedor
+                          (producto_id, proveedor_id, precio_compra, fecha_registro, cargo_id, es_ultimo)
+                          VALUES (?, ?, ?, ?, ?, 1)
+                          ON DUPLICATE KEY UPDATE
+                            precio_compra = VALUES(precio_compra),
+                            cargo_id = VALUES(cargo_id),
+                            es_ultimo = 1";
+            $stmtInsert = $this->pdo->prepare($sqlInsert);
+            $stmtInsert->execute([
+                $detalle['producto_id'],
+                $proveedorId,
+                $detalle['costo_unitario'],
+                $fecha,
+                $cargoId
+            ]);
+
+            // Update product's costo_ultimo
+            $sqlUpdateProduct = "UPDATE productos SET costo_ultimo = ? WHERE id = ?";
+            $stmtProd = $this->pdo->prepare($sqlUpdateProduct);
+            $stmtProd->execute([$detalle['costo_unitario'], $detalle['producto_id']]);
+        }
+    }
+
+    /**
+     * Get purchase price history for a product
+     */
+    public function getPriceHistory($productoId) {
+        $sql = "SELECT pp.*, p.nombre AS proveedor_nombre, c.codigo AS cargo_codigo
+                FROM precios_proveedor pp
+                LEFT JOIN proveedores p ON pp.proveedor_id = p.id
+                LEFT JOIN cargos_existencias c ON pp.cargo_id = c.id
+                WHERE pp.producto_id = ?
+                ORDER BY pp.fecha_registro DESC, pp.creado_at DESC
+                LIMIT 20";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$productoId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Get products supplied by a provider with their last prices
+     */
+    public function getProductsByProvider($proveedorId) {
+        $sql = "SELECT pp.producto_id, pr.sku, pr.nombre AS producto_nombre,
+                       pp.precio_compra, pp.fecha_registro, c.codigo AS cargo_codigo
+                FROM precios_proveedor pp
+                INNER JOIN productos pr ON pp.producto_id = pr.id
+                LEFT JOIN cargos_existencias c ON pp.cargo_id = c.id
+                WHERE pp.proveedor_id = ? AND pp.es_ultimo = 1
+                ORDER BY pr.nombre";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$proveedorId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }
