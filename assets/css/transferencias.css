@@ -1,0 +1,141 @@
+/* =====================================================
+   TRANSFERENCIAS - Estilos Específicos
+   ===================================================== */
+
+/* Override grid para transferencias (5 columnas) */
+.transferencias-grid .cargo-lineas-header,
+.transferencias-grid .cargo-linea-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 100px 100px 50px;
+    gap: 12px;
+    align-items: center;
+}
+
+/* SKU container dentro de la columna */
+.transferencias-grid .col-sku {
+    position: relative;
+    width: 100%;
+}
+
+.transferencias-grid .sku-container {
+    position: relative;
+    width: 100%;
+}
+
+.transferencias-grid .sku-input {
+    width: 100%;
+}
+
+/* Autocomplete z-index fix - importante para que no quede debajo */
+.transferencias-grid .autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999 !important;
+    background: var(--buzz-darker);
+    border: 1px solid var(--buzz-primary);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+}
+
+/* Columna de stock origen */
+.col-stock {
+    text-align: center;
+}
+
+/* Stock origen display */
+.stock-origen {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    display: inline-block;
+    color: var(--buzz-text-muted);
+}
+
+/* Badges de estado para transferencias */
+.badge-en_transito {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.badge-recibido {
+    background: rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.badge-cancelado {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Filas de tabla por estado */
+.table-buzz tbody tr.row-en_transito {
+    background: rgba(59, 130, 246, 0.03);
+}
+
+.table-buzz tbody tr.row-recibido {
+    background: rgba(34, 197, 94, 0.03);
+}
+
+.table-buzz tbody tr.row-cancelado {
+    background: rgba(239, 68, 68, 0.03);
+    opacity: 0.6;
+}
+
+/* Padding bottom para evitar que el footer tape los botones */
+#vistaFormulario {
+    padding-bottom: 30px;
+}
+
+/* Cantidad input */
+.transferencias-grid .cantidad-input {
+    text-align: center;
+    font-family: var(--font-mono);
+}
+
+/* Responsive para transferencias */
+@media (max-width: 992px) {
+    .transferencias-grid .cargo-lineas-header,
+    .transferencias-grid .cargo-linea-row {
+        grid-template-columns: 120px 1fr 80px 80px 40px;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .transferencias-grid .cargo-lineas-header {
+        display: none;
+    }
+
+    .transferencias-grid .cargo-linea-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .transferencias-grid .col-sku {
+        flex: 1 1 100%;
+    }
+
+    .transferencias-grid .col-nombre {
+        flex: 1 1 100%;
+    }
+
+    .transferencias-grid .col-stock,
+    .transferencias-grid .col-cantidad {
+        flex: 1 1 40%;
+    }
+
+    .transferencias-grid .col-acciones {
+        flex: 0 0 auto;
+    }
+}

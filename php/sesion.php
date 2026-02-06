@@ -156,9 +156,9 @@ $fallback_pages = [
         'users.php', 'sesion.php', 'db.php', 'sidebar.php', 'reports.php', 'api_orders.php',
         'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
         'backup_status.php', 'api_logs.php',
-        'cargos_existencias.php', 'almacenes.php',
+        'cargos_existencias.php', 'almacenes.php', 'transferencias.php',
         'proveedores.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
+        'api_notifications.php', 'api_transferencias.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
         'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php',
         'api_2fa.php'
     ],
@@ -167,8 +167,8 @@ $fallback_pages = [
         'about.php', 'manual.php', 'login.php', 'logout.php', 'api_sales_chart.php',
         'api_products.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
-        'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php'
+        'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php', 'transferencias.php',
+        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
@@ -197,7 +197,8 @@ $always_allowed_apis = [
     'api_stats.php',
     'search_api.php',
     'sidebar.php',
-    'api_2fa.php' // 2FA is available for all authenticated users
+    'api_2fa.php', // 2FA is available for all authenticated users
+    'api_tasa.php'
 ];
 
 // Merge always-allowed APIs into current user's permissions
