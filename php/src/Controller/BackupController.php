@@ -1,5 +1,7 @@
 <?php
 // Autoload handled by composer
+require_once __DIR__ . '/../helpers/logger.php';
+
 use OpenApi\Attributes as OA;
 
 #[OA\Tag(name: "Backups", description: "Backup Management")]
@@ -108,7 +110,9 @@ class BackupController {
         ]
     )]
     private function restore($id) {
+        global $pdo;
         $result = $this->service->restoreBackup($id, $_SESSION['usuario_id']);
+        logSystemAction($pdo, getCurrentUserId(), 'Backup restaurado', '#' . $id . ' | ' . ($result['archivo'] ?? ''));
         $this->jsonResponse(true, $result);
     }
 
@@ -122,7 +126,18 @@ class BackupController {
         ]
     )]
     private function delete($id) {
+        global $pdo;
+        // Get backup info before delete for logging
+        $backups = $this->service->getAllBackups();
+        $archivo = '';
+        foreach ($backups as $b) {
+            if ($b['id'] == $id) {
+                $archivo = $b['archivo'] ?? '';
+                break;
+            }
+        }
         $this->service->deleteBackup($id);
+        logSystemAction($pdo, getCurrentUserId(), 'Backup eliminado', '#' . $id . ' | ' . $archivo);
         $this->jsonResponse(true, null, 'Backup eliminado exitosamente');
     }
 

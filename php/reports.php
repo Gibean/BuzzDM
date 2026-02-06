@@ -11,8 +11,8 @@ use Dompdf\Options;
 try {
     $pdo = getDbConnection();
 
-    // Verify Admin Password
-    $password = $_GET['password'] ?? '';
+    // Verify Admin Password (POST for security - password not in URL)
+    $password = $_POST['password'] ?? '';
     if (empty($password)) {
         die("<h1 style='color:#003366; font-family:sans-serif;'>Acceso Denegado</h1><p>Se requiere contraseña de administrador.</p>");
     }
@@ -29,6 +29,7 @@ try {
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
     $options->set('isRemoteEnabled', true);
+    $options->set('isPhpEnabled', true); // Enable PHP for dynamic page numbering
     $dompdf = new Dompdf($options);
 
     // Get Company Data
@@ -41,12 +42,12 @@ try {
     $scriptRoot = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
     $baseUrl = $protocol . "://" . $host . rtrim($scriptRoot, '/') . '/';
 
-    // Logo path
-    $logoFile = $empresa['logo_svg'] ?? 'assets/img/logov1.png';
+    // Logo path - use company logo if available, otherwise default
+    $logoFile = (!empty($empresa['logo_svg'])) ? $empresa['logo_svg'] : 'assets/img/logov1.png';
     $rutaLogo = $baseUrl . $logoFile;
 
-    // Handle multiple report types
-    $tiposRaw = $_GET['tipo'] ?? '';
+    // Handle multiple report types (from POST form)
+    $tiposRaw = $_POST['tipo'] ?? '';
     $tiposArr = array_filter(explode(',', $tiposRaw));
 
     if (empty($tiposArr)) {
@@ -64,6 +65,21 @@ try {
         $reportData = fetchReportData($pdo, $tipo);
         $fullHtml .= generateReportSection($tipo, $reportData, $empresa, $rutaLogo);
     }
+
+    // Add footer script ONCE at the end (not per report section)
+    $generationDateTime = date('d/m/Y H:i:s');
+    $fullHtml .= '
+    <script type="text/php">
+        if (isset($pdf)) {
+            $font = $fontMetrics->getFont("Helvetica", "normal");
+            $size = 8;
+            $pageText = "pág " . $PAGE_NUM . " de " . $PAGE_COUNT;
+            $x = 520;
+            $y = 815;
+            $pdf->page_text($x, $y, $pageText, $font, $size, array(0.4, 0.4, 0.4));
+            $pdf->page_text(50, $y, "Generado: ' . $generationDateTime . ' | BuzzDM", $font, $size, array(0.4, 0.4, 0.4));
+        }
+    </script>';
 
     $fullHtml .= '</body></html>';
 
@@ -98,7 +114,6 @@ function getReportStyles() {
         table.data td { padding: 7px; border-bottom: 1px solid #eee; word-wrap: break-word; font-size: 8.5pt; vertical-align: top; }
         tr:nth-child(even) { background-color: #fafafa; }
 
-        .footer { position: fixed; bottom: 0; left: 0; right: 0; height: 30px; border-top: 1px solid #ccc; font-size: 8pt; color: #999; text-align: center; padding-top: 5px; }
         .summary-box { background: #f8f9fa; border: 1px solid #dee2e6; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
         .summary-item { display: inline-block; width: 30%; font-size: 11pt; }
         .summary-label { display: block; font-size: 8pt; color: #666; text-transform: uppercase; margin-bottom: 2px; }
@@ -180,8 +195,7 @@ function generateReportSection($tipo, $datos, $empresa, $rutaLogo) {
     } else {
         $html .= generateDefaultTable($tipo, $datos);
     }
-
-    $html .= '<div class="footer">Este documento es un reporte oficial generado por BuzzDM v1.0 | Página 1</div>';
+    // Dynamic page counter removed - now handled globally in reports.php main loop
 
     return $html;
 }

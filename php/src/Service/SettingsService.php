@@ -22,7 +22,7 @@ class SettingsService {
         $email = $data['companyEmail'] ?? '';
 
         $fullRif = $rifType . $rifNumber;
-        $fullPhone = $phoneCode . $phoneNumber;
+        $fullPhone = trim($phoneCode) . ' ' . trim($phoneNumber);
 
         if (empty($fullRif) || empty($nombre) || empty($email)) {
             throw new Exception('RIF, Nombre y Email son campos obligatorios.');
@@ -49,11 +49,14 @@ class SettingsService {
         }
 
         $fileMimeType = mime_content_type($file['tmp_name']);
-        $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-        // Validate type
-        if ($fileMimeType !== 'image/svg+xml' || strtolower($fileExtension) !== 'svg') {
-             throw new Exception('Formato de archivo no permitido. Solo se aceptan archivos SVG.');
+        // Validate type - accept PNG or JPG only
+        $allowedMimes = ['image/png', 'image/jpeg', 'image/jpg'];
+        $allowedExts = ['png', 'jpg', 'jpeg'];
+
+        if (!in_array($fileMimeType, $allowedMimes) || !in_array($fileExtension, $allowedExts)) {
+            throw new Exception('Formato de archivo no permitido. Solo se aceptan archivos PNG o JPG.');
         }
 
         // Validate size (6MB)
@@ -61,25 +64,49 @@ class SettingsService {
             throw new Exception('El archivo es demasiado grande. El tamaño máximo permitido es 6MB.');
         }
 
+        // Check GD support for WebP
+        if (!function_exists('imagecreatefrompng') || !function_exists('imagewebp')) {
+            throw new Exception('La extensión GD con soporte WebP no está disponible en el servidor.');
+        }
+
         $companyInfo = $this->repository->findCompanyInfo();
         if (!$companyInfo || empty($companyInfo['rif'])) {
             throw new Exception('No se pudo obtener el RIF de la empresa para nombrar el logo. Guarde la información de la empresa primero.');
         }
 
-        $uploadDir = __DIR__ . '/../../../assets/img/uploads/'; // Adjust path relative to Service/
+        $uploadDir = __DIR__ . '/../../../assets/img/uploads/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0777, true);
         }
 
-        $fileName = $companyInfo['rif'] . '.svg';
+        // Convert to WebP using GD
+        $image = null;
+        if ($fileMimeType === 'image/png') {
+            $image = imagecreatefrompng($file['tmp_name']);
+            // Preserve transparency
+            imagesavealpha($image, true);
+            imagealphablending($image, true);
+        } else {
+            $image = imagecreatefromjpeg($file['tmp_name']);
+        }
+
+        if (!$image) {
+            throw new Exception('Error al procesar la imagen.');
+        }
+
+        $fileName = $companyInfo['rif'] . '.webp';
         $targetFilePath = $uploadDir . $fileName;
 
-        if (move_uploaded_file($file['tmp_name'], $targetFilePath)) {
+        // Save as WebP with 90% quality
+        $success = imagewebp($image, $targetFilePath, 90);
+        imagedestroy($image);
+
+        if ($success) {
             $logoPathForDb = 'assets/img/uploads/' . $fileName;
             $this->repository->updateLogo($logoPathForDb);
             return true;
         } else {
-            throw new Exception('Error al mover el archivo subido.');
+            throw new Exception('Error al convertir la imagen a WebP.');
         }
     }
 }

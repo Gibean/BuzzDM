@@ -2,6 +2,7 @@
 // Autoload handled by composer
 use OpenApi\Attributes as OA;
 require_once __DIR__ . '/../Service/SupplierService.php';
+require_once __DIR__ . '/../Repository/CargoRepository.php';
 
 #[OA\Tag(name: "Suppliers", description: "Operations related to Suppliers")]
 class SupplierController {
@@ -38,6 +39,8 @@ class SupplierController {
                 case 'GET':
                     if (isset($_GET['action']) && $_GET['action'] === 'search') {
                         $this->searchSuppliers($_GET['q'] ?? '');
+                    } elseif (isset($_GET['action']) && $_GET['action'] === 'productos' && isset($_GET['id'])) {
+                        $this->getProductsBySupplier((int)$_GET['id']);
                     } elseif (isset($_GET['id'])) {
                         $this->getSupplier((int)$_GET['id']);
                     } else {
@@ -96,6 +99,15 @@ class SupplierController {
         } else {
             $this->jsonResponse(false, [], 'Proveedor no encontrado');
         }
+    }
+
+    /**
+     * Get products supplied by this provider with their last purchase prices
+     */
+    private function getProductsBySupplier($id) {
+        $cargoRepo = new CargoRepository();
+        $productos = $cargoRepo->getProductsByProvider($id);
+        $this->jsonResponse(true, ['productos' => $productos], 'Productos del proveedor obtenidos');
     }
 
     #[OA\Post(

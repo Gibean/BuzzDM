@@ -283,3 +283,160 @@ body:has(.modal-buzz[style*="flex"]) {
         width: 100%;
     }
 }
+
+/* ============================================
+   VIEW FIELD STYLES
+   For read-only modal displays
+   ============================================ */
+
+.view-field {
+    margin-bottom: 0.5rem;
+}
+
+.view-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--buzz-text-muted);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.view-value {
+    font-size: 0.95rem;
+    color: var(--buzz-text-light);
+    display: block;
+    padding: 0.25rem 0;
+}
+
+.view-value:empty::after {
+    content: "-";
+    color: var(--buzz-text-muted);
+}
+
+/* VIP Badge */
+.badge-vip {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #1a1f28;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 10px rgba(255, 193, 7, 0.3);
+}
+
+.badge-vip i {
+    font-size: 0.9rem;
+}
+
+/* ============================================
+   TOTALS BOX
+   For displaying order totals with currency conversion
+   ============================================ */
+
+.totals-box {
+    background: rgba(16, 20, 26, 0.6);
+    border: 1px solid rgba(255, 160, 0, 0.2);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.totals-box .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.1);
+}
+
+.totals-box .total-row:last-child {
+    border-bottom: none;
+}
+
+.totals-box .total-label {
+    font-size: 0.8rem;
+    color: var(--buzz-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.totals-box .total-value {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.totals-box .total-value.usd {
+    color: #4caf50;
+}
+
+.totals-box .total-value.ves {
+    color: var(--buzz-primary-color);
+    font-size: 1.15rem;
+}
+
+.totals-box .rate-info {
+    font-size: 0.7rem;
+    color: var(--buzz-text-muted);
+    text-align: right;
+    margin-top: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px dashed rgba(255, 160, 0, 0.1);
+}
+
+/* Compact table for products in view modal */
+.table-compact {
+    font-size: 0.85rem;
+    color: var(--buzz-text-light) !important;
+    background-color: transparent !important;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
+}
+
+.table-compact th {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--buzz-primary-color) !important;
+    padding: 0.85rem 1rem !important;
+    border-bottom: 2px solid rgba(255, 160, 0, 0.2) !important;
+    background-color: rgba(16, 20, 26, 0.8) !important;
+    font-weight: 700 !important;
+}
+
+.table-compact td {
+    padding: 1rem !important;
+    vertical-align: middle !important;
+    border-bottom: 1px solid rgba(255, 160, 0, 0.05) !important;
+    color: var(--buzz-text-light) !important;
+    background-color: transparent !important;
+}
+
+/* Override any potential Bootstrap conflicting header styles */
+.table-compact > :not(caption) > * > * {
+    background-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.table-compact tbody tr {
+    background-color: transparent !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.table-compact tbody tr:hover {
+    background-color: rgba(255, 160, 0, 0.05) !important;
+}
+
+.subtotal-ves {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--buzz-primary-color);
+    margin-top: 2px;
+    font-weight: 500;
+}

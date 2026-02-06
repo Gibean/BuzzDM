@@ -169,17 +169,26 @@ async function viewCustomerDetail(customerId) {
       document.getElementById("viewCustomerId").textContent = customer.id
       document.getElementById("viewCustomerName").textContent = customer.nombre
       document.getElementById("viewCustomerEmail").textContent =
-        customer.email || "N/A"
+        customer.email || "No especificado"
       document.getElementById("viewCustomerPhone").textContent =
-        customer.telefono || "N/A"
+        customer.telefono || "No especificado"
       document.getElementById("viewCustomerAddress").textContent =
-        customer.direccion || "N/A"
+        customer.direccion || "No especificada"
       document.getElementById("viewCustomerNotes").textContent =
-        customer.notas || "N/A"
-      document.getElementById("viewCustomerVip").textContent =
-        customer.vip == 1 ? "Sí" : "No"
+        customer.notas || "Sin notas"
+
+      // Handle VIP badge visibility
+      const vipBadge = document.getElementById("viewCustomerVip")
+      if (customer.vip == 1) {
+        vipBadge.style.display = "inline-block"
+      } else {
+        vipBadge.style.display = "none"
+      }
+
       document.getElementById("viewCustomerCreatedAt").textContent =
         formatDateTime(customer.creado_at)
+      document.getElementById("viewCustomerTotalOrders").textContent =
+        customer.total_orders || "0"
 
       openModal('viewCustomerModal')
     } else {
@@ -202,6 +211,8 @@ async function editCustomer(customerId) {
       document.getElementById("editCustomerName").value = customer.nombre
       document.getElementById("editCustomerEmail").value = customer.email
       document.getElementById("editCustomerPhone").value = customer.telefono
+      // Parse phone to set country code selector
+      parseAndSetPhoneFields(customer.telefono, "editCustomerPhoneCountryCode", "editCustomerPhone");
       document.getElementById("editCustomerAddress").value = customer.direccion
       document.getElementById("editCustomerNotes").value = customer.notas
       document.getElementById("editCustomerVip").checked = customer.vip == 1
@@ -214,7 +225,7 @@ async function editCustomer(customerId) {
           id: document.getElementById("editCustomerIdHidden").value,
           nombre: document.getElementById("editCustomerName").value,
           email: document.getElementById("editCustomerEmail").value,
-          telefono: document.getElementById("editCustomerPhone").value,
+          telefono: combinePhoneNumber("editCustomerPhoneCountryCode", "editCustomerPhone"),
           direccion: document.getElementById("editCustomerAddress").value,
           notas: document.getElementById("editCustomerNotes").value,
           vip: document.getElementById("editCustomerVip").checked ? 1 : 0
@@ -295,11 +306,7 @@ async function setupCreateCustomerForm() {
     const fullId = `${idType}-${idNumber}`
 
     // Combine country code and phone number
-    const countryCode = document.getElementById(
-      "createCustomerPhoneCountryCode"
-    ).value
-    const phoneNumber = document.getElementById("createCustomerPhone").value
-    const fullPhone = `${countryCode}${phoneNumber}`
+    const fullPhone = combinePhoneNumber("createCustomerPhoneCountryCode", "createCustomerPhone");
 
     const newCustomer = {
       id: fullId,
@@ -448,7 +455,38 @@ function updateActiveFiltersCount() {
 
 // Initial load
 document.addEventListener("DOMContentLoaded", () => {
-  fetchAndRenderCustomers()
-  setupCreateCustomerForm()
-  setupAdvancedFilters()
-})
+  fetchAndRenderCustomers();
+  setupAdvancedFilters();
+  setupCreateCustomerForm();
+});
+
+// Helper function to combine country code and phone number
+function combinePhoneNumber(countryCodeId, phoneId) {
+  const countryCode = document.getElementById(countryCodeId).value;
+  let phoneNumber = document.getElementById(phoneId).value.trim();
+  // Remove leading zero if present
+  if (phoneNumber.startsWith("0")) {
+    phoneNumber = phoneNumber.substring(1);
+  }
+  return countryCode + phoneNumber;
+}
+
+// Helper function to parse stored phone and set fields
+function parseAndSetPhoneFields(fullPhone, countryCodeId, phoneId) {
+  if (!fullPhone) return;
+
+  const countryCodes = ["+58", "+1", "+57", "+54", "+34", "+52", "+55"];
+  let matchedCode = "+58"; // Default
+  let localNumber = fullPhone;
+
+  for (const code of countryCodes) {
+    if (fullPhone.startsWith(code)) {
+      matchedCode = code;
+      localNumber = fullPhone.substring(code.length);
+      break;
+    }
+  }
+
+  document.getElementById(countryCodeId).value = matchedCode;
+  document.getElementById(phoneId).value = localNumber;
+}
