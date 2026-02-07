@@ -114,7 +114,29 @@ class SupplierController {
         path: "/php/api_suppliers.php",
         tags: ["Suppliers"],
         summary: "Create a new supplier",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["nombre"],
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Distribuidora ABC C.A.", description: "Company name"),
+                    new OA\Property(property: "rif", type: "string", example: "J-12345678-9", description: "RIF/Tax ID"),
+                    new OA\Property(property: "contacto_nombre", type: "string", example: "María García", description: "Contact person"),
+                    new OA\Property(property: "email", type: "string", example: "ventas@abc.com", description: "Email"),
+                    new OA\Property(property: "telefono", type: "string", example: "0212-1234567", description: "Phone"),
+                    new OA\Property(property: "direccion", type: "string", example: "Zona Industrial, Galpón 5", description: "Address")
+                ],
+                example: [
+                    "nombre" => "Distribuidora ABC C.A.",
+                    "rif" => "J-12345678-9",
+                    "contacto_nombre" => "María García",
+                    "email" => "ventas@abc.com",
+                    "telefono" => "0212-1234567",
+                    "direccion" => "Zona Industrial, Galpón 5"
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Supplier created")
         ]
@@ -131,7 +153,25 @@ class SupplierController {
         parameters: [
             new OA\Parameter(name: "id", in: "query", description: "Supplier ID", required: true, schema: new OA\Schema(type: "integer"))
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Distribuidora ABC Actualizada"),
+                    new OA\Property(property: "rif", type: "string", example: "J-12345678-9"),
+                    new OA\Property(property: "contacto_nombre", type: "string", example: "Pedro López"),
+                    new OA\Property(property: "email", type: "string", example: "nuevo@abc.com"),
+                    new OA\Property(property: "telefono", type: "string", example: "0212-9999999"),
+                    new OA\Property(property: "direccion", type: "string", example: "Nueva dirección")
+                ],
+                example: [
+                    "nombre" => "Distribuidora ABC Actualizada",
+                    "contacto_nombre" => "Pedro López",
+                    "email" => "nuevo@abc.com"
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Supplier updated")
         ]

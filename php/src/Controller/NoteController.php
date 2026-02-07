@@ -69,7 +69,29 @@ class NoteController {
         path: "/php/api_notes.php",
         tags: ["Notes"],
         summary: "Create a note",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["titulo", "estado"],
+                properties: [
+                    new OA\Property(property: "titulo", type: "string", example: "Revisar inventario", description: "Note title"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Verificar stock de productos populares", description: "Description"),
+                    new OA\Property(property: "estado", type: "string", enum: ["pendiente", "en_progreso", "completado"], example: "pendiente", description: "Status"),
+                    new OA\Property(property: "prioridad", type: "string", enum: ["baja", "media", "alta"], example: "alta", description: "Priority"),
+                    new OA\Property(property: "fecha_vencimiento", type: "string", format: "date", example: "2026-02-15", description: "Due date"),
+                    new OA\Property(property: "cliente_id", type: "integer", example: 1, nullable: true, description: "Related client ID"),
+                    new OA\Property(property: "cliente_nombre", type: "string", example: "Juan Pérez", nullable: true, description: "Client name")
+                ],
+                example: [
+                    "titulo" => "Revisar inventario",
+                    "descripcion" => "Verificar stock de productos populares",
+                    "estado" => "pendiente",
+                    "prioridad" => "alta",
+                    "fecha_vencimiento" => "2026-02-15"
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Note created")
         ]
@@ -84,7 +106,25 @@ class NoteController {
         path: "/php/api_notes.php",
         tags: ["Notes"],
         summary: "Update a note",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["id"],
+                properties: [
+                    new OA\Property(property: "id", type: "integer", example: 1, description: "Note ID"),
+                    new OA\Property(property: "titulo", type: "string", example: "Nota actualizada"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Nueva descripción"),
+                    new OA\Property(property: "estado", type: "string", enum: ["pendiente", "en_progreso", "completado"], example: "en_progreso"),
+                    new OA\Property(property: "prioridad", type: "string", enum: ["baja", "media", "alta"], example: "media")
+                ],
+                example: [
+                    "id" => 1,
+                    "estado" => "en_progreso",
+                    "prioridad" => "media"
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Note updated")
         ]

@@ -85,7 +85,25 @@ class WarehouseController {
         path: "/php/api_warehouses.php",
         tags: ["Warehouses"],
         summary: "Create a new warehouse",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["nombre"],
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Almacén Principal", description: "Warehouse name"),
+                    new OA\Property(property: "direccion", type: "string", example: "Zona Industrial, Galpón 10", description: "Address"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Almacén de productos terminados", description: "Description"),
+                    new OA\Property(property: "activo", type: "boolean", example: true, description: "Active status")
+                ],
+                example: [
+                    "nombre" => "Almacén Principal",
+                    "direccion" => "Zona Industrial, Galpón 10",
+                    "descripcion" => "Almacén de productos terminados",
+                    "activo" => true
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Warehouse created")
         ]
@@ -103,7 +121,22 @@ class WarehouseController {
         parameters: [
             new OA\Parameter(name: "id", in: "query", description: "Warehouse ID", required: true, schema: new OA\Schema(type: "integer"))
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Almacén Actualizado"),
+                    new OA\Property(property: "direccion", type: "string", example: "Nueva dirección"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Nueva descripción"),
+                    new OA\Property(property: "activo", type: "boolean", example: true)
+                ],
+                example: [
+                    "nombre" => "Almacén Actualizado",
+                    "direccion" => "Nueva dirección"
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Warehouse updated")
         ]
