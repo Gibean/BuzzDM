@@ -9,13 +9,17 @@ class TutorialManager {
             animate: true,
             opacity: 0.75,
             padding: 5,
-            allowClose: true, // Restore 'X' button and ESC/Overlay functionality
-            overlayColor: '#000', // Standard black shadow
+            allowClose: true,
+            overlayColor: '#000',
+            stagePadding: 4,
+            overlayClickable: true,
+            showProgress: true,
+            keyboardControl: true, // Enables Left/Right arrow navigation
             doneBtnText: 'Siguiente Módulo',
             closeBtnText: 'Salir',
             nextBtnText: 'Siguiente',
             prevBtnText: 'Anterior',
-            popoverClass: 'driver-theme-buzz', // Custom Dark Theme
+            popoverClass: 'driver-theme-buzz',
             onCloseClick: () => {
                 this.endTutorial();
                 this.driver.destroy();
@@ -39,6 +43,8 @@ class TutorialManager {
             'proveedores',
             'clientes',
             'pedidos',
+            'requisiciones',
+            'transferencias',
             'envios',
             'cargos',
             'notas',
@@ -112,6 +118,8 @@ class TutorialManager {
             'proveedores': 'proveedores',
             'clientes': 'clientes',
             'pedidos': 'pedidos',
+            'requisiciones': 'requisiciones',
+            'transferencias': 'transferencias',
             'envios': 'envios',
             'cargos': 'cargos_existencias',
             'notas': 'todo',
@@ -132,6 +140,8 @@ class TutorialManager {
             'proveedores': 'proveedores',
             'clientes': 'clientes',
             'pedidos': 'pedidos',
+            'requisiciones': 'requisiciones',
+            'transferencias': 'transferencias',
             'envios': 'envios',
             'cargos': 'cargos_existencias',
             'notas': 'todo',
@@ -472,6 +482,76 @@ class TutorialManager {
                         }
                     }
                 ];
+             case 'requisiciones':
+                return [
+                    {
+                        element: '.top-navbar',
+                        popover: { title: 'Requisiciones de Compra', description: 'Aquí gestionas las solicitudes de abastecimiento masivas para tu inventario.', side: 'bottom' }
+                    },
+                    {
+                        element: '#btnFromLowStock',
+                        popover: { title: 'Auto-Stock Inteligente', description: 'Usa este botón para que el sistema analice qué productos tienen bajo stock y genere una propuesta de compra automáticamente.', side: 'bottom' }
+                    },
+                    {
+                        element: '#btnNuevaRequisicion',
+                        popover: {
+                            title: 'Nueva Requisición',
+                            description: 'Crea una manualmente vinculando múltiples productos.',
+                            side: 'bottom',
+                            onNextClick: () => {
+                                const btn = document.getElementById('btnNuevaRequisicion');
+                                if(btn) btn.click();
+                                setTimeout(() => this.driver.moveNext(), 500);
+                            }
+                        }
+                    },
+                    {
+                        element: '#prioridadRequisicion',
+                        popover: { title: 'Prioridad', description: 'Marca si es Urgente o Normal para que el aprobador lo vea primero.', side: 'right' }
+                    },
+                    {
+                         element: '#btnAddLinea',
+                         popover: { title: 'Añadir Ítems', description: 'Busca productos para agregar a la lista. El sistema te sugerirá el proveedor habitual.', side: 'top' }
+                    },
+                    {
+                         element: '#resumenProveedores',
+                         popover: { title: 'Consolidado', description: 'Mira cuánto le comprarás a cada proveedor antes de enviar.', side: 'left', onNextClick: () => this.nextModule() }
+                    }
+                ];
+
+             case 'transferencias':
+                return [
+                    {
+                        element: '.top-navbar',
+                        popover: { title: 'Transferencias', description: 'Mueve productos entre sucursales o depósitos físicos sin generar ventas.', side: 'bottom' }
+                    },
+                    {
+                        element: '#btnNueva',
+                        popover: {
+                            title: 'Iniciar Traslado',
+                            description: 'Selecciona almacén de origen y destino.',
+                            side: 'bottom',
+                            onNextClick: () => {
+                                const btn = document.getElementById('btnNueva');
+                                if(btn) btn.click();
+                                setTimeout(() => this.driver.moveNext(), 500);
+                            }
+                        }
+                    },
+                    {
+                        element: '#almacenOrigen',
+                        popover: { title: 'Almacén Origen', description: 'El stock se restará de aquí al momento de enviar el camión.', side: 'right' }
+                    },
+                    {
+                        element: '#almacenDestino',
+                        popover: { title: 'Almacén Destino', description: 'El stock se sumará aquí **solo** cuando el receptor marque la transferencia como "Recibida".', side: 'right' }
+                    },
+                    {
+                        element: '#btnEnviar',
+                        popover: { title: 'Procesar', description: 'Puedes guardar como borrador o enviar para iniciar el tránsito de la mercancía.', side: 'top', onNextClick: () => this.nextModule() }
+                    }
+                ];
+
              case 'envios':
                 return [
                     {
@@ -500,7 +580,6 @@ class TutorialManager {
                             description: 'Haz click aquí para registrar una nueva entrada de stock.',
                             side: 'bottom',
                             onNextClick: () => {
-                                // Simulate click to open form
                                 const btn = document.getElementById('btnNewCargo');
                                 if(btn) btn.click();
                                 setTimeout(() => this.driver.moveNext(), 500);
@@ -509,15 +588,15 @@ class TutorialManager {
                     },
                     {
                         element: '#cargoConcepto',
-                        popover: { title: 'Concepto', description: 'Define la razón del ingreso: "Compra" (a proveedor), "Ajuste Positivo" (corrección), etc.', side: 'right' }
+                        popover: { title: 'Precio de Compra', description: 'Si seleccionas **Compra a Proveedor**, aparecerá una columna nueva para ingresar el costo unitario.', side: 'right' }
                     },
                     {
-                        element: '#cargoReferencia',
-                        popover: { title: 'Referencia / Factura', description: 'Ingresa el número de factura del proveedor. Este campo es puramente informativo para tu seguimiento.', side: 'left' }
+                        element: '#proveedorBusqueda',
+                        popover: { title: 'Proveedor', description: 'Vincular el proveedor es vital para el historial de precios y futuras requisiciones.', side: 'left' }
                     },
                     {
-                         element: '#btnAddProductLine', // Point to the button that adds products
-                         popover: { title: 'Buscador de Productos', description: 'Usa este botón para buscar y añadir los ítems que están ingresando.', side: 'top' }
+                         element: '#btnAddProductLine',
+                         popover: { title: 'Buscador de Productos', description: 'Usa este botón para buscar y añadir los ítems. Recuerda ingresar la cantidad exacta recibida.', side: 'top' }
                     },
                    {
                         element: '#btnConfirmar',
@@ -679,7 +758,7 @@ class TutorialManager {
                      },
                      {
                          element: '#adminPasswordReport',
-                         popover: { title: 'Seguridad', description: '⚠️ Requerido: Ingrese su contraseña de administrador antes de solicitar cualquier reporte.', side: 'left' }
+                         popover: { title: 'Seguridad', description: 'Requerido: Ingrese su contraseña de administrador antes de solicitar cualquier reporte.', side: 'left' }
                      },
                       {
                          element: '#reportOptionsContainer',
@@ -710,7 +789,7 @@ class TutorialManager {
                      },
                      {
                          element: '#backupsTable', // Target table for restore example
-                         popover: { title: 'Restauración', description: '⚠️ ADVERTENCIA: En la lista de backups, usa el botón "Restaurar" para volver a un punto anterior. Esto **sobrescribe** toda la información.', side: 'top', onNextClick: () => this.nextModule() }
+                         popover: { title: 'Restauración', description: 'ADVERTENCIA: En la lista de backups, usa el botón "Restaurar" para volver a un punto anterior. Esto sobrescribe toda la información.', side: 'top', onNextClick: () => this.nextModule() }
                      }
                  ];
 
