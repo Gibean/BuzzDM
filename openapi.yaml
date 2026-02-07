@@ -587,6 +587,27 @@ paths:
       responses:
         '200':
           description: 'Logs data'
+    post:
+      tags:
+        - Logs
+      summary: 'Log inactivity logout'
+      operationId: fa076d31ea463ddba799e94361f80f76
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                action:
+                  type: string
+                  example: log_inactivity_logout
+                minutes:
+                  type: integer
+                  example: 30
+              type: object
+      responses:
+        '200':
+          description: 'Log created successfully'
   /php/api_notes.php:
     get:
       tags:
@@ -1000,6 +1021,88 @@ paths:
       responses:
         '200':
           description: 'Supplier deleted'
+  /php/api_transferencias.php:
+    get:
+      tags:
+        - Transfers
+      summary: 'Get all transfers with filters'
+      operationId: 6c8ef651aa452fec57c988f5169cd776
+      parameters:
+        -
+          name: page
+          in: query
+          schema:
+            type: integer
+        -
+          name: limit
+          in: query
+          schema:
+            type: integer
+        -
+          name: estado
+          in: query
+          schema:
+            type: string
+        -
+          name: almacen_origen
+          in: query
+          schema:
+            type: integer
+        -
+          name: almacen_destino
+          in: query
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'List of transfers'
+    post:
+      tags:
+        - Transfers
+      summary: 'Create new transfer'
+      operationId: 7e9a67dc64424a724d52a921d939736a
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - almacen_origen_id
+                - almacen_destino_id
+                - fecha_solicitud
+              properties:
+                almacen_origen_id:
+                  type: integer
+                almacen_destino_id:
+                  type: integer
+                fecha_solicitud:
+                  type: string
+                  format: date
+                motivo:
+                  type: string
+                lineas:
+                  type: array
+                  items: { type: object }
+              type: object
+      responses:
+        '200':
+          description: 'Transfer created'
+  '/php/api_transferencias.php?id={id}':
+    get:
+      tags:
+        - Transfers
+      summary: 'Get single transfer by ID'
+      operationId: e58368482e0b1a30537e575aa7142dff
+      parameters:
+        -
+          name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Transfer details'
   /php/api_2fa.php:
     get:
       tags:
@@ -1245,6 +1348,9 @@ tags:
   -
     name: Suppliers
     description: 'Operations related to Suppliers'
+  -
+    name: Transfers
+    description: 'Operations related to warehouse transfers'
   -
     name: TwoFactor
     description: 'Two-Factor Authentication Management'
