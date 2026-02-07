@@ -27,7 +27,8 @@
                 <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
                     <i class="fas fa-bars"></i>
                 </button>
-                <h1 class="h5 mb-0">Requisiciones de Compra</h1>
+                <h1 class="font-primary mb-0">REQUISICIONES</h1>
+                <span class="text-muted ms-2 font-mono">/ PLAN DE ABASTECIMIENTO</span>
             </div>
             <div class="d-flex gap-2">
                 <button class="btn btn-outline-warning" id="btnFromLowStock" title="Crear desde productos con stock bajo">
@@ -62,10 +63,10 @@
                         <label class="text-muted">Prioridad</label>
                         <select class="form-select form-select-buzz" id="filterPrioridad">
                             <option value="">Todas</option>
-                            <option value="urgente">🔴 Urgente</option>
-                            <option value="alta">🟠 Alta</option>
-                            <option value="media">🟡 Media</option>
-                            <option value="baja">🟢 Baja</option>
+                            <option value="urgente">Urgente</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Media</option>
+                            <option value="baja">Baja</option>
                         </select>
                     </div>
                     <div class="filter-group filter-actions">
@@ -129,10 +130,10 @@
                                     <div class="col-md-3">
                                         <label class="form-label small text-muted">Prioridad</label>
                                         <select class="form-select form-select-buzz form-select-sm" id="prioridadRequisicion">
-                                            <option value="baja">🟢 Baja</option>
-                                            <option value="media" selected>🟡 Media</option>
-                                            <option value="alta">🟠 Alta</option>
-                                            <option value="urgente">🔴 Urgente</option>
+                                            <option value="baja">Baja</option>
+                                            <option value="media" selected>Media</option>
+                                            <option value="alta">Alta</option>
+                                            <option value="urgente">Urgente</option>
                                         </select>
                                     </div>
                                     <div class="col-md-3">
@@ -159,11 +160,16 @@
                                             <!-- Dynamic rows -->
                                         </tbody>
                                         <tfoot>
-                                            <tr class="table-light">
+                                            <tr>
                                                 <td colspan="7">
-                                                    <button type="button" class="btn btn-sm btn-outline-buzz w-100" id="btnAddLinea">
-                                                        <i class="fas fa-plus"></i> Agregar producto
-                                                    </button>
+                                                    <div class="d-flex gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline-buzz flex-grow-1" id="btnAddLinea">
+                                                            <i class="fas fa-plus"></i> Agregar producto
+                                                        </button>
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddNewProductRow" title="Crear Producto si no existe">
+                                                            <i class="fas fa-box-open"></i> + Nuevo
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -213,6 +219,9 @@
                                     <button type="button" class="btn btn-outline-success" id="btnAprobar" style="display: none;">
                                         <i class="fas fa-check me-1"></i> Aprobar
                                     </button>
+                                    <button type="button" class="btn btn-primary" id="btnReportePDF" style="display: none;">
+                                        <i class="fas fa-file-pdf me-1"></i> Generar Reporte
+                                    </button>
                                     <button type="button" class="btn btn-success" id="btnGenerarCargos" style="display: none;">
                                         <i class="fas fa-truck-loading me-1"></i> Generar Cargos
                                     </button>
@@ -228,13 +237,83 @@
         </div>
     </main>
 
+    <!-- System Footer -->
+    <?php require_once 'php/system_footer.php'; ?>
+
     <!-- Product Search Dropdown Template -->
     <div id="productSearchDropdown" class="autocomplete-dropdown" style="display: none;"></div>
+
+    <!-- Modal Nuevo Producto Rápido -->
+    <div id="modalNuevoProducto" class="modal-buzz">
+        <div class="modal-content-buzz" style="max-width: 550px;">
+            <div class="modal-header-buzz">
+                <h5 class="text-primary"><i class="fas fa-box"></i> Crear Producto Rápido</h5>
+                <button type="button" class="close-buzz" onclick="cerrarModalNuevoProducto()">&times;</button>
+            </div>
+            <div class="modal-body-buzz">
+                <input type="hidden" id="nuevoProductoLineaIdx">
+                <div class="alert alert-info small mb-3">
+                    <i class="fas fa-info-circle"></i>
+                    Puedes completar los demás campos después desde el módulo de Inventario.
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label text-muted">SKU / Código *</label>
+                        <input type="text" class="form-control form-control-buzz" id="nuevoProductoSku"
+                               placeholder="LBR-0001" required>
+                    </div>
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label text-muted">Nombre del Producto *</label>
+                        <input type="text" class="form-control form-control-buzz" id="nuevoProductoNombre"
+                               placeholder="Nombre del producto..." required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Precio Venta ($)</label>
+                        <input type="number" class="form-control form-control-buzz" id="nuevoProductoPrecio"
+                               placeholder="0.00" step="0.01" min="0">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Stock Mínimo</label>
+                        <input type="number" class="form-control form-control-buzz" id="nuevoProductoMinStock"
+                               placeholder="10" min="0" value="10">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-buzz">
+                <button type="button" class="btn btn-outline-buzz" onclick="cerrarModalNuevoProducto()">Cancelar</button>
+                <button type="button" class="btn btn-buzz" onclick="guardarNuevoProducto()">
+                    <i class="fas fa-save"></i> Crear y Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Confirmación con Contraseña -->
+    <div id="modalConfirmPassword" class="modal-buzz">
+        <div class="modal-content-buzz" style="max-width: 400px;">
+            <div class="modal-header-buzz">
+                <h5><i class="fas fa-lock"></i> Confirmar Identidad</h5>
+                <button type="button" class="close-buzz" onclick="cerrarModalPassword()">&times;</button>
+            </div>
+            <div class="modal-body-buzz text-center">
+                <p id="passwordModalMessage" class="text-muted small">Para generar el reporte, ingrese su contraseña de administrador:</p>
+                <input type="password" class="form-control form-control-buzz text-center mb-2" id="confirmPasswordInput" placeholder="Contraseña">
+            </div>
+            <div class="modal-footer-buzz">
+                <button type="button" class="btn btn-outline-buzz btn-sm" onclick="cerrarModalPassword()">Cancelar</button>
+                <button type="button" class="btn btn-buzz btn-sm" id="btnConfirmPassword">Confirmar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/toast.js"></script>
-    <script src="assets/js/requisiciones.js"></script>
+    <script src="assets/js/modal.js?v=1.4"></script>
+    <script src="assets/js/confirmation_modal.js?v=1.4"></script>
+    <script src="assets/js/requisiciones.js?v=1.4"></script>
 </body>
 </html>
