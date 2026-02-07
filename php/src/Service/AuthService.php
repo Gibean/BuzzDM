@@ -33,9 +33,13 @@ class AuthService {
 
         $userId = $user['id'];
 
-        if ($user['estado'] === 'bloqueado') {
-            $this->repository->logLoginAttempt($userId, 'Denegado', 'Usuario bloqueado');
-            throw new Exception('Usuario bloqueado. Contacte al administrador.');
+        if ($user['estado'] === 'bloqueado' || $user['estado'] === 'inactivo') {
+            $reason = ($user['estado'] === 'bloqueado') ? 'Usuario bloqueado' : 'Usuario desactivado';
+            $this->repository->logLoginAttempt($userId, 'Denegado', $reason);
+            $message = ($user['estado'] === 'bloqueado')
+                ? 'Usuario bloqueado. Contacte al administrador.'
+                : 'Esta cuenta ha sido desactivada. Contacte al administrador.';
+            throw new Exception($message);
         }
 
         if (!password_verify($password, $user['password'])) {
