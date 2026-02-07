@@ -37,16 +37,20 @@ class UserService {
 
         $hashedPassword = password_hash($data['password'], PASSWORD_DEFAULT);
 
-        // Map frontend state to DB enum if needed
-        $estado = $data['estado'] ?? 'active';
-        if ($estado === 'activo') $estado = 'active';
-        if ($estado === 'inactivo') $estado = 'inactive';
+        // Map frontend state to DB enum (DB uses Spanish ENUM)
+        $estado = $data['estado'] ?? 'activo';
+        // Ensure we send Spanish values
+        if ($estado === 'active') $estado = 'activo';
+        if ($estado === 'inactive') $estado = 'inactivo';
+
+        $rol = $data['rol'] ?? 'operador';
+        if ($rol === 'user') $rol = 'operador';
 
         $userData = [
             'nombre' => $data['nombre'],
             'email' => $data['email'],
             'password' => $hashedPassword,
-            'rol' => $data['rol'] ?? 'user',
+            'rol' => $rol,
             'estado' => $estado
         ];
 
@@ -86,8 +90,9 @@ class UserService {
         // Explicitly update state if present
         if (isset($data['estado'])) {
              $estado = $data['estado'];
-             if ($estado === 'activo') $estado = 'active';
-             if ($estado === 'inactivo') $estado = 'inactive';
+             // Ensure we send Spanish values
+             if ($estado === 'active') $estado = 'activo';
+             if ($estado === 'inactive') $estado = 'inactivo';
              $this->repository->updateStatus($id, $estado);
         }
 
@@ -98,8 +103,8 @@ class UserService {
         if (!in_array($estado, ['active', 'inactive', 'activo', 'inactivo'])) {
             throw new Exception("Estado inválido.");
         }
-        // Normalize
-        $estado = ($estado === 'activo') ? 'active' : (($estado === 'inactivo') ? 'inactive' : $estado);
+        // Normalize to Spanish
+        $estado = ($estado === 'active') ? 'activo' : (($estado === 'inactive') ? 'inactivo' : $estado);
 
         $user = $this->repository->findById($id);
         if ($user && $user['rol'] === 'admin' && $estado === 'inactive') {

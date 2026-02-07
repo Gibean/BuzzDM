@@ -662,7 +662,7 @@
                                 <label class="form-label">Nombre *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="userName" required>
+                                    <input type="text" class="form-control form-control-buzz" id="inputUserName" required>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -708,8 +708,8 @@
                                 <label class="form-label">Rol</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-user-shield"></i></span>
-                                    <select class="form-control form-control-buzz" id="userRole">
-                                        <option value="user">Usuario</option>
+                                    <select class="form-control form-control-buzz" id="selectUserRole">
+                                        <option value="operador">Operador</option>
                                         <option value="supervisor">Supervisor</option>
                                         <option value="admin">Administrador</option>
                                     </select>
