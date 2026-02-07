@@ -95,7 +95,8 @@ $api_scripts = [
     // Notificaciones y estadísticas
     'api_notifications.php',
     'api_stats.php',
-    'api_2fa.php' // Two-Factor Authentication
+    'api_2fa.php', // Two-Factor Authentication
+    'api_requisiciones.php' // Requisiciones de Compra
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -230,10 +231,11 @@ $fallback_pages = [
         'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
         'backup_status.php', 'api_logs.php',
         'cargos_existencias.php', 'almacenes.php', 'transferencias.php',
-        'proveedores.php', 'todo.php', 'notas_actions.php',
+        'proveedores.php', 'todo.php', 'notas_actions.php', 'catalogos.php',
         'api_notifications.php', 'api_transferencias.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
-        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php',
-        'api_2fa.php'
+        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_cargos.php',
+        'api_2fa.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -241,14 +243,17 @@ $fallback_pages = [
         'api_products.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php', 'transferencias.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php'
+        'todo.php', 'notas_actions.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php',
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php', 'api_cargos.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
         'api_orders.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ]
 ];
 
@@ -262,6 +267,16 @@ if (!empty($db_permissions)) {
 // HOTFIX: Ensure api_logs.php is allowed for admin even if not in DB yet (failed migration protection)
 if ($user_role === 'admin' && isset($allowed_pages['admin']) && !in_array('api_logs.php', $allowed_pages['admin'])) {
     $allowed_pages['admin'][] = 'api_logs.php';
+}
+
+// HOTFIX: Ensure requisiciones is allowed for all roles until migration is run
+$requisicion_pages = ['requisiciones.php', 'api_requisiciones.php'];
+if (isset($allowed_pages[$user_role])) {
+    foreach ($requisicion_pages as $page) {
+        if (!in_array($page, $allowed_pages[$user_role])) {
+            $allowed_pages[$user_role][] = $page;
+        }
+    }
 }
 
 // Always-allowed APIs for any authenticated user (core system functionality)
