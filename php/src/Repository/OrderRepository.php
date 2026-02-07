@@ -132,6 +132,13 @@ class OrderRepository {
         return $stmt->execute([$delta, $productId]);
     }
 
+    public function getProductStock($productId) {
+        $sql = "SELECT stock, nombre FROM productos WHERE id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([$productId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
     public function createHeader($data) {
         $sql = "INSERT INTO pedidos (cliente_id, referencia, fecha_creacion, total, estado_pago, estado_envio, direccion_envio, notas_envio)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";

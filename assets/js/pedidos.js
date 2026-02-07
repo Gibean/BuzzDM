@@ -445,6 +445,9 @@ async function editOrder(orderId) {
                         <input type="hidden" class="product-price-input" value="${
                           product ? product.precio_unitario : ""
                         }">
+                        <input type="hidden" class="product-stock-input" value="${
+                          product ? (product.current_stock || 9999) : ""
+                        }">
                         <div class="product-search-results list-group position-absolute w-100" style="z-index: 999;"></div>
                     </div>
                     <div class="col-md-2">
@@ -467,6 +470,7 @@ async function editOrder(orderId) {
         const productSearchInput = newRow.querySelector(".product-search-input")
         const productIdInput = newRow.querySelector(".product-id-input")
         const productPriceInput = newRow.querySelector(".product-price-input")
+        const productStockInput = newRow.querySelector(".product-stock-input")
         const productQuantityInput = newRow.querySelector(
           ".product-quantity-input"
         )
@@ -567,6 +571,8 @@ async function editOrder(orderId) {
 
             productIdInput.value = productId
             productPriceInput.value = productPrice
+            productStockInput.value = productStock // Store available stock
+            productQuantityInput.max = productStock // Set max attribute
             productSearchInput.value = productName
             productSearchResultsDiv.innerHTML = ""
             productQuantityInput.value = 1
@@ -575,8 +581,17 @@ async function editOrder(orderId) {
         })
 
         const updateProductSubtotal = () => {
-          const quantity = parseFloat(productQuantityInput.value) || 0
+          let quantity = parseFloat(productQuantityInput.value) || 0
           const price = parseFloat(productPriceInput.value) || 0
+          const maxStock = parseInt(productStockInput.value) || 0
+
+          // Validate against available stock
+          if (maxStock > 0 && quantity > maxStock) {
+            showToast(`Stock insuficiente. Máximo disponible: ${maxStock}`, 'warning', 3000)
+            quantity = maxStock
+            productQuantityInput.value = maxStock
+          }
+
           const subtotalUsd = quantity * price;
           productSubtotalDisplay.value = formatCurrency(subtotalUsd)
 
@@ -833,6 +848,7 @@ async function openOrderModal() {
                 <input type="text" class="form-control form-control-buzz product-search-input" placeholder="Nombre o SKU del producto">
                 <input type="hidden" class="product-id-input">
                 <input type="hidden" class="product-price-input">
+                <input type="hidden" class="product-stock-input">
                 <div class="product-search-results list-group position-absolute w-100" style="z-index: 999;"></div>
             </div>
             <div class="col-md-2">
@@ -853,6 +869,7 @@ async function openOrderModal() {
     const productSearchInput = newRow.querySelector(".product-search-input")
     const productIdInput = newRow.querySelector(".product-id-input")
     const productPriceInput = newRow.querySelector(".product-price-input")
+    const productStockInput = newRow.querySelector(".product-stock-input")
     const productQuantityInput = newRow.querySelector(".product-quantity-input")
     const productSearchResultsDiv = newRow.querySelector(
       ".product-search-results"
@@ -940,6 +957,8 @@ async function openOrderModal() {
 
         productIdInput.value = productId
         productPriceInput.value = productPrice
+        productStockInput.value = productStock // Store available stock
+        productQuantityInput.max = productStock // Set max attribute
         productSearchInput.value = productName // Set input value to selected product name
         productSearchResultsDiv.innerHTML = "" // Clear search results
         productQuantityInput.value = 1 // Default quantity to 1
@@ -948,8 +967,17 @@ async function openOrderModal() {
     })
 
     const updateProductSubtotal = () => {
-      const quantity = parseFloat(productQuantityInput.value) || 0
+      let quantity = parseFloat(productQuantityInput.value) || 0
       const price = parseFloat(productPriceInput.value) || 0
+      const maxStock = parseInt(productStockInput.value) || 0
+
+      // Validate against available stock
+      if (maxStock > 0 && quantity > maxStock) {
+        showToast(`Stock insuficiente. Máximo disponible: ${maxStock}`, 'warning', 3000)
+        quantity = maxStock
+        productQuantityInput.value = maxStock
+      }
+
       const subtotalUsd = quantity * price;
       productSubtotalDisplay.value = formatCurrency(subtotalUsd)
 

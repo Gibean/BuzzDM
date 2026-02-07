@@ -96,11 +96,29 @@ class ProductController {
             required: true,
             content: new OA\JsonContent(
                 type: "object",
-                required: ["nombre", "sku", "precio_venta"],
+                required: ["nombre", "sku", "precio"],
                 properties: [
-                    new OA\Property(property: "nombre", type: "string"),
-                    new OA\Property(property: "sku", type: "string"),
-                    new OA\Property(property: "precio_venta", type: "number")
+                    new OA\Property(property: "sku", type: "string", example: "PROD-001", description: "Unique product code"),
+                    new OA\Property(property: "nombre", type: "string", example: "Camiseta Negra M", description: "Product name"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Camiseta de algodón 100%", description: "Description"),
+                    new OA\Property(property: "precio", type: "number", format: "float", example: 25.99, description: "Sale price"),
+                    new OA\Property(property: "costo_promedio", type: "number", format: "float", example: 12.50, description: "Average cost"),
+                    new OA\Property(property: "stock", type: "integer", example: 100, description: "Initial stock"),
+                    new OA\Property(property: "min_stock", type: "integer", example: 10, description: "Minimum stock alert"),
+                    new OA\Property(property: "categoria", type: "integer", example: 1, description: "Category ID"),
+                    new OA\Property(property: "marca_id", type: "integer", example: 1, description: "Brand ID"),
+                    new OA\Property(property: "estado", type: "string", enum: ["activo", "inactivo"], example: "activo")
+                ],
+                example: [
+                    "sku" => "PROD-001",
+                    "nombre" => "Camiseta Negra M",
+                    "descripcion" => "Camiseta de algodón 100%",
+                    "precio" => 25.99,
+                    "costo_promedio" => 12.50,
+                    "stock" => 100,
+                    "min_stock" => 10,
+                    "categoria" => 1,
+                    "estado" => "activo"
                 ]
             )
         ),
@@ -132,7 +150,24 @@ class ProductController {
         parameters: [
             new OA\Parameter(name: "id", in: "query", description: "Product ID", required: true, schema: new OA\Schema(type: "integer"))
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Camiseta Actualizada"),
+                    new OA\Property(property: "descripcion", type: "string", example: "Nueva descripción"),
+                    new OA\Property(property: "precio", type: "number", example: 29.99),
+                    new OA\Property(property: "min_stock", type: "integer", example: 15),
+                    new OA\Property(property: "estado", type: "string", example: "activo")
+                ],
+                example: [
+                    "nombre" => "Camiseta Actualizada",
+                    "precio" => 29.99,
+                    "min_stock" => 15
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Product updated")
         ]

@@ -54,7 +54,7 @@ class ImportController {
         ]
     )]
     private function processImport() {
-        // Validate File
+        // Validate File Upload
         if (!isset($_FILES['import_file']) || $_FILES['import_file']['error'] !== UPLOAD_ERR_OK) {
             $this->jsonResponse(false, [], 'Error al subir archivo. Verifique que seleccionó un archivo válido.');
         }
@@ -62,6 +62,28 @@ class ImportController {
         $fileTmpPath = $_FILES['import_file']['tmp_name'];
         $fileName = $_FILES['import_file']['name'];
         $userId = $_SESSION['usuario_id'] ?? null;
+
+        // Validate MIME Type (Edge Case: Corrupted/Invalid Files)
+        $allowedMimeTypes = [
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+            'application/vnd.ms-excel', // .xls
+            'text/csv', // .csv
+            'application/csv'
+        ];
+
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $detectedMime = $finfo->file($fileTmpPath);
+
+        if (!in_array($detectedMime, $allowedMimeTypes)) {
+            $this->jsonResponse(false, [], "Tipo de archivo no permitido. Se detectó: {$detectedMime}. Solo se aceptan archivos Excel (.xlsx, .xls) o CSV.");
+        }
+
+        // Validate file extension as secondary check
+        $allowedExtensions = ['xlsx', 'xls', 'csv'];
+        $fileExtension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            $this->jsonResponse(false, [], "Extensión de archivo no permitida: .{$fileExtension}. Solo se aceptan: .xlsx, .xls, .csv");
+        }
 
         if (!$userId) {
             $this->jsonResponse(false, [], 'Usuario no autenticado.');
