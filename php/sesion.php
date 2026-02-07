@@ -9,6 +9,39 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// ========================================
+// Session Inactivity Timeout (24 hours)
+// Edge Case: Prevents stale sessions from persisting indefinitely
+// ========================================
+define('SESSION_TIMEOUT_SECONDS', 24 * 60 * 60); // 24 hours
+
+if (isset($_SESSION['last_activity'])) {
+    $inactiveTime = time() - $_SESSION['last_activity'];
+
+    if ($inactiveTime > SESSION_TIMEOUT_SECONDS) {
+        // Session expired due to inactivity
+        $expiredUserId = $_SESSION['usuario_id'] ?? null;
+
+        // Destroy the session
+        session_unset();
+        session_destroy();
+        session_start(); // Restart fresh session for redirects
+
+        // Log the automatic logout (if we had a user)
+        if ($expiredUserId) {
+            // Note: Can't use LogController here as it may not be autoloaded yet
+            // This will be logged via the frontend when redirected to login
+            $_SESSION['session_expired'] = true;
+            $_SESSION['expired_user_id'] = $expiredUserId;
+        }
+
+        // Will be handled below in the session check
+    }
+}
+
+// Update last activity timestamp
+$_SESSION['last_activity'] = time();
+
 // Generate CSRF token if not exists
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -75,13 +108,53 @@ function json_auth_error($message) {
     exit;
 }
 
-// Si no existe la variable de sesión del ID de usuario, significa que no ha iniciado sesión
+/**
+ * Check if request has valid dev token (only for development mode)
+ * This allows Swagger UI and other API testing tools to bypass session auth
+ * @return bool Whether dev token is valid
+ */
+function checkDevToken() {
+    // Load .env if not already loaded
+    if (!getenv('APP_ENV')) {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+        $dotenv->safeLoad();
+    }
+
+    // Only allow dev token in development mode
+    if (getenv('APP_ENV') !== 'development') {
+        return false;
+    }
+
+    $devToken = getenv('DEV_API_TOKEN');
+    if (empty($devToken)) {
+        return false;
+    }
+
+    // Check X-Dev-Token header
+    $headerToken = $_SERVER['HTTP_X_DEV_TOKEN'] ?? '';
+    if (!empty($headerToken) && hash_equals($devToken, $headerToken)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Si no existe la variable de sesión del ID de usuario, verificar dev token como alternativa
 if (!isset($_SESSION['usuario_id'])) {
-    if ($is_api_call) {
-        json_auth_error('No autenticado. Por favor, inicia sesión.');
+    // Check if dev token is provided (for API testing)
+    if ($is_api_call && checkDevToken()) {
+        // Dev token valid - set a fake admin session for API testing
+        $_SESSION['usuario_id'] = 1; // Assume admin user ID 1
+        $_SESSION['usuario_nombre'] = 'API Dev User';
+        $_SESSION['usuario_rol'] = 'admin';
+        $_SESSION['is_dev_token_session'] = true;
     } else {
-        header('Location: login');
-        exit();
+        if ($is_api_call) {
+            json_auth_error('No autenticado. Por favor, inicia sesión.');
+        } else {
+            header('Location: login');
+            exit();
+        }
     }
 }
 

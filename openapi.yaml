@@ -335,7 +335,30 @@ paths:
         content:
           application/json:
             schema:
+              properties:
+                cedula:
+                  type: string
+                  example: V-12345678
+                nombre:
+                  type: string
+                  example: 'Juan Pérez Actualizado'
+                email:
+                  type: string
+                  example: juan.nuevo@email.com
+                telefono:
+                  type: string
+                  example: 0412-9999999
+                direccion:
+                  type: string
+                  example: 'Nueva dirección'
+                vip:
+                  type: boolean
+                  example: true
               type: object
+            example:
+              nombre: 'Juan Pérez Actualizado'
+              email: juan.nuevo@email.com
+              vip: true
       responses:
         '200':
           description: 'Client updated'
@@ -352,9 +375,39 @@ paths:
               required:
                 - nombre
               properties:
-                nombre:
+                cedula:
+                  description: 'ID document (Cédula/RIF)'
                   type: string
+                  example: V-12345678
+                nombre:
+                  description: 'Full name or company name'
+                  type: string
+                  example: 'Juan Pérez'
+                email:
+                  description: 'Email address'
+                  type: string
+                  format: email
+                  example: juan@email.com
+                telefono:
+                  description: 'Phone number'
+                  type: string
+                  example: 0414-1234567
+                direccion:
+                  description: Address
+                  type: string
+                  example: 'Av. Principal #123, Caracas'
+                vip:
+                  description: 'VIP customer flag'
+                  type: boolean
+                  example: false
               type: object
+            example:
+              cedula: V-12345678
+              nombre: 'Juan Pérez'
+              email: juan@email.com
+              telefono: 0414-1234567
+              direccion: 'Av. Principal #123, Caracas'
+              vip: false
       responses:
         '200':
           description: 'Client created'
@@ -635,7 +688,32 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - id
+              properties:
+                id:
+                  description: 'Note ID'
+                  type: integer
+                  example: 1
+                titulo:
+                  type: string
+                  example: 'Nota actualizada'
+                descripcion:
+                  type: string
+                  example: 'Nueva descripción'
+                estado:
+                  type: string
+                  enum: [pendiente, en_progreso, completado]
+                  example: en_progreso
+                prioridad:
+                  type: string
+                  enum: [baja, media, alta]
+                  example: media
               type: object
+            example:
+              id: 1
+              estado: en_progreso
+              prioridad: media
       responses:
         '200':
           description: 'Note updated'
@@ -649,7 +727,50 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - titulo
+                - estado
+              properties:
+                titulo:
+                  description: 'Note title'
+                  type: string
+                  example: 'Revisar inventario'
+                descripcion:
+                  description: Description
+                  type: string
+                  example: 'Verificar stock de productos populares'
+                estado:
+                  description: Status
+                  type: string
+                  enum: [pendiente, en_progreso, completado]
+                  example: pendiente
+                prioridad:
+                  description: Priority
+                  type: string
+                  enum: [baja, media, alta]
+                  example: alta
+                fecha_vencimiento:
+                  description: 'Due date'
+                  type: string
+                  format: date
+                  example: '2026-02-15'
+                cliente_id:
+                  description: 'Related client ID'
+                  type: integer
+                  example: 1
+                  nullable: true
+                cliente_nombre:
+                  description: 'Client name'
+                  type: string
+                  example: 'Juan Pérez'
+                  nullable: true
               type: object
+            example:
+              titulo: 'Revisar inventario'
+              descripcion: 'Verificar stock de productos populares'
+              estado: pendiente
+              prioridad: alta
+              fecha_vencimiento: '2026-02-15'
       responses:
         '200':
           description: 'Note created'
@@ -732,7 +853,59 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - cliente_id
+                - direccion_envio
+                - products
+              properties:
+                cliente_id:
+                  description: 'Client ID'
+                  type: integer
+                  example: 1
+                direccion_envio:
+                  description: 'Shipping address'
+                  type: string
+                  example: 'Av. Principal #123, Caracas'
+                notas_envio:
+                  description: 'Shipping notes'
+                  type: string
+                  example: 'Entregar en horario de oficina'
+                estado_pago:
+                  description: 'Payment status'
+                  type: string
+                  enum: [pagado, 'no pagado']
+                  example: pagado
+                estado_envio:
+                  description: 'Shipping status'
+                  type: string
+                  enum: [pendiente, enviado, entregado]
+                  example: pendiente
+                fecha_creacion:
+                  description: 'Order date'
+                  type: string
+                  format: datetime
+                  example: '2026-02-07 10:30:00'
+                products:
+                  description: 'List of products in the order'
+                  type: array
+                  items: { properties: { producto_id: { description: 'Product ID', type: integer, example: 5 }, cantidad: { description: Quantity, type: integer, example: 2 }, precio_unitario: { description: 'Unit price', type: number, format: float, example: 25.5 } }, type: object }
               type: object
+            example:
+              cliente_id: 1
+              direccion_envio: 'Av. Principal #123, Caracas'
+              notas_envio: 'Entregar en horario de oficina'
+              estado_pago: pagado
+              estado_envio: pendiente
+              fecha_creacion: '2026-02-07 10:30:00'
+              products:
+                -
+                  producto_id: 5
+                  cantidad: 2
+                  precio_unitario: 25.5
+                -
+                  producto_id: 12
+                  cantidad: 1
+                  precio_unitario: 100
       responses:
         '200':
           description: 'Order created'
@@ -802,7 +975,27 @@ paths:
         content:
           application/json:
             schema:
+              properties:
+                nombre:
+                  type: string
+                  example: 'Camiseta Actualizada'
+                descripcion:
+                  type: string
+                  example: 'Nueva descripción'
+                precio:
+                  type: number
+                  example: 29.99
+                min_stock:
+                  type: integer
+                  example: 15
+                estado:
+                  type: string
+                  example: activo
               type: object
+            example:
+              nombre: 'Camiseta Actualizada'
+              precio: 29.99
+              min_stock: 15
       responses:
         '200':
           description: 'Product updated'
@@ -820,15 +1013,61 @@ paths:
               required:
                 - nombre
                 - sku
-                - precio_venta
+                - precio
               properties:
-                nombre:
-                  type: string
                 sku:
+                  description: 'Unique product code'
                   type: string
-                precio_venta:
+                  example: PROD-001
+                nombre:
+                  description: 'Product name'
+                  type: string
+                  example: 'Camiseta Negra M'
+                descripcion:
+                  description: Description
+                  type: string
+                  example: 'Camiseta de algodón 100%'
+                precio:
+                  description: 'Sale price'
                   type: number
+                  format: float
+                  example: 25.99
+                costo_promedio:
+                  description: 'Average cost'
+                  type: number
+                  format: float
+                  example: 12.5
+                stock:
+                  description: 'Initial stock'
+                  type: integer
+                  example: 100
+                min_stock:
+                  description: 'Minimum stock alert'
+                  type: integer
+                  example: 10
+                categoria:
+                  description: 'Category ID'
+                  type: integer
+                  example: 1
+                marca_id:
+                  description: 'Brand ID'
+                  type: integer
+                  example: 1
+                estado:
+                  type: string
+                  enum: [activo, inactivo]
+                  example: activo
               type: object
+            example:
+              sku: PROD-001
+              nombre: 'Camiseta Negra M'
+              descripcion: 'Camiseta de algodón 100%'
+              precio: 25.99
+              costo_promedio: 12.5
+              stock: 100
+              min_stock: 10
+              categoria: 1
+              estado: activo
       responses:
         '200':
           description: 'Product created'
@@ -987,7 +1226,30 @@ paths:
         content:
           application/json:
             schema:
+              properties:
+                nombre:
+                  type: string
+                  example: 'Distribuidora ABC Actualizada'
+                rif:
+                  type: string
+                  example: J-12345678-9
+                contacto_nombre:
+                  type: string
+                  example: 'Pedro López'
+                email:
+                  type: string
+                  example: nuevo@abc.com
+                telefono:
+                  type: string
+                  example: 0212-9999999
+                direccion:
+                  type: string
+                  example: 'Nueva dirección'
               type: object
+            example:
+              nombre: 'Distribuidora ABC Actualizada'
+              contacto_nombre: 'Pedro López'
+              email: nuevo@abc.com
       responses:
         '200':
           description: 'Supplier updated'
@@ -1001,7 +1263,41 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - nombre
+              properties:
+                nombre:
+                  description: 'Company name'
+                  type: string
+                  example: 'Distribuidora ABC C.A.'
+                rif:
+                  description: 'RIF/Tax ID'
+                  type: string
+                  example: J-12345678-9
+                contacto_nombre:
+                  description: 'Contact person'
+                  type: string
+                  example: 'María García'
+                email:
+                  description: Email
+                  type: string
+                  example: ventas@abc.com
+                telefono:
+                  description: Phone
+                  type: string
+                  example: 0212-1234567
+                direccion:
+                  description: Address
+                  type: string
+                  example: 'Zona Industrial, Galpón 5'
               type: object
+            example:
+              nombre: 'Distribuidora ABC C.A.'
+              rif: J-12345678-9
+              contacto_nombre: 'María García'
+              email: ventas@abc.com
+              telefono: 0212-1234567
+              direccion: 'Zona Industrial, Galpón 5'
       responses:
         '200':
           description: 'Supplier created'
@@ -1169,7 +1465,29 @@ paths:
         content:
           application/json:
             schema:
+              properties:
+                nombre:
+                  type: string
+                  example: 'Carlos Actualizado'
+                email:
+                  type: string
+                  example: nuevo.email@empresa.com
+                password:
+                  description: 'Leave empty to keep current'
+                  type: string
+                  example: NuevoPass456!
+                rol:
+                  type: string
+                  enum: [admin, supervisor, operador]
+                  example: admin
+                activo:
+                  type: boolean
+                  example: true
               type: object
+            example:
+              nombre: 'Carlos Actualizado'
+              rol: admin
+              activo: true
       responses:
         '200':
           description: 'User updated'
@@ -1183,7 +1501,41 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - nombre
+                - email
+                - password
+                - rol
+              properties:
+                nombre:
+                  description: 'Full name'
+                  type: string
+                  example: 'Carlos Rodríguez'
+                email:
+                  description: 'Email address'
+                  type: string
+                  format: email
+                  example: carlos@empresa.com
+                password:
+                  description: Password
+                  type: string
+                  example: SecurePass123!
+                rol:
+                  description: Role
+                  type: string
+                  enum: [admin, supervisor, operador]
+                  example: supervisor
+                activo:
+                  description: 'Active status'
+                  type: boolean
+                  example: true
               type: object
+            example:
+              nombre: 'Carlos Rodríguez'
+              email: carlos@empresa.com
+              password: SecurePass123!
+              rol: supervisor
+              activo: true
       responses:
         '200':
           description: 'User created'
@@ -1245,7 +1597,23 @@ paths:
         content:
           application/json:
             schema:
+              properties:
+                nombre:
+                  type: string
+                  example: 'Almacén Actualizado'
+                direccion:
+                  type: string
+                  example: 'Nueva dirección'
+                descripcion:
+                  type: string
+                  example: 'Nueva descripción'
+                activo:
+                  type: boolean
+                  example: true
               type: object
+            example:
+              nombre: 'Almacén Actualizado'
+              direccion: 'Nueva dirección'
       responses:
         '200':
           description: 'Warehouse updated'
@@ -1259,7 +1627,31 @@ paths:
         content:
           application/json:
             schema:
+              required:
+                - nombre
+              properties:
+                nombre:
+                  description: 'Warehouse name'
+                  type: string
+                  example: 'Almacén Principal'
+                direccion:
+                  description: Address
+                  type: string
+                  example: 'Zona Industrial, Galpón 10'
+                descripcion:
+                  description: Description
+                  type: string
+                  example: 'Almacén de productos terminados'
+                activo:
+                  description: 'Active status'
+                  type: boolean
+                  example: true
               type: object
+            example:
+              nombre: 'Almacén Principal'
+              direccion: 'Zona Industrial, Galpón 10'
+              descripcion: 'Almacén de productos terminados'
+              activo: true
       responses:
         '200':
           description: 'Warehouse created'
@@ -1302,6 +1694,11 @@ components:
       type: apiKey
       name: PHPSESSID
       in: cookie
+    devTokenAuth:
+      type: apiKey
+      description: 'Development token for API testing (only works when APP_ENV=development). Value: buzz_dev_swagger_2026_secure_token'
+      name: X-Dev-Token
+      in: header
 tags:
   -
     name: Auth
