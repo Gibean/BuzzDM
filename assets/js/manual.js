@@ -246,6 +246,8 @@ const sectionNames = {
     'pedidos': 'Crear Pedidos',
     'pagos': 'Estados de Pago',
     'envios': 'Seguimiento Envíos',
+    'requisiciones': 'Requisiciones',
+    'transferencias': 'Transferencias',
     'notas': 'Notas Kanban',
     'divisas': 'Monitor Divisas',
     'backups': 'Respaldos',
@@ -482,7 +484,7 @@ function startTour() {
                 {
                     element: '#docs-hero',
                     popover: {
-                        title: '👋 ¡Bienvenido al Centro de Ayuda!',
+                        title: 'Bienvenido al Centro de Ayuda',
                         description: 'Aquí encontrarás guías completas para cada módulo de BUZZ Data Manager. El sistema está diseñado para ser intuitivo y flexible.',
                         side: 'bottom',
                         align: 'center'
@@ -491,7 +493,7 @@ function startTour() {
                 {
                     element: '#docsSidebar',
                     popover: {
-                        title: '🔢 Flujo de Trabajo',
+                        title: 'Flujo de Trabajo',
                         description: 'Hemos organizado la navegación siguiendo el proceso lógico de uso del sistema, desde la configuración inicial hasta la administración avanzada.',
                         side: 'right',
                         align: 'start'
@@ -500,7 +502,7 @@ function startTour() {
                 {
                     element: '#docsGlobalSearch',
                     popover: {
-                        title: '🔍 Búsqueda Inteligente',
+                        title: 'Búsqueda Inteligente',
                         description: 'Busca cualquier funcionalidad o término. El sistema filtrará instantáneamente las guías relevantes para ti.',
                         side: 'bottom',
                         align: 'start'
@@ -509,7 +511,7 @@ function startTour() {
                 {
                     element: '#themeToggle',
                     popover: {
-                        title: '🌗 Modo Oscuro/Claro',
+                        title: 'Modo Oscuro/Claro',
                         description: 'Personaliza tu experiencia visual. Cambia el tema según tu preferencia o las condiciones de iluminación.',
                         side: 'bottom',
                         align: 'end'
@@ -518,7 +520,7 @@ function startTour() {
                 {
                     element: '#moduleGrid',
                     popover: {
-                        title: '🧱 Módulos Principales',
+                        title: 'Módulos Principales',
                         description: 'Haz clic en cualquier tarjeta para abrir la guía detallada. Dentro encontrarás diagramas interactivos y pasos detallados.',
                         side: 'top',
                         align: 'center'
@@ -527,7 +529,7 @@ function startTour() {
                 {
                     element: '#docsBreadcrumb',
                     popover: {
-                        title: '📍 ¿Dónde estás?',
+                        title: '¿Dónde estás?',
                         description: 'Usa el rastro de migas de pan para saber exactamente en qué sección te encuentras y volver rápidamente al inicio.',
                         side: 'bottom',
                         align: 'start'
@@ -536,7 +538,7 @@ function startTour() {
                 {
                     element: '#docsToc',
                     popover: {
-                        title: '📑 Tabla de Contenidos',
+                        title: 'Tabla de Contenidos',
                         description: 'Al leer un artículo, usa este panel para saltar rápidamente entre subsecciones y encontrar el dato preciso.',
                         side: 'left',
                         align: 'start'

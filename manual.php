@@ -83,6 +83,8 @@ require_once 'php/sesion.php';
                     <!-- OPERACIONES -->
                     <li><a class="docs-step-item" data-section="clientes" onclick="showSection('clientes')">Clientes</a></li>
                     <li><a class="docs-step-item" data-section="pedidos" onclick="showSection('pedidos')">Pedidos</a></li>
+                    <li><a class="docs-step-item" data-section="requisiciones" onclick="showSection('requisiciones')">Requisiciones</a></li>
+                    <li><a class="docs-step-item" data-section="transferencias" onclick="showSection('transferencias')">Transferencias</a></li>
                     <li><a class="docs-step-item" data-section="envios" onclick="showSection('envios')">Envíos</a></li>
                     <li><a class="docs-step-item" data-section="cargos" onclick="showSection('cargos')">Cargar Existencias</a></li>
 
@@ -132,7 +134,7 @@ require_once 'php/sesion.php';
                         <a class="docs-block-link" onclick="showSection('pedidos')">
                             <div class="docs-block-icon" style="color: var(--buzz-success);"><i class="fas fa-shopping-cart"></i></div>
                             <div class="docs-block-title">Operaciones</div>
-                            <div class="docs-block-desc">Pedidos, Clientes, Envíos, Cargas</div>
+                            <div class="docs-block-desc">Pedidos, Requisiciones, Transferencias, Envíos, Cargas</div>
                         </a>
 
                         <!-- Group: Herramientas -->
@@ -286,9 +288,9 @@ require_once 'php/sesion.php';
             <table class="table table-bordered">
                 <thead><tr><th>Tipo</th><th>Icono</th><th>Maneja Stock</th><th>Uso</th></tr></thead>
                 <tbody>
-                    <tr><td><strong>Producto Físico</strong></td><td>📦</td><td>✅ Sí</td><td>Artículos tangibles con inventario</td></tr>
-                    <tr><td><strong>Servicio</strong></td><td>🔧</td><td>❌ No</td><td>Instalación, mantenimiento, consultoría</td></tr>
-                    <tr><td><strong>Kit / Combo</strong></td><td>📦📦</td><td>Depende</td><td>Conjunto de otros productos</td></tr>
+                    <tr><td><strong>Producto Físico</strong></td><td><i class="fas fa-box"></i></td><td><i class="fas fa-check text-success"></i> Sí</td><td>Artículos tangibles con inventario</td></tr>
+                    <tr><td><strong>Servicio</strong></td><td><i class="fas fa-tools"></i></td><td><i class="fas fa-times text-danger"></i> No</td><td>Instalación, mantenimiento, consultoría</td></tr>
+                    <tr><td><strong>Kit / Combo</strong></td><td><i class="fas fa-boxes"></i></td><td>Depende</td><td>Conjunto de otros productos</td></tr>
                 </tbody>
             </table>
 
@@ -729,15 +731,15 @@ require_once 'php/sesion.php';
 
             <h3>2. Concepto y Destino</h3>
             <table class="table table-bordered">
-                <thead><tr><th>Concepto</th><th>Emoji</th><th>Cuándo usar</th></tr></thead>
+                <thead><tr><th>Concepto</th><th>Icono</th><th>Cuándo usar</th></tr></thead>
                 <tbody>
-                    <tr><td><strong>Compra a Proveedor</strong></td><td>📦</td><td>Mercancía adquirida</td></tr>
-                    <tr><td><strong>Transferencia</strong></td><td>🔄</td><td>Mover entre almacenes</td></tr>
-                    <tr><td><strong>Ajuste Positivo</strong></td><td>➕</td><td>Corrección de conteo</td></tr>
-                    <tr><td><strong>Inventario Inicial</strong></td><td>📋</td><td>Carga inicial del sistema</td></tr>
-                    <tr><td><strong>Devolución Cliente</strong></td><td>↩️</td><td>Producto regresado</td></tr>
-                    <tr><td><strong>Donación</strong></td><td>🎁</td><td>Mercancía recibida sin costo</td></tr>
-                    <tr><td><strong>Otro</strong></td><td>📝</td><td>Casos especiales</td></tr>
+                    <tr><td><strong>Compra a Proveedor</strong></td><td><i class="fas fa-box"></i></td><td>Mercancía adquirida</td></tr>
+                    <tr><td><strong>Transferencia</strong></td><td><i class="fas fa-exchange-alt"></i></td><td>Mover entre almacenes</td></tr>
+                    <tr><td><strong>Ajuste Positivo</strong></td><td><i class="fas fa-plus"></i></td><td>Corrección de conteo</td></tr>
+                    <tr><td><strong>Inventario Inicial</strong></td><td><i class="fas fa-clipboard-list"></i></td><td>Carga inicial del sistema</td></tr>
+                    <tr><td><strong>Devolución Cliente</strong></td><td><i class="fas fa-undo"></i></td><td>Producto regresado</td></tr>
+                    <tr><td><strong>Donación</strong></td><td><i class="fas fa-gift"></i></td><td>Mercancía recibida sin costo</td></tr>
+                    <tr><td><strong>Otro</strong></td><td><i class="fas fa-edit"></i></td><td>Casos especiales</td></tr>
                 </tbody>
             </table>
 
@@ -747,8 +749,9 @@ require_once 'php/sesion.php';
 
             <h3>3. Proveedor y Referencia</h3>
             <ol class="step-list">
-                <li><span class="step-title">Proveedor</span> Opcional. Busca por nombre. Puedes crear uno nuevo con "+ Nuevo".</li>
+                <li><span class="step-title">Proveedor</span> Opcional. Busca por nombre. Vincula compras a proveedores específicos para histórico de precios.</li>
                 <li><span class="step-title">Referencia / Factura</span> Número de documento externo para trazabilidad.</li>
+                <li><span class="step-title">Control de Costos (Compras)</span> Si el concepto es **Compra**, el sistema habilita el campo "Precio Compra". Esto permite calcular el valor total del ingreso y actualizar costos promedio.</li>
                 <li><span class="step-title">Notas</span> Observaciones internas sobre el movimiento.</li>
             </ol>
 
@@ -1149,6 +1152,78 @@ require_once 'php/sesion.php';
             </div>
         </div>
 
+        <!-- REQUISICIONES -->
+        <div id="tpl-requisiciones">
+            <div class="docs-hero-minimal">
+                <h1>Requisiciones de Compra</h1>
+                <p class="lead">Planifica el abastecimiento de tu inventario de forma inteligente y centralizada.</p>
+            </div>
+
+            <h2><i class="fas fa-magic me-2"></i>Auto-Stock Inteligente</h2>
+            <p>BuzzDM analiza tu inventario en tiempo real para sugerirte qué comprar:</p>
+            <ul>
+                <li><strong>Detección de Stock Bajo:</strong> Identifica productos por debajo de su stock mínimo configurado.</li>
+                <li><strong>Propuesta de Venta:</strong> El botón <span class="badge bg-warning text-dark"><i class="fas fa-magic"></i> Auto-Stock</span> genera automáticamente una lista con las cantidades necesarias.</li>
+                <li><strong>Sugerencia de Proveedor:</strong> Para cada producto, el sistema propone el último proveedor al que se le compró.</li>
+            </ul>
+
+            <h2><i class="fas fa-tasks me-2"></i>Ciclo de Vida</h2>
+            <ol class="step-list">
+                <li><span class="step-title">Generación</span> Registra los ítems necesarios, asigna prioridad (Baja a Urgente) y notas.</li>
+                <li><span class="step-title">Aprobación</span> Un usuario con rango Administrativo debe revisar y "Aprobar" la solicitud.</li>
+                <li><span class="step-title">Procesamiento</span> Una vez aprobada, puedes hacer clic en "Generar Cargos". Esto creará automáticamente entradas de inventario (Borradores) para cada proveedor involucrado.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    stateDiagram-v2
+                    [*] --> Pendiente : Crear Requisición
+                    Pendiente --> Aprobada : Revisión Admin
+                    Pendiente --> Rechazada : Falta Presupuesto/Error
+                    Aprobada --> Procesada : Generar Cargos (Entradas)
+                    Procesada --> [*]
+                </div>
+            </div>
+
+            <div class="docs-alert info">
+                Este flujo garantiza que las compras sigan un proceso de control previo antes de afectar el inventario físico.
+            </div>
+        </div>
+
+        <!-- TRANSFERENCIAS -->
+        <div id="tpl-transferencias">
+            <div class="docs-hero-minimal">
+                <h1>Transferencias entre Almacenes</h1>
+                <p class="lead">Mueve stock de forma segura entre tus distintas ubicaciones físicas.</p>
+            </div>
+
+            <h2><i class="fas fa-exchange-alt me-2"></i>Movimiento de Stock</h2>
+            <p>Este módulo gestiona el traslado interno de mercancía sin afectar las ventas o compras externas.</p>
+
+            <div class="docs-alert warning">
+                <strong>Responsabilidad:</strong> Una transferencia resta stock del origen al "Enviar" y suma al destino solo cuando se marca como "Recibida".
+            </div>
+
+            <ol class="step-list">
+                <li><span class="step-title">Nueva Transferencia</span> Elige el almacén de origen y el de destino. El sistema no permite que sean el mismo.</li>
+                <li><span class="step-title">Selección de Artículos</span> Agrega los productos. El sistema te muestra el stock disponible en el almacén de origen para evitar errores.</li>
+                <li><span class="step-title">Envío</span> Al hacer clic en "Enviar", la transferencia pasa a estado "En Tránsito". El stock queda bloqueado (restado del origen).</li>
+                <li><span class="step-title">Recepción</span> El responsable en el almacén de destino debe buscar la transferencia y marcarla como "Recibida". En ese momento, el stock se suma al inventario del destino.</li>
+            </ol>
+
+            <div class="mermaid-container">
+                <div class="mermaid">
+                    stateDiagram-v2
+                    [*] --> Borrador : Crear
+                    Borrador --> EnTránsito : Enviar (Resta Origen)
+                    EnTránsito --> Recibido : Recibir (Suma Destino)
+                    EnTránsito --> Cancelado : Cancelar (Reclama Origen)
+                </div>
+            </div>
+
+            <h2><i class="fas fa-truck-loading me-2"></i>Seguimiento</h2>
+            <p>Usa la "Referencia Externa" para colocar números de guía de transporte o nombres de choferes para un mejor control logístico.</p>
+        </div>
     </div>
 
     <!-- Scripts -->

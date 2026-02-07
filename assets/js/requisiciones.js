@@ -34,6 +34,14 @@ function initEventListeners() {
     // Workflow actions
     document.getElementById('btnAprobar')?.addEventListener('click', aprobarRequisicion);
     document.getElementById('btnGenerarCargos')?.addEventListener('click', generarCargos);
+    document.getElementById('btnReportePDF')?.addEventListener('click', () => {
+        if (currentRequisicion) generarReportePDF(currentRequisicion.id);
+    });
+    document.getElementById('btnAddNewProductRow')?.addEventListener('click', () => {
+        addProductRow();
+        const lastIdx = lineaIndex - 1;
+        abrirModalNuevoProducto(lastIdx);
+    });
 
     // Filters
     document.getElementById('filterSearch').addEventListener('input', debounce(applyFilters, 300));
@@ -99,6 +107,11 @@ function renderTable(data) {
                     <button class="btn btn-outline-buzz btn-sm" onclick="editRequisicion(${req.id})" title="Ver/Editar">
                         <i class="fas fa-eye"></i>
                     </button>
+                    ${(req.estado === 'aprobada' || req.estado === 'procesada') ? `
+                        <button class="btn btn-outline-primary btn-sm" onclick="generarReportePDF(${req.id})" title="Reporte PDF">
+                            <i class="fas fa-file-pdf"></i>
+                        </button>
+                    ` : ''}
                     ${req.estado === 'pendiente' ? `
                         <button class="btn btn-outline-danger btn-sm" onclick="deleteRequisicion(${req.id})" title="Eliminar">
                             <i class="fas fa-trash"></i>
@@ -112,10 +125,10 @@ function renderTable(data) {
 
 function getPrioridadBadge(prioridad) {
     const badges = {
-        'urgente': '<span class="badge bg-danger">🔴 Urgente</span>',
-        'alta': '<span class="badge bg-warning text-dark">🟠 Alta</span>',
-        'media': '<span class="badge bg-info text-dark">🟡 Media</span>',
-        'baja': '<span class="badge bg-success">🟢 Baja</span>'
+        'urgente': '<span class="badge bg-danger">Urgente</span>',
+        'alta': '<span class="badge bg-warning text-dark">Alta</span>',
+        'media': '<span class="badge bg-info text-dark">Media</span>',
+        'baja': '<span class="badge bg-success">Baja</span>'
     };
     return badges[prioridad] || prioridad;
 }
@@ -226,6 +239,7 @@ async function editRequisicion(id) {
 
         document.getElementById('btnAprobar').style.display = isPendiente && canApprove ? '' : 'none';
         document.getElementById('btnGenerarCargos').style.display = isAprobada && canApprove ? '' : 'none';
+        document.getElementById('btnReportePDF').style.display = (isAprobada || req.estado === 'procesada') ? '' : 'none';
 
         // Disable form if not editable
         const formInputs = document.querySelectorAll('#formRequisicion input:not([readonly]), #formRequisicion select, #formRequisicion textarea');
@@ -354,6 +368,13 @@ function showProductDropdown(input, products) {
             <span class="text-muted ms-2">(Stock: ${p.stock})</span>
         </div>
     `).join('');
+
+    // Add Create New option
+    dropdown.innerHTML += `
+        <div class="autocomplete-footer text-primary p-2 border-top cursor-pointer" onclick="abrirModalNuevoProducto(${input.dataset.idx}, '${input.value}')">
+            <i class="fas fa-plus-circle me-1"></i> Crear nuevo producto "${input.value}"
+        </div>
+    `;
 
     dropdown.style.display = 'block';
 
@@ -519,92 +540,287 @@ function collectLineas() {
 // WORKFLOW ACTIONS
 // ===========================================
 async function createFromLowStock() {
-    if (!confirm('¿Crear requisición automática con todos los productos con stock bajo?')) return;
+    showConfirmation(
+        'Auto-Stock',
+        '¿Crear requisición automática con todos los productos con stock bajo?',
+        async () => {
+            try {
+                const response = await fetch('php/api_requisiciones.php?action=fromLowStock', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prioridad: 'alta' })
+                });
+                const result = await response.json();
 
-    try {
-        const response = await fetch('php/api_requisiciones.php?action=fromLowStock', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ prioridad: 'alta' })
-        });
-        const result = await response.json();
+                if (!result.success) throw new Error(result.message);
 
-        if (!result.success) throw new Error(result.message);
+                showToast(`Requisición ${result.codigo} creada con productos de stock bajo`, 'success');
+                editRequisicion(result.requisicion_id);
 
-        showToast(`Requisición ${result.codigo} creada con productos de stock bajo`, 'success');
-        editRequisicion(result.requisicion_id);
-
-    } catch (error) {
-        showToast('Error: ' + error.message, 'danger');
-    }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'danger');
+            }
+        }
+    );
 }
 
 async function aprobarRequisicion() {
     const id = document.getElementById('requisicionId').value;
-    if (!id || !confirm('¿Aprobar esta requisición?')) return;
+    if (!id) return;
 
-    try {
-        const response = await fetch(`php/api_requisiciones.php?action=approve&id=${id}`, {
-            method: 'POST'
-        });
-        const result = await response.json();
+    showConfirmation(
+        'Aprobar Requisición',
+        '¿Estás seguro de que deseas aprobar esta requisición?',
+        async () => {
+            try {
+                const response = await fetch(`php/api_requisiciones.php?action=approve&id=${id}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
 
-        if (!result.success) throw new Error(result.message);
+                if (!result.success) throw new Error(result.message);
 
-        showToast('Requisición aprobada', 'success');
-        editRequisicion(id); // Reload to update buttons
+                showToast('Requisición aprobada', 'success');
+                editRequisicion(id); // Reload to update buttons
 
-    } catch (error) {
-        showToast('Error: ' + error.message, 'danger');
-    }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'danger');
+            }
+        }
+    );
 }
 
 async function generarCargos() {
     const id = document.getElementById('requisicionId').value;
-    if (!id || !confirm('¿Generar cargos borrador desde esta requisición?')) return;
+    if (!id) return;
 
-    try {
-        const response = await fetch(`php/api_requisiciones.php?action=generate&id=${id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        });
-        const result = await response.json();
+    showConfirmation(
+        'Generar Cargos',
+        '¿Deseas generar cargos borrador desde esta requisición? El estado cambiará a Procesada.',
+        async () => {
+            try {
+                const response = await fetch(`php/api_requisiciones.php?action=generate&id=${id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+                const result = await response.json();
 
-        if (!result.success) throw new Error(result.message);
+                if (!result.success) throw new Error(result.message);
 
-        showToast(result.mensaje || 'Cargos generados', 'success');
+                showToast(result.mensaje || 'Cargos generados', 'success');
 
-        // Offer to navigate to cargos
-        if (confirm(`Se generaron ${result.cargos.length} cargo(s). ¿Ir a Cargos?`)) {
-            window.location.href = 'cargos_existencias';
-        } else {
-            showHistorial();
+                showConfirmation(
+                    'Cargos Generados',
+                    `Se generaron ${result.cargos.length} cargo(s). ¿Ir al módulo de Cargos ahora?`,
+                    () => { window.location.href = 'cargos_existencias'; },
+                    () => { showHistorial(); }
+                );
+
+            } catch (error) {
+                showToast('Error: ' + error.message, 'danger');
+            }
         }
-
-    } catch (error) {
-        showToast('Error: ' + error.message, 'danger');
-    }
+    );
 }
 
 async function deleteRequisicion(id) {
-    if (!confirm('¿Eliminar esta requisición?')) return;
+    showConfirmation(
+        'Eliminar Requisición',
+        '¿Estás seguro de que deseas eliminar esta requisición? Esta acción no se puede deshacer.',
+        async () => {
+            try {
+                const response = await fetch(`php/api_requisiciones.php?id=${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+
+                if (!result.success) throw new Error(result.message);
+
+                showToast('Requisición eliminada', 'success');
+                loadRequisiciones();
+
+            } catch (error) {
+                showToast('Error: ' + error.message, 'danger');
+            }
+        }
+    );
+}
+
+// ===========================================
+// QUICK PRODUCT CREATION
+// ===========================================
+function abrirModalNuevoProducto(idx, query = '') {
+    const modal = document.getElementById('modalNuevoProducto');
+    document.getElementById('nuevoProductoLineaIdx').value = idx;
+    document.getElementById('nuevoProductoSku').value = (query.length > 2 && query.length < 15) ? query.toUpperCase() : '';
+    document.getElementById('nuevoProductoNombre').value = query.length > 3 ? query : '';
+    document.getElementById('nuevoProductoPrecio').value = '';
+    document.getElementById('nuevoProductoMinStock').value = '10';
+
+    hideProductDropdown();
+    modal.style.display = 'block';
+
+    setTimeout(() => {
+        const inputToFocus = document.getElementById('nuevoProductoSku').value ? 'nuevoProductoNombre' : 'nuevoProductoSku';
+        document.getElementById(inputToFocus).focus();
+    }, 100);
+}
+window.abrirModalNuevoProducto = abrirModalNuevoProducto;
+
+function cerrarModalNuevoProducto() {
+    document.getElementById('modalNuevoProducto').style.display = 'none';
+}
+window.cerrarModalNuevoProducto = cerrarModalNuevoProducto;
+
+async function guardarNuevoProducto() {
+    const sku = document.getElementById('nuevoProductoSku').value.trim();
+    const nombre = document.getElementById('nuevoProductoNombre').value.trim();
+    const precio = parseFloat(document.getElementById('nuevoProductoPrecio').value) || 0;
+    const minStock = parseInt(document.getElementById('nuevoProductoMinStock').value) || 10;
+    const idx = document.getElementById('nuevoProductoLineaIdx').value;
+
+    if (!sku || !nombre) {
+        showToast('SKU y Nombre son obligatorios', 'warning');
+        return;
+    }
+
+    const data = {
+        sku: sku,
+        nombre: nombre,
+        precio: precio,
+        min_stock: minStock,
+        stock: 0,
+        estado: 'activo',
+        tipo_producto: 'fisico',
+        maneja_stock: true
+    };
 
     try {
-        const response = await fetch(`php/api_requisiciones.php?id=${id}`, {
-            method: 'DELETE'
+        const response = await fetch('php/api_products.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
+
         const result = await response.json();
 
-        if (!result.success) throw new Error(result.message);
+        if (result.success) {
+            showToast('Producto creado', 'success');
+            cerrarModalNuevoProducto();
 
-        showToast('Requisición eliminada', 'success');
-        loadRequisiciones();
-
+            // Auto-select in the row
+            const row = document.querySelector(`tr[data-index="${idx}"]`);
+            if (row) {
+                const searchInput = row.querySelector('.product-search');
+                selectProduct(searchInput, {
+                    id: result.id,
+                    sku: sku,
+                    nombre: nombre,
+                    stock: 0
+                });
+            }
+        } else {
+            showToast('Error: ' + result.message, 'danger');
+        }
     } catch (error) {
-        showToast('Error: ' + error.message, 'danger');
+        showToast('Error al crear producto', 'danger');
     }
 }
+window.guardarNuevoProducto = guardarNuevoProducto;
+
+// ===========================================
+// PDF REPORT
+// ===========================================
+function generarReportePDF(id) {
+    document.getElementById('confirmPasswordInput').value = '';
+
+    showPasswordPrompt('Generar Reporte', 'Para descargar el reporte, ingrese su contraseña:', async (password) => {
+        try {
+            // 1. Validate password first (prevent new tab on error)
+            const formData = new FormData();
+            formData.append('password', password);
+            formData.append('validate_only', '1');
+
+            const resp = await fetch('php/reports.php', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await resp.json();
+
+            if (!result.success) {
+                showToast(result.message || 'Contraseña incorrecta', 'danger');
+                return; // Keep modal open
+            }
+
+            // 2. If valid, submit form to open PDF in new tab
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'php/reports.php';
+            form.target = '_blank';
+
+            const fields = {
+                tipo: 'requisicion_individual',
+                id: id,
+                password: password
+            };
+
+            for (const [name, value] of Object.entries(fields)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+
+            cerrarModalPassword(); // Success
+
+        } catch (error) {
+            showToast('Error de validación: ' + error.message, 'danger');
+        }
+    });
+}
+window.generarReportePDF = generarReportePDF;
+
+/**
+ * Custom Password Prompt Logic
+ */
+let passwordCallback = null;
+
+function showPasswordPrompt(title, message, callback) {
+    document.getElementById('passwordModalMessage').textContent = message;
+    passwordCallback = callback;
+
+    openModal('modalConfirmPassword');
+    document.getElementById('confirmPasswordInput').focus();
+
+    // Bind confirm button once
+    const btnConfirm = document.getElementById('btnConfirmPassword');
+    btnConfirm.onclick = () => {
+        const pass = document.getElementById('confirmPasswordInput').value;
+        if (pass && passwordCallback) {
+            passwordCallback(pass);
+        } else {
+            showToast('Debe ingresar la contraseña', 'warning');
+        }
+    };
+
+    // Enter key support
+    document.getElementById('confirmPasswordInput').onkeypress = (e) => {
+        if (e.key === 'Enter') btnConfirm.click();
+    };
+}
+window.showPasswordPrompt = showPasswordPrompt;
+
+function cerrarModalPassword() {
+    closeModal('modalConfirmPassword');
+    passwordCallback = null;
+}
+window.cerrarModalPassword = cerrarModalPassword;
 
 // ===========================================
 // UTILITIES
