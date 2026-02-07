@@ -20,7 +20,10 @@ class UserController {
         }
 
         $method = $_SERVER['REQUEST_METHOD'];
-        $input = json_decode(file_get_contents('php://input'), true);
+        $rawInput = file_get_contents('php://input');
+        $input = json_decode($rawInput, true);
+
+        // Debug logging removed after fix
 
         if (is_null($input) && $method === 'POST' && !empty($_POST)) $input = $_POST;
         $input = $input ?? [];
@@ -95,7 +98,8 @@ class UserController {
     )]
     private function createUser($data) {
         global $pdo;
-        $id = $this->service->createUser($data);
+        $result = $this->service->createUser($data);
+        $id = $result['id'];
         logSystemAction($pdo, getCurrentUserId(), 'Usuario creado', '#' . $id . ' | ' . ($data['nombre'] ?? '') . ' (' . ($data['email'] ?? '') . ') | Rol: ' . ($data['rol'] ?? ''));
         $this->jsonResponse(true, ['id' => $id], 'Usuario creado exitosamente');
     }
