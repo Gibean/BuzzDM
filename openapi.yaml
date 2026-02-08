@@ -1087,6 +1087,116 @@ paths:
       responses:
         '200':
           description: 'Product deleted'
+  /php/api_requisiciones.php:
+    get:
+      tags:
+        - Requisiciones
+      summary: 'List requisitions, get single, or get suggestions'
+      operationId: aac58a70e0f32e0c9ff30fb39641e419
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Requisition ID'
+          required: false
+          schema:
+            type: integer
+        -
+          name: action
+          in: query
+          description: 'Action: suggest, lowstock'
+          required: false
+          schema:
+            type: string
+        -
+          name: producto_id
+          in: query
+          description: 'Product ID for suggestion'
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Requisition data or suggestions'
+    put:
+      tags:
+        - Requisiciones
+      summary: 'Update requisition'
+      operationId: b69204e9355f68cb912251d2e221fa48
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Requisition ID'
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: 'Requisition updated'
+    post:
+      tags:
+        - Requisiciones
+      summary: 'Create requisition or perform actions'
+      operationId: eb45d756b59718d59fc525a6c22c9a75
+      parameters:
+        -
+          name: action
+          in: query
+          description: 'Action: create, fromLowStock, approve, reject, generate'
+          required: false
+          schema:
+            type: string
+        -
+          name: id
+          in: query
+          description: 'Requisition ID for actions'
+          required: false
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              fecha_solicitud: '2026-02-07'
+              prioridad: alta
+              notas: 'Urgente para evento'
+              lineas:
+                -
+                  producto_id: 1
+                  cantidad_solicitada: 50
+                -
+                  producto_id: 2
+                  cantidad_solicitada: 100
+                  proveedor_seleccionado_id: 3
+      responses:
+        '200':
+          description: 'Requisition created or action performed'
+    delete:
+      tags:
+        - Requisiciones
+      summary: 'Delete requisition'
+      operationId: a1c95e6a62d0e77fb46b42dafdbed8d4
+      parameters:
+        -
+          name: id
+          in: query
+          description: 'Requisition ID'
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 'Requisition deleted'
   '/php/api_settings.php?action=get_company_info':
     get:
       tags:
@@ -1736,6 +1846,9 @@ tags:
   -
     name: Products
     description: 'Operations related to Products'
+  -
+    name: Requisiciones
+    description: 'Purchase Requisitions with Supplier Intelligence'
   -
     name: Settings
     description: 'System Settings'
