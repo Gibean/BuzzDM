@@ -309,6 +309,23 @@
   .command-strip {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .command-strip .status-node {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .command-strip .node-label {
+    font-size: 0.55rem;
+  }
+
+  .command-strip .node-value {
+    font-size: 0.9rem;
   }
 }
 
