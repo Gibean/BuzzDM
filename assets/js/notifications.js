@@ -44,32 +44,116 @@ function injectNavbarButtons() {
     const topNavbar = document.querySelector('.top-navbar');
     if (!topNavbar) return;
 
-    // Check if buttons already exist
-    if (document.getElementById('notifBell')) return;
+    // Check if already injected
+    if (document.getElementById('notifBell') || document.getElementById('mobileBottomNav')) return;
 
-    // Strategy: Find or create a container for our utility buttons
-    // Look for an existing actions container (second div in navbar that has buttons)
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (isMobile) {
+        injectMobileLayout(topNavbar);
+    } else {
+        injectDesktopButtons(topNavbar);
+    }
+}
+
+/**
+ * Mobile layout: logo in header + bottom nav bar
+ */
+function injectMobileLayout(topNavbar) {
+    // 1. Inject logo into header (top-right)
+    const logo = document.createElement('img');
+    logo.src = 'assets/img/logov1_icon.png';
+    logo.alt = 'BuzzDM';
+    logo.className = 'navbar-mobile-logo';
+    topNavbar.appendChild(logo);
+
+    // 2. Find page-specific primary action button (e.g. "+ Nuevo Pedido")
+    const headerPrimaryBtn = topNavbar.querySelector('.btn-buzz');
+    let primaryAction = null;
+    if (headerPrimaryBtn) {
+        primaryAction = {
+            icon: 'fa-plus',
+            onclick: headerPrimaryBtn.getAttribute('onclick') || null,
+            id: headerPrimaryBtn.id || null
+        };
+    }
+
+    // 3. Detect current page for "active" state
+    const currentPath = window.location.pathname.split('/').pop().replace('.php', '');
+    const isDashboard = currentPath === 'dashboard' || currentPath === '' || currentPath === 'index';
+
+    // 4. Build bottom nav bar
+    const nav = document.createElement('nav');
+    nav.className = 'mobile-bottom-nav';
+    nav.id = 'mobileBottomNav';
+
+    // --- Item 1: Manual ---
+    const manualItem = document.createElement('a');
+    manualItem.href = 'manual';
+    manualItem.className = 'bottom-nav-item' + (currentPath === 'manual' ? ' active' : '');
+    manualItem.innerHTML = '<i class="fas fa-book"></i><span>Manual</span>';
+
+    // --- Item 2: Notifications ---
+    const notifItem = document.createElement('button');
+    notifItem.className = 'bottom-nav-item';
+    notifItem.id = 'notifBell';
+    notifItem.type = 'button';
+    notifItem.onclick = toggleHub;
+    notifItem.innerHTML = '<i class="fas fa-bell"></i><span>Alertas</span>';
+
+    // --- Item 3: Primary action (if exists) ---
+    let primaryItem = null;
+    if (primaryAction) {
+        primaryItem = document.createElement('button');
+        primaryItem.className = 'bottom-nav-item nav-primary';
+        primaryItem.type = 'button';
+        primaryItem.innerHTML = '<i class="fas ' + primaryAction.icon + '"></i><span>Nuevo</span>';
+        if (primaryAction.onclick) {
+            primaryItem.setAttribute('onclick', primaryAction.onclick);
+        } else if (primaryAction.id) {
+            // Trigger click on the original hidden button
+            primaryItem.addEventListener('click', function() {
+                const origBtn = document.getElementById(primaryAction.id);
+                if (origBtn) origBtn.click();
+            });
+        }
+    }
+
+    // --- Item 4: Home ---
+    const homeItem = document.createElement('a');
+    homeItem.href = 'dashboard.php';
+    homeItem.className = 'bottom-nav-item' + (isDashboard ? ' active' : '');
+    homeItem.innerHTML = '<i class="fas fa-home"></i><span>Inicio</span>';
+
+    // Assemble: Manual, Notif, [Primary], Home
+    nav.appendChild(manualItem);
+    nav.appendChild(notifItem);
+    if (primaryItem) nav.appendChild(primaryItem);
+    nav.appendChild(homeItem);
+
+    document.body.appendChild(nav);
+}
+
+/**
+ * Desktop layout: buttons in header (original behavior)
+ */
+function injectDesktopButtons(topNavbar) {
+    // Strategy: Find or create a container for utility buttons
     let actionsContainer = null;
 
-    // Get all direct children that could be containers
     const navChildren = topNavbar.querySelectorAll(':scope > div, :scope > nav');
 
     for (const child of navChildren) {
-        // Skip the title container (has h1)
         if (child.querySelector('h1')) continue;
-
-        // Found a potential actions container
         actionsContainer = child;
         break;
     }
 
-    // If no actions container exists, create one
     if (!actionsContainer) {
         actionsContainer = document.createElement('div');
         actionsContainer.className = 'd-flex align-items-center navbar-utils';
         topNavbar.appendChild(actionsContainer);
     } else {
-        // Ensure it has proper flexbox classes for consistent spacing
         if (!actionsContainer.classList.contains('d-flex')) {
             actionsContainer.classList.add('d-flex', 'align-items-center');
         }
@@ -92,7 +176,6 @@ function injectNavbarButtons() {
     bellBtn.innerHTML = '<i class="fas fa-bell"></i><span class="notification-badge" style="display:none">0</span>';
     bellBtn.onclick = toggleHub;
 
-    // Append buttons: Info first, then Bell
     actionsContainer.appendChild(infoBtn);
     actionsContainer.appendChild(bellBtn);
 }
@@ -159,17 +242,33 @@ async function fetchNotifications() {
 }
 
 function updateBadge(count) {
+    // Desktop badge (span inside bell button)
     const badge = document.querySelector('.notification-badge');
     const bell = document.querySelector('.notification-bell-btn');
-    if (!badge || !bell) return;
+    if (badge && bell) {
+        if (count > 0) {
+            badge.textContent = count > 99 ? '99+' : count;
+            badge.style.display = 'block';
+            bell.classList.add('has-unread');
+        } else {
+            badge.style.display = 'none';
+            bell.classList.remove('has-unread');
+        }
+    }
 
-    if (count > 0) {
-        badge.textContent = count > 99 ? '99+' : count;
-        badge.style.display = 'block';
-        bell.classList.add('has-unread');
-    } else {
-        badge.style.display = 'none';
-        bell.classList.remove('has-unread');
+    // Mobile bottom nav badge
+    const mobileNotifBtn = document.querySelector('#mobileBottomNav #notifBell');
+    if (mobileNotifBtn) {
+        // Remove existing badge
+        const existing = mobileNotifBtn.querySelector('.bottom-nav-badge');
+        if (existing) existing.remove();
+
+        if (count > 0) {
+            const mobileBadge = document.createElement('span');
+            mobileBadge.className = 'bottom-nav-badge';
+            mobileBadge.textContent = count > 99 ? '99+' : count;
+            mobileNotifBtn.appendChild(mobileBadge);
+        }
     }
 }
 
