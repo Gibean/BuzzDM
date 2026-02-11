@@ -96,8 +96,8 @@ class AppConfig {
      * Configure URLs based on detected environment
      */
     private function configureUrls(): void {
-        // Check for explicit base URL in environment
-        $envBaseUrl = $_ENV['APP_BASE_URL'] ?? getenv('APP_BASE_URL') ?: '';
+        // Base URL for links, emails, redirects (e.g. http://localhost/buzzdm or https://example.com)
+        $envBaseUrl = $_ENV['APP_URL'] ?? getenv('APP_URL') ?: '';
 
         if (!empty($envBaseUrl)) {
             $this->baseUrl = rtrim($envBaseUrl, '/');
