@@ -1625,38 +1625,93 @@ input:-webkit-autofill:active {
     margin-right: 0.6rem;
   }
 
-  /* Tables - responsive wrapper with horizontal scroll */
+  /* Tables - Mobile Card View */
   .table-responsive-buzz {
     display: block;
     width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    -ms-overflow-style: -ms-autohiding-scrollbar;
+    overflow-x: visible; /* Disable horizontal scroll */
+    border: none;
   }
 
   .table-buzz {
-    min-width: 600px;
+    min-width: 0;
+    display: block;
+    background: transparent;
   }
 
-  .table-buzz th,
+  .table-buzz thead {
+    display: none; /* Hide headers */
+  }
+
+  .table-buzz tbody,
+  .table-buzz tr,
   .table-buzz td {
-    padding: 0.6rem 0.75rem;
-    white-space: nowrap;
+    display: block;
+    width: 100%;
   }
 
-  .table-buzz th {
-    font-size: 0.75rem;
-    letter-spacing: 1px;
+  .table-buzz tr {
+    margin-bottom: 1rem;
+    background: var(--buzz-card-bg);
+    border: 1px solid var(--buzz-border-color);
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 
   .table-buzz td {
-    font-size: 0.8rem;
-  }
-
-  /* Allow text wrap for specific columns on mobile */
-  .table-buzz td.wrap-mobile {
+    text-align: right;
+    padding: 0.75rem 1rem;
+    position: relative;
+    padding-left: 40%; /* Space for label */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     white-space: normal;
-    min-width: 120px;
+    min-height: 40px;
+  }
+
+  .table-buzz td:last-child {
+    border-bottom: none;
+  }
+
+  /* Label pseudo-element */
+  .table-buzz td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    color: var(--buzz-text-muted);
+    font-family: var(--font-monospace);
+    width: 35%;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Special handling for 'Acciones' column - make it a full-width footer */
+  .table-buzz td[data-label="Acciones"],
+  .table-buzz td:last-child {
+    padding: 0.75rem;
+    padding-left: 0.75rem;
+    justify-content: flex-end; /* Align buttons to right */
+    background: rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    width: 100%;
+  }
+
+  .table-buzz td[data-label="Acciones"]::before {
+    display: none;
+  }
+
+  /* Don't show empty cells */
+  .table-buzz td:empty {
+    display: none;
   }
 
   /* Form controls - smaller padding */
