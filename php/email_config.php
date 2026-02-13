@@ -20,7 +20,7 @@ define('MAIL_FROM_EMAIL', $_ENV['SMTP_FROM_EMAIL'] ?? getenv('SMTP_FROM_EMAIL') 
 define('MAIL_FROM_NAME', $_ENV['SMTP_FROM_NAME'] ?? getenv('SMTP_FROM_NAME') ?: 'BuzzDM');
 
 // Use centralized config for BASE_URL
-define('APP_BASE_URL', base_url());
+define('APP_URL', base_url());
 
 /**
  * Helper function to get mailer configuration as an array
@@ -37,7 +37,7 @@ function getMailerConfig() {
         'password' => SMTP_PASSWORD,
         'from_email' => MAIL_FROM_EMAIL,
         'from_name' => MAIL_FROM_NAME,
-        'base_url' => APP_BASE_URL
+        'base_url' => APP_URL
     ];
 }
 
@@ -47,5 +47,5 @@ function getMailerConfig() {
  * @return string The application base URL
  */
 function getAppBaseUrl() {
-    return rtrim(APP_BASE_URL, '/');
+    return rtrim(APP_URL, '/');
 }
