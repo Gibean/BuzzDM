@@ -1027,34 +1027,6 @@ async function ejecutarAnulacion() {
     }
 }
 
-// =====================================================
-// CARGAR ALMACENES
-// =====================================================
-
-async function cargarAlmacenes() {
-    const select = document.getElementById('cargoAlmacenId');
-    if (!select) return;
-
-    try {
-        const response = await fetch('php/api_warehouses.php');
-        const data = await response.json();
-
-        if (data.success && data.almacenes) {
-            select.innerHTML = '<option value="">Seleccionar almacén...</option>';
-            data.almacenes.forEach(almacen => {
-                select.innerHTML += `<option value="${almacen.id}">${almacen.nombre}${almacen.es_principal ? ' (Principal)' : ''}</option>`;
-            });
-
-            // Auto-select principal warehouse if there's only one or if there's a principal
-            const principal = data.almacenes.find(a => a.es_principal);
-            if (principal) {
-                select.value = principal.id;
-            }
-        }
-    } catch (error) {
-        console.error('Error cargando almacenes:', error);
-    }
-}
 
 // =====================================================
 // CONCEPTO CHANGE HANDLER
