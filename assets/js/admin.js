@@ -1000,9 +1000,9 @@ function updateActiveFiltersCount() {
     if (user) {
       currentUserId = user.id
       userModalTitle.innerHTML = '<i class="fas fa-edit"></i> Editar Usuario'
-      document.getElementById("userName").value = user.nombre
+      document.getElementById("inputUserName").value = user.nombre
       document.getElementById("userEmail").value = user.email
-      document.getElementById("userRole").value = user.rol
+      document.getElementById("selectUserRole").value = user.rol
       // Map DB state (active/inactive) to Dropdown values (activo/inactivo)
       let displayStatus = user.estado;
       if (displayStatus === 'active') displayStatus = 'activo';
@@ -1029,10 +1029,13 @@ function updateActiveFiltersCount() {
   async function handleUserSubmit(e) {
     e.preventDefault()
 
+    const userNameInput = document.getElementById("inputUserName");
+    const userRoleInput = document.getElementById("selectUserRole");
+
     const user = {
-      nombre: document.getElementById("userName").value,
+      nombre: userNameInput ? userNameInput.value : '',
       email: document.getElementById("userEmail").value,
-      rol: document.getElementById("userRole").value,
+      rol: userRoleInput ? userRoleInput.value : 'operador',
       estado: document.getElementById("userStatus").value,
       csrf_token: document.querySelector('#userForm [name="csrf_token"]')?.value
     }
@@ -1047,7 +1050,13 @@ function updateActiveFiltersCount() {
       return
     }
 
-    // Password validation
+    // Password validation for new users (Strict)
+    if (!currentUserId && !password) {
+      showToast("La contraseña es obligatoria para nuevos usuarios.", "error")
+      return
+    }
+
+    // Password complexity validation
     if (password) {
       if (password.length < 8) {
         showToast("La contraseña debe tener al menos 8 caracteres.", "error")
@@ -1106,10 +1115,11 @@ function updateActiveFiltersCount() {
         body: JSON.stringify(user)
       })
 
-      if (data.error) {
-        showToast(data.error, "error")
+      // Fix: Check data.success explicitly instead of data.error
+      if (!data.success) {
+        showToast(data.message || data.error || "Error al guardar usuario", "error")
       } else {
-        showToast(data.message, "success")
+        showToast(data.message || "Usuario guardado exitosamente", "success")
         loadUsers()
         closeUserModal()
       }

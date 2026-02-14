@@ -87,7 +87,20 @@ class ClienteController {
                 type: "object",
                 required: ["nombre"],
                 properties: [
-                    new OA\Property(property: "nombre", type: "string")
+                    new OA\Property(property: "cedula", type: "string", example: "V-12345678", description: "ID document (Cédula/RIF)"),
+                    new OA\Property(property: "nombre", type: "string", example: "Juan Pérez", description: "Full name or company name"),
+                    new OA\Property(property: "email", type: "string", format: "email", example: "juan@email.com", description: "Email address"),
+                    new OA\Property(property: "telefono", type: "string", example: "0414-1234567", description: "Phone number"),
+                    new OA\Property(property: "direccion", type: "string", example: "Av. Principal #123, Caracas", description: "Address"),
+                    new OA\Property(property: "vip", type: "boolean", example: false, description: "VIP customer flag")
+                ],
+                example: [
+                    "cedula" => "V-12345678",
+                    "nombre" => "Juan Pérez",
+                    "email" => "juan@email.com",
+                    "telefono" => "0414-1234567",
+                    "direccion" => "Av. Principal #123, Caracas",
+                    "vip" => false
                 ]
             )
         ),
@@ -117,7 +130,25 @@ class ClienteController {
         parameters: [
             new OA\Parameter(name: "id", in: "query", description: "Client ID", required: true, schema: new OA\Schema(type: "integer"))
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "cedula", type: "string", example: "V-12345678"),
+                    new OA\Property(property: "nombre", type: "string", example: "Juan Pérez Actualizado"),
+                    new OA\Property(property: "email", type: "string", example: "juan.nuevo@email.com"),
+                    new OA\Property(property: "telefono", type: "string", example: "0412-9999999"),
+                    new OA\Property(property: "direccion", type: "string", example: "Nueva dirección"),
+                    new OA\Property(property: "vip", type: "boolean", example: true)
+                ],
+                example: [
+                    "nombre" => "Juan Pérez Actualizado",
+                    "email" => "juan.nuevo@email.com",
+                    "vip" => true
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Client updated")
         ]

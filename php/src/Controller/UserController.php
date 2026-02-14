@@ -20,7 +20,10 @@ class UserController {
         }
 
         $method = $_SERVER['REQUEST_METHOD'];
-        $input = json_decode(file_get_contents('php://input'), true);
+        $rawInput = file_get_contents('php://input');
+        $input = json_decode($rawInput, true);
+
+        // Debug logging removed after fix
 
         if (is_null($input) && $method === 'POST' && !empty($_POST)) $input = $_POST;
         $input = $input ?? [];
@@ -88,14 +91,35 @@ class UserController {
         path: "/php/api_users.php",
         tags: ["Users"],
         summary: "Create a new user",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["nombre", "email", "password", "rol"],
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Carlos Rodríguez", description: "Full name"),
+                    new OA\Property(property: "email", type: "string", format: "email", example: "carlos@empresa.com", description: "Email address"),
+                    new OA\Property(property: "password", type: "string", example: "SecurePass123!", description: "Password"),
+                    new OA\Property(property: "rol", type: "string", enum: ["admin", "supervisor", "operador"], example: "supervisor", description: "Role"),
+                    new OA\Property(property: "activo", type: "boolean", example: true, description: "Active status")
+                ],
+                example: [
+                    "nombre" => "Carlos Rodríguez",
+                    "email" => "carlos@empresa.com",
+                    "password" => "SecurePass123!",
+                    "rol" => "supervisor",
+                    "activo" => true
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "User created")
         ]
     )]
     private function createUser($data) {
         global $pdo;
-        $id = $this->service->createUser($data);
+        $result = $this->service->createUser($data);
+        $id = $result['id'];
         logSystemAction($pdo, getCurrentUserId(), 'Usuario creado', '#' . $id . ' | ' . ($data['nombre'] ?? '') . ' (' . ($data['email'] ?? '') . ') | Rol: ' . ($data['rol'] ?? ''));
         $this->jsonResponse(true, ['id' => $id], 'Usuario creado exitosamente');
     }
@@ -107,7 +131,24 @@ class UserController {
         parameters: [
             new OA\Parameter(name: "id", in: "query", description: "User ID", required: true, schema: new OA\Schema(type: "integer"))
         ],
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                properties: [
+                    new OA\Property(property: "nombre", type: "string", example: "Carlos Actualizado"),
+                    new OA\Property(property: "email", type: "string", example: "nuevo.email@empresa.com"),
+                    new OA\Property(property: "password", type: "string", example: "NuevoPass456!", description: "Leave empty to keep current"),
+                    new OA\Property(property: "rol", type: "string", enum: ["admin", "supervisor", "operador"], example: "admin"),
+                    new OA\Property(property: "activo", type: "boolean", example: true)
+                ],
+                example: [
+                    "nombre" => "Carlos Actualizado",
+                    "rol" => "admin",
+                    "activo" => true
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "User updated")
         ]
