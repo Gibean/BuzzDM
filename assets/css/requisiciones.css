@@ -1,0 +1,163 @@
+/**
+ * requisiciones.css
+ * Compact, high-density styles for purchase requisitions
+ */
+
+/* ==========================================
+   Product Search Dropdown
+   ========================================== */
+.autocomplete-dropdown {
+    position: fixed;
+    background: var(--card-bg, #1e1e1e);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+
+.autocomplete-item {
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color, #333);
+    font-size: 0.85rem;
+    transition: background 0.15s;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-item:hover {
+    background: var(--primary-color-alpha, rgba(255, 204, 0, 0.15));
+}
+
+/* ==========================================
+   High-Density Table
+   ========================================== */
+#tablaProductos {
+    font-size: 0.85rem;
+}
+
+#tablaProductos th {
+    padding: 0.5rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#tablaProductos td {
+    padding: 0.35rem 0.5rem;
+    vertical-align: middle;
+}
+
+#tablaProductos .form-control-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+#tablaProductos input[type="number"] {
+    width: 70px;
+    text-align: center;
+}
+
+#tablaProductos .product-search {
+    width: 100%;
+}
+
+/* ==========================================
+   Badges & Status
+   ========================================== */
+.bg-success-subtle {
+    background-color: rgba(25, 135, 84, 0.2) !important;
+    color: #198754 !important;
+}
+
+.bg-warning-subtle {
+    background-color: rgba(255, 193, 7, 0.2) !important;
+    color: #ffc107 !important;
+}
+
+/* ==========================================
+   Summary Panel
+   ========================================== */
+#resumenProveedores .badge {
+    font-size: 0.75rem;
+}
+
+/* ==========================================
+   Priority Colors
+   ========================================== */
+.priority-urgente { border-left: 4px solid #dc3545 !important; }
+.priority-alta { border-left: 4px solid #fd7e14 !important; }
+.priority-media { border-left: 4px solid #ffc107 !important; }
+.priority-baja { border-left: 4px solid #198754 !important; }
+
+/* ==========================================
+   Responsive Adjustments
+   ========================================== */
+@media (max-width: 991.98px) {
+    /* Stack columns on tablet */
+    .col-lg-8, .col-lg-4 {
+        width: 100%;
+    }
+
+    .sticky-top {
+        position: relative !important;
+        top: 0 !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    #tablaProductos {
+        font-size: 0.75rem;
+    }
+
+    #tablaProductos .form-control-sm {
+        font-size: 0.75rem;
+    }
+
+    /* Hide less important columns on mobile */
+    #tablaProductos th:nth-child(3),
+    #tablaProductos td:nth-child(3),
+    #tablaProductos th:nth-child(6),
+    #tablaProductos td:nth-child(6) {
+        display: none;
+    }
+}
+
+/* ==========================================
+   Remove Row Button
+   ========================================== */
+.btn-remove-row {
+    padding: 0.15rem 0.4rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.btn-remove-row:hover {
+    opacity: 1;
+}
+
+/* ==========================================
+   Form Layout
+   ========================================== */
+#vistaFormulario .buzz-card {
+    background: var(--card-bg, #1e1e1e);
+}
+
+#vistaFormulario .form-label {
+    margin-bottom: 0.25rem;
+}
+
+/* ==========================================
+   Action Button Group
+   ========================================== */
+#vistaFormulario .d-grid .btn {
+    text-align: left;
+    padding-left: 1rem;
+}
+
+#vistaFormulario .d-grid .btn i {
+    width: 1.5rem;
+}

@@ -24,8 +24,42 @@ class OrderService {
         return $this->repository->getDetails($id);
     }
 
+    private function validateOrderData($data) {
+        if (empty($data['cliente_id'])) throw new Exception("El cliente es obligatorio");
+        if (empty($data['direccion_envio'])) throw new Exception("La dirección de envío es obligatoria");
+        if (empty($data['products']) || !is_array($data['products'])) {
+             // It's possible to create order without products in some systems, but original logic implied it.
+             // Let's warn if empty but allow? Original logic loop checks if set.
+             // Ideally an order should have products.
+             throw new Exception("El pedido debe tener al menos un producto");
+        }
+    }
+
+    private function validateStockAvailability(array $products) {
+        foreach ($products as $product) {
+            $stockInfo = $this->repository->getProductStock($product['producto_id']);
+            if (!$stockInfo) {
+                throw new Exception("Producto con ID {$product['producto_id']} no encontrado");
+            }
+            $requestedQty = abs($product['cantidad']);
+            if ($stockInfo['stock'] < $requestedQty) {
+                throw new Exception("Stock insuficiente para '{$stockInfo['nombre']}'. Disponible: {$stockInfo['stock']}, Solicitado: {$requestedQty}");
+            }
+        }
+    }
+
+
+    private function calculateTotal($products) {
+        $total = 0;
+        foreach ($products as $p) {
+            $total += ($p['cantidad'] * $p['precio_unitario']);
+        }
+        return $total;
+    }
+
     public function createOrder($data) {
         $this->validateOrderData($data);
+        $this->validateStockAvailability($data['products']);
 
         $this->repository->beginTransaction();
         try {
@@ -76,6 +110,9 @@ class OrderService {
                 $this->repository->adjustStock($old['producto_id'], $old['cantidad']);
             }
 
+            // 1.5 Validate stock for new products
+            $this->validateStockAvailability($data['products']);
+
             // 2. Update Header
             $headerData = [
                 'cliente_id' => $data['cliente_id'],
@@ -119,24 +156,5 @@ class OrderService {
 
     public function restoreOrder($id) {
         $this->repository->restore($id);
-    }
-
-    private function validateOrderData($data) {
-        if (empty($data['cliente_id'])) throw new Exception("El cliente es obligatorio");
-        if (empty($data['direccion_envio'])) throw new Exception("La dirección de envío es obligatoria");
-        if (empty($data['products']) || !is_array($data['products'])) {
-             // It's possible to create order without products in some systems, but original logic implied it.
-             // Let's warn if empty but allow? Original logic loop checks if set.
-             // Ideally an order should have products.
-             throw new Exception("El pedido debe tener al menos un producto");
-        }
-    }
-
-    private function calculateTotal($products) {
-        $total = 0;
-        foreach ($products as $p) {
-            $total += ($p['cantidad'] * $p['precio_unitario']);
-        }
-        return $total;
     }
 }

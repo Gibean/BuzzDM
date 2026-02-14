@@ -74,9 +74,10 @@ class UserRepository {
     }
 
     public function delete($id) {
-        $stmt = $this->pdo->prepare("DELETE FROM usuarios WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE usuarios SET estado = 'inactivo' WHERE id = ?");
         return $stmt->execute([$id]);
     }
+
 
     public function countAdmins() {
         $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM usuarios WHERE rol = 'admin'");

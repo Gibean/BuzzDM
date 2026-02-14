@@ -9,6 +9,39 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
+// ========================================
+// Session Inactivity Timeout (24 hours)
+// Edge Case: Prevents stale sessions from persisting indefinitely
+// ========================================
+define('SESSION_TIMEOUT_SECONDS', 24 * 60 * 60); // 24 hours
+
+if (isset($_SESSION['last_activity'])) {
+    $inactiveTime = time() - $_SESSION['last_activity'];
+
+    if ($inactiveTime > SESSION_TIMEOUT_SECONDS) {
+        // Session expired due to inactivity
+        $expiredUserId = $_SESSION['usuario_id'] ?? null;
+
+        // Destroy the session
+        session_unset();
+        session_destroy();
+        session_start(); // Restart fresh session for redirects
+
+        // Log the automatic logout (if we had a user)
+        if ($expiredUserId) {
+            // Note: Can't use LogController here as it may not be autoloaded yet
+            // This will be logged via the frontend when redirected to login
+            $_SESSION['session_expired'] = true;
+            $_SESSION['expired_user_id'] = $expiredUserId;
+        }
+
+        // Will be handled below in the session check
+    }
+}
+
+// Update last activity timestamp
+$_SESSION['last_activity'] = time();
+
 // Generate CSRF token if not exists
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -62,7 +95,8 @@ $api_scripts = [
     // Notificaciones y estadísticas
     'api_notifications.php',
     'api_stats.php',
-    'api_2fa.php' // Two-Factor Authentication
+    'api_2fa.php', // Two-Factor Authentication
+    'api_requisiciones.php' // Requisiciones de Compra
 ];
 
 $current_page = basename($_SERVER['PHP_SELF']);
@@ -75,13 +109,53 @@ function json_auth_error($message) {
     exit;
 }
 
-// Si no existe la variable de sesión del ID de usuario, significa que no ha iniciado sesión
+/**
+ * Check if request has valid dev token (only for development mode)
+ * This allows Swagger UI and other API testing tools to bypass session auth
+ * @return bool Whether dev token is valid
+ */
+function checkDevToken() {
+    // Load .env if not already loaded
+    if (!getenv('APP_ENV')) {
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
+        $dotenv->safeLoad();
+    }
+
+    // Only allow dev token in development mode
+    if (getenv('APP_ENV') !== 'development') {
+        return false;
+    }
+
+    $devToken = getenv('DEV_API_TOKEN');
+    if (empty($devToken)) {
+        return false;
+    }
+
+    // Check X-Dev-Token header
+    $headerToken = $_SERVER['HTTP_X_DEV_TOKEN'] ?? '';
+    if (!empty($headerToken) && hash_equals($devToken, $headerToken)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Si no existe la variable de sesión del ID de usuario, verificar dev token como alternativa
 if (!isset($_SESSION['usuario_id'])) {
-    if ($is_api_call) {
-        json_auth_error('No autenticado. Por favor, inicia sesión.');
+    // Check if dev token is provided (for API testing)
+    if ($is_api_call && checkDevToken()) {
+        // Dev token valid - set a fake admin session for API testing
+        $_SESSION['usuario_id'] = 1; // Assume admin user ID 1
+        $_SESSION['usuario_nombre'] = 'API Dev User';
+        $_SESSION['usuario_rol'] = 'admin';
+        $_SESSION['is_dev_token_session'] = true;
     } else {
-        header('Location: login');
-        exit();
+        if ($is_api_call) {
+            json_auth_error('No autenticado. Por favor, inicia sesión.');
+        } else {
+            header('Location: login');
+            exit();
+        }
     }
 }
 
@@ -157,10 +231,11 @@ $fallback_pages = [
         'search_api.php', 'clientes.php', 'api_clientes.php', 'api_products.php', 'api_sales_by_status_chart.php',
         'backup_status.php', 'api_logs.php',
         'cargos_existencias.php', 'almacenes.php', 'transferencias.php',
-        'proveedores.php', 'todo.php', 'notas_actions.php',
+        'proveedores.php', 'todo.php', 'notas_actions.php', 'catalogos.php',
         'api_notifications.php', 'api_transferencias.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
-        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php',
-        'api_2fa.php'
+        'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_cargos.php',
+        'api_2fa.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -168,14 +243,17 @@ $fallback_pages = [
         'api_products.php', 'sesion.php', 'db.php',
         'sidebar.php', 'reports.php', 'api_orders.php', 'search_api.php', 'clientes.php',
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php', 'transferencias.php',
-        'todo.php', 'notas_actions.php', 'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php'
+        'todo.php', 'notas_actions.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php',
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php', 'api_cargos.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
         'logout.php', 'api_sales_chart.php', 'sesion.php', 'db.php', 'sidebar.php',
         'api_orders.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'todo.php', 'notas_actions.php',
-        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php'
+        'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php',
+        'requisiciones.php', 'api_requisiciones.php'
     ]
 ];
 
@@ -189,6 +267,16 @@ if (!empty($db_permissions)) {
 // HOTFIX: Ensure api_logs.php is allowed for admin even if not in DB yet (failed migration protection)
 if ($user_role === 'admin' && isset($allowed_pages['admin']) && !in_array('api_logs.php', $allowed_pages['admin'])) {
     $allowed_pages['admin'][] = 'api_logs.php';
+}
+
+// HOTFIX: Ensure requisiciones is allowed for all roles until migration is run
+$requisicion_pages = ['requisiciones.php', 'api_requisiciones.php'];
+if (isset($allowed_pages[$user_role])) {
+    foreach ($requisicion_pages as $page) {
+        if (!in_array($page, $allowed_pages[$user_role])) {
+            $allowed_pages[$user_role][] = $page;
+        }
+    }
 }
 
 // Always-allowed APIs for any authenticated user (core system functionality)

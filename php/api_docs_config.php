@@ -13,4 +13,11 @@ use OpenApi\Attributes as OA;
     in: "cookie",
     name: "PHPSESSID"
 )]
+#[OA\SecurityScheme(
+    securityScheme: "devTokenAuth",
+    type: "apiKey",
+    in: "header",
+    name: "X-Dev-Token",
+    description: "Development token for API testing (only works when APP_ENV=development). Value: buzz_dev_swagger_2026_secure_token"
+)]
 class OpenApiConfig {}

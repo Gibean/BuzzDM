@@ -62,12 +62,23 @@ class ImportService {
                     }
                 }
 
-                // Map Excel Headers
+                // Map Excel Headers (with alias support)
                 $colMap = [];
                 foreach ($headerRow as $colLetter => $headerName) {
                     foreach ($config['columns'] as $key => $colCfg) {
+                        // Check direct key match
                         if ($key === $headerName || strpos($headerName, $key) !== false) {
                             $colMap[$colLetter] = $key;
+                            break;
+                        }
+                        // Check aliases
+                        if (isset($colCfg['aliases']) && is_array($colCfg['aliases'])) {
+                            foreach ($colCfg['aliases'] as $alias) {
+                                if ($alias === $headerName || strpos($headerName, $alias) !== false) {
+                                    $colMap[$colLetter] = $key;
+                                    break 2; // Exit both foreach loops
+                                }
+                            }
                         }
                     }
                 }
@@ -243,16 +254,17 @@ class ImportService {
                 ]
             ],
             'Clientes' => [
-                'sheet_names' => ['Clientes', 'Customers'],
+                'sheet_names' => ['Clientes', 'Customers', 'Cliente'],
                 'table' => 'clientes',
-                'unique_key' => 'id',
+                'unique_key' => 'documentoid',
                 'columns' => [
-                    'documentoid' => ['db' => 'id', 'required' => true], // Requires ID column in DB
-                    'nombrerazon' => ['db' => 'nombre', 'required' => true],
-                    'email' => ['db' => 'email'],
-                    'telefono' => ['db' => 'telefono'],
-                    'direccion' => ['db' => 'direccion'],
-                    'esvip' => ['db' => 'vip', 'type' => 'bool']
+                    // Multiple aliases for each field - normalized to lowercase during matching
+                    'documentoid' => ['db' => 'id', 'required' => true, 'aliases' => ['id', 'cedula', 'rif', 'documento', 'identificacion', 'nro documento', 'nrodocumento', 'doc']],
+                    'nombrerazon' => ['db' => 'nombre', 'required' => true, 'aliases' => ['nombre', 'razon social', 'razonsocial', 'cliente', 'name', 'razon', 'nombrecliente', 'nombre cliente']],
+                    'email' => ['db' => 'email', 'aliases' => ['correo', 'correoelectronico', 'correo electronico', 'e-mail', 'mail']],
+                    'telefono' => ['db' => 'telefono', 'aliases' => ['tel', 'phone', 'celular', 'movil', 'contacto', 'nro telefono', 'numero']],
+                    'direccion' => ['db' => 'direccion', 'aliases' => ['address', 'ubicacion', 'domicilio', 'dir']],
+                    'esvip' => ['db' => 'vip', 'type' => 'bool', 'aliases' => ['vip', 'es vip', 'cliente vip', 'premium']]
                 ]
             ],
             'Proveedores' => [
