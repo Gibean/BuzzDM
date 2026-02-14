@@ -22,7 +22,18 @@ try {
     $user = $stmtAuth->fetch(PDO::FETCH_ASSOC);
 
     if (!$user || !password_verify($password, $user['password'])) {
+        if ($_POST['validate_only'] ?? false) {
+            header('Content-Type: application/json');
+            echo json_encode(['success' => false, 'message' => 'Contraseña incorrecta.']);
+            exit;
+        }
         die("<h1 style='color:#003366; font-family:sans-serif;'>Acceso Denegado</h1><p>Contraseña incorrecta.</p>");
+    }
+
+    if ($_POST['validate_only'] ?? false) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => true]);
+        exit;
     }
 
     // DomPDF Options
@@ -152,6 +163,10 @@ function fetchReportData($pdo, $tipo) {
             $data['pendientes'] = $pdo->query("SELECT p.referencia, c.nombre as cliente, p.total, p.fecha_creacion FROM pedidos p JOIN clientes c ON p.cliente_id = c.id WHERE p.estado_pago = 'pendiente' ORDER BY p.fecha_creacion DESC LIMIT 20")->fetchAll(PDO::FETCH_ASSOC);
             return $data;
 
+        case 'requisicion_individual':
+            $id = $_POST['id'] ?? 0;
+            return fetchRequisitionData($pdo, $id);
+
         default:
             return [];
     }
@@ -166,7 +181,8 @@ function generateReportSection($tipo, $datos, $empresa, $rutaLogo) {
         'inventario' => ['title' => 'Inventario de Productos', 'icon' => 'boxes'],
         'historial_login' => ['title' => 'Inicios de Sesión', 'icon' => 'sign-in-alt'],
         'inventario_critico' => ['title' => 'Alerta de Inventario Crítico', 'icon' => 'exclamation-triangle'],
-        'resumen_financiero' => ['title' => 'Resumen Financiero', 'icon' => 'file-invoice-dollar']
+        'resumen_financiero' => ['title' => 'Resumen Financiero', 'icon' => 'file-invoice-dollar'],
+        'requisicion_individual' => ['title' => 'Detalle de Requisición', 'icon' => 'clipboard-list']
     ];
 
     $info = $titulos[$tipo] ?? ['title' => 'Reporte', 'icon' => 'file'];
@@ -192,6 +208,8 @@ function generateReportSection($tipo, $datos, $empresa, $rutaLogo) {
 
     if ($tipo === 'resumen_financiero') {
         $html .= generateFinancialLayout($datos);
+    } elseif ($tipo === 'requisicion_individual') {
+        $html .= generateRequisitionLayout($datos);
     } else {
         $html .= generateDefaultTable($tipo, $datos);
     }
@@ -302,6 +320,127 @@ function generateFinancialLayout($datos) {
 
     $html .= '<h3 class="paid-detail-title">Próximos Cobros (Pedidos Pendientes)</h3>';
     $html .= generateDefaultTable('pedidos_mini', $datos['pendientes']);
+
+    return $html;
+}
+
+function fetchRequisitionData($pdo, $id) {
+    // Basic requisicion info
+    $stmt = $pdo->prepare("
+        SELECT r.*, u1.nombre as solicitante_nombre, u2.nombre as aprobador_nombre
+        FROM requisiciones r
+        LEFT JOIN usuarios u1 ON r.usuario_id = u1.id
+        LEFT JOIN usuarios u2 ON r.aprobado_por = u2.id
+        WHERE r.id = ?
+    ");
+    $stmt->execute([$id]);
+    $req = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$req) return [];
+
+    // Detailed lines
+    $stmtLines = $pdo->prepare("
+        SELECT rd.*, p.sku, p.nombre as producto_nombre, prov.nombre as proveedor_nombre
+        FROM detalle_requisicion rd
+        JOIN productos p ON rd.producto_id = p.id
+        LEFT JOIN proveedores prov ON rd.proveedor_sugerido_id = prov.id
+        WHERE rd.requisicion_id = ?
+    ");
+    $stmtLines->execute([$id]);
+    $req['detalles'] = $stmtLines->fetchAll(PDO::FETCH_ASSOC);
+
+    return $req;
+}
+
+function generateRequisitionLayout($req) {
+    if (empty($req)) return '<p class="text-center">Requisición no encontrada.</p>';
+
+    $html = '
+    <div class="summary-box">
+        <div class="summary-item">
+            <span class="summary-label">CÓDIGO</span>
+            <strong>' . htmlspecialchars($req['codigo']) . '</strong>
+        </div>
+        <div class="summary-item">
+            <span class="summary-label">FECHA SOLICITUD</span>
+            <strong>' . date('d/m/Y', strtotime($req['fecha_solicitud'])) . '</strong>
+        </div>
+        <div class="summary-item" style="text-align:right;">
+            <span class="summary-label">ESTADO</span>
+            <strong>' . strtoupper($req['estado']) . '</strong>
+        </div>
+    </div>
+
+    <table style="width:100%; margin-bottom: 20px;">
+        <tr>
+            <td style="width:50%;">
+                <span class="summary-label">Solicitado por:</span>
+                <strong>' . htmlspecialchars($req['solicitante_nombre'] ?? 'Sistema') . '</strong>
+            </td>
+            <td style="width:50%; text-align:right;">
+                <span class="summary-label">Aprobado por:</span>
+                <strong>' . htmlspecialchars($req['aprobador_nombre'] ?? '-') . '</strong>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <span class="summary-label">Prioridad:</span>
+                <strong>' . strtoupper($req['prioridad']) . '</strong>
+            </td>
+        </tr>
+    </table>';
+
+    if (!empty($req['notas'])) {
+        $html .= '<div class="summary-box" style="padding:10px;">
+            <span class="summary-label">NOTAS</span>
+            <p style="margin-top:5px; font-style: italic;">' . nl2br(htmlspecialchars($req['notas'])) . '</p>
+        </div>';
+    }
+
+    $html .= '<h3 class="paid-detail-title">Listado de Productos</h3>
+    <table class="data">
+        <thead>
+            <tr>
+                <th style="width:15%;">SKU</th>
+                <th style="width:40%;">Producto</th>
+                <th style="width:10%; text-align:center;">Cant.</th>
+                <th style="width:35%;">Proveedor Sugerido</th>
+            </tr>
+        </thead>
+        <tbody>';
+
+    foreach ($req['detalles'] as $d) {
+        $html .= '<tr>
+            <td>' . htmlspecialchars($d['sku']) . '</td>
+            <td>' . htmlspecialchars($d['producto_nombre']) . '</td>
+            <td style="text-align:center;">' . $d['cantidad_solicitada'] . '</td>
+            <td>' . htmlspecialchars($d['proveedor_nombre'] ?? 'Sin asignar') . '</td>
+        </tr>';
+    }
+
+    $html .= '</tbody></table>
+
+    <div style="margin-top: 50px;">
+        <table style="width:100%;">
+            <tr>
+                <td style="width:33%; text-align:center;">
+                    <br><br>
+                    <div style="border-top: 1px solid #333; width: 80%; margin: 0 auto;"></div>
+                    <span class="summary-label">Solicitado</span>
+                </td>
+                <td style="width:33%; text-align:center;">
+                    <br><br>
+                    <div style="border-top: 1px solid #333; width: 80%; margin: 0 auto;"></div>
+                    <span class="summary-label">Revisado</span>
+                </td>
+                <td style="width:33%; text-align:center;">
+                    <br><br>
+                    <div style="border-top: 1px solid #333; width: 80%; margin: 0 auto;"></div>
+                    <span class="summary-label">Autorizado</span>
+                </td>
+            </tr>
+        </table>
+    </div>';
 
     return $html;
 }

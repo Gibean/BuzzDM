@@ -86,7 +86,46 @@ class OrderController {
         path: "/php/api_orders.php",
         tags: ["Orders"],
         summary: "Create a new order",
-        requestBody: new OA\RequestBody(required: true, content: new OA\JsonContent(type: "object")),
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\JsonContent(
+                type: "object",
+                required: ["cliente_id", "direccion_envio", "products"],
+                properties: [
+                    new OA\Property(property: "cliente_id", type: "integer", example: 1, description: "Client ID"),
+                    new OA\Property(property: "direccion_envio", type: "string", example: "Av. Principal #123, Caracas", description: "Shipping address"),
+                    new OA\Property(property: "notas_envio", type: "string", example: "Entregar en horario de oficina", description: "Shipping notes"),
+                    new OA\Property(property: "estado_pago", type: "string", enum: ["pagado", "no pagado"], example: "pagado", description: "Payment status"),
+                    new OA\Property(property: "estado_envio", type: "string", enum: ["pendiente", "enviado", "entregado"], example: "pendiente", description: "Shipping status"),
+                    new OA\Property(property: "fecha_creacion", type: "string", format: "datetime", example: "2026-02-07 10:30:00", description: "Order date"),
+                    new OA\Property(
+                        property: "products",
+                        type: "array",
+                        description: "List of products in the order",
+                        items: new OA\Items(
+                            type: "object",
+                            properties: [
+                                new OA\Property(property: "producto_id", type: "integer", example: 5, description: "Product ID"),
+                                new OA\Property(property: "cantidad", type: "integer", example: 2, description: "Quantity"),
+                                new OA\Property(property: "precio_unitario", type: "number", format: "float", example: 25.50, description: "Unit price")
+                            ]
+                        )
+                    )
+                ],
+                example: [
+                    "cliente_id" => 1,
+                    "direccion_envio" => "Av. Principal #123, Caracas",
+                    "notas_envio" => "Entregar en horario de oficina",
+                    "estado_pago" => "pagado",
+                    "estado_envio" => "pendiente",
+                    "fecha_creacion" => "2026-02-07 10:30:00",
+                    "products" => [
+                        ["producto_id" => 5, "cantidad" => 2, "precio_unitario" => 25.50],
+                        ["producto_id" => 12, "cantidad" => 1, "precio_unitario" => 100.00]
+                    ]
+                ]
+            )
+        ),
         responses: [
             new OA\Response(response: 200, description: "Order created")
         ]

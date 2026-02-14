@@ -526,3 +526,80 @@ function renderPaginationControls(options) {
 // Export for global use
 window.renderPaginationControls = renderPaginationControls;
 
+/**
+ * Global Mobile Table Enhancer
+ * Automatically adds data-label attributes to table cells for mobile card view
+ */
+function enableMobileTableCards() {
+    const processTable = (table) => {
+        if (table.dataset.mobileEnhanced) return;
+
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            cells.forEach((cell, index) => {
+                if (headers[index] && !cell.hasAttribute('data-label')) {
+                    cell.setAttribute('data-label', headers[index]);
+                }
+            });
+        });
+
+        // Mark as processed but allow re-processing if rows change
+        table.dataset.mobileEnhanced = 'true';
+    };
+
+    // Process all existing tables
+    document.querySelectorAll('.table-buzz').forEach(processTable);
+
+    // Watch for new tables or changes in existing tables
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'childList') {
+                // If a table was added
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1) {
+                         // Check if node itself is a table or contains tables
+                        if (node.classList && node.classList.contains('table-buzz')) {
+                            processTable(node);
+                        } else if (node.querySelectorAll) {
+                            node.querySelectorAll('.table-buzz').forEach(processTable);
+                        }
+
+                        // Check if rows were added to an existing table
+                        if (node.tagName === 'TR' && node.closest('.table-buzz')) {
+                            const table = node.closest('.table-buzz');
+                            // Re-process just this row if possible, or the whole table headers
+                            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                            const cells = node.querySelectorAll('td');
+                            cells.forEach((cell, index) => {
+                                if (headers[index]) cell.setAttribute('data-label', headers[index]);
+                            });
+                        }
+                         // Check if tbody changed
+                        if (node.tagName === 'TBODY' && node.closest('.table-buzz')) {
+                             const table = node.closest('.table-buzz');
+                             const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+                             Array.from(node.querySelectorAll('tr')).forEach(row => {
+                                 const cells = row.querySelectorAll('td');
+                                 cells.forEach((cell, index) => {
+                                     if (headers[index]) cell.setAttribute('data-label', headers[index]);
+                                 });
+                             });
+                        }
+                    }
+                });
+            }
+        });
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Initialize on load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', enableMobileTableCards);
+} else {
+    enableMobileTableCards();
+}
