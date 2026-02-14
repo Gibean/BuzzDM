@@ -486,31 +486,9 @@ body {
     filter: brightness(1.1);
   }
 
-  /* === Mobile System Footer – company name only === */
+  /* === Hide system-footer on mobile – info moves into bottom nav === */
   .system-footer {
-    left: 0;
-    height: auto;
-    min-height: 30px;
-    padding: 0.4rem 0.75rem;
-    justify-content: center;
-    /* Push it above the bottom nav */
-    bottom: 56px;
-  }
-
-  .system-footer-left {
     display: none !important;
-  }
-
-  .system-footer-right {
-    width: 100%;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.65rem;
-  }
-
-  /* Hide version on mobile footer */
-  .system-footer-right .system-footer-item:last-child {
-    display: none;
   }
 
   .system-footer-item.hide-mobile {
@@ -520,7 +498,7 @@ body {
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: 120px; /* Space for footer + bottom nav */
+    padding-bottom: 90px; /* Space for bottom nav */
   }
 }
 
@@ -534,20 +512,41 @@ body {
 @media (max-width: 768px) {
   .mobile-bottom-nav {
     display: flex;
+    flex-wrap: wrap;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     z-index: 1050;
-    height: 56px;
+    height: auto;
     background: rgba(10, 12, 16, 0.95);
     border-top: 1px solid rgba(255, 160, 0, 0.15);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     justify-content: space-around;
     align-items: center;
-    padding: 0 4px;
+    padding: 6px 4px 0 4px;
     box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Company name row inside bottom nav */
+  .mobile-bottom-nav .bottom-nav-company {
+    width: 100%;
+    text-align: center;
+    font-family: var(--font-monospace);
+    font-size: 0.6rem;
+    color: var(--buzz-text-muted);
+    padding: 2px 0 4px 0;
+    opacity: 0.7;
+    letter-spacing: 0.5px;
+    border-top: 1px solid rgba(255, 160, 0, 0.08);
+    margin-top: 4px;
+  }
+
+  .mobile-bottom-nav .bottom-nav-company i {
+    color: var(--buzz-primary-color);
+    margin-right: 4px;
+    font-size: 0.55rem;
   }
 
   .mobile-bottom-nav .bottom-nav-item {
