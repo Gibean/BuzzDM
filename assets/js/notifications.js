@@ -131,6 +131,15 @@ function injectMobileLayout(topNavbar) {
     if (primaryItem) nav.appendChild(primaryItem);
     nav.appendChild(homeItem);
 
+    // 5. Pull company name from the (hidden) system-footer and show it in bottom nav
+    const footerCompany = document.querySelector('.system-footer-right .footer-value');
+    if (footerCompany && footerCompany.textContent.trim()) {
+        const companyRow = document.createElement('div');
+        companyRow.className = 'bottom-nav-company';
+        companyRow.innerHTML = '<i class="fas fa-building"></i>' + footerCompany.textContent.trim();
+        nav.appendChild(companyRow);
+    }
+
     document.body.appendChild(nav);
 }
 
