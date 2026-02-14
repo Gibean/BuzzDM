@@ -451,9 +451,20 @@ body {
     padding: 0.75rem 1rem;
     margin: -1rem -1rem 1rem -1rem;
     align-items: center;
+    gap: 0.5rem;
   }
 
-  .top-navbar > div {
+  /* Title group: don't grow, let action icons + logo take the right side */
+  .top-navbar > div:first-child {
+    flex: 0 1 auto;
+    min-width: 0;
+    align-items: center;
+  }
+
+  /* Action buttons group: push to the right, sit next to logo */
+  .top-navbar > div:last-of-type {
+    margin-left: auto;
+    flex-shrink: 0;
     align-items: center;
   }
 
@@ -476,11 +487,27 @@ body {
     display: none !important;
   }
 
+  /* Navbar action buttons: icon-only, borderless on mobile */
+  .top-navbar .btn-outline-buzz,
+  .top-navbar .btn-outline-warning {
+    font-size: 0;
+    padding: 0.4rem;
+    border: none;
+    background: transparent;
+  }
+  .top-navbar .btn-outline-buzz i,
+  .top-navbar .btn-outline-warning i {
+    font-size: 1.05rem;
+  }
+  /* Hide .btn-text spans inside navbar buttons */
+  .top-navbar .btn-text {
+    display: none;
+  }
+
   /* === Mobile Header Logo === */
   .navbar-mobile-logo {
     height: 28px;
     width: auto;
-    margin-left: auto;
     flex-shrink: 0;
     opacity: 0.85;
     filter: brightness(1.1);
