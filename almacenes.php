@@ -145,7 +145,7 @@
                                 <label class="form-label">Código <small class="text-muted">(auto)</small></label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-barcode"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="almacenCodigo"
+                                    <input type="text" class="form-control form-control-buzz form-control-autogen" id="almacenCodigo"
                                            placeholder="Se genera automáticamente" maxlength="20" readonly>
                                 </div>
                             </div>

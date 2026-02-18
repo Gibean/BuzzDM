@@ -149,8 +149,8 @@
                                     <label class="form-label text-muted small fw-bold">CÓDIGO</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-dark border-secondary text-primary"><i class="fas fa-hashtag"></i></span>
-                                        <input type="text" class="form-control form-control-buzz" id="cargoCodigo"
-                                               readonly tabindex="-1" style="pointer-events: none;" placeholder="Auto-generado">
+                                        <input type="text" class="form-control form-control-buzz form-control-autogen" id="cargoCodigo"
+                                               readonly tabindex="-1" placeholder="Auto-generado">
                                     </div>
                                 </div>
                                 <div class="mb-0">
