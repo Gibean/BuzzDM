@@ -121,7 +121,7 @@
                                 <div class="row g-3 mb-3">
                                     <div class="col-md-3">
                                         <label class="form-label small text-muted">Código</label>
-                                        <input type="text" class="form-control form-control-buzz form-control-sm" id="codigoRequisicion" readonly placeholder="Auto">
+                                        <input type="text" class="form-control form-control-buzz form-control-sm form-control-autogen" id="codigoRequisicion" readonly placeholder="Auto">
                                     </div>
                                     <div class="col-md-3">
                                         <label class="form-label small text-muted">Fecha</label>
@@ -145,7 +145,7 @@
                                 <!-- Products Table (High Density) -->
                                 <div class="table-responsive">
                                     <table class="table table-sm table-hover mb-0" id="tablaProductos">
-                                        <thead class="table-dark">
+                                        <thead>
                                             <tr>
                                                 <th style="width: 120px;">SKU</th>
                                                 <th>Producto</th>
