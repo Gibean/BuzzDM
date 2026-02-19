@@ -34,7 +34,7 @@
 }
 
 .kanban-column-title {
-    font-family: 'Black Ops One', cursive, system-ui;
+    font-family: var(--font-primary);
     font-size: 1.1rem;
     margin: 0;
     color: var(--buzz-primary);
