@@ -982,6 +982,37 @@ body {
   box-shadow: 0 0 0 2px rgba(255, 160, 0, 0.2);
 }
 
+/* Password visibility toggle button */
+.btn-toggle-password {
+  position: absolute;
+  right: 1px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--buzz-text-muted);
+  cursor: pointer;
+  padding: 6px 10px;
+  z-index: 5;
+  transition: color 0.3s ease;
+  line-height: 1;
+}
+
+.btn-toggle-password:hover {
+  color: var(--buzz-primary-color);
+}
+
+.input-group .btn-toggle-password {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  transform: none;
+  display: flex;
+  align-items: center;
+  border-radius: 0 4px 4px 0;
+}
+
 /* Asegurar que los campos de formulario mantengan el color de fondo y texto en modo oscuro */
 input,
 textarea,

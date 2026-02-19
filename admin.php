@@ -681,14 +681,20 @@
                                 <label class="form-label">Contraseña *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
-                                    <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password">
+                                    <input type="password" class="form-control form-control-buzz" id="userPassword" required autocomplete="new-password" style="padding-right: 40px;">
+                                    <button type="button" class="btn-toggle-password" data-target="userPassword" aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Confirmar Contraseña *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-check-double"></i></span>
-                                    <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password">
+                                    <input type="password" class="form-control form-control-buzz" id="userPasswordConfirm" required autocomplete="new-password" style="padding-right: 40px;">
+                                    <button type="button" class="btn-toggle-password" data-target="userPasswordConfirm" aria-label="Toggle password visibility">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
