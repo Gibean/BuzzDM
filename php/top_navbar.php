@@ -16,17 +16,17 @@ $nav_subtitle = $nav_subtitle ?? '';
 $nav_actions  = $nav_actions  ?? '';
 ?>
 <nav class="top-navbar">
-    <div class="d-flex align-items-center">
-        <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
+    <div class="top-navbar__title-block">
+        <button class="top-navbar__toggle" id="sidebarToggle" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>
         </button>
-        <h1 class="font-primary mb-0"><?php echo htmlspecialchars($nav_title); ?></h1>
+        <h1 class="top-navbar__heading"><?php echo htmlspecialchars($nav_title); ?></h1>
         <?php if ($nav_subtitle !== ''): ?>
-        <span class="text-muted ms-2 font-mono">/ <?php echo htmlspecialchars($nav_subtitle); ?></span>
+        <span class="top-navbar__subtitle">/ <?php echo htmlspecialchars($nav_subtitle); ?></span>
         <?php endif; ?>
     </div>
     <?php if ($nav_actions !== ''): ?>
-    <div class="d-flex align-items-center gap-2">
+    <div class="top-navbar__actions">
         <?php echo $nav_actions; ?>
     </div>
     <?php endif; ?>
