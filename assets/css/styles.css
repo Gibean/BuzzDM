@@ -2432,6 +2432,10 @@ input:-webkit-autofill:active {
 @media (max-width: 768px) {
   .sidebar-enhanced {
     transform: translateX(-100%);
+    padding-bottom: calc(
+      var(--mobile-nav-height) + env(safe-area-inset-bottom, 20px)
+    );
+    box-sizing: border-box;
   }
 
   .sidebar-enhanced.show {
