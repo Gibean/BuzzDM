@@ -15,16 +15,12 @@
 
      <!-- Main Content  -->
     <main class="main-content">
-         <!-- Top Navbar  -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">ADMINISTRACIÓN DEL SISTEMA</h1>
-                <span class="text-muted ms-2 font-mono">/ CONFIGURACIÓN</span>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'ADMINISTRACIÓN DEL SISTEMA';
+        $nav_subtitle = 'CONFIGURACIÓN';
+        require_once 'php/top_navbar.php';
+        ?>
 
          <!-- Admin Tabs - Material Design Style -->
         <div class="admin-tabs-container">
