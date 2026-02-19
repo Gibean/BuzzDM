@@ -20,23 +20,15 @@
 
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">CARGAR EXISTENCIAS</h1>
-                <span class="text-muted ms-2 font-mono">/ ENTRADA DE INVENTARIO</span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()">
-                    <i class="fas fa-history"></i> Historial
-                </button>
-                <button class="btn btn-buzz" id="btnNewCargo" onclick="nuevoCargo()">
-                    <i class="fas fa-plus"></i> Nuevo Cargo
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'CARGAR EXISTENCIAS';
+        $nav_subtitle = 'ENTRADA DE INVENTARIO';
+        $nav_actions = '
+                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()"><i class="fas fa-history"></i> Historial</button>
+                <button class="btn btn-buzz" id="btnNewCargo" onclick="nuevoCargo()"><i class="fas fa-plus"></i> Nuevo Cargo</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Vista de Historial (por defecto) -->
         <div id="vistaHistorial">

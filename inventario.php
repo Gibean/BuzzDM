@@ -17,21 +17,13 @@
     <!-- Sidebar -->
     <?php require_once 'php/sidebar.php'; ?>
     <main class="main-content">
-       <!--  Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE INVENTARIO</h1>
-                <span class="text-muted ms-2 font-mono">/ PRODUCTOS</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" id="btnNewProduct" onclick="openProductModal()">
-                    <i class="fas fa-plus"></i> Nuevo Producto
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'GESTIÓN DE INVENTARIO';
+        $nav_subtitle = 'PRODUCTOS';
+        $nav_actions = '<button class="btn btn-buzz" id="btnNewProduct" onclick="openProductModal()"><i class="fas fa-plus"></i> Nuevo Producto</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
        <!-- Filters -->
         <div class="buzz-card mb-4 pb-3"> <!-- Added padding for better distribution -->

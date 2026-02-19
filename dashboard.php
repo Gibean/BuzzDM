@@ -71,16 +71,12 @@ try {
     <?php require_once 'php/sidebar.php'; ?>
 
     <main class="main-content">
-        <!-- Top Navbar --->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">CENTRO DE COMANDO</h1>
-                <span class="text-muted ms-2 font-mono">/ DASHBOARD</span>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'CENTRO DE COMANDO';
+        $nav_subtitle = 'DASHBOARD';
+        require_once 'php/top_navbar.php';
+        ?>
 
 
         <!-- Command Strip (High Density Status Bar) -->
