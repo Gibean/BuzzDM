@@ -7,6 +7,9 @@ servers:
   -
     url: 'http://localhost/BuzzDM'
     description: 'Local Development Server'
+  -
+    url: 'https://buzzdatamanager.com'
+    description: 'Production Server (Hostinger)'
 paths:
   /php/api_auth.php:
     post:

@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUZZ Data Manager - Login</title>
+    <meta name="description" content="Accede a BUZZ Data Manager, tu sistema profesional de gestión empresarial para inventario, pedidos y reportes.">
+
+    <!-- Open Graph (Facebook, WhatsApp, Discord, etc.) -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://buzzdatamanager.com/login">
+    <meta property="og:title" content="BUZZ Data Manager - Iniciar Sesión">
+    <meta property="og:description" content="Accede a tu sistema de gestión empresarial. Control de inventario, pedidos, clientes y reportes avanzados.">
+    <meta property="og:image" content="https://buzzdatamanager.com/assets/img/logov1_long.png">
+    <meta property="og:site_name" content="BUZZ Data Manager">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BUZZ Data Manager - Iniciar Sesión">
+    <meta name="twitter:description" content="Accede a tu sistema de gestión empresarial profesional.">
+    <meta name="twitter:image" content="https://buzzdatamanager.com/assets/img/logov1_long.png">
+
     <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
