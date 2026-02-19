@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../Repository/AuthRepository.php';
+require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../email_config.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 
