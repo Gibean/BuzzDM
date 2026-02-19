@@ -321,11 +321,11 @@
                 const response = await fetch(`php/api_suppliers.php?action=productos&id=${id}`);
                 const data = await response.json();
 
-                let html = `<div class="modal-buzz">
+                let html = `<div class="modal-buzz" style="display: flex;">
                     <div class="modal-content-buzz" style="max-width: 700px;">
                         <div class="modal-header-buzz">
                             <h3><i class="fas fa-boxes me-2"></i>Productos de ${nombre}</h3>
-                            <button type="button" class="btn-close-buzz" onclick="this.closest('.modal-buzz').remove()">&times;</button>
+                            <button type="button" class="close-buzz" onclick="this.closest('.modal-buzz').remove()">&times;</button>
                         </div>
                         <div class="modal-body-buzz">`;
 
@@ -343,8 +343,8 @@
                         html += `<tr>
                             <td>${escapeHtml(p.sku)}</td>
                             <td>${escapeHtml(p.producto_nombre)}</td>
-                            <td class="precio-compra">$${parseFloat(p.precio_compra).toFixed(2)}</td>
-                            <td>${p.fecha_registro}</td>
+                            <td class="precio-compra">${p.precio_compra ? '$' + parseFloat(p.precio_compra).toFixed(2) : '<span class="text-muted">-</span>'}</td>
+                            <td>${p.fecha_registro || '<span class="text-muted">-</span>'}</td>
                             <td>${escapeHtml(p.cargo_codigo || '-')}</td>
                         </tr>`;
                     });

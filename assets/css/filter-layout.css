@@ -102,11 +102,23 @@
 /* Mobile */
 @media (max-width: 576px) {
     .filter-wrapper {
-        gap: 0.5rem;
+        gap: 0.4rem;
     }
 
-    .filter-group {
+    /* Search: full width */
+    .filter-group.filter-search {
         flex: 1 1 100% !important;
+        order: -1;
+    }
+
+    /* Date fields: side-by-side */
+    .filter-group.filter-date {
+        flex: 1 1 calc(50% - 0.2rem) !important;
+    }
+
+    /* Selects: side-by-side */
+    .filter-group.filter-select {
+        flex: 1 1 calc(50% - 0.2rem) !important;
     }
 
     .filter-group.filter-checkbox {
@@ -115,10 +127,15 @@
     }
 
     .filter-group.filter-actions {
-        flex: 1 1 100% !important;
+        flex: 0 0 auto !important;
         flex-direction: row !important;
         justify-content: flex-end;
         order: 11;
+    }
+
+    /* Hide labels on mobile — rely on placeholders */
+    .filter-group label {
+        display: none;
     }
 
     /* Show icon only on small screens */
@@ -127,16 +144,13 @@
     }
 
     .btn-filter-action {
-        padding: 0.5rem 0.65rem;
+        padding: 0.45rem 0.6rem;
     }
 
-    .filter-group label {
-        font-size: 0.75rem;
-    }
-
-    .filter-group .form-control-buzz {
-        font-size: 0.85rem;
-        padding: 0.5rem;
+    .filter-group .form-control-buzz,
+    .filter-group .form-select-buzz {
+        font-size: 0.8rem;
+        padding: 0.4rem 0.5rem;
     }
 }
 

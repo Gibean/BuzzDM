@@ -102,15 +102,6 @@ function renderAlmacenes() {
         <div class="almacen-card ${a.id == selectedAlmacenId ? 'selected' : ''} ${!a.activo ? 'inactivo' : ''}"
              onclick="selectAlmacen(${a.id})" data-id="${a.id}">
 
-            <div class="almacen-actions">
-                <button class="btn-action" onclick="event.stopPropagation(); openAlmacenModal(${a.id})" title="Editar">
-                    <i class="fas fa-edit"></i>
-                </button>
-                <button class="btn-action btn-delete" onclick="event.stopPropagation(); deleteAlmacen(${a.id})" title="Eliminar">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-
             <div class="almacen-header">
                 <div class="almacen-icon">
                     <i class="fas ${getAlmacenIcon(a.tipo)}"></i>
@@ -118,6 +109,14 @@ function renderAlmacenes() {
                 <div class="almacen-badges">
                     ${a.es_principal ? '<span class="badge-principal"><i class="fas fa-star"></i> Principal</span>' : ''}
                     <span class="badge-tipo">${capitalize(a.tipo)}</span>
+                </div>
+                <div class="almacen-actions">
+                    <button class="btn-action" onclick="event.stopPropagation(); openAlmacenModal(${a.id})" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-action btn-delete" onclick="event.stopPropagation(); deleteAlmacen(${a.id})" title="Eliminar">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
 
