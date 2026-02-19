@@ -581,7 +581,10 @@ body {
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: calc(var(--mobile-nav-height) + var(--mobile-nav-safe-area) + env(safe-area-inset-bottom, 20px));
+    padding-bottom: calc(
+      var(--mobile-nav-height) + var(--mobile-nav-safe-area) +
+        env(safe-area-inset-bottom, 20px)
+    );
   }
 }
 
@@ -608,7 +611,8 @@ body {
     -webkit-backdrop-filter: blur(16px);
     justify-content: space-around;
     align-items: center;
-    padding: 6px 4px calc(var(--mobile-nav-safe-area) + env(safe-area-inset-bottom, 20px)) 4px;
+    padding: 6px 4px
+      calc(var(--mobile-nav-safe-area) + env(safe-area-inset-bottom, 20px)) 4px;
     box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
   }
 
@@ -734,14 +738,11 @@ body {
 
   .top-navbar h1 {
     font-size: 1.5rem;
-<<<<<<< Updated upstream
-=======
     letter-spacing: 2px;
   }
 
   .top-navbar__subtitle {
     display: inline;
->>>>>>> Stashed changes
   }
 }
 
@@ -1178,7 +1179,10 @@ input:-webkit-autofill:active {
   .main-content {
     margin-left: 0;
     padding: 0.5rem 1.5rem;
-    padding-bottom: calc(var(--mobile-nav-height) + var(--mobile-nav-safe-area) + env(safe-area-inset-bottom, 20px));
+    padding-bottom: calc(
+      var(--mobile-nav-height) + var(--mobile-nav-safe-area) +
+        env(safe-area-inset-bottom, 20px)
+    );
   }
 
   /* Reduce padding for cards on mobile */
