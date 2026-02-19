@@ -43,10 +43,10 @@ CREATE TABLE IF NOT EXISTS `almacenes` (
   CONSTRAINT `fk_almacen_responsable` FOREIGN KEY (`responsable_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Almacenes/Bodegas/Tiendas del sistema';
 
--- Volcando datos para la tabla dbuzz.almacenes: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.almacenes: ~0 rows (aproximadamente)
 DELETE FROM `almacenes`;
 INSERT INTO `almacenes` (`id`, `codigo`, `nombre`, `direccion`, `telefono`, `tipo`, `es_principal`, `activo`, `responsable_id`, `notas`, `creado_at`, `actualizado_at`) VALUES
-	(1, 'ALM-PRINCIPAL', 'Almacén Principal', NULL, NULL, 'almacen', 1, 1, NULL, NULL, '2026-01-07 20:59:51', NULL),
+	(1, 'ALM-PRINCIPAL', 'Almacén Principal', 'Calle Bolívar Cruce con, nro. 17 Sector C. Miranda, El Tigre 6050, Anzoátegui', '', 'almacen', 1, 1, NULL, '', '2026-01-07 20:59:51', '2026-02-15 03:25:04'),
 	(2, 'ALM-001', 'Exhibición A', '', '', 'almacen', 0, 1, NULL, 'Vitrina de exhibición interna', '2026-02-04 19:30:29', NULL);
 
 -- Volcando estructura para tabla dbuzz.backups
@@ -134,7 +134,7 @@ CREATE TABLE IF NOT EXISTS `categorias` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla dbuzz.categorias: ~7 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.categorias: ~6 rows (aproximadamente)
 DELETE FROM `categorias`;
 INSERT INTO `categorias` (`id`, `nombre`, `descripcion`) VALUES
 	(1, 'Papelería', 'Artículos de papelería generales: cuadernos, bolígrafos, goma, etc.'),
@@ -161,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
   KEY `idx_clientes_deleted_at` (`deleted_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.clientes: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.clientes: ~6 rows (aproximadamente)
 DELETE FROM `clientes`;
 INSERT INTO `clientes` (`id`, `nombre`, `email`, `telefono`, `direccion`, `notas`, `vip`, `creado_at`, `deleted_at`) VALUES
 	('V-10000001', 'María López', 'm.lopez@example.com', '+58 412 345 6789', 'Calle Comercio 123, Caracas', '', 0, '2025-12-01 13:00:00', NULL),
@@ -258,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `detalle_pedido` (
   CONSTRAINT `detalle_pedido_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.detalle_pedido: ~23 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.detalle_pedido: ~21 rows (aproximadamente)
 DELETE FROM `detalle_pedido`;
 INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `precio_unitario`) VALUES
 	(1, 2, 2, 2, 2.50),
@@ -285,6 +285,37 @@ INSERT INTO `detalle_pedido` (`id`, `pedido_id`, `producto_id`, `cantidad`, `pre
 	(22, 12, 2, 20, 2.50),
 	(23, 13, 14, 3, 129.00),
 	(24, 14, 14, 1, 129.00);
+
+-- Volcando estructura para tabla dbuzz.detalle_requisicion
+DROP TABLE IF EXISTS `detalle_requisicion`;
+CREATE TABLE IF NOT EXISTS `detalle_requisicion` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `requisicion_id` int(10) unsigned NOT NULL,
+  `producto_id` int(20) unsigned NOT NULL,
+  `cantidad_solicitada` int(10) unsigned NOT NULL DEFAULT 1,
+  `proveedor_sugerido_id` int(11) DEFAULT NULL COMMENT 'IA: mejor precio histórico',
+  `precio_sugerido` decimal(12,4) DEFAULT NULL COMMENT 'Último precio conocido',
+  `proveedor_seleccionado_id` int(11) DEFAULT NULL COMMENT 'Override manual usuario',
+  `notas` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_req_producto` (`requisicion_id`,`producto_id`),
+  KEY `idx_producto` (`producto_id`),
+  KEY `idx_prov_sugerido` (`proveedor_sugerido_id`),
+  KEY `idx_prov_seleccionado` (`proveedor_seleccionado_id`),
+  CONSTRAINT `fk_detreq_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
+  CONSTRAINT `fk_detreq_prov_seleccionado` FOREIGN KEY (`proveedor_seleccionado_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_detreq_prov_sugerido` FOREIGN KEY (`proveedor_sugerido_id`) REFERENCES `proveedores` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_detreq_requisicion` FOREIGN KEY (`requisicion_id`) REFERENCES `requisiciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Detalle de productos en requisición';
+
+-- Volcando datos para la tabla dbuzz.detalle_requisicion: ~5 rows (aproximadamente)
+DELETE FROM `detalle_requisicion`;
+INSERT INTO `detalle_requisicion` (`id`, `requisicion_id`, `producto_id`, `cantidad_solicitada`, `proveedor_sugerido_id`, `precio_sugerido`, `proveedor_seleccionado_id`, `notas`) VALUES
+	(4, 1, 10, 10, 1, 0.0000, NULL, NULL),
+	(5, 1, 13, 10, 2, 0.0000, NULL, NULL),
+	(6, 1, 14, 1, 5, 0.0000, NULL, NULL),
+	(7, 2, 14, 1, 5, 0.0000, NULL, NULL),
+	(8, 2, 11, 1, 1, 0.0000, NULL, NULL);
 
 -- Volcando estructura para tabla dbuzz.detalle_transferencia
 DROP TABLE IF EXISTS `detalle_transferencia`;
@@ -354,6 +385,27 @@ BEGIN
     SET v_codigo = CONCAT('CGO-', v_year, '-', LPAD(v_next_num, 4, '0'));
 
     RETURN v_codigo;
+END//
+DELIMITER ;
+
+-- Volcando estructura para función dbuzz.fn_generar_codigo_requisicion
+DROP FUNCTION IF EXISTS `fn_generar_codigo_requisicion`;
+DELIMITER //
+CREATE FUNCTION `fn_generar_codigo_requisicion`() RETURNS varchar(20) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci
+    READS SQL DATA
+    DETERMINISTIC
+BEGIN
+    DECLARE v_year CHAR(4);
+    DECLARE v_next_num INT;
+
+    SET v_year = YEAR(CURDATE());
+
+    SELECT COALESCE(MAX(CAST(SUBSTRING(codigo, 10) AS UNSIGNED)), 0) + 1
+    INTO v_next_num
+    FROM requisiciones
+    WHERE codigo LIKE CONCAT('REQ-', v_year, '-%');
+
+    RETURN CONCAT('REQ-', v_year, '-', LPAD(v_next_num, 4, '0'));
 END//
 DELIMITER ;
 
@@ -453,9 +505,9 @@ CREATE TABLE IF NOT EXISTS `logs` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `logs_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.logs: ~41 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.logs: ~44 rows (aproximadamente)
 DELETE FROM `logs`;
 INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(1, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-01-07_22-01-17.sql | Tamaño: 0.11 MB', '2026-01-07 21:01:20'),
@@ -498,7 +550,13 @@ INSERT INTO `logs` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VALUES
 	(38, 1, 'Producto actualizado', '#14 | 9788445018538 - ', '2026-02-07 02:00:34'),
 	(39, 1, 'Pedido creado', '#14 | Ref:  | Total: $129.00', '2026-02-07 02:05:17'),
 	(40, NULL, 'Backup realizado', 'Archivo: dbuzzbackup_2026-02-07_05-49-54.sql | Tamaño: 0.14 MB', '2026-02-07 04:49:57'),
-	(41, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2026-02-07_05-49-54.sql","tamanio_mb":0.14,"duracion_ms":3244}', '2026-02-07 04:49:57');
+	(41, 1, 'Backup Manual', '{"archivo":"dbuzzbackup_2026-02-07_05-49-54.sql","tamanio_mb":0.14,"duracion_ms":3244}', '2026-02-07 04:49:57'),
+	(42, 1, 'Producto actualizado', '#14 | 9788445018538 - ', '2026-02-07 05:50:26'),
+	(43, 1, 'Requisición creada (auto stock bajo)', 'REQ-2026-0001', '2026-02-07 06:45:43'),
+	(44, 1, 'Requisición actualizada', '#1', '2026-02-07 06:46:20'),
+	(45, 1, 'Requisición creada', 'REQ-2026-0002 | 2 productos', '2026-02-07 06:46:49'),
+	(46, 1, 'Requisición aprobada', '#1', '2026-02-07 16:26:46'),
+	(47, 1, 'Producto actualizado', '#14 | 9788445018538 - ', '2026-02-14 02:32:02');
 
 -- Volcando estructura para tabla dbuzz.logs_login
 DROP TABLE IF EXISTS `logs_login`;
@@ -512,7 +570,7 @@ CREATE TABLE IF NOT EXISTS `logs_login` (
   KEY `usuario_id` (`usuario_id`),
   KEY `fecha` (`fecha`),
   CONSTRAINT `FK_logs_login_usuarios` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.logs_login: ~69 rows (aproximadamente)
 DELETE FROM `logs_login`;
@@ -585,7 +643,18 @@ INSERT INTO `logs_login` (`id`, `usuario_id`, `accion`, `detalles`, `fecha`) VAL
 	(66, 1, 'Exitoso', 'Login de admin', '2026-02-07 01:28:38'),
 	(67, 1, 'Denegado', 'Contraseña incorrecta', '2026-02-07 03:10:35'),
 	(68, 1, 'Denegado', 'Contraseña incorrecta', '2026-02-07 03:10:38'),
-	(69, 1, 'Exitoso', 'Login de admin', '2026-02-07 04:49:31');
+	(69, 1, 'Exitoso', 'Login de admin', '2026-02-07 04:49:31'),
+	(70, 1, 'Exitoso', 'Login de admin', '2026-02-07 05:49:54'),
+	(71, 1, 'Exitoso', 'Login de admin', '2026-02-07 14:13:06'),
+	(72, NULL, 'Exitoso', 'Login de operador', '2026-02-07 15:32:00'),
+	(73, NULL, 'Denegado', 'Usuario desactivado', '2026-02-07 15:32:00'),
+	(74, 1, 'Denegado', 'Contraseña incorrecta', '2026-02-07 19:24:16'),
+	(75, 1, 'Exitoso', 'Login de admin', '2026-02-07 19:24:37'),
+	(76, 1, 'Exitoso', 'Login de admin', '2026-02-10 22:51:59'),
+	(77, 1, 'Exitoso', 'Login de admin', '2026-02-11 00:52:21'),
+	(78, 1, 'Exitoso', 'Login de admin', '2026-02-12 02:28:16'),
+	(79, 1, 'Exitoso', 'Login de admin', '2026-02-13 23:23:10'),
+	(80, 1, 'Exitoso', 'Login de admin', '2026-02-15 02:12:28');
 
 -- Volcando estructura para tabla dbuzz.marcas
 DROP TABLE IF EXISTS `marcas`;
@@ -793,12 +862,12 @@ CREATE TABLE IF NOT EXISTS `notificaciones` (
   CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Volcando datos para la tabla dbuzz.notificaciones: ~3 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.notificaciones: ~2 rows (aproximadamente)
 DELETE FROM `notificaciones`;
 INSERT INTO `notificaciones` (`id`, `usuario_id`, `tipo`, `titulo`, `mensaje`, `enlace`, `leido`, `creado_at`) VALUES
 	(9, 63, 'security', 'Usuario Bloqueado', 'Usuario operador@buzz.com bloqueado tras 10 intentos fallidos.', 'admin', 0, '2026-02-06 21:26:05'),
 	(10, 101, 'security', 'Usuario Bloqueado', 'Usuario operador@buzz.com bloqueado tras 10 intentos fallidos.', 'admin', 0, '2026-02-06 21:26:05'),
-	(11, 1, 'low_stock', 'Stock Crítico Detectado', 'Hay 2 productos con existencias críticas. Se recomienda reabastecer.', 'inventario.php?filter=low_stock', 0, '2026-02-07 00:49:32');
+	(11, 1, 'low_stock', 'Stock Crítico Detectado', 'Hay 2 productos con existencias críticas. Se recomienda reabastecer.', 'inventario.php?filter=low_stock', 0, '2026-02-14 22:12:29');
 
 -- Volcando estructura para tabla dbuzz.password_reset_tokens
 DROP TABLE IF EXISTS `password_reset_tokens`;
@@ -853,7 +922,7 @@ CREATE TABLE IF NOT EXISTS `pedidos` (
   CONSTRAINT `pedidos_ibfk_2` FOREIGN KEY (`creado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.pedidos: ~13 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.pedidos: ~14 rows (aproximadamente)
 DELETE FROM `pedidos`;
 INSERT INTO `pedidos` (`id`, `cliente_id`, `referencia`, `fecha_creacion`, `total`, `estado_pago`, `estado_envio`, `direccion_envio`, `notas_envio`, `creado_por`, `actualizado_at`, `tracking_number`, `estimated_delivery_date`, `deleted_at`) VALUES
 	(2, 'V-10000001', 'REF-LBR-0002', '2025-12-25 15:00:00', 9.70, 'pagado', 'pendiente', 'Calle Comercio 123, Caracas', 'Entrega mañana', 100, '2026-01-07 21:01:09', NULL, NULL, NULL),
@@ -880,7 +949,7 @@ CREATE TABLE IF NOT EXISTS `permisos_rol` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uk_rol_pagina` (`rol`,`pagina`),
   KEY `idx_rol` (`rol`)
-) ENGINE=InnoDB AUTO_INCREMENT=279 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Permisos de acceso por rol a páginas del sistema';
+) ENGINE=InnoDB AUTO_INCREMENT=285 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Permisos de acceso por rol a páginas del sistema';
 
 -- Volcando datos para la tabla dbuzz.permisos_rol: ~132 rows (aproximadamente)
 DELETE FROM `permisos_rol`;
@@ -1030,7 +1099,13 @@ INSERT INTO `permisos_rol` (`id`, `rol`, `pagina`, `creado_at`) VALUES
 	(271, 'admin', 'transferencias.php', '2026-02-04 19:19:51'),
 	(272, 'admin', 'api_transferencias.php', '2026-02-04 19:19:51'),
 	(273, 'supervisor', 'transferencias.php', '2026-02-04 19:19:51'),
-	(274, 'supervisor', 'api_transferencias.php', '2026-02-04 19:19:51');
+	(274, 'supervisor', 'api_transferencias.php', '2026-02-04 19:19:51'),
+	(279, 'admin', 'requisiciones.php', '2026-02-07 06:30:24'),
+	(280, 'admin', 'api_requisiciones.php', '2026-02-07 06:30:24'),
+	(281, 'supervisor', 'requisiciones.php', '2026-02-07 06:30:24'),
+	(282, 'supervisor', 'api_requisiciones.php', '2026-02-07 06:30:24'),
+	(283, 'operador', 'requisiciones.php', '2026-02-07 06:30:24'),
+	(284, 'operador', 'api_requisiciones.php', '2026-02-07 06:30:24');
 
 -- Volcando estructura para tabla dbuzz.precios_proveedor
 DROP TABLE IF EXISTS `precios_proveedor`;
@@ -1122,7 +1197,7 @@ INSERT INTO `productos` (`id`, `sku`, `nombre`, `descripcion`, `precio`, `costo_
 	(11, 'LBR-0010', 'Resma papel bond A4 80gr (500)', 'Resma de papel bond A4 80 g/m2, 500 hojas', 6.50, 0.0000, 0.0000, 50, 10, 'activo', 'fisico', 1, '2025-12-25 14:09:00', NULL, 3, NULL, 1, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
 	(12, 'LBR-0011', 'Set acuarelas Tombow 12 colores', 'Set de acuarelas en pastilla, 12 colores', 22.00, 0.0000, 0.0000, 15, 5, 'activo', 'fisico', 1, '2025-12-25 14:10:00', NULL, 4, 6, 3, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
 	(13, 'LBR-0012', 'Marcador permanente negro', 'Marcador indeleble punta media', 2.00, 0.0000, 0.0000, 0, 10, 'agotado', 'fisico', 1, '2025-12-25 14:11:00', NULL, 1, NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, 'UND', 1, NULL, NULL, 0, NULL),
-	(14, '9788445018538', 'El Señor de los Anillos (NE revisada). Ilustrado por Alan Lee', 'ISBN 10: 8445018531 / ISBN 13: 9788445018538\nEditorial: Minotauro, 2024\nIdioma: Español', 129.00, 0.0000, 0.0000, 1, 1, 'activo', 'fisico', 1, '2026-02-07 01:40:05', '2026-02-07 02:05:17', 7, 7, 5, 'Tapa dura coffee table', '', '', '16.5x24.5x8.4cm', 2.400, '', 'UND', 1, NULL, NULL, 1, '');
+	(14, '9788445018538', 'El Señor de los Anillos (NE revisada). Ilustrado por Alan Lee', 'ISBN 10: 8445018531 / ISBN 13: 9788445018538\nEditorial: Minotauro, 2024\nIdioma: Español', 129.00, 0.0000, 0.0000, 0, 1, 'activo', 'fisico', 1, '2026-02-07 01:40:05', '2026-02-14 02:32:02', 7, 7, 5, 'Tapa dura coffee table', '', '', '16.5x24.5x8.4cm', 2.400, '', 'UND', 1, NULL, NULL, 1, '');
 
 -- Volcando estructura para tabla dbuzz.producto_componentes
 DROP TABLE IF EXISTS `producto_componentes`;
@@ -1171,7 +1246,38 @@ INSERT INTO `proveedores` (`id`, `nombre`, `rif`, `contacto_nombre`, `email`, `t
 	(3, 'ArtículosCreativos C.A.', NULL, 'Ana Gómez', 'info@articuloscreativos.com', '+58 261 555 0303', 'C.C. Arte, Maracay', NULL, '2026-01-07 21:01:08', NULL, NULL),
 	(4, 'Capi', 'J-1886868', NULL, 'contacto@importutiles.com', '+58 5151161565', 'srdsg', 'sgdsrg', '2026-01-18 03:37:07', NULL, NULL),
 	(5, 'Grupo Planeta, S.A.', 'A-08186249', NULL, 'info@planetadelibros.es', '+3493 492 80 00', 'Avenida Diagonal, 662-664. 08034 Barcelona.', 'Proveedor de libros', '2026-02-07 01:57:39', NULL, NULL),
-	(6, 'Grupo Planeta S.A.', NULL, NULL, NULL, NULL, NULL, NULL, '2026-02-07 02:44:32', NULL, NULL);
+	(6, 'Grupo Planeta S.A.', NULL, NULL, NULL, NULL, NULL, NULL, '2026-02-07 02:44:32', '2026-02-11 00:52:42', '2026-02-11 00:52:42');
+
+-- Volcando estructura para tabla dbuzz.requisiciones
+DROP TABLE IF EXISTS `requisiciones`;
+CREATE TABLE IF NOT EXISTS `requisiciones` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `codigo` varchar(20) NOT NULL COMMENT 'Formato: REQ-YYYY-NNNN',
+  `fecha_solicitud` date NOT NULL,
+  `estado` enum('pendiente','aprobada','rechazada','procesada') NOT NULL DEFAULT 'pendiente',
+  `prioridad` enum('baja','media','alta','urgente') NOT NULL DEFAULT 'media',
+  `notas` text DEFAULT NULL,
+  `usuario_id` int(10) unsigned NOT NULL COMMENT 'Solicitante',
+  `aprobado_por` int(10) unsigned DEFAULT NULL,
+  `fecha_aprobacion` timestamp NULL DEFAULT NULL,
+  `creado_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `actualizado_at` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_codigo` (`codigo`),
+  KEY `idx_estado` (`estado`),
+  KEY `idx_fecha` (`fecha_solicitud`),
+  KEY `idx_prioridad` (`prioridad`),
+  KEY `fk_req_usuario` (`usuario_id`),
+  KEY `fk_req_aprobador` (`aprobado_por`),
+  CONSTRAINT `fk_req_aprobador` FOREIGN KEY (`aprobado_por`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_req_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Encabezado de requisiciones de compra';
+
+-- Volcando datos para la tabla dbuzz.requisiciones: ~2 rows (aproximadamente)
+DELETE FROM `requisiciones`;
+INSERT INTO `requisiciones` (`id`, `codigo`, `fecha_solicitud`, `estado`, `prioridad`, `notas`, `usuario_id`, `aprobado_por`, `fecha_aprobacion`, `creado_at`, `actualizado_at`) VALUES
+	(1, 'REQ-2026-0001', '2026-02-07', 'aprobada', 'alta', 'Requisición automática por stock bajo (3 productos)', 1, 1, '2026-02-07 16:26:46', '2026-02-07 06:45:43', '2026-02-07 16:26:46'),
+	(2, 'REQ-2026-0002', '2026-02-07', 'pendiente', 'media', '', 1, NULL, NULL, '2026-02-07 06:46:49', NULL);
 
 -- Volcando estructura para tabla dbuzz.sesiones_api
 DROP TABLE IF EXISTS `sesiones_api`;
@@ -1187,16 +1293,13 @@ CREATE TABLE IF NOT EXISTS `sesiones_api` (
   KEY `sesiones_api_ibfk_2` (`creado_en`),
   KEY `idx_expiracion` (`expiracion`),
   CONSTRAINT `sesiones_api_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=96 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=105 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
--- Volcando datos para la tabla dbuzz.sesiones_api: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.sesiones_api: ~1 rows (aproximadamente)
 DELETE FROM `sesiones_api`;
 INSERT INTO `sesiones_api` (`id`, `usuario_id`, `token`, `expiracion`, `creado_en`) VALUES
-	(91, 1, '0c4938a5c0e56b74b24e8e24d2b9fa076a16a5ee715c283b3f75a487a6ecd78f', '2026-02-06 11:26:41', '2026-02-05 22:26:41'),
-	(92, 1, '49ae12ecf4eebae5c189fe4cbc9d8871e53367e7ca3a74ec7d730d03c6b210c9', '2026-02-06 15:06:18', '2026-02-06 02:06:18'),
-	(93, 1, 'b2796405a04729f576169a8cadf9318970dbb3638e3caac8f5196ff1d277407d', '2026-02-07 13:35:44', '2026-02-07 00:35:44'),
-	(94, 1, '5e5eb9b9294be6155c732233af1342a9fe17498b0046059e14e0abdbf6731117', '2026-02-07 14:28:38', '2026-02-07 01:28:38'),
-	(95, 1, '108054ac753c4d153ac715b12315d17c73f3ceae9622bf1a6e7d8742fa6228f5', '2026-02-07 17:49:31', '2026-02-07 04:49:31');
+	(103, 1, 'f8c3df0c14deac37441aedbf4794839927efa2ef85fdf2209815d9ed77e09a89', '2026-02-14 12:23:10', '2026-02-13 23:23:10'),
+	(104, 1, '24287564206ba64179a7f45fde8e3fae4b1357259b7d0c80ee0db48a6b601845', '2026-02-15 15:12:28', '2026-02-15 02:12:28');
 
 -- Volcando estructura para tabla dbuzz.stock_ubicacion
 DROP TABLE IF EXISTS `stock_ubicacion`;
@@ -1250,9 +1353,9 @@ CREATE TABLE IF NOT EXISTS `tasas_cambio` (
   KEY `idx_fecha` (`fecha`),
   KEY `FK_tasa_usuario` (`usuario_id`),
   CONSTRAINT `FK_tasa_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tasa de cambio diaria USD para referencia de precios';
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tasa de cambio diaria USD para referencia de precios';
 
--- Volcando datos para la tabla dbuzz.tasas_cambio: ~64 rows (aproximadamente)
+-- Volcando datos para la tabla dbuzz.tasas_cambio: ~76 rows (aproximadamente)
 DELETE FROM `tasas_cambio`;
 INSERT INTO `tasas_cambio` (`id`, `tasa`, `fuente`, `fecha`, `creado_at`, `usuario_id`) VALUES
 	(1, 311.8800, 'bcv', '2026-01-07', '2026-01-08 01:40:29', NULL),
@@ -1318,7 +1421,23 @@ INSERT INTO `tasas_cambio` (`id`, `tasa`, `fuente`, `fecha`, `creado_at`, `usuar
 	(78, 382.6318, 'bcv', '2026-02-07', '2026-02-07 04:49:32', NULL),
 	(79, 545.3300, 'paralelo', '2026-02-07', '2026-02-07 04:49:32', NULL),
 	(80, 451.7495, 'bcv_euro', '2026-02-07', '2026-02-07 04:49:33', NULL),
-	(81, 542.6034, 'binance_usdt', '2026-02-07', '2026-02-07 04:49:33', NULL);
+	(81, 542.6034, 'binance_usdt', '2026-02-07', '2026-02-07 04:49:33', NULL),
+	(82, 385.2720, 'bcv', '2026-02-10', '2026-02-10 22:52:00', NULL),
+	(83, 547.6900, 'paralelo', '2026-02-10', '2026-02-10 22:52:00', NULL),
+	(84, 458.1118, 'bcv_euro', '2026-02-10', '2026-02-10 22:52:01', NULL),
+	(85, 544.9516, 'binance_usdt', '2026-02-10', '2026-02-10 22:52:01', NULL),
+	(86, 388.7394, 'bcv', '2026-02-11', '2026-02-12 02:28:18', NULL),
+	(87, 547.5800, 'paralelo', '2026-02-11', '2026-02-12 02:28:18', NULL),
+	(88, 461.6857, 'bcv_euro', '2026-02-11', '2026-02-12 02:28:19', NULL),
+	(89, 544.8421, 'binance_usdt', '2026-02-11', '2026-02-12 02:28:19', NULL),
+	(90, 396.3674, 'bcv', '2026-02-13', '2026-02-13 23:23:11', NULL),
+	(91, 530.8900, 'paralelo', '2026-02-13', '2026-02-13 23:23:11', NULL),
+	(92, 470.7451, 'bcv_euro', '2026-02-13', '2026-02-13 23:23:12', NULL),
+	(93, 528.2356, 'binance_usdt', '2026-02-13', '2026-02-13 23:23:12', NULL),
+	(94, 396.3674, 'bcv', '2026-02-14', '2026-02-15 02:12:29', NULL),
+	(95, 531.1400, 'paralelo', '2026-02-14', '2026-02-15 02:12:29', NULL),
+	(96, 470.1867, 'bcv_euro', '2026-02-14', '2026-02-15 02:12:29', NULL),
+	(97, 528.4843, 'binance_usdt', '2026-02-14', '2026-02-15 02:12:29', NULL);
 
 -- Volcando estructura para tabla dbuzz.transferencias_almacen
 DROP TABLE IF EXISTS `transferencias_almacen`;
@@ -1394,17 +1513,33 @@ CREATE TABLE IF NOT EXISTS `usuarios` (
   `two_factor_confirmed_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 -- Volcando datos para la tabla dbuzz.usuarios: ~6 rows (aproximadamente)
 DELETE FROM `usuarios`;
 INSERT INTO `usuarios` (`id`, `nombre`, `email`, `password`, `two_factor_secret`, `rol`, `estado`, `creado_at`, `actualizado_at`, `intentos_fallidos`, `two_factor_enabled`, `two_factor_confirmed_at`) VALUES
-	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', '7VRZAXCNBDRIICAI6LTE7R7BUP3LOYCU', 'admin', 'activo', '2025-08-09 17:43:16', '2026-02-07 04:49:05', 0, 1, '2026-01-28 18:02:18'),
+	(1, 'Givi', 'admin@buzz.com', '$2y$10$dU7Lj8mU43zV6Rla7Bd0zuZ5hOOGumIErvLPONXvKM9sD7tAXWp3G', '7VRZAXCNBDRIICAI6LTE7R7BUP3LOYCU', 'admin', 'activo', '2025-08-09 17:43:16', '2026-02-07 19:24:20', 0, 1, '2026-01-28 18:02:18'),
 	(4, 'Gisvel Aray', 'gisvelaray@gmail.com', '$2y$10$yjYWVs.8ODLr7CzI95RNresCNi9gJDOMKyviSoqb1gWfJxLTGjNiG', NULL, 'operador', 'activo', '2025-11-30 18:13:22', '2026-02-07 01:08:26', 0, 0, NULL),
 	(36, 'GiviSupervisor', 'supervisor@buzz.com', '$2y$10$m389cp0CKSWLAODHmzL1Z.zyB8XnGt8BCDFmtoqI781PZcD2EjZna', NULL, 'supervisor', 'activo', '2025-08-14 01:32:53', NULL, 0, 0, NULL),
 	(37, 'GiviOperador', 'operador@buzz.com', '$2y$10$7ofF41nU06Ct9hl90TdzguI8eSxA90RCq4K/i7yWSpic01oTiLCLC', NULL, 'operador', 'activo', '2025-08-14 01:33:00', '2026-02-07 01:29:41', 10, 0, NULL),
 	(63, 'Juan Luis Chaurant', 'juanluischaurant@gmail.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', NULL, 'admin', 'activo', '2025-11-30 21:18:35', NULL, 0, 0, NULL),
 	(101, 'Yeicson Acosta', 'acostajeiison@gmail.com', '$2y$10$eWaKLST8XfAOCcDSluyq6OaeP3ncNkSliDrtxFPjFwkdNwn1DL53K', NULL, 'admin', 'activo', '2026-02-07 01:02:12', NULL, 0, 0, NULL);
+
+-- Volcando estructura para vista dbuzz.vw_productos_stock_bajo_activos
+DROP VIEW IF EXISTS `vw_productos_stock_bajo_activos`;
+-- Creando tabla temporal para superar errores de dependencia de VIEW
+CREATE TABLE `vw_productos_stock_bajo_activos` (
+	`id` INT(20) UNSIGNED NOT NULL,
+	`sku` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
+	`nombre` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
+	`stock` INT(11) NOT NULL,
+	`min_stock` INT(11) NOT NULL,
+	`costo_ultimo` DECIMAL(12,4) NULL,
+	`proveedor_default_id` INT(11) NULL,
+	`proveedor_default_nombre` VARCHAR(1) NULL COLLATE 'utf8mb4_unicode_ci',
+	`nivel_stock` VARCHAR(1) NOT NULL COLLATE 'utf8mb4_uca1400_ai_ci',
+	`cantidad_faltante` BIGINT(12) NOT NULL
+);
 
 -- Volcando estructura para vista dbuzz.v_almacenes_resumen
 DROP VIEW IF EXISTS `v_almacenes_resumen`;
@@ -1930,6 +2065,32 @@ BEGIN
 END//
 DELIMITER ;
 SET SQL_MODE=@OLDTMP_SQL_MODE;
+
+-- Eliminando tabla temporal y crear estructura final de VIEW
+DROP TABLE IF EXISTS `vw_productos_stock_bajo_activos`;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `vw_productos_stock_bajo_activos` AS SELECT
+            p.id,
+            p.sku,
+            p.nombre,
+            p.stock,
+            p.min_stock,
+            p.costo_ultimo,
+            p.proveedor_id AS proveedor_default_id,
+            prov.nombre AS proveedor_default_nombre,
+            CASE
+                WHEN p.stock = 0 THEN 'agotado'
+                WHEN p.stock <= p.min_stock THEN 'bajo'
+                ELSE 'normal'
+            END AS nivel_stock,
+            (p.min_stock - p.stock) AS cantidad_faltante
+        FROM productos p
+        LEFT JOIN proveedores prov ON prov.id = p.proveedor_id
+        WHERE p.estado != 'inactivo'
+          AND p.stock <= p.min_stock
+        ORDER BY
+            CASE WHEN p.stock = 0 THEN 0 ELSE 1 END,
+            (p.min_stock - p.stock) DESC 
+;
 
 -- Eliminando tabla temporal y crear estructura final de VIEW
 DROP TABLE IF EXISTS `v_almacenes_resumen`;

@@ -326,15 +326,15 @@ class CargoRepository {
      * Get products supplied by a provider with their last prices
      */
     public function getProductsByProvider($proveedorId) {
-        $sql = "SELECT pp.producto_id, pr.sku, pr.nombre AS producto_nombre,
+        $sql = "SELECT pr.id AS producto_id, pr.sku, pr.nombre AS producto_nombre,
                        pp.precio_compra, pp.fecha_registro, c.codigo AS cargo_codigo
-                FROM precios_proveedor pp
-                INNER JOIN productos pr ON pp.producto_id = pr.id
+                FROM productos pr
+                LEFT JOIN precios_proveedor pp ON pr.id = pp.producto_id AND pp.proveedor_id = ? AND pp.es_ultimo = 1
                 LEFT JOIN cargos_existencias c ON pp.cargo_id = c.id
-                WHERE pp.proveedor_id = ? AND pp.es_ultimo = 1
+                WHERE pr.proveedor_id = ? OR pp.id IS NOT NULL
                 ORDER BY pr.nombre";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$proveedorId]);
+        $stmt->execute([$proveedorId, $proveedorId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }

@@ -80,7 +80,6 @@ function injectMobileLayout(topNavbar) {
 
     // 3. Detect current page for "active" state
     const currentPath = window.location.pathname.split('/').pop().replace('.php', '');
-    const isDashboard = currentPath === 'dashboard' || currentPath === '' || currentPath === 'index';
 
     // 4. Build bottom nav bar
     const nav = document.createElement('nav');
@@ -93,15 +92,7 @@ function injectMobileLayout(topNavbar) {
     manualItem.className = 'bottom-nav-item' + (currentPath === 'manual' ? ' active' : '');
     manualItem.innerHTML = '<i class="fas fa-book"></i><span>Manual</span>';
 
-    // --- Item 2: Notifications ---
-    const notifItem = document.createElement('button');
-    notifItem.className = 'bottom-nav-item';
-    notifItem.id = 'notifBell';
-    notifItem.type = 'button';
-    notifItem.onclick = toggleHub;
-    notifItem.innerHTML = '<i class="fas fa-bell"></i><span>Alertas</span>';
-
-    // --- Item 3: Primary action (if exists) ---
+    // --- Item 2: Primary action (if exists) - centered ---
     let primaryItem = null;
     if (primaryAction) {
         primaryItem = document.createElement('button');
@@ -119,17 +110,27 @@ function injectMobileLayout(topNavbar) {
         }
     }
 
-    // --- Item 4: Home ---
-    const homeItem = document.createElement('a');
-    homeItem.href = 'dashboard.php';
-    homeItem.className = 'bottom-nav-item' + (isDashboard ? ' active' : '');
-    homeItem.innerHTML = '<i class="fas fa-home"></i><span>Inicio</span>';
+    // --- Item 3: Notifications ---
+    const notifItem = document.createElement('button');
+    notifItem.className = 'bottom-nav-item';
+    notifItem.id = 'notifBell';
+    notifItem.type = 'button';
+    notifItem.onclick = toggleHub;
+    notifItem.innerHTML = '<i class="fas fa-bell"></i><span>Alertas</span>';
 
-    // Assemble: Manual, Notif, [Primary], Home
+    // Assemble: Manual, [Primary], Notif
     nav.appendChild(manualItem);
-    nav.appendChild(notifItem);
     if (primaryItem) nav.appendChild(primaryItem);
-    nav.appendChild(homeItem);
+    nav.appendChild(notifItem);
+
+    // 5. Pull company name from the (hidden) system-footer and show it in bottom nav
+    const footerCompany = document.querySelector('.system-footer-right .footer-value');
+    if (footerCompany && footerCompany.textContent.trim()) {
+        const companyRow = document.createElement('div');
+        companyRow.className = 'bottom-nav-company';
+        companyRow.innerHTML = '<i class="fas fa-building"></i>' + footerCompany.textContent.trim();
+        nav.appendChild(companyRow);
+    }
 
     document.body.appendChild(nav);
 }

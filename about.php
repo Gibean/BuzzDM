@@ -300,8 +300,8 @@
                         <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-label">VERSIÓN</div>
-                                <div class="stat-value">v1.3.4.x</div>
-                                <div class="stat-sub">Build 2026.01</div>
+                                <div class="stat-value">v1.4.0</div>
+                                <div class="stat-sub">Build 2026.02</div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -389,6 +389,13 @@
                                 <div>
                                     <div class="feature-name">Recuperación de Contraseña</div>
                                     <div class="feature-desc">Reset vía correo electrónico</div>
+                                </div>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <div>
+                                    <div class="feature-name">Mobile Optimized</div>
+                                    <div class="feature-desc">Diseño responsivo y adaptativo para móviles</div>
                                 </div>
                             </div>
                             <div class="feature-item">
