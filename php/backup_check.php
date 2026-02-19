@@ -6,6 +6,9 @@
  * in a non-blocking way. It's called on every page load for logged-in users.
  */
 
+// Load centralized config for URL generation
+require_once __DIR__ . '/config.php';
+
 // Only load config if not already loaded
 if (!defined('BACKUP_SECRET_TOKEN')) {
     require_once __DIR__ . '/backup_config.php';
@@ -146,13 +149,7 @@ function checkAndRunBcvSync() {
  * Trigger the BCV sync script asynchronously
  */
 function triggerBcvSyncAsync() {
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $basePath = dirname($scriptName);
-    if (basename($basePath) === 'php') $basePath = dirname($basePath);
-
-    $url = $protocol . '://' . $host . rtrim($basePath, '/') . '/php/tasa_bcv_update.php';
+    $url = app_url('php/tasa_bcv_update.php');
 
     // Fire and forget
     if (function_exists('curl_init')) {
@@ -216,28 +213,9 @@ function triggerBackupAsync() {
  * Get the full URL to the backup script with token
  */
 function getBackupUrl() {
-    // Determine protocol
-    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-
-    // Get host
-    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-
-    // Get the base URL path
-    // If SCRIPT_NAME is /BuzzDM/dashboard.php, we want /BuzzDM
-    $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-    $basePath = dirname($scriptName);
-
-    // Handle case where we're in /php/ subdirectory
-    if (basename($basePath) === 'php') {
-        $basePath = dirname($basePath);
-    }
-
-    // Build the backup script URL
-    $backupScript = rtrim($basePath, '/') . '/php/auto_backup.php';
-
-    // Build full URL with token and fallback flag
+    // Build full URL with token and fallback flag using centralized config
     $token = defined('BACKUP_SECRET_TOKEN') ? BACKUP_SECRET_TOKEN : '';
-    $url = $protocol . '://' . $host . $backupScript
+    $url = app_url('php/auto_backup.php')
          . '?token=' . urlencode($token)
          . '&fallback=1&json=1'
          . '&triggered_by=' . ($_SESSION['usuario_id'] ?? 'unknown');
