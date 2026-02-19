@@ -222,7 +222,7 @@ class AuthService {
     }
 
     private function sendPasswordResetEmail($user, $token) {
-        $resetLink = getAppBaseUrl() . '/reset_password?token=' . $token;
+        $resetLink = app_url('reset_password') . '?token=' . $token;
         $mail = new PHPMailer(true);
         $config = getMailerConfig();
 
