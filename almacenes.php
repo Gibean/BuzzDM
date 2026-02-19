@@ -18,20 +18,13 @@
     <?php require_once 'php/sidebar.php'; ?>
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE ALMACENES</h1>
-                <span class="text-muted ms-2 font-mono">/ UBICACIONES</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" id="btnNewAlmacen" onclick="openAlmacenModal()">
-                    <i class="fas fa-plus"></i> Nuevo Almacén
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'GESTIÓN DE ALMACENES';
+        $nav_subtitle = 'UBICACIONES';
+        $nav_actions = '<button class="btn btn-buzz" id="btnNewAlmacen" onclick="openAlmacenModal()"><i class="fas fa-plus"></i> Nuevo Almacén</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Stats Cards -->
         <div class="row mb-4">
