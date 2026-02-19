@@ -17,6 +17,8 @@
   --font-primary: "Orbitron", sans-serif;
   --font-monospace: "Roboto Mono", monospace;
   --font-secondary: "Inter", sans-serif;
+  --mobile-nav-height: 80px;
+  --mobile-nav-safe-area: 24px;
 }
 
 /* ============================================
@@ -597,7 +599,10 @@ body {
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: 90px; /* Space for bottom nav */
+    padding-bottom: calc(
+      var(--mobile-nav-height) + var(--mobile-nav-safe-area) +
+        env(safe-area-inset-bottom, 20px)
+    );
   }
 }
 
@@ -624,7 +629,8 @@ body {
     -webkit-backdrop-filter: blur(16px);
     justify-content: space-around;
     align-items: center;
-    padding: 6px 4px 0 4px;
+    padding: 6px 4px
+      calc(var(--mobile-nav-safe-area) + env(safe-area-inset-bottom, 20px)) 4px;
     box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.5);
   }
 
@@ -768,7 +774,6 @@ body {
 
   .top-navbar__subtitle {
     display: inline;
-    margin-left: 0.5rem;
   }
 }
 
@@ -1205,6 +1210,10 @@ input:-webkit-autofill:active {
   .main-content {
     margin-left: 0;
     padding: 0.5rem 1.5rem;
+    padding-bottom: calc(
+      var(--mobile-nav-height) + var(--mobile-nav-safe-area) +
+        env(safe-area-inset-bottom, 20px)
+    );
   }
 
   /* Reduce padding for cards on mobile */
@@ -2454,6 +2463,10 @@ input:-webkit-autofill:active {
 @media (max-width: 768px) {
   .sidebar-enhanced {
     transform: translateX(-100%);
+    padding-bottom: calc(
+      var(--mobile-nav-height) + env(safe-area-inset-bottom, 20px)
+    );
+    box-sizing: border-box;
   }
 
   .sidebar-enhanced.show {
