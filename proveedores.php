@@ -53,6 +53,11 @@
         }
         .proveedor-actions button {
             flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            white-space: nowrap;
         }
         .empty-state {
             text-align: center;
