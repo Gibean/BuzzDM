@@ -114,7 +114,7 @@
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <span class="input-group-text bg-dark border-secondary text-primary"><i class="fas fa-hashtag"></i></span>
-                                        <input type="text" class="form-control form-control-buzz" id="transferenciaCodigo"
+                                        <input type="text" class="form-control form-control-buzz form-control-autogen" id="transferenciaCodigo"
                                                readonly tabindex="-1" placeholder="Código auto-generado">
                                     </div>
                                 </div>
