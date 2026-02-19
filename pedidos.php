@@ -20,20 +20,13 @@
      <!-- Main Content  -->
     <main class="main-content">
          <!-- Top Navbar  -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">PEDIDOS</h1>
-                <span class="text-muted ms-2 font-mono">/ GESTIÓN</span>
-            </div>
-            <div>
-                <button class="btn btn-buzz" id="newOrderBtn">
-                    <i class="fas fa-plus"></i> Nuevo Pedido
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'PEDIDOS';
+        $nav_subtitle = 'GESTIÓN';
+        $nav_actions = '<button class="btn btn-buzz" id="newOrderBtn"><i class="fas fa-plus"></i> Nuevo Pedido</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
 
             <!-- Filtros -->

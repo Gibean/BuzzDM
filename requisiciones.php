@@ -22,23 +22,18 @@
 
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">REQUISICIONES</h1>
-                <span class="text-muted ms-2 font-mono">/ PLAN DE ABASTECIMIENTO</span>
-            </div>
-            <div class="d-flex gap-2">
+        <?php
+        $nav_title = 'REQUISICIONES';
+        $nav_subtitle = 'PLAN DE ABASTECIMIENTO';
+        $nav_actions = '
                 <button class="btn btn-outline-warning" id="btnFromLowStock" title="Crear desde productos con stock bajo">
                     <i class="fas fa-magic"></i><span class="btn-text"> Auto-Stock</span>
                 </button>
                 <button class="btn btn-buzz" id="btnNuevaRequisicion">
                     <i class="fas fa-plus"></i><span class="btn-text"> Nueva Requisición</span>
-                </button>
-            </div>
-        </nav>
+                </button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Vista de Historial (por defecto) -->
         <div id="vistaHistorial">

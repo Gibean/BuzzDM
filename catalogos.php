@@ -18,15 +18,12 @@
     <?php require_once 'php/sidebar.php'; ?>
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE CATÁLOGOS</h1>
-                <span class="text-muted ms-2 font-mono">/ MAESTROS</span>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'GESTIÓN DE CATÁLOGOS';
+        $nav_subtitle = 'MAESTROS';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <div class="container-fluid py-4">
             <!-- Search Bar -->

@@ -20,20 +20,12 @@
     <!-- Main Content -->
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">TO-DO</h1>
-                <span class="text-muted ms-2 font-mono">/ GESTIÓN DE TAREAS</span>
-            </div>
-            <div>
-                <button class="btn btn-buzz" id="btnNewNote" onclick="openNewNoteModal()">
-                    <i class="fas fa-plus"></i> Nueva Nota
-                </button>
-            </div>
-        </nav>
+        <?php
+        $nav_title = 'TO-DO';
+        $nav_subtitle = 'GESTIÓN DE TAREAS';
+        $nav_actions = '<button class="btn btn-buzz" id="btnNewNote" onclick="openNewNoteModal()"><i class="fas fa-plus"></i> Nueva Nota</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Kanban Board Area -->
         <div class="container-fluid py-4">
