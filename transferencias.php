@@ -21,23 +21,15 @@
 
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">TRANSFERENCIAS</h1>
-                <span class="text-muted ms-2 font-mono">/ MOVIMIENTO DE STOCK</span>
-            </div>
-            <div class="d-flex align-items-center gap-2">
-                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()">
-                    <i class="fas fa-history"></i> Historial
-                </button>
-                <button class="btn btn-buzz" id="btnNueva" onclick="nuevaTransferencia()">
-                    <i class="fas fa-plus"></i> Nueva Transferencia
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'TRANSFERENCIAS';
+        $nav_subtitle = 'MOVIMIENTO DE STOCK';
+        $nav_actions = '
+                <button class="btn btn-outline-buzz" id="btnVerHistorial" onclick="verHistorial()"><i class="fas fa-history"></i> Historial</button>
+                <button class="btn btn-buzz" id="btnNueva" onclick="nuevaTransferencia()"><i class="fas fa-plus"></i> Nueva Transferencia</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Vista Historial -->
         <div id="vistaHistorial">
