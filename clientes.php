@@ -19,20 +19,13 @@
     <?php require_once 'php/sidebar.php'; ?>
     <main class="main-content">
          <!-- Top Navbar  -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE CLIENTES</h1>
-                <span class="text-muted ms-2 font-mono">/ CLIENTES</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" id="btnNewCliente" onclick="openModal('createCustomerModal')">
-                    <i class="fas fa-plus"></i> Nuevo Cliente
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'GESTIÓN DE CLIENTES';
+        $nav_subtitle = 'CLIENTES';
+        $nav_actions = '<button class="btn btn-buzz" id="btnNewCliente" onclick="openModal(\'createCustomerModal\')"><i class="fas fa-plus"></i> Nuevo Cliente</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Frequent Customers Section (Full Width) -->
         <div class="row mb-4">

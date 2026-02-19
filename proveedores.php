@@ -113,20 +113,13 @@
 
     <main class="main-content">
         <!-- Top Navbar -->
-        <nav class="top-navbar">
-            <div class="d-flex align-items-center">
-                <button class="btn btn-outline-buzz me-3 d-md-none" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <h1 class="font-primary mb-0">GESTIÓN DE PROVEEDORES</h1>
-                <span class="text-muted ms-2 font-mono">/ PROVEEDORES</span>
-            </div>
-            <div class="d-flex align-items-center">
-                <button class="btn btn-buzz" id="btnNewProveedor" onclick="abrirModalProveedor()">
-                    <i class="fas fa-plus"></i> Nuevo Proveedor
-                </button>
-            </div>
-        </nav>
+        <!-- Top Navbar -->
+        <?php
+        $nav_title = 'GESTIÓN DE PROVEEDORES';
+        $nav_subtitle = 'PROVEEDORES';
+        $nav_actions = '<button class="btn btn-buzz" id="btnNewProveedor" onclick="abrirModalProveedor()"><i class="fas fa-plus"></i> Nuevo Proveedor</button>';
+        require_once 'php/top_navbar.php';
+        ?>
 
         <!-- Lista de proveedores -->
         <div id="proveedoresContainer">
