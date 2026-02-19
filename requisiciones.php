@@ -294,7 +294,12 @@
             </div>
             <div class="modal-body-buzz text-center">
                 <p id="passwordModalMessage" class="text-muted small">Para generar el reporte, ingrese su contraseña de administrador:</p>
-                <input type="password" class="form-control form-control-buzz text-center mb-2" id="confirmPasswordInput" placeholder="Contraseña">
+                <div style="position: relative;">
+                    <input type="password" class="form-control form-control-buzz text-center mb-2" id="confirmPasswordInput" placeholder="Contraseña" style="padding-right: 45px;">
+                    <button type="button" class="btn-toggle-password" data-target="confirmPasswordInput" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%);" aria-label="Toggle password visibility">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
             </div>
             <div class="modal-footer-buzz">
                 <button type="button" class="btn btn-outline-buzz btn-sm" onclick="cerrarModalPassword()">Cancelar</button>
