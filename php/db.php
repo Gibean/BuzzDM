@@ -13,11 +13,19 @@ if (file_exists($autoload_path)) {
 }
 
 // Load .env configuration if available
+// Strategy: load .env first (production defaults), then .env.local overrides (local dev)
 $dotenv_path = __DIR__ . '/../';
-if (class_exists('Dotenv\Dotenv') && file_exists($dotenv_path . '.env')) {
-    $dotenv = Dotenv\Dotenv::createImmutable($dotenv_path);
-    $dotenv->safeLoad(); // safeLoad won't throw if .env doesn't exist
+if (class_exists('Dotenv\\Dotenv')) {
+    if (file_exists($dotenv_path . '.env')) {
+        $dotenv = Dotenv\Dotenv::createMutable($dotenv_path, '.env');
+        $dotenv->safeLoad();
+    }
+    if (file_exists($dotenv_path . '.env.local')) {
+        $dotenvLocal = Dotenv\Dotenv::createMutable($dotenv_path, '.env.local');
+        $dotenvLocal->safeLoad();
+    }
 }
+
 
 /**
  * Database singleton class
