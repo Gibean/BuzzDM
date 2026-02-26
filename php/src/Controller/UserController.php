@@ -39,7 +39,9 @@ class UserController {
         try {
             switch ($method) {
                 case 'GET':
-                    if (isset($_GET['id'])) {
+                    if (isset($_GET['action']) && $_GET['action'] === 'get_sessions') {
+                        $this->getSessionStats();
+                    } elseif (isset($_GET['id'])) {
                         $this->getUser($_GET['id']);
                     } else {
                         $this->getAllUsers();
@@ -85,6 +87,13 @@ class UserController {
         $user = $this->service->getUserById($id);
         if ($user) $this->jsonResponse(true, $user);
         else $this->jsonResponse(false, null, 'Usuario no encontrado');
+    }
+
+    private function getSessionStats() {
+        $stats = $this->service->getSessionStats();
+        header('Content-Type: application/json');
+        echo json_encode($stats);
+        exit;
     }
 
     #[OA\Post(
