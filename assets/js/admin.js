@@ -517,7 +517,7 @@ function updateActiveFiltersCount() {
 
     try {
       const sessionData = await fetchJSON("php/api_users.php?action=get_sessions")
-      const todaySessions = sessionData.session_count
+      const todaySessions = sessionData?.session_count ?? 0
       document.getElementById("todaySessions").textContent = todaySessions
     } catch (error) {
       console.error("Error fetching sessions:", error)
