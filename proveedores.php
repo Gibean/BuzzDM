@@ -146,7 +146,7 @@
                 </h5>
                 <button type="button" class="close-buzz" onclick="cerrarModalProveedor()">&times;</button>
             </div>
-            <form id="formProveedor">
+            <form id="formProveedor" novalidate>
                 <input type="hidden" id="proveedorId">
                 <div class="modal-body-buzz">
                     <!-- Información Básica Section -->
@@ -384,6 +384,9 @@
             document.getElementById('proveedorId').value = '';
             document.getElementById('formProveedor').reset();
             document.getElementById('modalProveedorTitulo').textContent = 'Nuevo Proveedor';
+            ['proveedorNombre', 'proveedorRif', 'proveedorEmail', 'proveedorTelefono'].forEach(id => {
+                document.getElementById(id)?.classList.remove('is-invalid');
+            });
             document.getElementById('modalProveedor').style.display = 'block';
         }
 
@@ -395,6 +398,9 @@
             const proveedor = proveedores.find(p => p.id == id);
             if (!proveedor) return;
 
+            ['proveedorNombre', 'proveedorRif', 'proveedorEmail', 'proveedorTelefono'].forEach(fid => {
+                document.getElementById(fid)?.classList.remove('is-invalid');
+            });
             document.getElementById('proveedorId').value = proveedor.id;
             document.getElementById('proveedorNombre').value = proveedor.nombre || '';
             document.getElementById('proveedorRif').value = proveedor.rif || '';
@@ -407,14 +413,12 @@
         }
 
         async function guardarProveedor() {
+            const form = document.getElementById('formProveedor');
+            if (typeof validateFormWithToast === 'function' && !validateFormWithToast(form)) return;
+
             const id = document.getElementById('proveedorId').value;
             const nombre = document.getElementById('proveedorNombre').value.trim();
             const rif = document.getElementById('proveedorRif').value.trim();
-
-            if (!nombre) {
-                showToast('El nombre es obligatorio', 'warning');
-                return;
-            }
 
             if (rif && typeof isValidVenezuelaRif === 'function') {
                 const rifCheck = isValidVenezuelaRif(rif);
@@ -433,6 +437,21 @@
                     showToast(emailCheck.message, 'warning');
                     document.getElementById('proveedorEmail').classList.add('is-invalid');
                     document.getElementById('proveedorEmail').focus();
+                    return;
+                }
+            }
+
+            const fullPhone = combinePhoneNumber('proveedorPais', 'proveedorTelefono');
+            const countryCode = document.getElementById('proveedorPais').value;
+            if (fullPhone && typeof isValidVenezuelaPhone === 'function') {
+                const digits = fullPhone.replace(/\D/g, '');
+                const phoneValid = (countryCode === '+58')
+                    ? isValidVenezuelaPhone(fullPhone)
+                    : (digits.length >= 10 ? { valid: true } : { valid: false, message: 'El teléfono debe tener al menos 10 dígitos.' });
+                if (!phoneValid.valid) {
+                    showToast(phoneValid.message, 'warning');
+                    document.getElementById('proveedorTelefono').classList.add('is-invalid');
+                    document.getElementById('proveedorTelefono').focus();
                     return;
                 }
             }

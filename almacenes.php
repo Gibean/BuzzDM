@@ -125,7 +125,7 @@
                 </h5>
                 <button type="button" class="close-buzz" onclick="closeAlmacenModal()">&times;</button>
             </div>
-            <form id="almacenForm" onsubmit="event.preventDefault(); saveAlmacen();">
+            <form id="almacenForm" novalidate onsubmit="event.preventDefault(); saveAlmacen();">
                 <input type="hidden" id="almacenId">
                 <div class="modal-body-buzz">
                     <!-- Información Básica -->
