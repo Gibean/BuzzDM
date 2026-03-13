@@ -42,6 +42,11 @@ const ubicacionNivelInput = document.getElementById('ubicacionNivel');
 const ubicacionCapacidadInput = document.getElementById('ubicacionCapacidad');
 const ubicacionActivoCheck = document.getElementById('ubicacionActivo');
 
+// Validación de teléfono venezolano
+if (typeof initVenezuelaPhoneValidation === 'function') {
+  initVenezuelaPhoneValidation(almacenTelefonoInput);
+}
+
 // ========================================
 // FETCH FUNCTIONS
 // ========================================
@@ -238,10 +243,21 @@ window.saveAlmacen = async function() {
     const id = almacenIdInput.value;
     const codigo = almacenCodigoInput.value.trim();
     const nombre = almacenNombreInput.value.trim();
+    const telefono = almacenTelefonoInput.value.trim();
 
     if (!nombre) {
         showToast('El nombre es requerido', 'warning');
         return;
+    }
+
+    if (telefono && typeof isValidVenezuelaPhone === 'function') {
+        const phoneCheck = isValidVenezuelaPhone(telefono);
+        if (!phoneCheck.valid) {
+            showToast(phoneCheck.message, 'warning');
+            almacenTelefonoInput.classList.add('is-invalid');
+            almacenTelefonoInput.focus();
+            return;
+        }
     }
 
     const data = {
@@ -249,7 +265,7 @@ window.saveAlmacen = async function() {
         codigo: codigo,
         nombre: nombre,
         tipo: almacenTipoInput.value,
-        telefono: almacenTelefonoInput.value.trim(),
+        telefono: telefono,
         direccion: almacenDireccionInput.value.trim(),
         es_principal: almacenPrincipalCheck.checked,
         activo: almacenActivoCheck.checked,

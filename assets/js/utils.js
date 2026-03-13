@@ -61,4 +61,80 @@
     toArray(decimal).forEach(applyDecimalValidation)
     toArray(integer).forEach(applyIntegerValidation)
   }
+
+  /**
+   * Valida si un valor es un número telefónico venezolano válido.
+   * Acepta: 04141234567, 02121234567, +58 414 123 4567, 58 414 123 4567
+   * Móvil: 0414, 0424, 0412, 0416, 0422, 0426, 0415 | Fijo: 02xx (Caracas 0212, etc.)
+   * @param {string} value - Valor a validar
+   * @returns {{ valid: boolean, normalized?: string, message?: string }}
+   */
+  window.isValidVenezuelaPhone = function (value) {
+    if (!value || typeof value !== "string") return { valid: true }
+    const digits = value.replace(/\D/g, "")
+    if (digits.length === 0) return { valid: true }
+    let normalized = digits
+    if (digits.length === 11 && digits.startsWith("0")) normalized = digits.slice(1)
+    else if (digits.length === 12 && digits.startsWith("58")) normalized = digits.slice(2)
+    else if (digits.length === 13 && digits.startsWith("0058")) normalized = digits.slice(4)
+    if (normalized.length !== 10) {
+      return { valid: false, message: "El teléfono debe tener 10 dígitos (ej: 04141234567 o 02121234567)" }
+    }
+    const mobileRe = /^(412|414|415|416|417|418|422|424|426)\d{7}$/
+    const landlineRe = /^2[1-9]\d{8}$/
+    if (!mobileRe.test(normalized) && !landlineRe.test(normalized)) {
+      return { valid: false, message: "Formato inválido. Móvil: 0414/0424/0412... | Fijo: 0212/0241..." }
+    }
+    return { valid: true, normalized: "+58" + normalized }
+  }
+
+  /**
+   * Inicializa validación y formato para inputs de teléfono venezolano.
+   * Permite solo dígitos, +, espacios, guiones. Valida al salir del campo (blur).
+   * @param {HTMLElement|HTMLElement[]} elements - Input(s) de teléfono
+   * @param {number} [maxLength=18] - Límite de caracteres (ej: +58 414 123 4567 = 15)
+   */
+  window.initVenezuelaPhoneValidation = function (elements, maxLength = 18) {
+    toArray(elements).forEach((el) => {
+      if (!el) return
+      el.setAttribute("maxlength", maxLength)
+      el.addEventListener("keypress", (e) => {
+        const c = e.key
+        if (!/[\d+\s\-()]/.test(c) && !["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight"].includes(c)) e.preventDefault()
+        else if (el.value.length >= maxLength && !["Backspace", "Delete"].includes(c)) e.preventDefault()
+      })
+      el.addEventListener("paste", (e) => {
+        e.preventDefault()
+        const pasted = (e.clipboardData?.getData("text") || "").replace(/[^\d+\s\-()]/g, "")
+        const start = el.selectionStart
+        const end = el.selectionEnd
+        const current = el.value
+        const newVal = (current.substring(0, start) + pasted + current.substring(end)).replace(/[^\d+\s\-()]/g, "").slice(0, maxLength)
+        el.value = newVal
+        const pos = Math.min(start + pasted.length, newVal.length)
+        el.setSelectionRange(pos, pos)
+      })
+      el.addEventListener("input", () => {
+        let v = el.value.replace(/[^\d+\s\-()]/g, "")
+        if (v.length > maxLength) v = v.slice(0, maxLength)
+        if (v !== el.value) el.value = v
+      })
+      el.addEventListener("blur", () => {
+        const v = el.value.trim()
+        if (!v) return
+        const result = window.isValidVenezuelaPhone(v)
+        if (!result.valid) {
+          el.classList.add("is-invalid")
+          el.setCustomValidity(result.message)
+        } else {
+          el.classList.remove("is-invalid")
+          el.setCustomValidity("")
+        }
+      })
+      el.addEventListener("focus", () => {
+        el.classList.remove("is-invalid")
+        el.setCustomValidity("")
+      })
+    })
+  }
 })()
