@@ -287,21 +287,24 @@
                                 <label class="form-label">Precio Unitario *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
-                                    <input type="number" class="form-control form-control-buzz" id="productPrice" step="0.01" min="0" required>
+                                    <input type="text" inputmode="decimal" class="form-control form-control-buzz" id="productPrice" placeholder="0.00" required
+                                           pattern="[0-9]+\.?[0-9]*" title="Solo números (ej: 10.50)">
                                 </div>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Stock Actual *</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-boxes"></i></span>
-                                    <input type="number" class="form-control form-control-buzz" id="productStock" min="0" required>
+                                    <input type="text" inputmode="numeric" class="form-control form-control-buzz" id="productStock" placeholder="0" required
+                                           pattern="[0-9]+" title="Solo números enteros">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label text-muted">Stock Mínimo</label>
-                                <input type="number" class="form-control form-control-buzz" id="productMinStock" value="10" min="0">
+                                <input type="text" inputmode="numeric" class="form-control form-control-buzz" id="productMinStock" value="10" placeholder="10"
+                                       pattern="[0-9]+" title="Solo números enteros">
                                 <small class="text-muted font-mono">Alerta cuando el stock sea menor</small>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -481,6 +484,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js"></script>
