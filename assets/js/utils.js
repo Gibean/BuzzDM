@@ -137,4 +137,127 @@
       })
     })
   }
+
+  /**
+   * Valida si un valor tiene formato RIF venezolano válido.
+   * Formato: X-NNNNNNNN o X-NNNNNNNN-N (V/E/J/P/G + 8 dígitos [+ 1 dígito verificador])
+   * Ej: J-12345678-9, V-12345678, J-1886868
+   * @param {string} value - Valor a validar
+   * @returns {{ valid: boolean, message?: string }}
+   */
+  window.isValidVenezuelaRif = function (value) {
+    if (!value || typeof value !== "string") return { valid: true }
+    const v = value.trim().toUpperCase()
+    if (v.length === 0) return { valid: true }
+    const normalized = v.replace(/[\s\-]/g, "")
+    if (!/^[VEJPG]\d{7,9}$/.test(normalized)) {
+      return { valid: false, message: "Formato RIF: letra (V/E/J/P/G), guión, 7 a 9 dígitos. Ej: J-12345678-9" }
+    }
+    return { valid: true }
+  }
+
+  /**
+   * Inicializa validación para inputs de RIF venezolano.
+   * Formato automático X-NNNNNNNN-N. Valida al salir del campo (blur).
+   * @param {HTMLElement|HTMLElement[]} elements - Input(s) de RIF
+   * @param {number} [maxLength=12] - Límite (J-12345678-9 = 12)
+   */
+  window.initVenezuelaRifValidation = function (elements, maxLength = 12) {
+    function formatRif(str) {
+      const s = (str || "").toUpperCase().replace(/[^VEJPG0-9]/g, "")
+      if (!/^[VEJPG]/.test(s)) return s.slice(0, 1)
+      const letter = s[0]
+      const digits = s.slice(1).slice(0, 9)
+      if (digits.length <= 8) return letter + (digits ? "-" + digits : "")
+      return letter + "-" + digits.slice(0, 8) + "-" + digits[8]
+    }
+    toArray(elements).forEach((el) => {
+      if (!el) return
+      el.setAttribute("maxlength", maxLength)
+      el.addEventListener("keypress", (e) => {
+        const c = e.key
+        if (["Backspace", "Delete", "Tab", "ArrowLeft", "ArrowRight"].includes(c)) return
+        if (el.value.length >= maxLength) return e.preventDefault()
+        if (!/[VEJPGvejpg0-9\-]/.test(c)) return e.preventDefault()
+        if (el.selectionStart === 0 && el.selectionEnd === 0 && !/[VEJPGvejpg]/.test(c)) e.preventDefault()
+      })
+      el.addEventListener("input", () => {
+        let v = el.value.toUpperCase().replace(/[^VEJPG0-9\-]/g, "")
+        const letter = (v.match(/^[VEJPG]/) || [""])[0]
+        const rest = v.slice(letter.length).replace(/-/g, "")
+        if (letter && rest.length > 0) v = formatRif(letter + rest)
+        if (v.length > maxLength) v = v.slice(0, maxLength)
+        if (v !== el.value) el.value = v
+      })
+      el.addEventListener("paste", (e) => {
+        e.preventDefault()
+        const pasted = (e.clipboardData?.getData("text") || "").toUpperCase().replace(/[^VEJPG0-9]/g, "")
+        const start = el.selectionStart
+        const end = el.selectionEnd
+        const current = el.value.replace(/-/g, "")
+        const merged = (current.substring(0, start) + pasted + current.substring(end)).replace(/[^VEJPG0-9]/g, "")
+        const newVal = formatRif(merged).slice(0, maxLength)
+        el.value = newVal
+        el.setSelectionRange(newVal.length, newVal.length)
+      })
+      el.addEventListener("blur", () => {
+        const v = el.value.trim()
+        if (!v) return
+        const result = window.isValidVenezuelaRif(v)
+        if (!result.valid) {
+          el.classList.add("is-invalid")
+          el.setCustomValidity(result.message)
+        } else {
+          el.classList.remove("is-invalid")
+          el.setCustomValidity("")
+        }
+      })
+      el.addEventListener("focus", () => {
+        el.classList.remove("is-invalid")
+        el.setCustomValidity("")
+      })
+    })
+  }
+
+  /**
+   * Valida si un valor tiene formato de email válido.
+   * @param {string} value - Valor a validar
+   * @returns {{ valid: boolean, message?: string }}
+   */
+  window.isValidEmail = function (value) {
+    if (!value || typeof value !== "string") return { valid: true }
+    const v = value.trim()
+    if (v.length === 0) return { valid: true }
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!re.test(v)) {
+      return { valid: false, message: "Ingrese un email válido (ej: ejemplo@dominio.com)" }
+    }
+    return { valid: true }
+  }
+
+  /**
+   * Inicializa validación para inputs de email. Valida al salir del campo (blur).
+   * @param {HTMLElement|HTMLElement[]} elements - Input(s) de email
+   */
+  window.initEmailValidation = function (elements) {
+    toArray(elements).forEach((el) => {
+      if (!el) return
+      el.addEventListener("blur", () => {
+        const v = el.value.trim()
+        if (!v) return
+        const result = window.isValidEmail(v)
+        if (!result.valid) {
+          el.classList.add("is-invalid")
+          el.setCustomValidity(result.message)
+        } else {
+          el.classList.remove("is-invalid")
+          el.setCustomValidity("")
+        }
+      })
+      el.addEventListener("focus", () => {
+        el.classList.remove("is-invalid")
+        el.setCustomValidity("")
+      })
+    })
+  }
 })()
