@@ -58,6 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
   // Load catalogs on page load
   cargarCatalogos()
 
+  // Validación de inputs numéricos (utilidad reutilizable)
+  initNumericInputValidation({
+    decimal: productPrice,
+    integer: [productStock, productMinStock]
+  })
+
   // Manejar filtros desde URL (ej: ?status=stock-bajo)
   const urlParams = new URLSearchParams(window.location.search);
   const statusParam = urlParams.get('status');
