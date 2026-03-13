@@ -115,9 +115,12 @@ function showToast(message, type = 'info', duration = null) {
     // Generate Unique ID
     const toastId = 'toast-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
 
+    // Normalize type for CSS (toast.css uses toast-success, toast-error, etc.)
+    const normalizedType = (type === 'danger') ? 'error' : type;
+
     // Create Toast Card
     const toast = document.createElement('div');
-    toast.className = `toast-card ${type}`;
+    toast.className = `toast-card toast-${normalizedType}`;
     toast.id = toastId;
 
     // Icon mapping
@@ -136,8 +139,8 @@ function showToast(message, type = 'info', duration = null) {
         info: 'Información'
     };
 
-    const iconClass = icons[type] || icons.info;
-    const titleText = titles[type] || 'Notificación';
+    const iconClass = icons[normalizedType] || icons.info;
+    const titleText = titles[normalizedType] || 'Notificación';
 
     // Timestamp
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -185,8 +188,11 @@ function updateToast(toastId, message, type = 'info') {
         return showToast(message, type);
     }
 
+    // Normalize type for CSS
+    const normalizedType = (type === 'danger') ? 'error' : type;
+
     // Update classes
-    toast.className = `toast-card ${type} show`;
+    toast.className = `toast-card toast-${normalizedType} show`;
 
     // Icon mapping
     const icons = {
@@ -203,8 +209,8 @@ function updateToast(toastId, message, type = 'info') {
         info: 'Información'
     };
 
-    const iconClass = icons[type] || icons.info;
-    const titleText = titles[type] || 'Notificación';
+    const iconClass = icons[normalizedType] || icons.info;
+    const titleText = titles[normalizedType] || 'Notificación';
     const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     // Re-render inner HTML structure to avoid complex DOM manipulation of different structure
@@ -244,6 +250,33 @@ function clearAllToasts() {
         }, index * 50); // Staggered removal
     });
     setTimeout(updateClearButtonVisibility, toasts.length * 50 + 300);
+}
+
+/**
+ * Valida un formulario y muestra toast con el primer error encontrado.
+ * Usar con formularios que tienen atributos required, pattern, etc.
+ * @param {HTMLFormElement} form - El formulario a validar
+ * @param {Object} [customMessages] - Mensajes personalizados por name: { "campoName": "Mensaje" }
+ * @returns {boolean} true si es válido, false si hay errores (y se mostró toast)
+ */
+function validateFormWithToast(form, customMessages = {}) {
+    if (!form || typeof form.checkValidity !== 'function') return true;
+    if (form.checkValidity()) return true;
+
+    const invalid = form.querySelector(':invalid');
+    if (!invalid) return true;
+
+    // Usar mensajes personalizados o generar uno en español (evitar "Please fill out this field." del navegador)
+    let msg = customMessages[invalid.name] || customMessages[invalid.id] || invalid.title;
+    if (!msg || msg === '') {
+        const label = invalid.closest('.mb-3, .form-group, .input-group')?.querySelector('label')?.textContent?.replace(/\s*\*$/, '').trim();
+        msg = label ? `${label} es obligatorio o inválido.` : 'Por favor complete correctamente los campos requeridos.';
+    }
+
+    showToast(msg, 'warning');
+    invalid.focus();
+    invalid.classList.add('is-invalid');
+    return false;
 }
 
 function updateClearButtonVisibility() {

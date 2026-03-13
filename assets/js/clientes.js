@@ -221,6 +221,31 @@ async function editCustomer(customerId) {
 
       document.getElementById("editCustomerForm").onsubmit = async (event) => {
         event.preventDefault()
+        const editForm = document.getElementById("editCustomerForm")
+        if (typeof validateFormWithToast === "function" && !validateFormWithToast(editForm)) return
+
+        const email = document.getElementById("editCustomerEmail").value.trim()
+        if (email && typeof isValidEmail === "function") {
+          const emailCheck = isValidEmail(email)
+          if (!emailCheck.valid) {
+            showToast(emailCheck.message, "warning")
+            document.getElementById("editCustomerEmail").classList.add("is-invalid")
+            document.getElementById("editCustomerEmail").focus()
+            return
+          }
+        }
+
+        const fullPhone = combinePhoneNumber("editCustomerPhoneCountryCode", "editCustomerPhone")
+        const countryCode = document.getElementById("editCustomerPhoneCountryCode").value
+        const phoneInput = document.getElementById("editCustomerPhone")
+        const phoneCheck = validatePhoneByCountry(fullPhone, countryCode)
+        if (!phoneCheck.valid) {
+          showToast(phoneCheck.message, "warning")
+          phoneInput.classList.add("is-invalid")
+          phoneInput.focus()
+          return
+        }
+
         const updatedCustomer = {
           id: document.getElementById("editCustomerIdHidden").value,
           nombre: document.getElementById("editCustomerName").value,
@@ -296,17 +321,43 @@ async function restoreCustomer(customerId) {
 
 async function setupCreateCustomerForm() {
   const form = document.getElementById("createCustomerForm")
+  if (typeof initEmailValidation === "function") {
+    initEmailValidation([
+      document.getElementById("createCustomerEmail"),
+      document.getElementById("editCustomerEmail")
+    ].filter(Boolean))
+  }
 
   form.onsubmit = async (event) => {
     event.preventDefault()
+    if (typeof validateFormWithToast === "function" && !validateFormWithToast(form)) return
+
+    const email = document.getElementById("createCustomerEmail").value.trim()
+    if (email && typeof isValidEmail === "function") {
+      const emailCheck = isValidEmail(email)
+      if (!emailCheck.valid) {
+        showToast(emailCheck.message, "warning")
+        document.getElementById("createCustomerEmail").classList.add("is-invalid")
+        document.getElementById("createCustomerEmail").focus()
+        return
+      }
+    }
+
+    const fullPhone = combinePhoneNumber("createCustomerPhoneCountryCode", "createCustomerPhone")
+    const countryCode = document.getElementById("createCustomerPhoneCountryCode").value
+    const phoneInput = document.getElementById("createCustomerPhone")
+    const phoneCheck = validatePhoneByCountry(fullPhone, countryCode)
+    if (!phoneCheck.valid) {
+      showToast(phoneCheck.message, "warning")
+      phoneInput.classList.add("is-invalid")
+      phoneInput.focus()
+      return
+    }
 
     // Combine ID type and number
     const idType = document.getElementById("createCustomerIdType").value
     const idNumber = document.getElementById("createCustomerId").value
     const fullId = `${idType}-${idNumber}`
-
-    // Combine country code and phone number
-    const fullPhone = combinePhoneNumber("createCustomerPhoneCountryCode", "createCustomerPhone");
 
     const newCustomer = {
       id: fullId,
@@ -459,6 +510,21 @@ document.addEventListener("DOMContentLoaded", () => {
   setupAdvancedFilters();
   setupCreateCustomerForm();
 });
+
+// Valida teléfono según el código de país. Venezuela (+58) usa formato estricto.
+function validatePhoneByCountry(fullPhone, countryCode) {
+  const digits = (fullPhone || "").replace(/\D/g, "")
+  if (digits.length === 0) return { valid: true }
+
+  if (countryCode === "+58" && typeof isValidVenezuelaPhone === "function") {
+    return isValidVenezuelaPhone(fullPhone)
+  }
+  // Otros países: mínimo 10 dígitos (código + número)
+  if (digits.length < 10) {
+    return { valid: false, message: "El teléfono debe tener al menos 10 dígitos." }
+  }
+  return { valid: true }
+}
 
 // Helper function to combine country code and phone number
 function combinePhoneNumber(countryCodeId, phoneId) {

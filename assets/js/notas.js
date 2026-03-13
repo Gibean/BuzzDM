@@ -45,10 +45,29 @@ function escapeHTML(str) {
     });
 }
 
+/**
+ * Valida teléfono según formato. Venezuela (+58) usa validación estricta.
+ */
+function validateNotePhone(phone) {
+    const digits = (phone || '').replace(/\D/g, '');
+    if (digits.length === 0) return { valid: true };
+    const isVenezuela = digits.startsWith('58') || digits.startsWith('0') || /^\+?\s*58/.test((phone || '').trim());
+    if (isVenezuela && typeof isValidVenezuelaPhone === 'function') {
+        return isValidVenezuelaPhone(phone);
+    }
+    if (digits.length < 10) {
+        return { valid: false, message: 'El teléfono debe tener al menos 10 dígitos.' };
+    }
+    return { valid: true };
+}
+
 function setupEventListeners() {
     document.getElementById('noteForm').addEventListener('submit', handleNoteSubmit);
     document.getElementById('addProductLine').addEventListener('click', () => addProductRow());
     document.getElementById('deleteNoteBtn').addEventListener('click', deleteNote);
+    if (typeof initEmailValidation === 'function') {
+        initEmailValidation(document.getElementById('noteEmail'));
+    }
 }
 
 function closeNoteModal() {
@@ -927,9 +946,37 @@ async function handleNoteSubmit(e) {
         return;
     }
 
+    // Validación de email (si se ingresó)
+    const emailEl = document.getElementById('noteEmail');
+    const email = emailEl.value.trim();
+    if (email && typeof isValidEmail === 'function') {
+        const emailCheck = isValidEmail(email);
+        if (!emailCheck.valid) {
+            emailEl.classList.add('is-invalid');
+            emailEl.focus();
+            showToast(emailCheck.message, 'warning');
+            return;
+        }
+    }
+
+    // Validación de teléfono (si se ingresó)
+    const phoneEl = document.getElementById('notePhone');
+    const phone = phoneEl.value.trim();
+    if (phone) {
+        const phoneCheck = validateNotePhone(phone);
+        if (!phoneCheck.valid) {
+            phoneEl.classList.add('is-invalid');
+            phoneEl.focus();
+            showToast(phoneCheck.message, 'warning');
+            return;
+        }
+    }
+
     // Limpiar estados de validación
     titleEl.classList.remove('is-invalid');
     clientNameEl.classList.remove('is-invalid');
+    emailEl.classList.remove('is-invalid');
+    phoneEl.classList.remove('is-invalid');
 
     const dueDateInput = document.getElementById('noteDueDate').value;
     const fecha_entrega = dueDateInput ? dueDateInput.replace('T', ' ') : null;

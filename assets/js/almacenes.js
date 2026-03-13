@@ -210,6 +210,7 @@ window.openAlmacenModal = function(almacenId = null) {
     almacenPrincipalCheck.checked = false;
     almacenActivoCheck.checked = true;
     almacenNotasInput.value = '';
+    [almacenNombreInput, almacenTelefonoInput].forEach(el => el?.classList.remove('is-invalid'));
 
     if (almacenId) {
         // Edit mode
@@ -240,15 +241,13 @@ window.closeAlmacenModal = function() {
 };
 
 window.saveAlmacen = async function() {
+    const form = document.getElementById('almacenForm');
+    if (typeof validateFormWithToast === 'function' && !validateFormWithToast(form)) return;
+
     const id = almacenIdInput.value;
     const codigo = almacenCodigoInput.value.trim();
     const nombre = almacenNombreInput.value.trim();
     const telefono = almacenTelefonoInput.value.trim();
-
-    if (!nombre) {
-        showToast('El nombre es requerido', 'warning');
-        return;
-    }
 
     if (telefono && typeof isValidVenezuelaPhone === 'function') {
         const phoneCheck = isValidVenezuelaPhone(telefono);
