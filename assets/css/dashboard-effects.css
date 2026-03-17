@@ -123,10 +123,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.buzz-card.tactical-card:hover {
-  border-color: var(--buzz-primary-color) !important;
-  box-shadow: 0 8px 32px rgba(255, 160, 0, 0.15) !important;
-}
+/* Hover effect removed — tactical cards are not clickable */
 
 /* Slimmed down list items */
 .premium-list {

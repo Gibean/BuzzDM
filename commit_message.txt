@@ -1,0 +1,14 @@
+Feat(Core): Implementar monitor BCV nativo y resolución de bloqueadores UI/UX (v1.4.1)
+
+Módulos Afectados:
+- Monitor de Divisas (`tasa_bcv_update.php`, `composer.json`)
+- UI / Dashboard (`dashboard.php`, `dashboard-effects.css`)
+- Autenticación y Autorización (`sesion.php`, `common.js`)
+- Reportes & Gráficas (`api_sales_chart.php`)
+
+Descripción de Cambios:
+- **Monitor de Divisas**: Reescritura completa del motor inyector usando Scraping Directo (vía `Symfony/DomCrawler` y `CssSelector`) apuntando a bcv.org.ve para obtener USD nativo y EUR calculado. Mantenido `ve.dolarapi.com` únicamente como fallback y para obtención persistente del paralelo/USDT.
+- **Acceso a Reportes (RBAC)**: Corregido el bloqueo ciego (Forbidden 403) en reportes de administradores provocado por un reemplazo absoluto de reglas; ahora los permisos provenientes de la tabla SQL (`permisos_rol`) se fusionan correctamente con el fallback estático.
+- **Métricas de Ventas**: Saneado el algoritmo del gráfico de flujo diario, forzando la suma del monto atómico final `pedidos.total` en lugar de agregar subtotales individuales de `detalle_pedido`.
+- **Persistencia de Sesión (Admin)**: Incorporada la purga del estado UI mediante `localStorage.removeItem()` al ejecutar el logout, impidiendo que el panel administrativo cargue vistas cacheadas de sesiones anteriores.
+- **Sanitización UI Dashboard**: Removida la regla global CSS que causaba efectos *hovering* e invitaba a interacción falsa en las tarjetas estáticas no-clickeables (Alertas Tácticas). Además, se normalizó el ruteo interno (URL limpia `inventario?status=stock-bajo`) para evitar bucles 404 en subdominios originados desde módulos ajenos.

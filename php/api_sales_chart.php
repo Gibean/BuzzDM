@@ -10,12 +10,12 @@ try {
     $days = max(1, min($days, 365)); // Clamp between 1 and 365
 
     // Consulta para obtener las ventas diarias del período especificado
+    // Usa pedidos.total como fuente de verdad (monto final del pedido)
     $query = "
         SELECT
             DATE(p.fecha_creacion) as fecha,
-            SUM(dp.subtotal) as total_ventas
+            SUM(p.total) as total_ventas
         FROM pedidos p
-        JOIN detalle_pedido dp ON p.id = dp.pedido_id
         WHERE p.fecha_creacion >= CURDATE() - INTERVAL :days DAY
         GROUP BY DATE(p.fecha_creacion)
         ORDER BY fecha ASC;

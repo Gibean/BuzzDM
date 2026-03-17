@@ -396,7 +396,10 @@ function hideModal() {
 }
 
 function logout() {
-    window.location.href = "php/logout.php"
+    // Clear admin state from localStorage to prevent persisting across sessions
+    localStorage.removeItem('adminActiveTab');
+    localStorage.removeItem('advFiltersVisible_admin_logs');
+    window.location.href = "php/logout.php";
 }
 
 // --- Mobile Sidebar Toggle ---
