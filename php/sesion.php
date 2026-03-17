@@ -257,9 +257,16 @@ $fallback_pages = [
     ]
 ];
 
-// Use database permissions if available, otherwise use fallback
+// Use database permissions if available, MERGED with fallback to prevent gaps
+// (If DB table exists but doesn't have all pages, we don't want to block access)
 if (!empty($db_permissions)) {
-    $allowed_pages = [$user_role => $db_permissions];
+    // Start with fallback as base, then add any DB-specific permissions
+    $allowed_pages = $fallback_pages;
+    if (isset($allowed_pages[$user_role])) {
+        $allowed_pages[$user_role] = array_unique(array_merge($allowed_pages[$user_role], $db_permissions));
+    } else {
+        $allowed_pages[$user_role] = $db_permissions;
+    }
 } else {
     $allowed_pages = $fallback_pages;
 }
@@ -277,6 +284,11 @@ if (isset($allowed_pages[$user_role])) {
             $allowed_pages[$user_role][] = $page;
         }
     }
+}
+
+// HOTFIX: Ensure reports.php is allowed for admin and supervisor even if not in DB yet
+if (in_array($user_role, ['admin', 'supervisor']) && isset($allowed_pages[$user_role]) && !in_array('reports.php', $allowed_pages[$user_role])) {
+    $allowed_pages[$user_role][] = 'reports.php';
 }
 
 // Always-allowed APIs for any authenticated user (core system functionality)
