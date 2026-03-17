@@ -122,7 +122,7 @@
                 </h5>
                 <button class="close-buzz" onclick="closeModal('createCustomerModal')" aria-label="Cerrar">&times;</button>
             </div>
-            <form id="createCustomerForm">
+            <form id="createCustomerForm" novalidate>
                 <div class="modal-body-buzz">
                     <!-- Basic Information Section -->
                     <div class="modal-section">
@@ -321,7 +321,7 @@
                 </h5>
                 <button class="close-buzz" onclick="closeModal('editCustomerModal')" aria-label="Cerrar">&times;</button>
             </div>
-            <form id="editCustomerForm">
+            <form id="editCustomerForm" novalidate>
                 <input type="hidden" id="editCustomerIdHidden">
                 <div class="modal-body-buzz">
                     <!-- Basic Information Section -->
@@ -402,9 +402,11 @@
         </div>
     </div>
 
+    <div id="toast-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/toast.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/common.js?v=2"></script>
     <script src="assets/js/confirmation_modal.js?v=2"></script>
     <script src="assets/js/clientes.js?v=3"></script>

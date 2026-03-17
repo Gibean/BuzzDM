@@ -146,7 +146,7 @@
                 </h5>
                 <button type="button" class="close-buzz" onclick="cerrarModalProveedor()">&times;</button>
             </div>
-            <form id="formProveedor">
+            <form id="formProveedor" novalidate>
                 <input type="hidden" id="proveedorId">
                 <div class="modal-body-buzz">
                     <!-- Información Básica Section -->
@@ -158,7 +158,7 @@
                             <label class="form-label">Nombre *</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-building"></i></span>
-                                <input type="text" class="form-control form-control-buzz" id="proveedorNombre" required placeholder="Nombre del proveedor">
+                                <input type="text" class="form-control form-control-buzz" id="proveedorNombre" required placeholder="Nombre del proveedor" maxlength="150">
                             </div>
                         </div>
                         <div class="row g-3">
@@ -166,7 +166,7 @@
                                 <label class="form-label">RIF/Identificación</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-id-card"></i></span>
-                                    <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9">
+                                    <input type="text" class="form-control form-control-buzz" id="proveedorRif" placeholder="J-12345678-9" maxlength="12">
                                 </div>
                             </div>
                             <div class="col-md-3 mb-3">
@@ -188,7 +188,7 @@
                                 <label class="form-label">Teléfono</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
-                                    <input type="tel" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="412 1234567">
+                                    <input type="tel" class="form-control form-control-buzz" id="proveedorTelefono" placeholder="412 1234567" maxlength="10">
                                 </div>
                             </div>
                         </div>
@@ -203,21 +203,21 @@
                             <label class="form-label">Email</label>
                             <div class="input-group">
                                 <span class="input-group-text"><i class="fas fa-envelope"></i></span>
-                                <input type="email" class="form-control form-control-buzz" id="proveedorEmail" placeholder="contacto@proveedor.com">
+                                <input type="email" class="form-control form-control-buzz" id="proveedorEmail" placeholder="contacto@proveedor.com" maxlength="150">
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Dirección</label>
                             <div class="input-group">
                                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-map-marker-alt"></i></span>
-                                <textarea class="form-control form-control-buzz" id="proveedorDireccion" rows="2" placeholder="Dirección del proveedor"></textarea>
+                                <textarea class="form-control form-control-buzz" id="proveedorDireccion" rows="2" placeholder="Dirección del proveedor" maxlength="500"></textarea>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Notas</label>
                             <div class="input-group">
                                 <span class="input-group-text align-items-start pt-2"><i class="fas fa-sticky-note"></i></span>
-                                <textarea class="form-control form-control-buzz" id="proveedorNotas" rows="2" placeholder="Notas adicionales..."></textarea>
+                                <textarea class="form-control form-control-buzz" id="proveedorNotas" rows="2" placeholder="Notas adicionales..." maxlength="500"></textarea>
                             </div>
                         </div>
                     </div>
@@ -237,6 +237,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/confirmation_modal.js"></script>
     <script>
         // =====================================================
@@ -247,6 +248,15 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             cargarProveedores();
+            if (typeof initVenezuelaRifValidation === 'function') {
+                initVenezuelaRifValidation(document.getElementById('proveedorRif'));
+            }
+            if (typeof initVenezuelaPhoneValidation === 'function') {
+                initVenezuelaPhoneValidation(document.getElementById('proveedorTelefono'));
+            }
+            if (typeof initEmailValidation === 'function') {
+                initEmailValidation(document.getElementById('proveedorEmail'));
+            }
         });
 
         async function cargarProveedores() {
@@ -374,6 +384,9 @@
             document.getElementById('proveedorId').value = '';
             document.getElementById('formProveedor').reset();
             document.getElementById('modalProveedorTitulo').textContent = 'Nuevo Proveedor';
+            ['proveedorNombre', 'proveedorRif', 'proveedorEmail', 'proveedorTelefono'].forEach(id => {
+                document.getElementById(id)?.classList.remove('is-invalid');
+            });
             document.getElementById('modalProveedor').style.display = 'block';
         }
 
@@ -385,6 +398,9 @@
             const proveedor = proveedores.find(p => p.id == id);
             if (!proveedor) return;
 
+            ['proveedorNombre', 'proveedorRif', 'proveedorEmail', 'proveedorTelefono'].forEach(fid => {
+                document.getElementById(fid)?.classList.remove('is-invalid');
+            });
             document.getElementById('proveedorId').value = proveedor.id;
             document.getElementById('proveedorNombre').value = proveedor.nombre || '';
             document.getElementById('proveedorRif').value = proveedor.rif || '';
@@ -397,19 +413,54 @@
         }
 
         async function guardarProveedor() {
+            const form = document.getElementById('formProveedor');
+            if (typeof validateFormWithToast === 'function' && !validateFormWithToast(form)) return;
+
             const id = document.getElementById('proveedorId').value;
             const nombre = document.getElementById('proveedorNombre').value.trim();
+            const rif = document.getElementById('proveedorRif').value.trim();
 
-            if (!nombre) {
-                showToast('El nombre es obligatorio', 'warning');
-                return;
+            if (rif && typeof isValidVenezuelaRif === 'function') {
+                const rifCheck = isValidVenezuelaRif(rif);
+                if (!rifCheck.valid) {
+                    showToast(rifCheck.message, 'warning');
+                    document.getElementById('proveedorRif').classList.add('is-invalid');
+                    document.getElementById('proveedorRif').focus();
+                    return;
+                }
+            }
+
+            const email = document.getElementById('proveedorEmail').value.trim();
+            if (email && typeof isValidEmail === 'function') {
+                const emailCheck = isValidEmail(email);
+                if (!emailCheck.valid) {
+                    showToast(emailCheck.message, 'warning');
+                    document.getElementById('proveedorEmail').classList.add('is-invalid');
+                    document.getElementById('proveedorEmail').focus();
+                    return;
+                }
+            }
+
+            const fullPhone = combinePhoneNumber('proveedorPais', 'proveedorTelefono');
+            const countryCode = document.getElementById('proveedorPais').value;
+            if (fullPhone && typeof isValidVenezuelaPhone === 'function') {
+                const digits = fullPhone.replace(/\D/g, '');
+                const phoneValid = (countryCode === '+58')
+                    ? isValidVenezuelaPhone(fullPhone)
+                    : (digits.length >= 10 ? { valid: true } : { valid: false, message: 'El teléfono debe tener al menos 10 dígitos.' });
+                if (!phoneValid.valid) {
+                    showToast(phoneValid.message, 'warning');
+                    document.getElementById('proveedorTelefono').classList.add('is-invalid');
+                    document.getElementById('proveedorTelefono').focus();
+                    return;
+                }
             }
 
             const data = {
                 nombre: nombre,
-                rif: document.getElementById('proveedorRif').value.trim(),
+                rif: rif,
                 telefono: combinePhoneNumber('proveedorPais', 'proveedorTelefono'),
-                email: document.getElementById('proveedorEmail').value.trim(),
+                email: email,
                 direccion: document.getElementById('proveedorDireccion').value.trim(),
                 notas: document.getElementById('proveedorNotas').value.trim()
             };
