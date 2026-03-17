@@ -125,7 +125,7 @@
                 </h5>
                 <button type="button" class="close-buzz" onclick="closeAlmacenModal()">&times;</button>
             </div>
-            <form id="almacenForm" onsubmit="event.preventDefault(); saveAlmacen();">
+            <form id="almacenForm" novalidate onsubmit="event.preventDefault(); saveAlmacen();">
                 <input type="hidden" id="almacenId">
                 <div class="modal-body-buzz">
                     <!-- Información Básica -->
@@ -170,7 +170,7 @@
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                     <input type="text" class="form-control form-control-buzz" id="almacenTelefono"
-                                           placeholder="+1 234 567 8900">
+                                           placeholder="0414-666-88-88" maxlength="18">
                                 </div>
                             </div>
                         </div>
@@ -328,6 +328,7 @@
     <!-- System Footer (Includes Tutorial Scripts) -->
     <?php require_once 'php/system_footer.php'; ?>
     <script src="assets/js/common.js"></script>
+    <script src="assets/js/utils.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/almacenes.js"></script>
 </body>
