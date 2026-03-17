@@ -190,14 +190,14 @@ try {
                         <h5 class="font-primary text-warning mb-0 section-header border-warning">
                             <i class="fas fa-exclamation-triangle me-2"></i>ALERTA CRÍTICA
                         </h5>
-                        <a href="inventario.php?status=stock-bajo" class="btn-link text-warning font-mono" style="font-size: 0.7rem; text-decoration: none;">
+                        <a href="inventario?status=stock-bajo" class="btn-link text-warning font-mono" style="font-size: 0.7rem; text-decoration: none;">
                             VER TODOS <i class="fas fa-arrow-right ms-1"></i>
                         </a>
                     </div>
                     <div class="premium-list" id="lowStockProducts">
                         <?php if (!empty($lowStockProducts)): ?>
                             <?php foreach ($lowStockProducts as $product): ?>
-                                <a href="inventario.php?status=stock-bajo" class="premium-list-item warning text-decoration-none">
+                                <a href="inventario?status=stock-bajo" class="premium-list-item warning text-decoration-none">
                                     <div class="item-icon"><i class="fas fa-box"></i></div>
                                     <div class="item-info">
                                         <span class="item-sku font-mono"><?php echo htmlspecialchars($product['sku']); ?></span>

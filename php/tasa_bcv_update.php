@@ -1,15 +1,18 @@
 <?php
 /**
- * Automático de Tasa BCV
+ * Actualización Automática de Tasas de Cambio
  *
- * Este script consulta la API de DolarApi.com para obtener el valor oficial
- * del BCV y lo guarda en la base de datos de BuzzDM.
+ * Estrategia de fuentes (en orden de prioridad):
+ *   1. Scraping directo del BCV (bcv.org.ve) — USD y EUR oficiales
+ *   2. Fallback a DolarApi.com — USD oficial y paralelo
+ *
+ * El scraping del BCV usa los selectores #dolar strong y #euro strong
+ * que contienen la tasa en formato "451,50720000" (coma decimal).
  */
 
-// Si se llama vía web, devolver JSON
 header('Content-Type: application/json');
 
-// Definir si es carga silenciosa
+// Definir si es carga silenciosa (llamada desde backup_check / fallback)
 $isSilent = isset($is_fallback_call) && $is_fallback_call;
 $is_api_call = (php_sapi_name() !== 'cli' && !$isSilent);
 
@@ -19,96 +22,93 @@ try {
     $pdo->beginTransaction();
 
     // 1. Verificar si ya tenemos la tasa bcv de hoy para evitar spam
-    // Buscamos específicamente la bcv
     $stmt = $pdo->query("SELECT creado_at FROM tasas_cambio WHERE fecha = CURDATE() AND fuente = 'bcv' LIMIT 1");
     $existingRate = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($existingRate) {
         $lastUpdate = strtotime($existingRate['creado_at']);
         if ((time() - $lastUpdate) < 14400 && !$is_api_call) {
-             // Si no es API, salimos si es reciente
-             $pdo->rollBack();
-             exit("Tasa bcv reciente. Saltando sync.\n");
+            $pdo->rollBack();
+            exit("Tasa bcv reciente. Saltando sync.\n");
         }
     }
 
-    // Array of rates to fetch and save
     $syncResults = [];
+    $sourceUsed = 'none';
 
-    // 1. Fetch from DolarApi (Official & Paralelo)
+    // =============================================
+    // FUENTE PRIMARIA: Scraping directo del BCV
+    // =============================================
+    $bcvRates = fetchBcvDirectly();
+
+    if ($bcvRates !== null) {
+        $sourceUsed = 'bcv_directo';
+
+        // Guardar tasa USD (BCV oficial)
+        if (isset($bcvRates['usd']) && $bcvRates['usd'] > 0) {
+            upsertTasa($pdo, $bcvRates['usd'], 'bcv');
+            $syncResults['bcv'] = $bcvRates['usd'];
+        }
+
+        // Guardar tasa EUR (BCV oficial directa — sin cálculo cruzado)
+        if (isset($bcvRates['eur']) && $bcvRates['eur'] > 0) {
+            upsertTasa($pdo, $bcvRates['eur'], 'bcv_euro');
+            $syncResults['bcv_euro'] = $bcvRates['eur'];
+        }
+    }
+
+    // =============================================
+    // FUENTE COMPLEMENTARIA: DolarApi.com
+    // Se usa como fallback para BCV/EUR si el scraping falló,
+    // y SIEMPRE para obtener tasa paralelo + USDT.
+    // =============================================
     $apiUrl = "https://ve.dolarapi.com/v1/dolares";
-
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $apiUrl);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $dolarApiResponse = curl_exec($ch);
+    $dolarApiHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    if ($httpCode === 200) {
-        $rates = json_decode($response, true);
+    if ($dolarApiHttpCode === 200) {
+        $rates = json_decode($dolarApiResponse, true);
         if (is_array($rates)) {
             foreach ($rates as $rate) {
                 $fuenteName = ($rate['fuente'] === 'oficial') ? 'bcv' : 'paralelo';
                 $tasaValue = floatval($rate['promedio']);
 
                 if ($tasaValue > 0) {
-                    $sql = "INSERT INTO tasas_cambio (tasa, fuente, fecha, usuario_id)
-                            VALUES (:tasa, :fuente, CURDATE(), NULL)
-                            ON DUPLICATE KEY UPDATE
-                                tasa = :tasa_update,
-                                creado_at = CURRENT_TIMESTAMP";
-                    $stmt = $pdo->prepare($sql);
-                    $stmt->execute([':tasa' => $tasaValue, ':fuente' => $fuenteName, ':tasa_update' => $tasaValue]);
+                    if ($fuenteName === 'bcv' && isset($syncResults['bcv'])) {
+                        // Ya tenemos BCV del scraping directo, no sobreescribir
+                        continue;
+                    }
+                    upsertTasa($pdo, $tasaValue, $fuenteName);
                     $syncResults[$fuenteName] = $tasaValue;
+                    if ($fuenteName === 'bcv' && $sourceUsed === 'none') {
+                        $sourceUsed = 'dolarapi_fallback';
+                    }
                 }
             }
         }
     }
 
-    // 2. Fetch EUR rate (Estimation based on Cross Rate if not direct)
-    // We try to get EUR/USD from a public API
-    $eurUsdCross = 1.09; // Default fallback
-    $crossApi = "https://api.exchangerate-api.com/v4/latest/USD";
-    $chCross = curl_init($crossApi);
-    curl_setopt($chCross, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($chCross, CURLOPT_TIMEOUT, 5);
-    curl_setopt($chCross, CURLOPT_SSL_VERIFYPEER, false);
-    $crossResponse = curl_exec($chCross);
-    if ($crossResponse) {
-        $crossData = json_decode($crossResponse, true);
-        if (isset($crossData['rates']['EUR'])) {
-            $eurUsdCross = 1 / floatval($crossData['rates']['EUR']);
-        }
-    }
-    curl_close($chCross);
-
-    // If we have BCV rate, calculate BCV Euro
-    if (isset($syncResults['bcv'])) {
+    // Calcular EUR por cross-rate solo si no lo tenemos del BCV directo
+    if (isset($syncResults['bcv']) && !isset($syncResults['bcv_euro'])) {
+        $eurUsdCross = fetchEurUsdCrossRate();
         $tasaEuro = $syncResults['bcv'] * $eurUsdCross;
-        $sqlEuro = "INSERT INTO tasas_cambio (tasa, fuente, fecha, usuario_id)
-                    VALUES (:tasa, 'bcv_euro', CURDATE(), NULL)
-                    ON DUPLICATE KEY UPDATE
-                        tasa = :tasa_update,
-                        creado_at = CURRENT_TIMESTAMP";
-        $stmtEuro = $pdo->prepare($sqlEuro);
-        $stmtEuro->execute([':tasa' => $tasaEuro, ':tasa_update' => $tasaEuro]);
+        upsertTasa($pdo, $tasaEuro, 'bcv_euro');
         $syncResults['bcv_euro'] = $tasaEuro;
     }
 
-    // USDT is usually Parallel rate or very close
+    // =============================================
+    // USDT estimado (basado en paralelo)
+    // =============================================
     if (isset($syncResults['paralelo'])) {
-        $tasaUsdt = $syncResults['paralelo'] * 0.995; // Small spread typical for USDT
-        $sqlUsdt = "INSERT INTO tasas_cambio (tasa, fuente, fecha, usuario_id)
-                    VALUES (:tasa, 'binance_usdt', CURDATE(), NULL)
-                    ON DUPLICATE KEY UPDATE
-                        tasa = :tasa_update,
-                        creado_at = CURRENT_TIMESTAMP";
-        $stmtUsdt = $pdo->prepare($sqlUsdt);
-        $stmtUsdt->execute([':tasa' => $tasaUsdt, ':tasa_update' => $tasaUsdt]);
+        $tasaUsdt = $syncResults['paralelo'] * 0.995;
+        upsertTasa($pdo, $tasaUsdt, 'binance_usdt');
         $syncResults['binance_usdt'] = $tasaUsdt;
     }
 
@@ -117,11 +117,12 @@ try {
     if ($is_api_call) {
         echo json_encode([
             'success' => true,
-            'message' => 'Sincronización multidivisa completada.',
+            'message' => 'Sincronización completada.',
+            'source' => $sourceUsed,
             'rates' => $syncResults
         ]);
     } else {
-        echo "Sincronización completada con éxito. Tasas: " . implode(", ", array_keys($syncResults));
+        echo "Sincronización completada ($sourceUsed). Tasas: " . implode(", ", array_keys($syncResults));
     }
 
 } catch (Exception $e) {
@@ -135,4 +136,135 @@ try {
     } else {
         echo "Error: " . $e->getMessage();
     }
+}
+
+
+// =============================================
+// Funciones auxiliares
+// =============================================
+
+/**
+ * Scraping directo de bcv.org.ve
+ * Obtiene USD y EUR desde los selectores #dolar strong / #euro strong
+ *
+ * @return array|null ['usd' => float, 'eur' => float] o null si falla
+ */
+function fetchBcvDirectly(): ?array {
+    try {
+        // Usar Symfony DomCrawler para parsear el HTML
+        $crawler = new \Symfony\Component\DomCrawler\Crawler();
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://www.bcv.org.ve');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
+
+        $html = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+
+        if ($httpCode !== 200 || empty($html)) {
+            error_log("BCV scraping: HTTP $httpCode o respuesta vacía.");
+            return null;
+        }
+
+        $crawler->addHtmlContent($html);
+
+        $rates = [];
+
+        // USD: #dolar strong — valor como "451,50720000"
+        $dolarNode = $crawler->filter('#dolar strong');
+        if ($dolarNode->count() > 0) {
+            $rawValue = trim($dolarNode->text());
+            $rates['usd'] = parseBcvNumber($rawValue);
+        }
+
+        // EUR: #euro strong — valor como "520,64198246"
+        $euroNode = $crawler->filter('#euro strong');
+        if ($euroNode->count() > 0) {
+            $rawValue = trim($euroNode->text());
+            $rates['eur'] = parseBcvNumber($rawValue);
+        }
+
+        // Validar que obtuvimos al menos USD
+        if (!isset($rates['usd']) || $rates['usd'] <= 0) {
+            error_log("BCV scraping: No se encontró tasa USD válida.");
+            return null;
+        }
+
+        error_log("BCV scraping exitoso: USD={$rates['usd']}, EUR=" . ($rates['eur'] ?? 'N/A'));
+        return $rates;
+
+    } catch (Exception $e) {
+        error_log("BCV scraping error: " . $e->getMessage());
+        return null;
+    }
+}
+
+/**
+ * Parsea un número del formato BCV (coma decimal, punto miles)
+ * Ejemplos: "451,50720000" → 451.5072, "1.234,56" → 1234.56
+ *
+ * @param string $value
+ * @return float
+ */
+function parseBcvNumber(string $value): float {
+    // Remover espacios y caracteres no numéricos excepto coma y punto
+    $value = preg_replace('/[^\d,.]/', '', $value);
+
+    // Si hay coma pero no punto → coma es decimal (ej: "451,507")
+    // Si hay punto Y coma → punto es miles, coma es decimal (ej: "1.234,56")
+    if (strpos($value, ',') !== false) {
+        // Remover puntos de miles y cambiar coma decimal por punto
+        $value = str_replace('.', '', $value);
+        $value = str_replace(',', '.', $value);
+    }
+
+    return floatval($value);
+}
+
+/**
+ * Obtiene el cross-rate EUR/USD para cálculo de EUR (fallback)
+ *
+ * @return float Cross-rate (cuántos USD vale 1 EUR)
+ */
+function fetchEurUsdCrossRate(): float {
+    $eurUsdCross = 1.09; // Default fallback
+
+    $crossApi = "https://api.exchangerate-api.com/v4/latest/USD";
+    $ch = curl_init($crossApi);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $crossResponse = curl_exec($ch);
+    curl_close($ch);
+
+    if ($crossResponse) {
+        $crossData = json_decode($crossResponse, true);
+        if (isset($crossData['rates']['EUR'])) {
+            $eurUsdCross = 1 / floatval($crossData['rates']['EUR']);
+        }
+    }
+
+    return $eurUsdCross;
+}
+
+/**
+ * Inserta o actualiza una tasa de cambio para hoy
+ *
+ * @param PDO $pdo
+ * @param float $tasa
+ * @param string $fuente
+ */
+function upsertTasa(PDO $pdo, float $tasa, string $fuente): void {
+    $sql = "INSERT INTO tasas_cambio (tasa, fuente, fecha, usuario_id)
+            VALUES (:tasa, :fuente, CURDATE(), NULL)
+            ON DUPLICATE KEY UPDATE
+                tasa = :tasa_update,
+                creado_at = CURRENT_TIMESTAMP";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':tasa' => $tasa, ':fuente' => $fuente, ':tasa_update' => $tasa]);
 }
