@@ -313,11 +313,11 @@ if (!isset($allowed_pages[$user_role]) || !in_array($current_page, $allowed_page
     if ($is_api_call) {
         json_auth_error('Acceso denegado. No tienes permisos para esta acción.');
     } else if ($user_role === 'admin' || $user_role === 'supervisor' || $user_role === 'operador') {
-        // Fix relative path redirect issues
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../dashboard' : 'dashboard';
+        // Fix relative path redirect issues cleanly
+        $redirectPath = ($current_page === 'manual.php' || !str_contains($_SERVER['PHP_SELF'], '/php/')) ? 'dashboard' : '../dashboard';
         header("Location: $redirectPath?error=access_denied&code=403");
     } else {
-        $redirectPath = (dirname($_SERVER['PHP_SELF']) == '/php') ? '../login' : 'login';
+        $redirectPath = ($current_page === 'manual.php' || !str_contains($_SERVER['PHP_SELF'], '/php/')) ? 'login' : '../login';
         header("Location: $redirectPath?error=auth_required&code=401");
     }
     exit();
