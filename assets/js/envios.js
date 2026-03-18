@@ -67,8 +67,8 @@ function updateActiveFiltersCount() {
 async function fetchTasa() {
     try {
         const response = await fetchJSON('php/api_tasa.php')
-        if (response.success && response.tasa) {
-            currentTasa = parseFloat(response.tasa)
+        if (response.success && response.tasa && response.tasa.tasa_actual) {
+            currentTasa = parseFloat(response.tasa.tasa_actual)
         }
     } catch (error) {
         console.error("Error fetching tasa:", error)
@@ -367,7 +367,7 @@ function formatDate(date) {
 }
 
 function formatCurrency(amount) {
-  return amount.toLocaleString("en-US", { style: "currency", currency: "USD" })
+  return parseFloat(amount).toLocaleString("en-US", { style: "currency", currency: "USD" })
 }
 
 // Removed - using showToast from common.js
