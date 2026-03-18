@@ -28,9 +28,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.x = x;
                 this.y = y;
                 this.size = size;
-                this.opacity = Math.random() * 0.3; // Very subtle
+                this.opacity = Math.random() * 0.45; // Más notable
                 this.fadeDirection = Math.random() > 0.5 ? 1 : -1;
-                this.fadeSpeed = 0.001 + Math.random() * 0.002; // Slow fade
+                this.fadeSpeed = 0.003 + Math.random() * 0.006; // Desvanecimiento más rápido
             }
 
             draw() {
@@ -47,14 +47,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 ctx.closePath();
                 ctx.strokeStyle = `rgba(255, 160, 0, ${this.opacity})`;
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 1.5;
                 ctx.stroke();
             }
 
             update() {
-                // Subtle fade in/out
+                // Fade in/out
                 this.opacity += this.fadeSpeed * this.fadeDirection;
-                if (this.opacity > 0.3 || this.opacity < 0.05) {
+                if (this.opacity > 0.45 || this.opacity < 0.02) {
                     this.fadeDirection *= -1;
                 }
                 this.draw();
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Create hexagon grid
         function createHexagons() {
             hexagons = [];
-            const size = 30;
+            const size = 50; // Hexágonos más grandes
             const spacing = size * 1.8;
 
             for (let y = -size; y < canvas.height + size; y += spacing * 1.5) {

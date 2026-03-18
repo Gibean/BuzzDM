@@ -1,14 +1,12 @@
-Feat(Core): Implementar monitor BCV nativo y resolución de bloqueadores UI/UX (v1.4.1)
+Feat(UI): Mejoras responsivas en Login y módulo de Envíos (v1.4.2)
 
 Módulos Afectados:
-- Monitor de Divisas (`tasa_bcv_update.php`, `composer.json`)
-- UI / Dashboard (`dashboard.php`, `dashboard-effects.css`)
-- Autenticación y Autorización (`sesion.php`, `common.js`)
-- Reportes & Gráficas (`api_sales_chart.php`)
+- Módulo de Envíos (`envios.js`, `ShipmentRepository.php`)
+- Autenticación / Login (`login.php`)
+- Landing Page (`landing.js`)
 
 Descripción de Cambios:
-- **Monitor de Divisas**: Reescritura completa del motor inyector usando Scraping Directo (vía `Symfony/DomCrawler` y `CssSelector`) apuntando a bcv.org.ve para obtener USD nativo y EUR calculado. Mantenido `ve.dolarapi.com` únicamente como fallback y para obtención persistente del paralelo/USDT.
-- **Acceso a Reportes (RBAC)**: Corregido el bloqueo ciego (Forbidden 403) en reportes de administradores provocado por un reemplazo absoluto de reglas; ahora los permisos provenientes de la tabla SQL (`permisos_rol`) se fusionan correctamente con el fallback estático.
-- **Métricas de Ventas**: Saneado el algoritmo del gráfico de flujo diario, forzando la suma del monto atómico final `pedidos.total` en lugar de agregar subtotales individuales de `detalle_pedido`.
-- **Persistencia de Sesión (Admin)**: Incorporada la purga del estado UI mediante `localStorage.removeItem()` al ejecutar el logout, impidiendo que el panel administrativo cargue vistas cacheadas de sesiones anteriores.
-- **Sanitización UI Dashboard**: Removida la regla global CSS que causaba efectos *hovering* e invitaba a interacción falsa en las tarjetas estáticas no-clickeables (Alertas Tácticas). Además, se normalizó el ruteo interno (URL limpia `inventario?status=stock-bajo`) para evitar bucles 404 en subdominios originados desde módulos ajenos.
+- **Vista de Envíos**: Rediseño responsivo de las tarjetas de envío para móviles. Se agregó soporte para conversión en tiempo real de USD a VES usando la API de Tasa BCV.
+- **Filtro de Envíos**: Corregida la consulta en `ShipmentRepository.php` para excluir pedidos con borrado lógico (`deleted_at`), asegurando consistencia con los subtotales del módulo de Pedidos.
+- **Login Frontend**: Ajustes CSS para la vista móvil, incrementando legibilidad de inputs y botón, además de asignar fondo transparente para revelar la animación de hexágonos del sistema.
+- **Landing Page**: Correcciones menores en el carrusel/animaciones de `landing.js`.

@@ -1,6 +1,7 @@
 // Shipments management functionality
 let shipments = []
 let filteredShipments = []
+let currentTasa = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   initShipments()
@@ -63,7 +64,19 @@ function updateActiveFiltersCount() {
     }
 }
 
+async function fetchTasa() {
+    try {
+        const response = await fetchJSON('php/api_tasa.php')
+        if (response.success && response.tasa) {
+            currentTasa = parseFloat(response.tasa)
+        }
+    } catch (error) {
+        console.error("Error fetching tasa:", error)
+    }
+}
+
 async function initShipments() {
+  await fetchTasa()
   await loadShipments()
   renderShipments()
   // updateStats() removed
@@ -131,91 +144,75 @@ function renderShipments() {
   container.innerHTML = filteredShipments
     .map(
       (shipment) => `
-        <div class="buzz-card mb-3 shipment-card-enhanced p-3">
-            <div class="row g-2 align-items-center">
-                <!-- Row 1 Mobile: Order ID & Status -->
-                <div class="col-6 col-md-2 order-1">
-                    <div class="d-flex flex-column">
-                        <span class="text-muted x-small text-uppercase fw-bold">Orden</span>
-                        <div class="d-flex align-items-baseline gap-2">
-                            <span class="shipment-id fs-5">#${shipment.id}</span>
-                            <span class="shipment-date text-muted x-small d-none d-md-inline">${formatDate(shipment.date)}</span>
-                        </div>
-                        <span class="shipment-date text-muted x-small d-md-none">${formatDate(shipment.date)}</span>
-                    </div>
-                </div>
-
-                <!-- Row 1 Mobile (Right): Status -->
-                <div class="col-6 col-md-2 order-2 text-end text-md-start">
-                    <span class="text-muted x-small text-uppercase fw-bold d-none d-md-block mb-1">Estado</span>
+        <div class="buzz-card mb-4 shipment-card-enhanced p-3 p-md-4">
+            <!-- Header Row -->
+            <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="text-white text-uppercase fw-bold fs-6">ORDEN</span>
+                <div>
                     ${getStatusBadge(shipment.status)}
                 </div>
+            </div>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <span class="fs-4 fw-bold text-white">#${shipment.id}</span>
+                <span class="text-muted small"><i class="fas fa-calendar-alt opacity-50 me-1"></i> ${formatDate(shipment.date)}</span>
+            </div>
 
-                <!-- Row 2 Mobile: Client & Amount -->
-                <div class="col-7 col-md-3 order-3 order-md-2">
-                    <div class="d-flex flex-column">
-                        <span class="text-muted x-small text-uppercase fw-bold">Cliente</span>
-                        <div class="shipment-customer-name text-truncate fw-medium" title="${shipment.customer}">${shipment.customer}</div>
-                    </div>
+            <hr class="border-secondary opacity-10 my-3">
+
+            <!-- Details Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-12 col-md-4">
+                    <span class="text-white x-small text-uppercase fw-bold d-block mb-2">CLIENTE</span>
+                    <div class="fw-medium text-white text-truncate fs-6" title="${shipment.customer}">${shipment.customer}</div>
                 </div>
-
-                <div class="col-5 col-md-1 order-3 order-md-2 text-end text-md-start">
-                     <div class="d-flex flex-column">
-                        <span class="text-muted x-small text-uppercase fw-bold d-md-none">Total</span>
-                        <span class="shipment-amount fw-bold text-primary">${formatCurrency(shipment.amount)}</span>
-                    </div>
+                <div class="col-12 col-md-3">
+                    <span class="text-white x-small text-uppercase fw-bold d-block mb-2">TOTAL</span>
+                    <div class="fw-bold text-warning fs-6">${formatCurrency(shipment.amount)}</div>
+                    ${currentTasa ? `<div class="text-muted font-monospace x-small mt-1" style="opacity:0.8;">Bs. ${(shipment.amount * currentTasa).toLocaleString("es-VE", {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>` : ''}
                 </div>
-
-                <!-- Row 3 Mobile: Destination -->
-                <div class="col-12 col-md-2 order-4 order-md-3">
-                     <div class="d-flex flex-column">
-                        <span class="text-muted x-small text-uppercase fw-bold mb-1">Destino</span>
-                        <div class="d-flex align-items-center gap-2">
-                             <div class="shipment-address-text small text-truncate flex-grow-1" title="${shipment.address}">
-                                ${shipment.address}
-                            </div>
-                        </div>
-                        ${
-                          shipment.trackingNumber
-                            ? `<div class="tracking-badge mt-1 d-inline-flex border rounded px-2 py-0 border-opacity-25 border-warning bg-warning bg-opacity-10 text-warning x-small">
-                                <i class="fas fa-barcode me-1"></i> ${shipment.trackingNumber}
-                               </div>`
-                            : ""
-                        }
-                    </div>
-                </div>
-
-                <!-- Row 4 Mobile: Actions -->
-                <div class="col-12 col-md-2 order-5 text-end order-md-last">
-                     <div class="d-grid d-md-block">
-                        ${getStatusActions(shipment)}
+                <div class="col-12 col-md-5">
+                    <span class="text-white x-small text-uppercase fw-bold d-block mb-2">DESTINO</span>
+                    <div class="text-white d-flex align-items-start gap-2">
+                        <i class="fas fa-map-marker-alt text-muted mt-1"></i>
+                        <span class="text-truncate fs-6" title="${shipment.address}">${shipment.address}</span>
                     </div>
                 </div>
             </div>
 
-            ${
-              shipment.status !== "recibido"
-                ? `
-                <div class="row mt-2 pt-2 border-top border-secondary border-opacity-10 align-items-center g-2">
-                    <div class="col-auto">
-                        <small class="text-muted x-small"><i class="fas fa-calendar-alt me-1"></i> Entrega: <strong>${
-                          shipment.estimatedDelivery
-                            ? formatDate(shipment.estimatedDelivery)
-                            : "N/A"
-                        }</strong></small>
-                    </div>
-                    <div class="col">
-                         <div class="progress" style="height: 4px; background: rgba(255,255,255,0.05);">
-                            <div class="progress-bar bg-warning" role="progressbar" style="width: ${getProgressWidth(shipment.status)}%"></div>
+            <!-- Action and Progress Section -->
+            <div class="d-flex flex-column gap-3">
+                <!-- Progress Block -->
+                ${
+                  shipment.status !== "recibido"
+                    ? `
+                    <div class="order-2 order-md-1">
+                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
+                            <span class="text-muted small d-flex align-items-center gap-2">
+                                <i class="fas fa-calendar-alt mt-1"></i>
+                                <span>Entrega: <strong class="text-white">${
+                                  shipment.estimatedDelivery
+                                    ? formatDate(shipment.estimatedDelivery)
+                                    : "N/A"
+                                }</strong></span>
+                                <!-- Mobile Status Text -->
+                                <span class="d-md-none text-warning ms-1 fw-bold">- ${getProgressText(shipment.status)}</span>
+                            </span>
+                            <!-- Desktop Status Text -->
+                            <span class="text-warning font-monospace small d-none d-md-block fw-bold">${getProgressText(shipment.status)}</span>
+                        </div>
+                        <div class="progress d-none d-md-flex mt-1 mb-2" style="height: 6px; background: rgba(255,255,255,0.05); border-radius: 6px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: ${getProgressWidth(shipment.status)}%; border-radius: 6px;"></div>
                         </div>
                     </div>
-                    <div class="col-auto">
-                        <small class="text-warning font-mono x-small">${getProgressText(shipment.status)}</small>
-                    </div>
+                    `
+                    : ""
+                }
+
+                <!-- Action Button Block -->
+                <div class="order-1 order-md-2 mt-1 mt-md-0">
+                    ${getStatusActions(shipment)}
                 </div>
-            `
-                : ""
-            }
+            </div>
         </div>
     `
     )
@@ -237,21 +234,21 @@ function getStatusActions(shipment) {
   switch (shipment.status) {
     case "pendiente":
       return `
-                <button class="btn btn-buzz btn-sm" onclick="updateShipmentStatus(${shipment.id}, 'enviado')">
-                    <i class="fas fa-shipping-fast"></i> Marcar Enviado
+                <button class="btn btn-warning w-100 fw-bold py-2" style="background-color: #ffb703; border-color: #ffb703; color: #000;" onclick="updateShipmentStatus(${shipment.id}, 'enviado')">
+                    <i class="fas fa-truck me-2"></i> Marcar Enviado
                 </button>
             `
     case "enviado":
       return `
-                <button class="btn btn-success btn-sm" onclick="updateShipmentStatus(${shipment.id}, 'recibido')">
-                    <i class="fas fa-check"></i> Marcar Entregado
+                <button class="btn btn-success w-100 fw-bold py-2" onclick="updateShipmentStatus(${shipment.id}, 'recibido')">
+                    <i class="fas fa-check-circle me-2"></i> Marcar Entregado
                 </button>
             `
     case "recibido":
       return `
-                <span class="text-success font-mono">
-                    <i class="fas fa-check-circle"></i> Completado
-                </span>
+                <div class="text-success text-center fw-bold w-100 py-2 border border-success rounded bg-success bg-opacity-10">
+                    <i class="fas fa-check-circle me-2"></i> Pedido Completado
+                </div>
             `
     default:
       return ""
