@@ -81,11 +81,11 @@
     # ----------------------------------------------------------------------
     # Only for direct browser requests, not internal rewrites
     # Exclude php/, assets/, vendor/ directories from redirect
-    RewriteCond %{THE_REQUEST} \s/+([^/]*/)?([^\.]+)\.php[\s?] [NC]
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,9}\ /+(.*)\.php[\ ?] [NC]
     RewriteCond %{REQUEST_URI} !.*/php/ [NC]
     RewriteCond %{REQUEST_URI} !.*/assets/ [NC]
     RewriteCond %{REQUEST_URI} !.*/vendor/ [NC]
-    RewriteRule ^([^\.]+)\.php$ %1 [R=301,L]
+    RewriteRule ^ /%1 [R=301,L]
 </IfModule>
 
 # ----------------------------------------------------------------------
