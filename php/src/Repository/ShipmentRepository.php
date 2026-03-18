@@ -15,7 +15,7 @@ class ShipmentRepository {
      * Get all shipments with filters
      */
     public function findAll($filters = []) {
-        $sql_from = "FROM pedidos p LEFT JOIN clientes c ON p.cliente_id = c.id WHERE 1=1";
+        $sql_from = "FROM pedidos p LEFT JOIN clientes c ON p.cliente_id = c.id WHERE p.deleted_at IS NULL";
         $params = [];
 
         if (!empty($filters['search'])) {
