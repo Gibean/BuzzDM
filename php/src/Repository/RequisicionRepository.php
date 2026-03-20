@@ -204,7 +204,7 @@ class RequisicionRepository {
             $data['notas'] ?? null,
             $data['usuario_id']
         ]);
-        return $this->pdo->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function insertDetail(int $requisicionId, array $line): int {
@@ -221,7 +221,7 @@ class RequisicionRepository {
             $line['proveedor_seleccionado_id'] ?? null,
             $line['notas'] ?? null
         ]);
-        return $this->pdo->lastInsertId();
+        return (int) $this->pdo->lastInsertId();
     }
 
     public function updateHeader(int $id, array $data): void {

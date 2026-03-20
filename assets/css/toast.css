@@ -167,7 +167,7 @@
     }
 }
 
-/* Animation for stacked toasts - FIXED SELECTOR */
+/* Animation for stacked toasts */
 .toast-card + .toast-card {
     margin-top: -10px;
     transform: translateX(400px) scale(0.95);

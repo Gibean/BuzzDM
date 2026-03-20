@@ -3,7 +3,16 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchNotes();
+    fetchNotes().then(() => {
+        // Auto-open note from URL param (e.g. todo.php?id=5 from notification link)
+        const urlParams = new URLSearchParams(window.location.search);
+        const noteId = urlParams.get('id');
+        if (noteId) {
+            openEditNoteModal(noteId);
+            // Clean URL without reloading
+            window.history.replaceState({}, '', window.location.pathname);
+        }
+    });
     setupEventListeners();
 });
 
