@@ -120,7 +120,7 @@ class BackupService {
 
         // MySQL Import Command
         $mysqlPath = 'c:\\xampp\\mysql\\bin\\mysql.exe'; // Could also use config constant if available or infer
-        if (defined('MYSQL_PATH')) $mysqlPath = MYSQL_PATH; // Add this to config if not present, or hardcode/detect
+        if (defined('MYSQL_PATH')) $mysqlPath = constant('MYSQL_PATH');
 
         $cmd = sprintf(
             '"%s" --user=%s --password=%s --host=%s %s < "%s" 2>&1',

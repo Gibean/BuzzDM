@@ -143,11 +143,11 @@
 }
 
 .note-textarea {
-    min-height: 180px;
+    min-height: 120px;
     background: #1a1f28 !important;
     color: #e0e0e0 !important;
     border: 1px solid #3f475e !important;
-    padding: 12px;
+    padding: 10px;
 }
 
 .trello-modal-sidebar {
@@ -378,15 +378,15 @@
 .modal-section-sidebar {
     background: rgba(255,255,255,0.02);
     border-left: 1px solid rgba(255,160,0,0.1);
-    padding: 1.5rem;
+    padding: 1rem 1.25rem;
 }
 
 .modal-section-sidebar h6 {
     color: var(--buzz-primary-color);
     font-family: var(--font-primary);
     font-weight: 600;
-    font-size: 0.85rem;
-    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
     letter-spacing: 1px;
 }
 
@@ -394,8 +394,8 @@
 .modal-tools-top {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    padding: 1rem 1.5rem;
+    gap: 8px;
+    padding: 0.6rem 1.25rem;
     background: rgba(16, 20, 26, 0.7);
     border-bottom: 1px solid rgba(255, 160, 0, 0.1);
     align-items: center;
@@ -879,11 +879,11 @@
    ============================================ */
 
 .view-mode .modal-content-buzz {
-    border-color: rgba(100, 150, 200, 0.3);
+    border-color: rgba(255, 160, 0, 0.2);
 }
 
 .view-mode .modal-header-buzz {
-    background: linear-gradient(135deg, rgba(30, 60, 90, 0.3) 0%, rgba(20, 40, 60, 0.3) 100%);
+    background: rgba(16, 20, 26, 0.8);
 }
 
 .view-mode .form-control,
@@ -900,12 +900,12 @@
 }
 
 .view-mode #noteTitle {
-    font-size: 1.25rem !important;
+    font-size: 1.15rem !important;
 }
 
 .view-mode .modal-tools-top {
-    background: rgba(30, 60, 90, 0.2);
-    border-bottom-color: rgba(100, 150, 200, 0.15);
+    background: rgba(16, 20, 26, 0.5);
+    border-bottom-color: rgba(255, 160, 0, 0.1);
 }
 
 .view-mode .checklist-item {
@@ -923,13 +923,14 @@
 
 /* Markdown View */
 .view-markdown-content {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    padding: 1.25rem;
-    color: #e0e0e0;
-    line-height: 1.6;
-    min-height: 100px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(255, 160, 0, 0.08);
+    border-radius: 6px;
+    padding: 0.85rem 1rem;
+    color: #d0d0d0;
+    line-height: 1.5;
+    font-size: 0.9rem;
+    min-height: 60px;
 }
 
 .view-markdown-content h3 { color: var(--buzz-primary); font-size: 1.1rem; margin-top: 1rem; }
@@ -940,18 +941,19 @@
 .view-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.4rem;
 }
 
 .view-item-pill {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.6rem 1rem;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 6px;
+    gap: 0.6rem;
+    padding: 0.45rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 160, 0, 0.08);
+    border-radius: 4px;
     transition: all 0.2s ease;
+    font-size: 0.88rem;
 }
 
 .view-item-pill:hover {
@@ -994,7 +996,7 @@
 .view-info-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.6rem;
 }
 
 .view-info-item {
@@ -1003,16 +1005,17 @@
 }
 
 .view-info-label {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     text-transform: uppercase;
-    color: #666;
+    color: var(--buzz-text-muted);
     letter-spacing: 1px;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
+    font-family: var(--font-monospace);
 }
 
 .view-info-value {
-    font-size: 0.9rem;
-    color: #ccc;
+    font-size: 0.85rem;
+    color: var(--buzz-text-color);
     font-family: var(--font-monospace);
 }
 
