@@ -189,7 +189,7 @@ class UserController {
         if (!$id) throw new Exception("ID requerido");
         // Get user info before delete
         $user = $this->service->getUserById($id);
-        $this->service->deleteUser($id);
+        $this->service->deleteUser($id, getCurrentUserId());
         logSystemAction($pdo, getCurrentUserId(), 'Usuario eliminado', '#' . $id . ' | ' . ($user['nombre'] ?? '') . ' (' . ($user['email'] ?? '') . ')');
         $this->jsonResponse(true, null, 'Usuario eliminado exitosamente');
     }

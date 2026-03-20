@@ -62,7 +62,7 @@ const ToastSystem = {
     createToast: function(id, message, type, duration, title) {
         const toast = document.createElement('div');
         toast.id = id;
-        toast.className = `toast toast-${type}`;
+        toast.className = `toast-card toast-${type}`;
 
         // Get icon based on type
         const icon = this.getIcon(type);

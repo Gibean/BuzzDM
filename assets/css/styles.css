@@ -1360,7 +1360,7 @@ input:-webkit-autofill:active {
   gap: 10px;
 }
 
-.toast {
+.toast-card {
   background-color: var(--buzz-card-bg);
   color: var(--buzz-text-color);
   padding: 15px 20px;
@@ -1373,18 +1373,18 @@ input:-webkit-autofill:active {
   transition: all 0.4s ease;
 }
 
-.toast.show {
+.toast-card.show {
   opacity: 1;
   transform: translateX(0);
 }
 
-.toast.success {
+.toast-card.success {
   border-left-color: var(--buzz-success);
 }
-.toast.error {
+.toast-card.error {
   border-left-color: var(--buzz-danger);
 }
-.toast.info {
+.toast-card.info {
   border-left-color: var(--buzz-primary-color);
 }
 

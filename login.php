@@ -741,8 +741,8 @@
                     alertDiv = document.createElement('div');
                     alertDiv.className = 'alert-login';
                     alertDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i><span></span>';
-                    const logoDiv = document.querySelector('.login-logo');
-                    logoDiv.after(alertDiv);
+                    const headerDiv = document.querySelector('.login-header');
+                    headerDiv.after(alertDiv);
                 } else {
                     alertDiv.style.display = 'flex';
                 }

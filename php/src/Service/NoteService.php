@@ -54,7 +54,7 @@ class NoteService {
                 'usuario_id' => $creatorUserId,
                 'fecha_entrega' => !empty($data['fecha_entrega']) ? $data['fecha_entrega'] : null,
                 'etiquetas' => $data['etiquetas'] ?? null,
-                'miembros' => !empty($data['miembros']) ? json_encode($data['miembros']) : null
+                'miembros' => $data['miembros'] ?? null
             ];
 
             $notaId = $this->repository->create($noteData);
@@ -96,7 +96,7 @@ class NoteService {
                 'prioridad' => $data['prioridad'] ?? 'media',
                 'fecha_entrega' => !empty($data['fecha_entrega']) ? $data['fecha_entrega'] : null,
                 'etiquetas' => $data['etiquetas'] ?? null,
-                'miembros' => !empty($data['miembros']) ? json_encode($data['miembros']) : null
+                'miembros' => $data['miembros'] ?? null
             ];
 
             $this->repository->update($id, $noteData);
@@ -124,29 +124,18 @@ class NoteService {
     }
 
     private function notifyMembers($notaId, $title, $members, $senderId, $type, $subject, $messagePrefix) {
+        // Decode members if it's a JSON string (comes from frontend as JSON.stringify)
+        if (is_string($members)) {
+            $members = json_decode($members, true);
+        }
+
         if (!empty($members) && is_array($members)) {
-            // Need PDO for notification function which currently expects connection or global.
-            // createNotification in notification_functions.php takes ($pdo, $user_id, $type, $title, $message, $link)
-            // NoteRepository exposes raw PDO? Or we pass it?
-            // In strict Service pattern, we shouldn't rely on global includes if possible, but notification_functions.php is a helper.
-            // Let's inspect createNotification signature again from previous memory or file view.
-            // View of notas_actions.php showed: createNotification($pdo, $memberId, ...)
+            $pdo = getDbConnection();
 
-            // I need the PDO instance.
-            // Hack: Use a getter in Repository which I added.
-            // Actually, in PHP strict OOP, I should inject NotificationService, but time is essence.
-            // Repository seems to have getDbConnection() available via global db.php effectively.
-
-            // Actually I can define a method in Repository to get PDO or expose it.
-            // I did NOT expose getPdo() in NoteRepository in my previous tool call.
-            // Checking... I defined `private $pdo;` and no getter.
-            // I should use `getDbConnection()` here too or update Repository.
-            // Since `notification_functions.php` is global, I can just call getDbConnection() again or access it.
-
-            $pdo = getDbConnection(); // It's singleton-ish in db.php usually?
-
-            foreach ($members as $memberId) {
-                if ($memberId != $senderId) {
+            foreach ($members as $member) {
+                // Each member is an object {id, name}
+                $memberId = is_array($member) ? ($member['id'] ?? null) : $member;
+                if ($memberId && $memberId != $senderId) {
                     createNotification($pdo, $memberId, $type, $subject, $messagePrefix . $title, 'todo.php?id=' . $notaId);
                 }
             }
