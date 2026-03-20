@@ -602,31 +602,6 @@
                     </button>
                 </div>
 
-                <!-- System Info -->
-                <div class="buzz-card mb-4">
-                    <h5 class="font-primary text-primary mb-3">INFORMACIÓN DEL SERVIDOR</h5>
-                    <div class="sys-info-row">
-                        <span class="label">Servidor</span>
-                        <span class="value"><?php echo php_uname('n'); ?></span>
-                    </div>
-                    <div class="sys-info-row">
-                        <span class="label">Sistema Operativo</span>
-                        <span class="value"><?php echo PHP_OS; ?></span>
-                    </div>
-                    <div class="sys-info-row">
-                        <span class="label">Memoria PHP (Peak)</span>
-                        <span class="value"><?php echo round(memory_get_peak_usage() / (1024 * 1024), 2) . ' MB'; ?></span>
-                    </div>
-                    <div class="sys-info-row">
-                        <span class="label">Espacio Libre</span>
-                        <span class="value"><?php echo round(disk_free_space('/') / (1024 * 1024 * 1024), 2) . ' GB'; ?></span>
-                    </div>
-                    <div class="sys-info-row">
-                        <span class="label">Espacio Total</span>
-                        <span class="value"><?php echo round(disk_total_space('/') / (1024 * 1024 * 1024), 2) . ' GB'; ?></span>
-                    </div>
-                </div>
-
                 <!-- Support -->
                 <div class="buzz-card mb-4">
                     <h5 class="font-primary text-primary mb-3">SOPORTE TÉCNICO</h5>

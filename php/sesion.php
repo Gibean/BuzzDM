@@ -235,7 +235,8 @@ $fallback_pages = [
         'api_notifications.php', 'api_transferencias.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php',
         'api_settings.php', 'api_backups.php', 'api_users.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_cargos.php',
         'api_2fa.php',
-        'requisiciones.php', 'api_requisiciones.php'
+        'requisiciones.php', 'api_requisiciones.php',
+        'ajustes.php'
     ],
     'supervisor' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'inventario.php', 'importacion.php',
@@ -245,7 +246,8 @@ $fallback_pages = [
         'api_clientes.php', 'api_sales_by_status_chart.php', 'envios_actions.php', 'transferencias.php',
         'todo.php', 'notas_actions.php', 'cargos_existencias.php', 'almacenes.php', 'proveedores.php', 'catalogos.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_import.php', 'api_notes.php', 'api_suppliers.php', 'api_catalogs.php', 'api_shipments.php', 'api_locations.php', 'api_kits.php', 'api_transferencias.php', 'api_cargos.php',
-        'requisiciones.php', 'api_requisiciones.php'
+        'requisiciones.php', 'api_requisiciones.php',
+        'ajustes.php'
     ],
     'operador' => [
         'dashboard.php', 'pedidos.php', 'envios.php', 'about.php', 'manual.php', 'login.php',
@@ -253,7 +255,8 @@ $fallback_pages = [
         'api_orders.php', 'api_sales_by_status_chart.php',
         'envios_actions.php', 'todo.php', 'notas_actions.php',
         'api_notifications.php', 'api_stats.php', 'api_warehouses.php', 'api_notes.php', 'api_shipments.php',
-        'requisiciones.php', 'api_requisiciones.php'
+        'requisiciones.php', 'api_requisiciones.php',
+        'ajustes.php'
     ]
 ];
 
