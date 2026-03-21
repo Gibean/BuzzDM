@@ -428,7 +428,7 @@
                                             <p class="text-muted small mb-2">Ingresa el código de 6 dígitos que muestra tu aplicación:</p>
                                             <div class="input-group mb-3">
                                                 <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fas fa-shield-alt"></i></span>
-                                                <input type="text" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center fs-4 letter-spacing-2"
+                                                <input type="text" inputmode="numeric" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center fs-4 letter-spacing-2"
                                                        maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="off">
                                             </div>
 

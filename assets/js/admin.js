@@ -1613,6 +1613,27 @@ function updateActiveFiltersCount() {
     load2FAStatus()
     initSessionTimeout()
 
+    // Restrict 2FA verification code input to digits only (init once)
+    const verifyInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyInput && !verifyInput.dataset.numericInit) {
+      verifyInput.dataset.numericInit = '1'
+      verifyInput.addEventListener('keypress', (e) => {
+        if (!/\d/.test(e.key)) e.preventDefault()
+      })
+      verifyInput.addEventListener('paste', (e) => {
+        e.preventDefault()
+        const sanitized = (e.clipboardData?.getData('text') || '').replace(/\D/g, '')
+        const start = verifyInput.selectionStart
+        const end = verifyInput.selectionEnd
+        const current = verifyInput.value
+        verifyInput.value = current.substring(0, start) + sanitized + current.substring(end)
+        verifyInput.setSelectionRange(start + sanitized.length, start + sanitized.length)
+      })
+      verifyInput.addEventListener('input', () => {
+        verifyInput.value = verifyInput.value.replace(/\D/g, '')
+      })
+    }
+
     // 2FA buttons
     const start2FASetupBtn = document.getElementById('start2FASetupBtn')
     const cancel2FASetupBtn = document.getElementById('cancel2FASetupBtn')
