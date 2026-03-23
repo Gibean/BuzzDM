@@ -107,7 +107,7 @@
   async function enable2FA() {
     const code = document.getElementById('twoFactorVerifyCode')?.value || ''
 
-    if (!code || code.length !== 6) {
+    if (!/^\d{6}$/.test(code)) {
       showToast('Ingresa un código de 6 dígitos', 'warning')
       return
     }
@@ -227,6 +227,13 @@
     }
     if (disable2FABtn) {
       disable2FABtn.addEventListener('click', disable2FA)
+    }
+
+    const verifyCodeInput = document.getElementById('twoFactorVerifyCode')
+    if (verifyCodeInput) {
+      verifyCodeInput.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 6)
+      })
     }
   }
 })()
