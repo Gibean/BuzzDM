@@ -171,7 +171,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
             <!-- SISTEMA - Visible para todos, items con permisos -->
             <!-- ═══════════════════════════════════════════════════════════ -->
             <?php
-            $sistemaPages = ['admin.php', 'about.php'];
+            $sistemaPages = ['admin.php', 'ajustes.php', 'about.php'];
             $sistemaActive = in_array($currentPage, $sistemaPages);
             ?>
             <li class="nav-item nav-dropdown <?php echo $sistemaActive ? 'open' : ''; ?>">
@@ -189,6 +189,12 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         </a>
                     </li>
                     <?php endif; ?>
+                    <li>
+                        <a class="nav-dropdown-item <?php echo $currentPage === 'ajustes.php' ? 'active' : ''; ?>"
+                           href="ajustes">
+                            <i class="fas fa-sliders-h"></i> Ajustes
+                        </a>
+                    </li>
                     <li>
                         <a class="nav-dropdown-item <?php echo $currentPage === 'about.php' ? 'active' : ''; ?>"
                            href="about">
