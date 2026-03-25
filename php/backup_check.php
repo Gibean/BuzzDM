@@ -1,9 +1,6 @@
 <?php
 /**
- * Poor Man's Cron - Automatic Backup Check
- *
- * This script checks if an automatic backup is needed and triggers it
- * in a non-blocking way. It's called on every page load for logged-in users.
+ * CRON JOB CONECTADO A HOSTINGER
  */
 
 // Load centralized config for URL generation

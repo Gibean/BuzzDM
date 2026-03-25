@@ -225,9 +225,29 @@
                                         <label class="text-muted small mb-1">Nombre Completo</label>
                                         <input type="text" class="form-control form-control-buzz form-control-sm" id="noteClientName" placeholder="Nombre completo">
                                     </div>
-                                    <div class="mb-3">
-                                        <label class="text-muted small mb-1">Teléfono</label>
-                                        <input type="text" class="form-control form-control-buzz form-control-sm" id="notePhone" placeholder="+58 ...">
+                                    <div class="row mb-3 g-2">
+                                        <div class="col-5">
+                                            <label class="text-muted small mb-1">País</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-globe"></i></span>
+                                                <select class="form-select form-control-buzz" id="notePhoneCountryCode">
+                                                    <option value="+58">🇻🇪 +58</option>
+                                                    <option value="+1">🇺🇸 +1</option>
+                                                    <option value="+57">🇨🇴 +57</option>
+                                                    <option value="+54">🇦🇷 +54</option>
+                                                    <option value="+34">🇪🇸 +34</option>
+                                                    <option value="+52">🇲🇽 +52</option>
+                                                    <option value="+55">🇧🇷 +55</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-7">
+                                            <label class="text-muted small mb-1">Teléfono</label>
+                                            <div class="input-group input-group-sm">
+                                                <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                                <input type="tel" class="form-control form-control-buzz" id="notePhone" placeholder="412 1234567">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="text-muted small mb-1">Email</label>

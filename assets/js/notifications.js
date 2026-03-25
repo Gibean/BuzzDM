@@ -354,19 +354,40 @@ async function performAction(action, id) {
 }
 
 // Utility: Time Ago
-function timeSince(date) {
-  const seconds = Math.floor((new Date() - date) / 1000);
+function timeSince(dateParam) {
+  // Parse date safely
+  let date = typeof dateParam === 'string' ? new Date(dateParam.replace(/-/g, '/')) : new Date(dateParam);
+  if (isNaN(date.getTime()) && typeof dateParam === 'string') {
+      date = new Date(dateParam.replace(' ', 'T') + 'Z'); // Fallback to UTC parsing if needed
+  }
+  
+  let seconds = Math.floor((new Date() - date) / 1000);
+  
+  // Handle timezone offsets (future dates) by capping at 0
+  if (seconds < 0) {
+      // If it's too far in the future, it's definitely a timezone offset issue.
+      // We will just assume it's "now" for recent notifications.
+      return "justo ahora";
+  }
+
+  if (seconds < 60) return "hace unos segundos";
+
   let interval = seconds / 31536000;
-  if (interval > 1) return Math.floor(interval) + " años";
+  if (interval > 1) return "hace " + Math.floor(interval) + (Math.floor(interval) === 1 ? " año" : " años");
+  
   interval = seconds / 2592000;
-  if (interval > 1) return Math.floor(interval) + " meses";
+  if (interval > 1) return "hace " + Math.floor(interval) + (Math.floor(interval) === 1 ? " mes" : " meses");
+  
   interval = seconds / 86400;
-  if (interval > 1) return Math.floor(interval) + " días";
+  if (interval > 1) return "hace " + Math.floor(interval) + (Math.floor(interval) === 1 ? " día" : " días");
+  
   interval = seconds / 3600;
-  if (interval > 1) return Math.floor(interval) + " horas";
+  if (interval > 1) return "hace " + Math.floor(interval) + (Math.floor(interval) === 1 ? " hora" : " horas");
+  
   interval = seconds / 60;
-  if (interval > 1) return Math.floor(interval) + " minutos";
-  return Math.floor(seconds) + " segundos";
+  if (interval > 1) return "hace " + Math.floor(interval) + (Math.floor(interval) === 1 ? " minuto" : " minutos");
+  
+  return "hace unos segundos";
 }
 
 // Utility: Escape HTML to prevent XSS
