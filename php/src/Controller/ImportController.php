@@ -89,6 +89,22 @@ class ImportController {
             $this->jsonResponse(false, [], 'Usuario no autenticado.');
         }
 
+        // Validate Password
+        $password = $_POST['password'] ?? '';
+        if (empty($password)) {
+            $this->jsonResponse(false, [], 'Debes proporcionar tu contraseña para autorizar la importación.');
+        }
+
+        require_once __DIR__ . '/../../db.php';
+        $pdo = \Database::getConnection();
+        $stmt = $pdo->prepare("SELECT password FROM usuarios WHERE id = ?");
+        $stmt->execute([$userId]);
+        $hash = $stmt->fetchColumn();
+
+        if (!$hash || !password_verify($password, $hash)) {
+            $this->jsonResponse(false, [], 'Contraseña incorrecta. Operación cancelada por seguridad.');
+        }
+
         // Process
         $result = $this->service->processFile($fileTmpPath, $fileName, $userId);
 

@@ -95,20 +95,14 @@
       normalized = digits.slice(2)
     else if (digits.length === 13 && digits.startsWith("0058"))
       normalized = digits.slice(4)
-    if (normalized.length !== 10) {
+      
+    // Eliminar validación estricta de regex para permitir todos los códigos
+    // Sólo validar que tenga al menos 10 dígitos para Venezuela
+    if (normalized.length < 10) {
       return {
         valid: false,
         message:
-          "El teléfono debe estar en el formato correcto (ej: 04141234567, 02121234567 o +584141234567)"
-      }
-    }
-    const mobileRe = /^(412|414|415|416|417|418|422|424|426)\d{7}$/
-    const landlineRe = /^2[1-9]\d{8}$/
-    if (!mobileRe.test(normalized) && !landlineRe.test(normalized)) {
-      return {
-        valid: false,
-        message:
-          "Formato inválido. Móvil: 0414/0424/0412... | Fijo: 0212/0241..."
+          "El teléfono debe tener al menos 10 dígitos (ej: 04141234567 o +58...)"
       }
     }
     return { valid: true, normalized: "+58" + normalized }

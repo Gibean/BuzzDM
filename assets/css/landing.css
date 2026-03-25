@@ -403,6 +403,20 @@
    RESPONSIVE DESIGN
    ============================================ */
 
+@media (max-width: 1024px) {
+    .hero-title {
+        font-size: 2.2rem;
+    }
+    .hero-subtitle {
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+    }
+    .hero-logo {
+        max-width: 300px;
+        margin-bottom: 1.5rem;
+    }
+}
+
 @media (max-width: 768px) {
     .hero-title {
         font-size: 2rem;
@@ -465,5 +479,33 @@
     .stats-section,
     .cta-section {
         padding: 4rem 1rem;
+    }
+}
+
+/* Fix for landscape orientation on short screens (e.g. Nest Hub) */
+@media (max-height: 700px) {
+    .hero-logo {
+        max-width: 250px;
+        margin-bottom: 1rem;
+    }
+    .hero-title {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+    .hero-subtitle {
+        font-size: 0.95rem;
+        margin-bottom: 1.5rem;
+    }
+    .hero-content {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+    .hero-buttons {
+        gap: 1rem;
+    }
+    .btn-hero-primary,
+    .btn-hero-secondary {
+        padding: 0.8rem 1.5rem;
+        font-size: 0.9rem;
     }
 }
