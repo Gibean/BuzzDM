@@ -2659,3 +2659,65 @@ input:-webkit-autofill:active {
   color: white !important;
   font-weight: bold;
 }
+
+/* ============================================
+   RESPONSIVE FIXES FOR SHORT SCREENS (e.g. Nest Hub 1024x600)
+   ============================================ */
+@media (max-height: 700px) {
+  /* Compact Sidebar */
+  .sidebar-header-enhanced {
+    padding: 1rem;
+  }
+  .sidebar-logo-enhanced {
+    max-width: 140px;
+  }
+  .sidebar-nav-enhanced {
+    padding: 0.5rem 0;
+  }
+  .sidebar-nav-enhanced .nav-item {
+    margin: 0.2rem 0.5rem;
+  }
+  .nav-link-enhanced {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+  .sidebar-footer-enhanced {
+    padding: 0.75rem;
+  }
+  .user-profile-enhanced {
+    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .user-avatar-enhanced {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+  .user-info-enhanced h6 {
+    font-size: 0.85rem;
+  }
+  .user-info-enhanced small {
+    font-size: 0.7rem;
+  }
+  .btn-logout-enhanced {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  /* Compact Main Content */
+  .top-navbar {
+    padding: 0.5rem 1rem;
+    margin: -1rem -1rem 1rem -1rem;
+  }
+  .top-navbar__heading {
+    font-size: 1.2rem;
+  }
+  .main-content {
+    padding: 1rem;
+    padding-bottom: 50px;
+  }
+  .buzz-card {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+}

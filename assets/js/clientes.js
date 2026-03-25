@@ -511,17 +511,14 @@ document.addEventListener("DOMContentLoaded", () => {
   setupCreateCustomerForm();
 });
 
-// Valida teléfono según el código de país. Venezuela (+58) usa formato estricto.
+// Valida teléfono de forma general para evitar bloqueos estrictos por país
 function validatePhoneByCountry(fullPhone, countryCode) {
   const digits = (fullPhone || "").replace(/\D/g, "")
   if (digits.length === 0) return { valid: true }
 
-  if (countryCode === "+58" && typeof isValidVenezuelaPhone === "function") {
-    return isValidVenezuelaPhone(fullPhone)
-  }
-  // Otros países: mínimo 10 dígitos (código + número)
-  if (digits.length < 10) {
-    return { valid: false, message: "El teléfono debe tener al menos 10 dígitos." }
+  // Mínimo 8 dígitos (ej. código de país + número corto)
+  if (digits.length < 8) {
+    return { valid: false, message: "El teléfono debe tener al menos 8 dígitos." }
   }
   return { valid: true }
 }

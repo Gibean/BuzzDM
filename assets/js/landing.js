@@ -16,8 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Set canvas size
         function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            const parent = canvas.parentElement;
+            canvas.width = parent ? parent.offsetWidth : window.innerWidth;
+            canvas.height = parent ? parent.offsetHeight : window.innerHeight;
         }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
