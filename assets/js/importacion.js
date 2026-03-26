@@ -267,18 +267,18 @@ function renderImportHistory() {
     .map(
       (item) => `
         <tr>
-            <td class="font-mono">${formatDateTime(item.date)}</td>
-            <td>
+            <td class="font-mono" data-label="Fecha">${formatDateTime(item.date)}</td>
+            <td data-label="Tipo">
                 <span class="badge badge-${getTypeColor(item.type)}">${getTypeLabel(item.type)}</span>
             </td>
-            <td class="font-mono">${item.filename}</td>
-            <td>${getStatusBadge(item.status)}</td>
-            <td class="font-mono">
+            <td class="font-mono" data-label="Archivo">${item.filename}</td>
+            <td data-label="Estado">${getStatusBadge(item.status)}</td>
+            <td class="font-mono" data-label="Registros">
                 <span class="text-success">${item.records}</span>
                 ${item.errors > 0 ? `/ <span class="text-danger">${item.errors}</span>` : ""}
             </td>
-            <td class="font-mono">${item.user}</td>
-            <td>
+            <td class="font-mono" data-label="Usuario">${item.user}</td>
+            <td data-label="Acciones">
                 <button class="btn btn-outline-buzz btn-sm" onclick="viewImportDetails(${item.id})" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
