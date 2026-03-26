@@ -139,12 +139,17 @@ class ImportController {
                 }
             }
 
+            $statusFrontend = $row['estado'];
+            if ($statusFrontend === 'procesado') {
+                $statusFrontend = ($errors > 0) ? 'completado-errores' : 'exitoso';
+            }
+
             $formattedHistory[] = [
                 'id' => $row['id'],
                 'date' => $row['fecha'],
                 'type' => $row['tipo'],
                 'filename' => $row['archivo_nombre'],
-                'status' => $row['estado'],
+                'status' => $statusFrontend,
                 'records' => $records,
                 'errors' => $errors,
                 'user' => $row['usuario_nombre'] ?? 'Desconocido',
