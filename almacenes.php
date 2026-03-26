@@ -26,43 +26,23 @@
         require_once 'php/top_navbar.php';
         ?>
 
-        <!-- Stats Cards -->
-        <div class="row mb-4">
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="buzz-card stat-card">
-                    <div class="stat-icon"><i class="fas fa-warehouse"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="totalAlmacenes">0</span>
-                        <span class="stat-label">Almacenes Activos</span>
-                    </div>
-                </div>
+        <!-- Command Strip (Almacenes Stats) -->
+        <div class="command-strip mb-4">
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-warehouse me-1"></i> Almacenes Activos</span>
+                <span class="node-value blue" id="totalAlmacenes">0</span>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="buzz-card stat-card">
-                    <div class="stat-icon"><i class="fas fa-map-marker-alt"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="totalUbicaciones">0</span>
-                        <span class="stat-label">Ubicaciones</span>
-                    </div>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-map-marker-alt me-1"></i> Ubicaciones</span>
+                <span class="node-value" id="totalUbicaciones">0</span>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="buzz-card stat-card">
-                    <div class="stat-icon"><i class="fas fa-boxes"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="totalProductos">0</span>
-                        <span class="stat-label">Productos Distribuidos</span>
-                    </div>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-boxes me-1"></i> Productos Distribuidos</span>
+                <span class="node-value orange" id="totalProductos">0</span>
             </div>
-            <div class="col-xl-3 col-md-6 mb-3">
-                <div class="buzz-card stat-card">
-                    <div class="stat-icon"><i class="fas fa-star"></i></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="almacenPrincipal">-</span>
-                        <span class="stat-label">Almacén Principal</span>
-                    </div>
-                </div>
+            <div class="status-node">
+                <span class="node-label"><i class="fas fa-star me-1"></i> Almacén Principal</span>
+                <span class="node-value" id="almacenPrincipal" style="font-size: 0.9rem;">-</span>
             </div>
         </div>
 

@@ -140,14 +140,16 @@
         <div class="buzz-card">
             <h5 class="font-primary text-primary mb-3">HISTORIAL DE IMPORTACIONES</h5>
             <div class="table-responsive">
-                <table class="table table-buzz text-nowrap">
+                <table class="table table-buzz">
                     <thead>
                         <tr>
                             <th>Fecha</th>
                             <th>Tipo</th>
                             <th>Archivo</th>
                             <th>Estado</th>
+                            <th>Registros</th>
                             <th>Usuario</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="importHistoryTable">
