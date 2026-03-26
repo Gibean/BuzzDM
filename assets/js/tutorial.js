@@ -42,13 +42,14 @@ class TutorialManager {
             'almacenes',
             'proveedores',
             'clientes',
+            'cargos',
             'pedidos',
             'requisiciones',
             'transferencias',
             'envios',
-            'cargos',
             'notas',
             'importacion',
+            'ajustes',
             'admin',
             'about'
         ];
@@ -117,13 +118,14 @@ class TutorialManager {
             'almacenes': 'almacenes',
             'proveedores': 'proveedores',
             'clientes': 'clientes',
+            'cargos': 'cargos_existencias',
             'pedidos': 'pedidos',
             'requisiciones': 'requisiciones',
             'transferencias': 'transferencias',
             'envios': 'envios',
-            'cargos': 'cargos_existencias',
             'notas': 'todo',
             'importacion': 'importacion',
+            'ajustes': 'ajustes',
             'admin': 'admin',
             'config': 'company_settings',
             'about': 'about'
@@ -139,13 +141,14 @@ class TutorialManager {
             'almacenes': 'almacenes',
             'proveedores': 'proveedores',
             'clientes': 'clientes',
+            'cargos': 'cargos_existencias',
             'pedidos': 'pedidos',
             'requisiciones': 'requisiciones',
             'transferencias': 'transferencias',
             'envios': 'envios',
-            'cargos': 'cargos_existencias',
             'notas': 'todo',
             'importacion': 'importacion',
+            'ajustes': 'ajustes',
             'admin': 'admin',
             'config': 'company_settings',
             'about': 'about'
@@ -231,7 +234,7 @@ class TutorialManager {
                         }
                     },
                     {
-                        element: '#salesChart',
+                        element: '.col-lg-8 .buzz-card.chart-container',
                         popover: { title: 'Métricas Clave', description: 'Visualiza rápidamente el rendimiento con indicadores en tiempo real.', side: 'bottom' }
                     },
                     {
@@ -243,7 +246,7 @@ class TutorialManager {
                         popover: { title: 'Estado de Pagos', description: 'Gráfico detallado de tus ventas pagadas vs. pendientes.', side: 'top' }
                     },
                      {
-                        element: '#topProducts', // Target the inner list for precision
+                        element: '#topProductsCard', // Target the card for precision
                         popover: { title: 'Top 5 Productos', description: 'Tus artículos más vendidos este mes.', side: 'left' }
                     },
                      {
@@ -269,7 +272,11 @@ class TutorialManager {
                     },
                     {
                         element: '#showDeletedFilter',
-                        popover: { title: 'Ver Eliminados', description: 'Permite visualizar productos que han sido eliminados del sistema (Papelera de reciclaje).', side: 'top' }
+                        popover: { title: 'Ver Eliminados', description: 'Permite visualizar productos que han sido eliminados del sistema (Papelera de reciclaje).', side: 'top' },
+                        onHighlightStarted: () => {
+                            const btn = document.getElementById('toggleAdvancedFilters');
+                            if (btn && !btn.classList.contains('active')) btn.click();
+                        }
                     },
                     {
                         element: '.table-buzz',
@@ -340,44 +347,113 @@ class TutorialManager {
                         element: '[data-catalog="categorias"] .btn-add-sm',
                         popover: {
                             title: 'Agregar Item',
-                            description: 'Usa este botón pequeño en cada tarjeta para crear nuevos elementos rápidamente.',
+                            description: 'Haz click para crear una nueva categoría.',
                             side: 'bottom',
-                            onNextClick: () => this.nextModule()
+                            onNextClick: () => {
+                                document.querySelector('[data-catalog="categorias"] .btn-add-sm').click();
+                                setTimeout(() => this.driver.moveNext(), 400);
+                            }
                         }
+                    },
+                    {
+                        element: '#itemName',
+                        popover: { title: 'Nombre', description: 'Nombre claro y descriptivo del elemento. Ej: "Electrónica".', side: 'right' }
+                    },
+                    {
+                        element: '.field-desc',
+                        popover: { title: 'Descripción', description: 'Detalle adicional sobre esta categoría o marca.', side: 'right' }
+                    },
+                    {
+                        element: '[data-catalog="categorias"] .catalog-card-body',
+                        popover: { title: 'Elemento Guardado', description: 'Una vez guardado, aparecerá aquí como un chip o tarjeta para uso rápido.', side: 'top', onNextClick: () => {
+                            if (typeof closeItemModal === 'function') closeItemModal();
+                            this.nextModule();
+                        }}
                     }
                 ];
              case 'almacenes':
                 return [
                    {
-                        element: '.row.mb-4', // Target the entire row of stats
+                        element: '.row.mb-4',
                         popover: { title: 'Resumen de Almacenes', description: 'Vista global de almacenes activos, ubicaciones totales y ocupación.', side: 'bottom' }
                     },
                     {
                         element: '#btnNewAlmacen',
-                        popover: { title: 'Nuevo Almacén', description: 'Registra depósitos físicos o virtuales para organizar tu stock.', side: 'bottom' }
+                        popover: { 
+                            title: 'Nuevo Almacén', 
+                            description: 'Haz click aquí para registrar depósitos físicos o virtuales.', 
+                            side: 'bottom',
+                            onNextClick: () => {
+                                if(typeof openAlmacenModal === 'function') openAlmacenModal();
+                                setTimeout(() => this.driver.moveNext(), 400);
+                            }
+                        }
+                    },
+                    {
+                        element: '#almacenNombre',
+                        popover: { title: 'Nombre del Almacén', description: 'Asigna un nombre reconocible (Ej: "Principal", "Depósito Sur").', side: 'right' }
+                    },
+                    {
+                        element: '#almacenTipo',
+                        popover: { title: 'Tipo de Espacio', description: 'Clasifica si es una tienda, bodega o depósito temporal.', side: 'right' }
+                    },
+                    {
+                        element: '#almacenPrincipalCheck',
+                        popover: { title: 'Almacén Principal', description: 'Márcalo para convertirlo en el destino por defecto de las compras nuevas.', side: 'right' }
                     },
                     {
                         element: '#almacenesGrid',
-                        popover: { title: 'Gestión de Ubicaciones', description: 'Haz click en cada tarjeta para ver el inventario detallado por ubicación.', side: 'top', onNextClick: () => this.nextModule() }
+                        popover: { 
+                            title: 'Gestión de Ubicaciones', 
+                            description: 'Al guardar, se mostrará aquí. Puedes entrar a cada almacén para configurar pasillos y estantes (ubicaciones).', 
+                            side: 'top',
+                            onNextClick: () => {
+                                if(typeof closeAlmacenModal === 'function') closeAlmacenModal();
+                                this.nextModule();
+                            }
+                        }
                     }
                 ];
              case 'proveedores':
                 return [
                     {
                         element: '#btnNewProveedor',
-                        popover: { title: 'Gestión de Proveedores', description: 'Centraliza la información de tus aliados comerciales para agilizar las órdenes de compra.', side: 'bottom' }
+                        popover: { 
+                            title: 'Gestión de Proveedores', 
+                            description: 'Haz click para registrar un aliado comercial y agilizar las futuras compras.', 
+                            side: 'bottom',
+                            onNextClick: () => {
+                                if(typeof abrirModalProveedor === 'function') abrirModalProveedor();
+                                setTimeout(() => this.driver.moveNext(), 400);
+                            }
+                        }
                     },
                     {
-                        element: '#proveedoresContainer',
-                        popover: { title: 'Directorio', description: 'Aquí verás la lista completa de tus proveedores.', side: 'top' }
+                        element: '#proveedorNombre',
+                        popover: { title: 'Nombre', description: 'Razón social o nombre comercial del proveedor.', side: 'right' }
                     },
-                     {
-                         element: '#proveedoresContainer', // Fallback to container to avoid errors if no rows
+                    {
+                        element: '#proveedorRif',
+                        popover: { title: 'Identificación', description: 'Ingresa el RIF completo (Ej: J-12345678-9).', side: 'right' }
+                    },
+                    {
+                        element: '#proveedorTelefono',
+                        popover: { title: 'Contacto Principal', description: 'Número telefónico, no olvides verificar el código de país.', side: 'right' }
+                    },
+                    {
+                        element: '#proveedorEmail',
+                        popover: { title: 'Correo Electrónico', description: 'Se enviarán las órdenes de compra a esta dirección.', side: 'right' }
+                    },
+                    {
+                         element: '#proveedoresContainer',
                          popover: {
-                            title: 'Acciones Rápidas',
-                            description: 'En cada fila encontrarás botones para **Editar** información o **Eliminar** el proveedor.',
+                            title: 'Directorio',
+                            description: 'Aquí verás las tarjetas de tus proveedores. Podrás consultar el histórico de precios (botón "Productos") que te han ofrecido.',
                             side: 'top',
-                            onNextClick: () => this.nextModule()
+                            onNextClick: () => {
+                                if(typeof cerrarModalProveedor === 'function') cerrarModalProveedor();
+                                this.nextModule();
+                            }
                         }
                     }
                 ];
@@ -385,118 +461,96 @@ class TutorialManager {
                 return [
                     {
                         element: '.frequent-customers-banner',
-                        popover: { title: 'Clientes VIP', description: 'Acceso rápido a tus clientes más frecuentes.', side: 'bottom' }
+                        popover: { title: 'Clientes VIP', description: 'Acceso rápido e inteligente a los clientes que más te compran.', side: 'bottom' }
                     },
                     {
                         element: '#btnNewCliente',
                         popover: {
                             title: 'Nuevo Cliente',
-                            description: 'Registra los datos básicos. <b>Importante:</b> Asegúrate de incluir la dirección exacta para agilizar los envíos.',
-                            side: 'bottom'
+                            description: 'Haz click para registrar un cliente en la base de datos central.',
+                            side: 'bottom',
+                            onNextClick: () => {
+                                if(typeof openModal === 'function') openModal('createCustomerModal');
+                                setTimeout(() => this.driver.moveNext(), 400);
+                            }
                         }
                     },
                     {
-                        element: '.filter-wrapper', // Generalizing filters
-                        popover: {
-                            title: 'Filtros y Auditoría',
-                            description: 'Encuentra clientes por tipo, fecha o estado. Activa "Ver inactivos" para consultar registros eliminados.',
-                            side: 'bottom'
-                        }
+                        element: '#createCustomerId',
+                        popover: { title: 'ID Cliente', description: 'Cédula o RIF del cliente. Esencial para la facturación.', side: 'right' }
                     },
                     {
-                        element: '#customersList', // Targeting list container
+                        element: '#createCustomerName',
+                        popover: { title: 'Nombre', description: 'Nombre representativo para las guías de envío.', side: 'right' }
+                    },
+                    {
+                        element: '#createCustomerPhone',
+                        popover: { title: 'WhatsApp o Teléfono', description: 'Fundamental para coordinar entregas.', side: 'right' }
+                    },
+                    {
+                        element: '#createCustomerEmail',
+                        popover: { title: 'Email', description: 'Destino automático de facturas y notificaciones.', side: 'right' }
+                    },
+                    {
+                        element: '#customersList',
                         popover: {
-                             title: 'Gestión de Clientes',
-                             description: 'Visualiza tu cartera de clientes. Usa los botones de acción en cada fila (Ver, Editar, Eliminar) para gestionarlos.',
+                             title: 'Gestión Completa',
+                             description: 'En el listado podrás editar, eliminar o ver el historial completo de pedidos de cada cliente.',
                              side: 'top',
-                             onNextClick: () => this.nextModule()
+                             onNextClick: () => {
+                                if(typeof closeModal === 'function') closeModal('createCustomerModal');
+                                this.nextModule();
+                             }
                         }
                     }
                 ];
             case 'pedidos':
                 return [
                     {
-                        element: '#newOrderBtn', // Ensure ID is correct in pedidos.php
+                        element: '#newOrderBtn',
                         popover: {
                             title: 'Crear Pedido',
-                            description: 'Inicia una nueva venta. Haz click para ver el formulario.',
+                            description: 'Inicia una nueva venta. Haz click para abrir el formulario.',
                             side: 'bottom',
                             onNextClick: () => {
-                                if(window.openCreateOrderModal) {
-                                    window.openCreateOrderModal();
-                                    setTimeout(() => this.driver.moveNext(), 500);
-                                } else {
-                                     // Fallback if global function not found, try bootstrap way or just move next
-                                     const btn = document.getElementById('newOrderBtn');
-                                     if(btn) btn.click();
-                                     setTimeout(() => this.driver.moveNext(), 500);
-                                }
+                                const btn = document.getElementById('newOrderBtn');
+                                if(btn) btn.click();
+                                setTimeout(() => this.driver.moveNext(), 500);
                             }
                         }
                     },
-                    {
-                        element: '#createOrderClientSearch',
-                        popover: { title: 'Asignar Cliente', description: 'Busca y selecciona un cliente existente o crea uno rápido.', side: 'right' }
-                    },
-                    {
-                         element: '#createOrderProductsContainer',
-                         popover: { title: 'Agregar Productos', description: 'Aquí aparecerán los productos. Usa el botón "Añadir Producto" para buscar y cargar items al pedido.', side: 'top' }
-                    },
-                    {
-                        element: '#createOrderShippingAddress',
-                         popover: {
-                             title: 'Detalles de Envío',
-                             description: 'Confirma la dirección y notas de entrega. (Cerraremos el modal ahora).',
-                             side: 'left',
-                             onNextClick: () => {
-                                 if(window.closeModal) window.closeModal('createOrderModal');
-                                 setTimeout(() => this.driver.moveNext(), 400);
-                             }
+                    { element: '#createOrderClientSearch', popover: { title: '1. Cliente', description: 'Escribe para buscar por nombre o cédula. Si no existe, puedes crearlo.', side: 'right' } },
+                    { element: '#createOrderDate', popover: { title: '2. Fecha', description: 'Fecha de emisión del pedido. Por defecto es hoy.', side: 'left' } },
+                    { element: '#createOrderShippingAddress', popover: { title: '3. Dirección', description: 'Fundamental para la logística de envíos. Si elegiste cliente frecuente, se auto-completa.', side: 'right' } },
+                    { element: '#createOrderShippingNotes', popover: { title: '4. Notas de Envío', description: 'Instrucciones especiales para el repartidor (Ej: Dejar en portería).', side: 'right' } },
+                    { element: '#createOrderProductsContainer', popover: { title: '5. Productos', description: 'Lista de items a comprar.', side: 'top' } },
+                    { element: '#addCreateOrderProductRow', popover: { title: 'Añadir Producto', description: 'Agrega un nuevo renglón para buscar otro producto.', side: 'top' } },
+                    { element: '#createOrderPaymentStatus', popover: { title: 'Estado de Pago', description: 'Registra si el anticipo/total ya fue recibido.', side: 'top' } },
+                    { element: '#createOrderShippingStatus', popover: { title: 'Estado de Envío', description: 'Elige Pendiente, Enviado o Recibido. Al guardar, pasará al panel de Envíos.', side: 'top', onNextClick: () => {
+                        const modalEl = document.getElementById('createOrderModal');
+                        if (modalEl) {
+                           const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                           if (modalInstance) modalInstance.hide();
                         }
-                    },
-                    {
-                        element: '.filter-wrapper',
-                        popover: { title: 'Filtros y Estados', description: 'Filtra pedidos por fecha, estado de pago o estado de envío.', side: 'bottom' }
-                    },
-                    {
-                         element: '#ordersList .dropdown-toggle', // Target dropdown in list
-                         popover: { title: 'Acciones de Pedido', description: 'Usa el menú desplegable en cada fila para: Ver Detalle, Editar, Abonar deuda o Anular.', side: 'left' }
-                    },
-
-                    {
-                        // Added step for element details
-                        element: '#ordersList',
-                        popover: {
-                            title: 'Contenido del Pedido',
-                            description: 'Despliega los detalles o usa la vista completa para revisar los items (productos, cantidad, precio).',
-                            side: 'top'
-                        }
-                    },
-                    {
-                        element: '#ordersList',
-                        popover: {
-                            title: 'Flujo de Trabajo',
-                            description: '<ul><li><b>Ver Pedido:</b> Haz click en el icono de ojo.</li><li><b>Pago -> Envío:</b> Cuando marcas un pedido como "Pagado", pasa automáticamente a la lista de "Envíos Pendientes".</li></ul>',
-                            side: 'top',
-                            onNextClick: () => this.nextModule()
-                        }
-                    }
+                        setTimeout(() => this.driver.moveNext(), 500);
+                    }} },
+                    { element: '#ordersList', popover: { title: 'Flujo de Trabajo', description: 'Aquí verás todo. Usa el menú de la fila para abonar deuda, enviar o facturar.', side: 'top', align: 'center', onNextClick: () => this.nextModule() } }
                 ];
              case 'requisiciones':
                 return [
                     {
                         element: '.top-navbar',
-                        popover: { title: 'Requisiciones de Compra', description: 'Aquí gestionas las solicitudes de abastecimiento masivas para tu inventario.', side: 'bottom' }
+                        popover: { title: 'Requisiciones', description: 'Gestión de solicitudes de abastecimiento internas hacia el área de compras.', side: 'bottom' }
                     },
                     {
                         element: '#btnFromLowStock',
-                        popover: { title: 'Auto-Stock Inteligente', description: 'Usa este botón para que el sistema analice qué productos tienen bajo stock y genere una propuesta de compra automáticamente.', side: 'bottom' }
+                        popover: { title: 'Auto-Stock Inteligente', description: 'El sistema analiza el stock crítico y te propone qué comprar automáticamente.', side: 'bottom' }
                     },
                     {
                         element: '#btnNuevaRequisicion',
                         popover: {
                             title: 'Nueva Requisición',
-                            description: 'Crea una manualmente vinculando múltiples productos.',
+                            description: 'Crea una solicitud manualmente.',
                             side: 'bottom',
                             onNextClick: () => {
                                 const btn = document.getElementById('btnNuevaRequisicion');
@@ -505,31 +559,28 @@ class TutorialManager {
                             }
                         }
                     },
-                    {
-                        element: '#prioridadRequisicion',
-                        popover: { title: 'Prioridad', description: 'Marca si es Urgente o Normal para que el aprobador lo vea primero.', side: 'right' }
-                    },
-                    {
-                         element: '#btnAddLinea',
-                         popover: { title: 'Añadir Ítems', description: 'Busca productos para agregar a la lista. El sistema te sugerirá el proveedor habitual.', side: 'top' }
-                    },
-                    {
-                         element: '#resumenProveedores',
-                         popover: { title: 'Consolidado', description: 'Mira cuánto le comprarás a cada proveedor antes de enviar.', side: 'left', onNextClick: () => this.nextModule() }
-                    }
+                    { element: '#prioridadRequisicion', popover: { title: '1. Prioridad', description: 'Urgente, Normal o Baja.', side: 'right' } },
+                    { element: '#fechaRequisicion', popover: { title: '2. Fecha', description: 'Fecha de solicitud de la requisición.', side: 'right' } },
+                    { element: '#btnAddLinea', popover: { title: '3. Añadir Ítems', description: 'Agrega las referencias que faltan. El sistema vinculará cada ítem con su proveedor habitual.', side: 'top' } },
+                    { element: '#resumenProveedores', popover: { title: 'Consolidado', description: 'Cálculo de inversión por proveedor.', side: 'left' } },
+                    { element: '#btnCancelar', popover: { title: 'Guardar y Acciones', description: 'Usa **Guardar** para confirmar la requisición, o **Volver** para cancelar. Si eres supervisor, podrás **Aprobar** directamente.', side: 'top', onNextClick: () => {
+                         // Return to history view before moving to next module
+                         const btnCancelar = document.getElementById('btnCancelar');
+                         if (btnCancelar) btnCancelar.click();
+                         setTimeout(() => this.nextModule(), 300);
+                    } } }
                 ];
-
              case 'transferencias':
                 return [
                     {
                         element: '.top-navbar',
-                        popover: { title: 'Transferencias', description: 'Mueve productos entre sucursales o depósitos físicos sin generar ventas.', side: 'bottom' }
+                        popover: { title: 'Transferencias', description: 'Movimiento interno de productos entre unidades de negocio.', side: 'bottom' }
                     },
                     {
                         element: '#btnNueva',
                         popover: {
                             title: 'Iniciar Traslado',
-                            description: 'Selecciona almacén de origen y destino.',
+                            description: 'Haz click para agendar un movimiento físico de stock.',
                             side: 'bottom',
                             onNextClick: () => {
                                 const btn = document.getElementById('btnNueva');
@@ -538,25 +589,21 @@ class TutorialManager {
                             }
                         }
                     },
-                    {
-                        element: '#almacenOrigen',
-                        popover: { title: 'Almacén Origen', description: 'El stock se restará de aquí al momento de enviar el camión.', side: 'right' }
-                    },
-                    {
-                        element: '#almacenDestino',
-                        popover: { title: 'Almacén Destino', description: 'El stock se sumará aquí **solo** cuando el receptor marque la transferencia como "Recibida".', side: 'right' }
-                    },
-                    {
-                        element: '#btnEnviar',
-                        popover: { title: 'Procesar', description: 'Puedes guardar como borrador o enviar para iniciar el tránsito de la mercancía.', side: 'top', onNextClick: () => this.nextModule() }
-                    }
+                    { element: '#almacenOrigen', popover: { title: '1. Origen', description: 'Almacén de donde saldrá la mercancía (se descuenta el stock).', side: 'right' } },
+                    { element: '#almacenDestino', popover: { title: '2. Destino', description: 'Almacén que recibirá. El stock no ingresa hasta que se confirme la recepción.', side: 'right' } },
+                    { element: '#lineasProductosContainer', popover: { title: '3. Ítems', description: 'Agrega los productos y las cantidades exactas a despachar usando el botón "Añadir Producto".', side: 'top' } },
+                    { element: '#btnEnviar', popover: { title: 'Procesar', description: 'Pondrá la mercancía "En Tránsito" y emitirá una guía.', side: 'top', onNextClick: () => {
+                        // Return to history view
+                        if (typeof cancelarFormulario === 'function') cancelarFormulario();
+                        setTimeout(() => this.nextModule(), 300);
+                    } } }
                 ];
 
              case 'envios':
                 return [
                     {
-                        element: '.stats-card',
-                        popover: { title: 'Panel de Envíos', description: 'Monitoreo de KPI logísticos. Los envíos se generan automáticamente desde los Pedidos.', side: 'bottom' }
+                        element: '.filter-wrapper',
+                        popover: { title: 'Panel de Envíos', description: 'Filtra y busca los envíos generados automáticamente desde los Pedidos.', side: 'bottom' }
                     },
                     {
                         element: '#statusFilter',
@@ -588,19 +635,36 @@ class TutorialManager {
                     },
                     {
                         element: '#cargoConcepto',
-                        popover: { title: 'Precio de Compra', description: 'Si seleccionas **Compra a Proveedor**, aparecerá una columna nueva para ingresar el costo unitario.', side: 'right' }
+                        popover: { 
+                            title: '1. Concepto', 
+                            description: '<ul><li><b>Compra a Proveedor:</b> Suma stock y registra costo.</li><li><b>Ajuste Positivo:</b> Por sobrante de inventario.</li><li><b>Devolución:</b> Cliente retorna producto.</li></ul>', 
+                            side: 'right',
+                            onHighlightStarted: () => {
+                                const sel = document.getElementById('cargoConcepto');
+                                if (sel) {
+                                    sel.focus();
+                                    // Visual cue
+                                    sel.style.boxShadow = "0 0 10px rgba(255,160,0,0.5)";
+                                    setTimeout(() => sel.style.boxShadow = "", 2000);
+                                }
+                            }
+                        }
                     },
                     {
                         element: '#proveedorBusqueda',
-                        popover: { title: 'Proveedor', description: 'Vincular el proveedor es vital para el historial de precios y futuras requisiciones.', side: 'left' }
+                        popover: { title: '2. Proveedor', description: '(Opcional/Requerido para compras). Vincula a quién le compraste para el historial.', side: 'left' }
                     },
                     {
                          element: '#btnAddProductLine',
-                         popover: { title: 'Buscador de Productos', description: 'Usa este botón para buscar y añadir los ítems. Recuerda ingresar la cantidad exacta recibida.', side: 'top' }
+                         popover: { title: '3. Ítems', description: 'Busca los productos. Recuerda ingresar el "Precio de Compra" si seleccionaste el concepto de Compra a Proveedor.', side: 'top' }
                     },
-                   {
+                    {
                         element: '#btnConfirmar',
-                        popover: { title: 'Finalizar', description: 'Guarda y confirma el movimiento para actualizar el stock inmediatamente.', side: 'top', onNextClick: () => this.nextModule() }
+                        popover: { title: 'Diferencia de Botones', description: '<ul><li><b>Guardar Borrador:</b> Guarda pero NO suma stock aún.</li><li><b>Confirmar:</b> Finaliza y suma el stock inmediatamente.</li></ul>', side: 'top', onNextClick: () => {
+                            const modal = document.getElementById('modalCargo');
+                            if (modal) modal.style.display = 'none';
+                            this.nextModule();
+                        } }
                     }
                 ];
              case 'notas':
@@ -668,6 +732,22 @@ class TutorialManager {
                         popover: { title: 'Historial', description: 'Verifica el estado de tus importaciones anteriores (Exitoso/Errores).', side: 'top', onNextClick: () => this.nextModule() }
                     }
                 ];
+             case 'ajustes':
+                return [
+                    {
+                        element: '.top-navbar',
+                        popover: { title: 'Ajustes de Cuenta', description: 'Opciones de seguridad personal y preferencias de sesión del usuario.', side: 'bottom' }
+                    },
+                    {
+                        element: '.col-lg-7 .buzz-card',
+                        popover: { title: 'Seguridad 2FA y Timeout', description: 'Protege tu cuenta activando la verificación en dos pasos (Google Authenticator) y define el tiempo máximo de inactividad antes de cerrar tu sesión.', side: 'top' }
+                    },
+                     {
+                        element: '.col-lg-5 .buzz-card',
+                        popover: { title: 'Estado del Servidor', description: 'Revisa de un vistazo cómo está respondiendo tu hosting (versión PHP, disco, memoria).', side: 'left', onNextClick: () => this.nextModule() }
+                    }
+                ];
+
              case 'admin':
                 return [
                     // --- Users Tab ---
@@ -710,12 +790,12 @@ class TutorialManager {
                         popover: { title: 'Registro de Actividad', description: 'Monitorea quién hizo qué y cuándo. Útil para seguridad.', side: 'top' }
                     },
 
-                    // --- Config Tab ---
+                     // --- Config Tab (Info Empresa) ---
                     {
                         element: '[data-tab="settings"]',
                         popover: {
-                            title: 'Configuración',
-                            description: 'Personaliza tu empresa, logo y seguridad (2FA).',
+                            title: 'Información de Empresa',
+                            description: 'Personaliza los datos públicos de tu negocio.',
                             side: 'bottom',
                             onNextClick: () => {
                                 // Switch to settings tab
@@ -727,19 +807,11 @@ class TutorialManager {
                     },
                      {
                           element: '#companyInfoForm',
-                          popover: { title: 'Datos de Empresa', description: 'Define datos fiscales y de contacto. Esta información aparecerá automáticamente en el <b>encabezado de los reportes</b> y documentos.', side: 'top' }
+                          popover: { title: 'Datos de Empresa', description: 'Define tu RIF, nombre y dirección física. Esta información se inyectará automáticamente en el **encabezado de todos los reportes** de PDF.', side: 'top' }
                      },
                      {
                           element: '#logoUploadArea',
-                          popover: { title: 'Logo', description: 'Sube tu logo en **SVG**. Esto garantiza la mejor calidad en todas las pantallas.', side: 'left' }
-                     },
-                     {
-                         element: '#twoFactorDisabledArea', // Target the specific area or button
-                         popover: { title: 'Seguridad 2FA', description: 'Protege tu cuenta activando la verificación en dos pasos. Escanea el QR con Google Authenticator.', side: 'top' }
-                     },
-                     {
-                         element: 'select[name="session_timeout"]',
-                         popover: { title: 'Timeout', description: 'Define el tiempo de inactividad antes de cerrar la sesión automáticamente.', side: 'top' }
+                          popover: { title: 'Logo Oficial', description: 'Sube tu logo en **PNG o JPG**. El sistema lo convertirá y optimizará automáticamente a WebP para que todo cargue súper rápido.', side: 'left' }
                      },
 
                       // --- Reports Tab ---
@@ -784,7 +856,7 @@ class TutorialManager {
                          popover: { title: 'Backup Manual', description: 'Cree una copia manual instantánea aquí.', side: 'bottom' }
                      },
                      {
-                          element: '#autoBackupContainer', // Fallback to container if switch logic is complex
+                          element: '#autoBackupToggle',
                           popover: { title: 'Backups Automáticos', description: 'Active esta opción para copias diarias. Las copias se guardan en el servidor.', side: 'right' }
                      },
                      {
