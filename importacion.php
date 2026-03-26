@@ -140,7 +140,7 @@
         <div class="buzz-card">
             <h5 class="font-primary text-primary mb-3">HISTORIAL DE IMPORTACIONES</h5>
             <div class="table-responsive">
-                <table class="table table-buzz">
+                <table class="table table-buzz text-nowrap">
                     <thead>
                         <tr>
                             <th>Fecha</th>
