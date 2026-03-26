@@ -230,27 +230,28 @@ class ImportService {
                 'unique_key' => 'sku',
                 'columns' => [
                     'sku' => ['db' => 'sku', 'required' => true],
-                    'nombreproducto' => ['db' => 'nombre', 'required' => true],
-                    'descripcion' => ['db' => 'descripcion'],
-                    'precioventa' => ['db' => 'precio', 'type' => 'float', 'default' => 0],
-                    'costounitario' => ['db' => 'costo_promedio', 'type' => 'float', 'default' => 0],
-                    'stockinicial' => ['db' => 'stock', 'type' => 'int', 'default' => 0],
-                    'stockminimo' => ['db' => 'min_stock', 'type' => 'int', 'default' => 10],
-                    'categoria' => ['db' => 'categoria', 'type' => 'fk', 'table' => 'categorias'],
-                    'marca' => ['db' => 'marca_id', 'type' => 'fk', 'table' => 'marcas'],
-                    'proveedor' => ['db' => 'proveedor_id', 'type' => 'fk', 'table' => 'proveedores'],
-                    'modelo' => ['db' => 'modelo'],
-                    'color' => ['db' => 'color'],
-                    'medidas' => ['db' => 'medidas'],
-                    'peso' => ['db' => 'peso_kg', 'type' => 'float'],
+                    'nombreproducto' => ['db' => 'nombre', 'required' => true, 'aliases' => ['nombre', 'producto', 'name', 'nombreproducto', 'nombre producto']],
+                    'descripcion' => ['db' => 'descripcion', 'aliases' => ['detalle', 'description']],
+                    'precioventa' => ['db' => 'precio', 'type' => 'float', 'default' => 0, 'aliases' => ['precio', 'preciofinal', 'precio venta', 'price', 'pref. venta', 'pref.venta']],
+                    'costounitario' => ['db' => 'costo_promedio', 'type' => 'float', 'default' => 0, 'aliases' => ['costo', 'costopromedio', 'costo unitario', 'cost', 'pref. costo', 'pref.costo']],
+                    'stockinicial' => ['db' => 'stock', 'type' => 'int', 'default' => 0, 'aliases' => ['stock', 'cantidad', 'inventario', 'stock inicial']],
+                    'stockminimo' => ['db' => 'min_stock', 'type' => 'int', 'default' => 10, 'aliases' => ['minimo', 'min', 'stock minimo', 'min stock']],
+                    'categoria' => ['db' => 'categoria', 'type' => 'fk', 'table' => 'categorias', 'aliases' => ['cat', 'category']],
+                    'marca' => ['db' => 'marca_id', 'type' => 'fk', 'table' => 'marcas', 'aliases' => ['brand']],
+                    'proveedor' => ['db' => 'proveedor_id', 'type' => 'fk', 'table' => 'proveedores', 'aliases' => ['supplier']],
+                    'modelo' => ['db' => 'modelo', 'aliases' => ['model', 'linea']],
+                    'color' => ['db' => 'color', 'aliases' => ['colour']],
                     'material' => ['db' => 'material'],
+                    'tamanio' => ['db' => 'tamanio', 'aliases' => ['tamano', 'talla', 'size', 'tama\u00f1o']],
+                    'peso' => ['db' => 'peso_kg', 'type' => 'float', 'aliases' => ['peso(kg)', 'pesokg', 'weight']],
+                    'medidas' => ['db' => 'medidas', 'aliases' => ['dimensiones', 'dimensions']],
+                    'unidadventa' => ['db' => 'unidad_venta', 'default' => 'UND', 'aliases' => ['unidad', 'unit', 'unidad venta']],
+                    'cantidadpresentacion' => ['db' => 'cantidad_presentacion', 'type' => 'int', 'default' => 1, 'aliases' => ['presentacion', 'cantidad presentacion', 'pack']],
                 ],
                 'defaults' => [
                     'estado' => 'activo',
                     'tipo_producto' => 'fisico',
-                    'maneja_stock' => 1,
-                    'unidad_venta' => 'UND',
-                    'cantidad_presentacion' => 1
+                    'maneja_stock' => 1
                 ]
             ],
             'Clientes' => [
@@ -264,7 +265,8 @@ class ImportService {
                     'email' => ['db' => 'email', 'aliases' => ['correo', 'correoelectronico', 'correo electronico', 'e-mail', 'mail']],
                     'telefono' => ['db' => 'telefono', 'aliases' => ['tel', 'phone', 'celular', 'movil', 'contacto', 'nro telefono', 'numero']],
                     'direccion' => ['db' => 'direccion', 'aliases' => ['address', 'ubicacion', 'domicilio', 'dir']],
-                    'esvip' => ['db' => 'vip', 'type' => 'bool', 'aliases' => ['vip', 'es vip', 'cliente vip', 'premium']]
+                    'esvip' => ['db' => 'vip', 'type' => 'bool', 'aliases' => ['vip', 'es vip', 'cliente vip', 'premium']],
+                    'notas' => ['db' => 'notas', 'aliases' => ['observaciones', 'notes', 'comentarios']]
                 ]
             ],
             'Proveedores' => [
@@ -272,12 +274,13 @@ class ImportService {
                 'table' => 'proveedores',
                 'unique_key' => 'nombre',
                 'columns' => [
-                    'nombreempresa' => ['db' => 'nombre', 'required' => true],
-                    'rifdocumento' => ['db' => 'rif'],
-                    'personacontacto' => ['db' => 'contacto_nombre'],
-                    'email' => ['db' => 'email'],
-                    'telefono' => ['db' => 'telefono'],
-                    'direccion' => ['db' => 'direccion']
+                    'nombreempresa' => ['db' => 'nombre', 'required' => true, 'aliases' => ['nombre', 'empresa', 'proveedor', 'supplier']],
+                    'rifdocumento' => ['db' => 'rif', 'aliases' => ['rif', 'documento', 'nit', 'fiscal']],
+                    'personacontacto' => ['db' => 'contacto_nombre', 'aliases' => ['contacto', 'persona', 'responsable']],
+                    'email' => ['db' => 'email', 'aliases' => ['correo', 'mail', 'e-mail']],
+                    'telefono' => ['db' => 'telefono', 'aliases' => ['tel', 'phone', 'celular']],
+                    'direccion' => ['db' => 'direccion', 'aliases' => ['address', 'ubicacion', 'dir']],
+                    'notas' => ['db' => 'notas', 'aliases' => ['observaciones', 'notes', 'comentarios']]
                 ]
             ],
             'Categorias' => [

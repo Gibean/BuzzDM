@@ -30,9 +30,9 @@ class UserController {
 
         // CSRF Validation for state-changing methods
         if ($method !== 'GET') {
-            $token = $input['csrf_token'] ?? '';
+            $token = $input['csrf_token'] ?? $_GET['csrf_token'] ?? '';
             if (!validateCsrfToken($token)) {
-                $this->jsonResponse(false, null, 'Error de seguridad: Token CSRF inválido o ausente.');
+                $this->jsonResponse(false, [], 'Error de seguridad: Token CSRF inválido o ausente.');
             }
         }
 
@@ -54,7 +54,7 @@ class UserController {
                     $this->updateUser($input);
                     break;
                 case 'DELETE':
-                    $this->deleteUser();
+                    $this->deleteUser($input);
                     break;
                 default:
                     $this->jsonResponse(false, null, 'Método no permitido');
@@ -183,9 +183,9 @@ class UserController {
             new OA\Response(response: 200, description: "User deleted")
         ]
     )]
-    private function deleteUser() {
+    private function deleteUser($data = []) {
         global $pdo;
-        $id = $_GET['id'] ?? null;
+        $id = $_GET['id'] ?? $data['id'] ?? null;
         if (!$id) throw new Exception("ID requerido");
         // Get user info before delete
         $user = $this->service->getUserById($id);

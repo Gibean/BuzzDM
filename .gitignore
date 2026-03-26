@@ -11,4 +11,5 @@ templates/Datos_Ejemplo_Catalogos.xlsx
 templates/Datos_Ejemplo_Productos.xlsx
 templates/Datos_Ejemplo_Clientes.xlsx
 templates/Datos_Ejemplo_Proveedores.xlsx
-
+# BORRAR
+tmp_fix_detalles.php

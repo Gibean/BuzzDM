@@ -440,7 +440,7 @@ function updateActiveFiltersCount() {
   async function loadUsers() {
     try {
       const response = await fetchJSON("php/api_users.php")
-      users = response.users || []
+      users = (response.users || []).filter(u => u.estado === 'activo')
       renderUsers()
       updateUserStats()
     } catch (error) {
@@ -903,15 +903,9 @@ function updateActiveFiltersCount() {
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/api_backups.php", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                id: backupId,
-                csrf_token: document.querySelector('[name="csrf_token"]')?.value
-            })
+          const csrf = document.querySelector('[name="csrf_token"]')?.value || "";
+          const data = await fetchJSON(`php/api_backups.php?id=${backupId}&csrf_token=${encodeURIComponent(csrf)}`, {
+            method: "DELETE"
           })
 
           if (data.success) {
@@ -1170,16 +1164,13 @@ function updateActiveFiltersCount() {
       type: "confirm",
       onConfirm: async () => {
         try {
-          const data = await fetchJSON("php/api_users.php", {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ id: id })
+          const csrf = document.querySelector('[name="csrf_token"]')?.value || "";
+          const data = await fetchJSON(`php/api_users.php?id=${id}&csrf_token=${encodeURIComponent(csrf)}`, {
+            method: "DELETE"
           })
 
-          if (data.error) {
-            showModal({ title: "Error", message: data.error, type: "error" })
+          if (!data.success) {
+            showModal({ title: "Error", message: data.message || "Error al eliminar usuario", type: "error" })
           } else {
             showToast("Usuario eliminado exitosamente", "success")
             loadUsers()
