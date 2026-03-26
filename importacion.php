@@ -61,22 +61,32 @@
 
                         <div class="mb-4">
                             <label class="form-label small text-muted">Descargar Plantillas:</label>
-                            <div class="d-grid gap-2">
-                                <div class="btn-group">
-                                    <button type="button" onclick="downloadTemplate('productos')" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-box"></i> Prod.
-                                    </button>
-                                    <button type="button" onclick="downloadTemplate('clientes')" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-users"></i> Cli.
-                                    </button>
-                                    <button type="button" onclick="downloadTemplate('proveedores')" class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-truck"></i> Prov.
+                            <div class="row g-2 mb-2">
+                                <div class="col-6">
+                                    <button type="button" onclick="downloadTemplate('productos')" class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="fas fa-box"></i> Productos
                                     </button>
                                 </div>
-                                <button type="button" onclick="downloadTemplate('catalogos')" class="btn btn-sm btn-outline-secondary">
-                                    <i class="fas fa-tags"></i> Catálogos (Marcas/Cats)
-                                </button>
+                                <div class="col-6">
+                                    <button type="button" onclick="downloadTemplate('clientes')" class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="fas fa-users"></i> Clientes
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" onclick="downloadTemplate('proveedores')" class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="fas fa-truck"></i> Proveedores
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" onclick="downloadTemplate('catalogos')" class="btn btn-sm btn-outline-secondary w-100">
+                                        <i class="fas fa-tags"></i> Catálogos
+                                    </button>
+                                </div>
                             </div>
+                            <hr class="border-secondary opacity-10 my-2">
+                            <button type="button" onclick="downloadTemplate('referencias')" class="btn btn-sm btn-outline-warning w-100" title="Descarga un Excel con todos los IDs de referencia del sistema">
+                                <i class="fas fa-book"></i> Hoja de Referencias (IDs)
+                            </button>
                         </div>
 
                         <hr class="border-secondary opacity-10 my-3">
