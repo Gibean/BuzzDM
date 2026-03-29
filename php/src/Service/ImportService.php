@@ -100,6 +100,17 @@ class ImportService {
                     $skipRow = false;
                     $rowErrors = [];
 
+                    // Skip entirely empty rows (Excel templates report many formatted but empty rows)
+                    $hasData = false;
+                    foreach ($colMap as $colLetter => $cfgKey) {
+                        $rawVal = $sheet->getCell($colLetter . $rowIndex)->getValue();
+                        if ($rawVal !== null && $rawVal !== '') {
+                            $hasData = true;
+                            break;
+                        }
+                    }
+                    if (!$hasData) continue;
+
                     // Extract Data
                     foreach ($colMap as $colLetter => $cfgKey) {
                         $cellVal = $sheet->getCell($colLetter . $rowIndex)->getValue();
