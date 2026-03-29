@@ -1,6 +1,6 @@
 // ============================================
 // MODAL UTILITY FUNCTIONS
-// Professional modal management (no animations)
+// Professional modal management with unsaved-changes guard
 // ============================================
 
 const ModalUtils = {
@@ -11,6 +11,13 @@ const ModalUtils = {
 
         // Show modal instantly
         modal.style.display = 'flex';
+
+        // Snapshot form state for dirty-checking (skip if guardUnsaved === false)
+        if (options.guardUnsaved !== false) {
+            setTimeout(() => this._snapshotFormState(modalId), 80);
+        }
+        // Store guard preference on modal element
+        modal._guardUnsaved = options.guardUnsaved !== false;
 
         // Add event listeners
         this.addModalEventListeners(modalId, options);
@@ -26,13 +33,41 @@ const ModalUtils = {
         document.body.style.overflow = 'hidden';
     },
 
-    // Close modal instantly
-    closeModal: function(modalId, callback) {
+    // Close modal instantly (force = skip dirty check)
+    closeModal: function(modalId, callbackOrForce, forceParam) {
+        // Normalize arguments: closeModal(id), closeModal(id, cb), closeModal(id, force), closeModal(id, cb, force)
+        let callback = null;
+        let force = false;
+
+        if (typeof callbackOrForce === 'function') {
+            callback = callbackOrForce;
+            force = !!forceParam;
+        } else if (typeof callbackOrForce === 'boolean') {
+            force = callbackOrForce;
+        }
+        // Fallback: always honour forceParam if set (covers closeModal(id, null, true))
+        if (!force && forceParam === true) {
+            force = true;
+        }
+
         const modal = document.getElementById(modalId);
         if (!modal) return;
 
+        // If not forced and guard is active, check for dirty form
+        if (!force && modal._guardUnsaved && this._isFormDirty(modalId)) {
+            this._showUnsavedGuard(modalId, callback);
+            return;
+        }
+
+        // Dismiss any open guard dialog
+        this._dismissGuard(modalId);
+
         // Hide modal instantly
         modal.style.display = 'none';
+
+        // Clean up state
+        delete modal._formSnapshot;
+        delete modal._guardUnsaved;
 
         // Remove event listeners
         this.removeModalEventListeners(modalId);
@@ -49,6 +84,78 @@ const ModalUtils = {
             callback();
         }
     },
+
+    // ── Form dirty-checking helpers ──────────────────────
+
+    // Snapshot the current form values so we can detect changes later
+    _snapshotFormState: function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+
+        const form = modal.querySelector('form');
+        if (!form) return;
+
+        modal._formSnapshot = this._serializeForm(form);
+    },
+
+    // Serialize form into a comparable string
+    _serializeForm: function(form) {
+        const parts = [];
+
+        form.querySelectorAll('input, select, textarea').forEach(el => {
+            // Skip hidden inputs (IDs, tokens, etc.) and disabled/readonly inputs
+            if (el.type === 'hidden') return;
+
+            const key = el.id || el.name || '';
+            if (!key) return;
+
+            if (el.type === 'checkbox' || el.type === 'radio') {
+                parts.push(key + '=' + el.checked);
+            } else {
+                parts.push(key + '=' + (el.value || ''));
+            }
+        });
+
+        return parts.join('&');
+    },
+
+    // Check if the form has been modified since it was opened
+    _isFormDirty: function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal || !modal._formSnapshot) return false;
+
+        const form = modal.querySelector('form');
+        if (!form) return false;
+
+        const current = this._serializeForm(form);
+        return current !== modal._formSnapshot;
+    },
+
+    // ── Unsaved-changes guard UI ─────────────────────────
+
+    _showUnsavedGuard: function(modalId, callback) {
+        // Use the existing showModal confirmation dialog from common.js
+        if (typeof showModal !== 'function') {
+            // Fallback: force-close if showModal is not available
+            this.closeModal(modalId, callback, true);
+            return;
+        }
+
+        showModal({
+            title: 'Cambios sin guardar',
+            message: 'Si sales ahora, los datos ingresados se perderán. ¿Deseas descartar los cambios?',
+            type: 'confirm',
+            onConfirm: () => {
+                this.closeModal(modalId, callback, true);
+            }
+        });
+    },
+
+    _dismissGuard: function(modalId) {
+        // Nothing to dismiss — showModal manages its own lifecycle via hideModal()
+    },
+
+    // ── Existing functionality ───────────────────────────
 
     // Show loading state
     showLoading: function(modalId, message = 'Cargando...') {
@@ -159,6 +266,11 @@ const ModalUtils = {
                 titleElement.textContent = title;
             }
         }
+    },
+
+    // Force-close helper (for programmatic closes after save)
+    forceClose: function(modalId, callback) {
+        this.closeModal(modalId, callback, true);
     }
 };
 
@@ -166,7 +278,7 @@ const ModalUtils = {
 window.ModalUtils = ModalUtils;
 
 window.openModal = (modalId, options = {}) => ModalUtils.openModal(modalId, options);
-window.closeModal = (modalId, callback) => ModalUtils.closeModal(modalId, callback);
+window.closeModal = (modalId, callbackOrForce, forceParam) => ModalUtils.closeModal(modalId, callbackOrForce, forceParam);
 window.showModalLoading = (modalId, message) => ModalUtils.showLoading(modalId, message);
 window.hideModalLoading = (modalId) => ModalUtils.hideLoading(modalId);
 window.setTitle = (modalId, title) => ModalUtils.setTitle(modalId, title);

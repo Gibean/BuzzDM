@@ -52,20 +52,30 @@ class ImportRepository {
     }
 
     // Helper to find or create catalogs (Categories, Brands, Suppliers) via Service delegation or direct call
-    // Logic extracted from original process_import.php findOrCreate
+    // Supports both numeric ID lookups and text name lookups
     public function findOrCreateCatalog($tableName, $name) {
-        if (empty($name) || trim($name) === '') return null;
-        $name = trim($name);
+        if ($name === null || (is_string($name) && trim($name) === '')) return null;
+        $value = is_string($name) ? trim($name) : $name;
 
-        // Check cache or simple query
-        // Note: Table names are trusted from internal config, ensuring no SQL injection risk from user input here if properly managed in Service
+        // 1. Si el valor es numérico, buscar primero por ID
+        if (is_numeric($value)) {
+            $stmt = $this->pdo->prepare("SELECT id FROM {$tableName} WHERE id = ? LIMIT 1");
+            $stmt->execute([(int)$value]);
+            if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) return (int)$result['id'];
+        }
+
+        // 2. Buscar por nombre (funciona para texto y como fallback para numéricos)
         $stmt = $this->pdo->prepare("SELECT id FROM {$tableName} WHERE LOWER(nombre) = LOWER(?) LIMIT 1");
-        $stmt->execute([$name]);
+        $stmt->execute([(string)$value]);
         if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) return (int)$result['id'];
 
+        // 3. Si es numérico y no se encontró ni por ID ni por nombre, no crear registro basura
+        if (is_numeric($value)) return null;
+
+        // 4. Solo crear registro nuevo si el valor es texto (comportamiento original)
         try {
             $stmt = $this->pdo->prepare("INSERT INTO {$tableName} (nombre) VALUES (?)");
-            $stmt->execute([$name]);
+            $stmt->execute([(string)$value]);
             return (int)$this->pdo->lastInsertId();
         } catch (PDOException $e) {
             // Race condition fallback or error

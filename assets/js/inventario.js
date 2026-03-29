@@ -247,19 +247,12 @@ document.addEventListener("DOMContentLoaded", function () {
       modalTitle.textContent = "Nuevo Producto"
     }
 
-    productModal.style.display = "block"
+    window.openModal('productModal')
   }
 
-  window.closeProductModal = function () {
-    productModal.style.display = "none"
+  window.closeProductModal = function (force) {
+    window.closeModal('productModal', !!force)
   }
-
-  // Cerrar modal al hacer click fuera de él
-  productModal.addEventListener("click", function (event) {
-    if (event.target === productModal) {
-      closeProductModal()
-    }
-  })
 
   productForm.addEventListener("submit", async (event) => {
     event.preventDefault()
@@ -353,7 +346,7 @@ document.addEventListener("DOMContentLoaded", function () {
           await guardarComponentesKit(productId)
         }
         showToast(data.message, "success")
-        closeProductModal()
+        closeProductModal(true)
         fetchProducts()
       } else {
         showToast("Error: " + data.message, "danger")

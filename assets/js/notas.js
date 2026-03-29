@@ -98,8 +98,8 @@ function setupEventListeners() {
     }
 }
 
-function closeNoteModal() {
-    closeModal('noteModal');
+function closeNoteModal(force) {
+    closeModal('noteModal', !!force);
     // Remove pickers if open
     const lp = document.getElementById('labelPicker');
     if (lp) lp.remove();
@@ -1062,7 +1062,7 @@ async function handleNoteSubmit(e) {
 
         if (response.success) {
             showToast(isEdit ? 'Nota actualizada' : 'Nota creada', 'success');
-            closeNoteModal();
+            closeNoteModal(true);
             fetchNotes();
         } else {
             showToast(response.message, 'error');
@@ -1081,7 +1081,7 @@ async function deleteNote() {
             const response = await fetchJSON(`php/api_notes.php?id=${id}`, { method: 'DELETE' });
             if (response.success) {
                 showToast('Nota eliminada', 'success');
-                closeNoteModal();
+                closeNoteModal(true);
                 fetchNotes();
             }
         } catch (error) { console.error(error); }

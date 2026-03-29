@@ -263,7 +263,7 @@ async function editCustomer(customerId) {
             body: JSON.stringify(updatedCustomer)
           })
           showToast("Cliente actualizado exitosamente.", "success")
-          closeModal('editCustomerModal')
+          closeModal('editCustomerModal', true)
           fetchAndRenderCustomers()
         } catch (error) {
           console.error("Error updating customer:", error)
@@ -378,7 +378,7 @@ async function setupCreateCustomerForm() {
 
       if (response.success) {
         showToast("Cliente creado exitosamente.", "success")
-        closeModal('createCustomerModal')
+        closeModal('createCustomerModal', true)
         form.reset()
         fetchAndRenderCustomers()
       } else {
