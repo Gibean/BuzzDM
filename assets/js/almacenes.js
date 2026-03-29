@@ -236,8 +236,8 @@ window.openAlmacenModal = function(almacenId = null) {
     window.openModal('almacenModal');
 };
 
-window.closeAlmacenModal = function() {
-    window.closeModal('almacenModal');
+window.closeAlmacenModal = function(force) {
+    window.closeModal('almacenModal', !!force);
 };
 
 window.saveAlmacen = async function() {
@@ -285,7 +285,7 @@ window.saveAlmacen = async function() {
 
         if (result.success) {
             showToast(result.message || 'Almacén guardado', 'success');
-            closeAlmacenModal();
+            closeAlmacenModal(true);
             fetchAlmacenes();
         } else {
             showToast(result.message || 'Error al guardar', 'error');
@@ -380,8 +380,8 @@ window.openUbicacionModal = function(ubicacionId = null) {
     window.openModal('ubicacionModal');
 };
 
-window.closeUbicacionModal = function() {
-    window.closeModal('ubicacionModal');
+window.closeUbicacionModal = function(force) {
+    window.closeModal('ubicacionModal', !!force);
 };
 
 window.saveUbicacion = async function() {
@@ -419,7 +419,7 @@ window.saveUbicacion = async function() {
 
         if (result.success) {
             showToast(result.message || 'Ubicación guardada', 'success');
-            closeUbicacionModal();
+            closeUbicacionModal(true);
             fetchUbicaciones(selectedAlmacenId);
             fetchAlmacenes(); // Refresh stats
         } else {
@@ -486,13 +486,7 @@ function escapeHtml(text) {
 
 showInactivos?.addEventListener('change', fetchAlmacenes);
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeAlmacenModal();
-        closeUbicacionModal();
-    }
-});
+// Keyboard shortcuts (handled by ModalUtils, removed duplicate ESC handler)
 
 // ========================================
 // INITIALIZATION

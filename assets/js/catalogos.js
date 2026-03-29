@@ -310,8 +310,8 @@ window.openEditModal = function(catalog, id) {
     window.openModal('itemModal');
 }
 
-window.closeItemModal = function() {
-    window.closeModal('itemModal');
+window.closeItemModal = function(force) {
+    window.closeModal('itemModal', !!force);
 }
 
 function toggleFields(catalog) {
@@ -363,7 +363,7 @@ window.saveItem = async function() {
         const result = await response.json();
         if (result.success) {
             showToast(result.message, 'success');
-            closeItemModal();
+            closeItemModal(true);
             fetchAllCatalogs();
         } else {
             showToast(result.message, 'error');

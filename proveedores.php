@@ -238,6 +238,7 @@
     <script src="assets/js/toast.js"></script>
     <script src="assets/js/common.js"></script>
     <script src="assets/js/utils.js"></script>
+    <script src="assets/js/modal.js"></script>
     <script src="assets/js/confirmation_modal.js"></script>
     <script>
         // =====================================================
@@ -387,11 +388,11 @@
             ['proveedorNombre', 'proveedorRif', 'proveedorEmail', 'proveedorTelefono'].forEach(id => {
                 document.getElementById(id)?.classList.remove('is-invalid');
             });
-            document.getElementById('modalProveedor').style.display = 'block';
+            window.openModal('modalProveedor');
         }
 
-        function cerrarModalProveedor() {
-            document.getElementById('modalProveedor').style.display = 'none';
+        function cerrarModalProveedor(force) {
+            window.closeModal('modalProveedor', !!force);
         }
 
         async function editarProveedor(id) {
@@ -409,7 +410,7 @@
             document.getElementById('proveedorDireccion').value = proveedor.direccion || '';
             document.getElementById('proveedorNotas').value = proveedor.notas || '';
             document.getElementById('modalProveedorTitulo').textContent = 'Editar Proveedor';
-            document.getElementById('modalProveedor').style.display = 'block';
+            window.openModal('modalProveedor');
         }
 
         async function guardarProveedor() {
@@ -479,7 +480,7 @@
 
                 if (result.success) {
                     showToast(result.message, 'success');
-                    cerrarModalProveedor();
+                    cerrarModalProveedor(true);
                     cargarProveedores();
                 } else {
                     showToast('Error: ' + result.message, 'danger');
