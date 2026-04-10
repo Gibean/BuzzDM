@@ -12,8 +12,7 @@
   })
 
   function initAdmin() {
-    const savedTab = localStorage.getItem('adminActiveTab') || "users"
-    switchTab(savedTab)
+    switchTab("users")
     setupAdvancedFilters()
   }
 
@@ -389,9 +388,6 @@ function updateActiveFiltersCount() {
   }
 
   function switchTab(tabName) {
-  // Save to localStorage
-  localStorage.setItem('adminActiveTab', tabName)
-
   // Update active tab - only toggle 'active' class (CSS handles styling)
   document.querySelectorAll("[data-tab]").forEach((tab) => {
     tab.classList.remove("active")

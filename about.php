@@ -284,8 +284,8 @@
         ?>
 
         <!-- System Info -->
-        <div class="row">
-            <div class="col-lg-8">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
                 <!-- Header with Logo -->
                 <div class="buzz-card mb-4">
                     <div class="about-header">
@@ -297,8 +297,8 @@
                         <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-label">VERSIÓN</div>
-                                <div class="stat-value">v1.4.0</div>
-                                <div class="stat-sub">Build 2026.02</div>
+                                <div class="stat-value">v1.1.0.0</div>
+                                <div class="stat-sub">Build 2026.04</div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -317,315 +317,49 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Features -->
-                <div class="buzz-card mb-4">
-                    <h5 class="font-primary text-primary mb-3">CARACTERÍSTICAS DEL SISTEMA</h5>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Gestión de Inventario</div>
-                                    <div class="feature-desc">Control de stock, productos, kits y almacenes múltiples</div>
+                <div class="row">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <!-- Support -->
+                        <div class="buzz-card h-100 d-flex flex-column text-center">
+                            <h5 class="font-primary text-primary mb-3">SOPORTE TÉCNICO</h5>
+                            <div class="d-flex flex-column align-items-center justify-content-center mb-3 flex-grow-1" style="gap: 10px;">
+                                <div class="support-item" style="justify-content: center;">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>buzzdatamanager@gmail.com</span>
+                                </div>
+                                <div class="support-item" style="justify-content: center;">
+                                    <i class="fas fa-phone"></i>
+                                    <span>+58 412 875 9068</span>
                                 </div>
                             </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Control de Pedidos</div>
-                                    <div class="feature-desc">Creación, seguimiento y estados de pedidos</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Seguimiento de Envíos</div>
-                                    <div class="feature-desc">Integración con guías y estados de entrega</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Importación Masiva</div>
-                                    <div class="feature-desc">Carga de datos desde archivos Excel</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Dashboard Analítico</div>
-                                    <div class="feature-desc">Gráficos de ventas, métricas y alertas</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Gestión de Usuarios</div>
-                                    <div class="feature-desc">Roles: Admin, Supervisor, Operador</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Autenticación 2FA</div>
-                                    <div class="feature-desc">Google Authenticator compatible</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Backups Automáticos</div>
-                                    <div class="feature-desc">Sistema fallback + cron job</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Recuperación de Contraseña</div>
-                                    <div class="feature-desc">Reset vía correo electrónico</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Mobile Optimized</div>
-                                    <div class="feature-desc">Diseño responsivo y adaptativo para móviles</div>
-                                </div>
-                            </div>
-                            <div class="feature-item">
-                                <i class="fas fa-check"></i>
-                                <div>
-                                    <div class="feature-name">Notas Kanban</div>
-                                    <div class="feature-desc">Tablero de tareas asignable a usuarios</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Technologies -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">TECNOLOGÍAS UTILIZADAS</h5>
-                    <div class="accordion tech-accordion" id="techAccordion">
-                        <!-- Frontend -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#frontendCollapse">
-                                    <i class="fas fa-desktop me-2"></i> Frontend
+                            
+                            <!-- Manual Button - Prominent -->
+                            <div class="manual-btn-container mt-auto mb-0" style="padding: 0.8rem;">
+                                <a href="manual" class="manual-btn">
+                                    <i class="fas fa-book"></i> Manual
+                                </a>
+                                <button class="tutorial-btn" onclick="tutorialManager.start()">
+                                    <i class="fas fa-play-circle"></i> Tutorial
                                 </button>
-                            </h2>
-                            <div id="frontendCollapse" class="accordion-collapse collapse show" data-bs-parent="#techAccordion">
-                                <div class="accordion-body">
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Bootstrap</div>
-                                            <div class="tech-desc">Framework CSS responsive</div>
-                                        </div>
-                                        <div class="tech-version">5.3.0</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Chart.js</div>
-                                            <div class="tech-desc">Gráficos interactivos del dashboard</div>
-                                        </div>
-                                        <div class="tech-version">4.4.7</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Driver.js</div>
-                                            <div class="tech-desc">Tours guiados interactivos</div>
-                                        </div>
-                                        <div class="tech-version">1.3.1</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Tippy.js</div>
-                                            <div class="tech-desc">Tooltips avanzados</div>
-                                        </div>
-                                        <div class="tech-version">6.3.7</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Mermaid.js</div>
-                                            <div class="tech-desc">Diagramas de flujo en documentación</div>
-                                        </div>
-                                        <div class="tech-version">11.x</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Font Awesome</div>
-                                            <div class="tech-desc">Librería de iconos</div>
-                                        </div>
-                                        <div class="tech-version">6.4.0</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Google Fonts</div>
-                                            <div class="tech-desc">Orbitron, Roboto Mono, Inter</div>
-                                        </div>
-                                        <div class="tech-version">-</div>
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                        <!-- Backend -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#backendCollapse">
-                                    <i class="fas fa-server me-2"></i> Backend
-                                </button>
-                            </h2>
-                            <div id="backendCollapse" class="accordion-collapse collapse" data-bs-parent="#techAccordion">
-                                <div class="accordion-body">
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">PHP</div>
-                                            <div class="tech-desc">Lenguaje del servidor</div>
-                                        </div>
-                                        <div class="tech-version"><?php echo phpversion(); ?></div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">MariaDB</div>
-                                            <div class="tech-desc">Base de datos relacional</div>
-                                        </div>
-                                        <div class="tech-version">11.8.x</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Composer</div>
-                                            <div class="tech-desc">Gestor de dependencias PHP</div>
-                                        </div>
-                                        <div class="tech-version">2.x</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">PHPSpreadsheet</div>
-                                            <div class="tech-desc">Lectura/escritura de archivos Excel</div>
-                                        </div>
-                                        <div class="tech-version">1.29</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Dompdf</div>
-                                            <div class="tech-desc">Generación de PDFs</div>
-                                        </div>
-                                        <div class="tech-version">2.0</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">PHPMailer</div>
-                                            <div class="tech-desc">Envío de correos SMTP</div>
-                                        </div>
-                                        <div class="tech-version">6.9</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Monolog</div>
-                                            <div class="tech-desc">Sistema de logging</div>
-                                        </div>
-                                        <div class="tech-version">3.x</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">TCPDF</div>
-                                            <div class="tech-desc">Generación de PDFs avanzados</div>
-                                        </div>
-                                        <div class="tech-version">6.7</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- API & Security -->
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#apiCollapse">
-                                    <i class="fas fa-shield-alt me-2"></i> API & Seguridad
-                                </button>
-                            </h2>
-                            <div id="apiCollapse" class="accordion-collapse collapse" data-bs-parent="#techAccordion">
-                                <div class="accordion-body">
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">OpenAPI / Swagger</div>
-                                            <div class="tech-desc">Documentación de API REST</div>
-                                        </div>
-                                        <div class="tech-version">3.0</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">TOTP (2FA)</div>
-                                            <div class="tech-desc">Autenticación de dos factores</div>
-                                        </div>
-                                        <div class="tech-version">RFC 6238</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">bcrypt</div>
-                                            <div class="tech-desc">Hashing de contraseñas</div>
-                                        </div>
-                                        <div class="tech-version">-</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">CSRF Protection</div>
-                                            <div class="tech-desc">Tokens de seguridad en formularios</div>
-                                        </div>
-                                        <div class="tech-version">-</div>
-                                    </div>
-                                    <div class="tech-item">
-                                        <div>
-                                            <div class="tech-name">Session Management</div>
-                                            <div class="tech-desc">Control de sesiones con limpieza automática</div>
-                                        </div>
-                                        <div class="tech-version">-</div>
-                                    </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- License -->
+                        <div class="buzz-card h-100 d-flex flex-column text-center">
+                            <h5 class="font-primary text-primary mb-2">LICENCIA</h5>
+                            <div class="legal-logos d-flex flex-column align-items-center justify-content-center flex-grow-1">
+                                <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA Logo" class="legal-logo mb-3" style="width: 55px; opacity: 0.9;">
+                                
+                                <div class="license-text">
+                                    <p class="mb-2">© 2025-2026 <b>Derechos de Autor:</b><br> Gisvel Aray y Yeicson Acosta.</p>
+                                    <p class="mb-2"><b>Licencia de Uso Exclusivo:</b><br> Librería Txiki C.A.</p>
+                                    <p class="mb-0 mt-3" style="font-size: 0.70rem; opacity: 0.8; line-height: 1.4;"><b>Derechos de Propiedad y Redistribución:</b><br> Universidad Politécnica Territorial "José Antonio Anzoátegui" (UPTJAA).</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <!-- Manual Button - Prominent -->
-                <div class="manual-btn-container">
-                    <a href="manual" class="manual-btn">
-                        <i class="fas fa-book"></i>
-                        Manual
-                    </a>
-                    <button class="tutorial-btn" onclick="tutorialManager.start()">
-                        <i class="fas fa-play-circle"></i> Tutorial
-                    </button>
-                </div>
-
-                <!-- Support -->
-                <div class="buzz-card mb-4">
-                    <h5 class="font-primary text-primary mb-3">SOPORTE TÉCNICO</h5>
-                    <div class="support-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>gisvelaray@gmail.com</span>
-                    </div>
-                    <div class="support-item">
-                        <i class="fas fa-phone"></i>
-                        <span>+58 412 875 9068</span>
-                    </div>
-                </div>
-
-                <!-- License -->
-                <div class="buzz-card">
-                    <h5 class="font-primary text-primary mb-3">LICENCIA</h5>
-                    <p class="license-text">
-                        © 2025-2026 <b>Proyecto Socio-Tecnológico BUZZ Data Manager.</b>
-                        Este software es para fines educativos y está protegido por derechos de autor.
-                        No se permite la distribución sin autorización.
-                    </p>
-
-                    <img src="assets/img/harebit.png" alt="HareBit Development Logo" class="developer-logo">
-                </div>
                 </div>
             </div>
         </div>

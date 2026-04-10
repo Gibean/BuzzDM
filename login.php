@@ -558,8 +558,16 @@
 
                 <!-- Forgot Password Link -->
                 <a href="forgot_password" class="forgot-password">
-                    ¿Olvidaste tu contraseña?
+                    &iquest;Olvidaste tu contrase&ntilde;a?
                 </a>
+
+                <!-- Legal Copyright -->
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--buzz-text-muted); font-size: 0.68rem; line-height: 1.6;">
+                    <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA" style="width: 36px; opacity: 0.8; display: block; margin: 0 auto 0.5rem;">
+                    <p style="margin: 0;">&copy; 2025-2026 <strong style="color: var(--buzz-text-color);">Gisvel Aray y Yeicson Acosta</strong></p>
+                    <p style="margin: 0;">Licencia de uso: <strong style="color: var(--buzz-text-color);">Librer&iacute;a Txiki C.A.</strong></p>
+                    <p style="margin: 0; font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">Derechos institucionales: UPTJAA</p>
+                </div>
             </div>
         </div>
     </div>
