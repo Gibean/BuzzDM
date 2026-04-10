@@ -287,11 +287,17 @@ async function viewOrderDetail(orderId) {
       const shippingStatus = order.estado_envio || order.shippingStatus || 'pendiente';
       let shippingBadge = '';
       switch(shippingStatus) {
+        case 'entregado':
+        case 'completado':
         case 'recibido':
-          shippingBadge = '<span class="badge bg-success"><i class="fas fa-check-double me-1"></i>Recibido</span>';
+          shippingBadge = '<span class="badge bg-success"><i class="fas fa-check-double me-1"></i>Completado</span>';
           break;
         case 'enviado':
+        case 'en_transito':
           shippingBadge = '<span class="badge bg-info"><i class="fas fa-shipping-fast me-1"></i>Enviado</span>';
+          break;
+        case 'cancelado':
+          shippingBadge = '<span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i>Cancelado</span>';
           break;
         default:
           shippingBadge = '<span class="badge bg-secondary"><i class="fas fa-hourglass-half me-1"></i>Pendiente</span>';

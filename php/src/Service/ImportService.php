@@ -37,11 +37,17 @@ class ImportService {
             $results = [];
 
             // 4. Iterate Mappings
+            $sheetCount = $spreadsheet->getSheetCount();
             foreach ($mappings as $entity => $config) {
                 $sheet = null;
                 foreach ($config['sheet_names'] as $name) {
                     $sheet = $spreadsheet->getSheetByName($name);
                     if ($sheet) break;
+                }
+
+                // Fallback for CSVs (single sheet) where sheet name is unknown
+                if (!$sheet && $sheetCount === 1) {
+                    $sheet = $spreadsheet->getActiveSheet();
                 }
 
                 if (!$sheet) continue;
@@ -67,20 +73,33 @@ class ImportService {
                 foreach ($headerRow as $colLetter => $headerName) {
                     foreach ($config['columns'] as $key => $colCfg) {
                         // Check direct key match
-                        if ($key === $headerName || strpos($headerName, $key) !== false) {
+                        if ($key === $headerName) {
                             $colMap[$colLetter] = $key;
                             break;
                         }
                         // Check aliases
                         if (isset($colCfg['aliases']) && is_array($colCfg['aliases'])) {
                             foreach ($colCfg['aliases'] as $alias) {
-                                if ($alias === $headerName || strpos($headerName, $alias) !== false) {
+                                if ($alias === $headerName) {
                                     $colMap[$colLetter] = $key;
                                     break 2; // Exit both foreach loops
                                 }
                             }
                         }
                     }
+                }
+
+                // If no crucial headers matched, this sheet is probably not for this entity (prevents CSV false positives)
+                $hasRequired = false;
+                foreach ($colMap as $mappedKey) {
+                    if ($config['columns'][$mappedKey]['required'] ?? false) {
+                        $hasRequired = true;
+                        break;
+                    }
+                }
+                
+                if (!$hasRequired && $sheetCount === 1) {
+                    continue; // Skip this entity processing completely for this single-sheet file
                 }
 
                 $this->repository->beginTransaction();
@@ -120,7 +139,7 @@ class ImportService {
                         if (isset($fieldCfg['type'])) {
                             if ($fieldCfg['type'] === 'float') $cellVal = (float)$cellVal;
                             if ($fieldCfg['type'] === 'int') $cellVal = (int)$cellVal;
-                            if ($fieldCfg['type'] === 'bool') $cellVal = (bool)$cellVal;
+                            if ($fieldCfg['type'] === 'bool') $cellVal = $cellVal ? 1 : 0;
                             if ($fieldCfg['type'] === 'fk') {
                                 $cellVal = $this->repository->findOrCreateCatalog($fieldCfg['table'], $cellVal);
                             }
@@ -283,7 +302,7 @@ class ImportService {
             'Proveedores' => [
                 'sheet_names' => ['Proveedores', 'Suppliers'],
                 'table' => 'proveedores',
-                'unique_key' => 'nombre',
+                'unique_key' => 'nombreempresa',
                 'columns' => [
                     'nombreempresa' => ['db' => 'nombre', 'required' => true, 'aliases' => ['nombre', 'empresa', 'proveedor', 'supplier']],
                     'rifdocumento' => ['db' => 'rif', 'aliases' => ['rif', 'documento', 'nit', 'fiscal']],
@@ -297,7 +316,7 @@ class ImportService {
             'Categorias' => [
                 'sheet_names' => ['Categorias', 'Categories'],
                 'table' => 'categorias',
-                'unique_key' => 'nombre',
+                'unique_key' => 'nombrecategoria',
                 'columns' => [
                     'nombrecategoria' => ['db' => 'nombre', 'required' => true],
                     'descripcion' => ['db' => 'descripcion']
@@ -306,7 +325,7 @@ class ImportService {
             'Marcas' => [
                 'sheet_names' => ['Marcas', 'Brands'],
                 'table' => 'marcas',
-                'unique_key' => 'nombre',
+                'unique_key' => 'nombremarca',
                 'columns' => [
                     'nombremarca' => ['db' => 'nombre', 'required' => true],
                     'sitioweb' => ['db' => 'sitio_web'],
