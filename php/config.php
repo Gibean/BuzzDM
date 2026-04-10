@@ -63,7 +63,7 @@ class AppConfig {
         }
 
         // Auto-detect based on host
-        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 
         // Common localhost patterns
         $localhostPatterns = [
@@ -113,16 +113,16 @@ class AppConfig {
             $protocol = 'https';
         }
 
-        $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
+        $host = $_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 
         // Determine base path
         if ($this->environment === 'local' || $this->environment === 'development') {
-            // For localhost, detect the project folder from script path
-            $scriptPath = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+            // Calculate project path relative to Document Root dynamically
+            $docRoot = str_replace('\\', '/', realpath($_SERVER['DOCUMENT_ROOT'] ?? ''));
+            $projectRoot = str_replace('\\', '/', realpath(dirname(__DIR__)));
 
-            // Extract project folder (e.g., /BuzzDM from /BuzzDM/php/config.php)
-            if (preg_match('#^(/[^/]+)#', $scriptPath, $matches)) {
-                $this->basePath = $matches[1];
+            if ($docRoot && strpos($projectRoot, $docRoot) === 0) {
+                $this->basePath = rtrim(substr($projectRoot, strlen($docRoot)), '/');
             } else {
                 $this->basePath = '/BuzzDM'; // Default fallback for local
             }
