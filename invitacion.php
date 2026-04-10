@@ -8,31 +8,31 @@
 
 // Mapping de invitados
 $invitados = [
-    'zulismar' => [
+    '01' => [
         'nombre'  => 'MSc. Zulismar Gallardo',
         'rol'     => 'Jurado Evaluador',
         'prefijo' => 'Estimada',
         'titulo'  => 'Profesora',
     ],
-    'eduardo' => [
+    '02' => [
         'nombre'  => 'Ing. Eduardo Yaguare',
         'rol'     => 'Jurado Evaluador',
         'prefijo' => 'Estimado',
         'titulo'  => 'Profesor',
     ],
-    'coral' => [
+    '03' => [
         'nombre'  => 'Lic. Coral Jeidub',
         'rol'     => 'Tutora Académica',
         'prefijo' => 'Estimada',
         'titulo'  => 'Profesora',
     ],
-    'sheira' => [
+    '04' => [
         'nombre'  => 'Sheira Jaramillo',
         'rol'     => 'Gerente General — Librería Txiki C.A.',
         'prefijo' => 'Estimada',
         'titulo'  => 'Sra.',
     ],
-    'yosmar' => [
+    '05' => [
         'nombre'  => 'Lic. Yosmar Hernández',
         'rol'     => 'Representante de la Comunidad',
         'prefijo' => 'Estimada',
@@ -56,9 +56,9 @@ $prefijo = htmlspecialchars($invitado['prefijo']);
 $titulo  = htmlspecialchars($invitado['titulo']);
 
 // Generar mensaje personalizado
-$esJurado = in_array($paraKey, ['zulismar', 'eduardo']);
-$esTutor  = $paraKey === 'coral';
-$esComunidad = in_array($paraKey, ['sheira', 'yosmar']);
+$esJurado = in_array($paraKey, ['01', '02']);
+$esTutor  = $paraKey === '03';
+$esComunidad = in_array($paraKey, ['04', '05']);
 
 if ($esJurado) {
     $mensaje = "$prefijo $titulo, nos es grato extenderle una cordial invitación para que nos honre con su presencia como <span class=\"inv-highlight\">Jurado Evaluador</span> en la defensa de nuestro Proyecto Socio Tecnológico.";
@@ -85,10 +85,9 @@ $pageTitle = ($paraKey === 'invitado')
     ? "Invitación — BUZZ Data Manager"
     : "Invitación para $nombre — BDM";
 
-// Base URL (ajustar en producción)
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') 
-    . '://' . $_SERVER['HTTP_HOST'] 
-    . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+// Base URL (utiliza configuración central para localhost/producción)
+require_once __DIR__ . '/php/config.php';
+$baseUrl = base_url();
 ?>
 <!DOCTYPE html>
 <html lang="es">
