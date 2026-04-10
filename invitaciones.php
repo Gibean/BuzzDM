@@ -4,37 +4,37 @@
  * Mini menú para acceder y copiar los links de cada invitación
  */
 
-$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http')
-    . '://' . $_SERVER['HTTP_HOST']
-    . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
+require_once __DIR__ . '/php/config.php';
+
+$baseUrl = base_url();
 
 $invitaciones = [
     [
-        'key'    => 'zulismar',
+        'key'    => '01',
         'nombre' => 'MSc. Zulismar Gallardo',
         'rol'    => 'Jurado Evaluador',
         'icon'   => '⚖️',
     ],
     [
-        'key'    => 'eduardo',
+        'key'    => '02',
         'nombre' => 'Ing. Eduardo Yaguare',
         'rol'    => 'Jurado Evaluador',
         'icon'   => '⚖️',
     ],
     [
-        'key'    => 'coral',
+        'key'    => '03',
         'nombre' => 'Lic. Coral Jeidub',
         'rol'    => 'Tutora Académica',
         'icon'   => '📚',
     ],
     [
-        'key'    => 'sheira',
+        'key'    => '04',
         'nombre' => 'Sheira Jaramillo',
         'rol'    => 'Gerente General — Txiki C.A.',
         'icon'   => '🏢',
     ],
     [
-        'key'    => 'yosmar',
+        'key'    => '05',
         'nombre' => 'Lic. Yosmar Hernández',
         'rol'    => 'Representante de la Comunidad',
         'icon'   => '🤝',
@@ -286,7 +286,7 @@ $invitaciones = [
 
     <div class="inv-list">
         <?php foreach ($invitaciones as $inv): 
-            $link = $baseUrl . '/invitacion?para=' . $inv['key'];
+            $link = app_url('invitacion?para=' . $inv['key']);
         ?>
         <div class="inv-item">
             <div class="inv-icon"><?php echo $inv['icon']; ?></div>

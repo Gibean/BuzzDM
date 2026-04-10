@@ -116,7 +116,7 @@ class AppConfig {
         $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 
         // Determine base path
-        if ($this->environment === 'local') {
+        if ($this->environment === 'local' || $this->environment === 'development') {
             // For localhost, detect the project folder from script path
             $scriptPath = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
 
@@ -138,7 +138,7 @@ class AppConfig {
      * Check if running in local/development environment
      */
     public function isLocal(): bool {
-        return $this->environment === 'local';
+        return $this->environment === 'local' || $this->environment === 'development';
     }
 
     /**
