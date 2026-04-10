@@ -74,7 +74,7 @@ class UserRepository {
     }
 
     public function delete($id) {
-        $stmt = $this->pdo->prepare("UPDATE usuarios SET estado = 'inactivo' WHERE id = ?");
+        $stmt = $this->pdo->prepare("UPDATE usuarios SET estado = 'inactivo', email = CONCAT('eliminado_', id, '_', email) WHERE id = ?");
         return $stmt->execute([$id]);
     }
 

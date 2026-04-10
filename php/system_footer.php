@@ -10,7 +10,7 @@ require_once __DIR__ . '/db.php';
 $currentTime = date('H:i');
 $currentDate = date('d/m/Y');
 $lastUpdate = date('H:i');
-$systemVersion = 'v1.3.2.0';
+$systemVersion = 'v1.1.0.0';
 
 // Get company name from database
 $companyName = '';
@@ -43,6 +43,10 @@ try {
         </div>
     </div>
     <div class="system-footer-right">
+        <div class="system-footer-item hide-mobile" style="font-size: 0.65rem; opacity: 0.7; gap: 6px;" title="Derechos de Propiedad y Redistribución Institucional: Universidad Politécnica Territorial José Antonio Anzoátegui">
+            <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA" style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
+            <span class="footer-value" style="white-space: nowrap;">&copy; 2026 Gisvel Aray &amp; Yeicson Acosta &mdash; UPTJAA</span>
+        </div>
         <?php if (!empty($companyName)): ?>
         <div class="system-footer-item">
             <i class="fas fa-building"></i>
