@@ -15,18 +15,34 @@ TRUNCATE TABLE `pedidos`;
 TRUNCATE TABLE `movimientos_inventario`;
 TRUNCATE TABLE `detalle_cargo_existencias`;
 TRUNCATE TABLE `cargos_existencias`;
+TRUNCATE TABLE `stock_ubicacion`;
+TRUNCATE TABLE `precios_proveedor`;
+TRUNCATE TABLE `producto_componentes`;
+TRUNCATE TABLE `detalle_requisicion`;
+TRUNCATE TABLE `requisiciones`;
+TRUNCATE TABLE `detalle_transferencia`;
+TRUNCATE TABLE `transferencias_almacen`;
 TRUNCATE TABLE `productos`;
 TRUNCATE TABLE `categorias`;
 TRUNCATE TABLE `marcas`;
+TRUNCATE TABLE `colores`;
+TRUNCATE TABLE `materiales`;
 TRUNCATE TABLE `proveedores`;
 TRUNCATE TABLE `almacenes`;
+TRUNCATE TABLE `ubicaciones`;
 -- Insertar almacén por defecto mínimo
 INSERT INTO `almacenes` (`id`, `codigo`, `nombre`, `tipo`, `es_principal`) VALUES (1, 'ALM-PRINCIPAL', 'Almacén Principal', 'almacen', 1);
 
--- 3. Limpieza de Clientes
+-- 3. Limpieza de Clientes y Personas
 TRUNCATE TABLE `clientes`;
+TRUNCATE TABLE `personas`;
+TRUNCATE TABLE `entradas`;
+TRUNCATE TABLE `data_entradas`;
 
 -- 4. Limpieza de Sistema y Logs
+TRUNCATE TABLE `acciones_usuario`;
+TRUNCATE TABLE `notificaciones`;
+TRUNCATE TABLE `sesiones_api`;
 TRUNCATE TABLE `logs`;
 TRUNCATE TABLE `logs_login`;
 TRUNCATE TABLE `importaciones`;

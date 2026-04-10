@@ -183,7 +183,7 @@ function renderShipments() {
             <div class="d-flex flex-column gap-3">
                 <!-- Progress Block -->
                 ${
-                  shipment.status !== "recibido"
+                  shipment.status !== "entregado" && shipment.status !== "recibido"
                     ? `
                     <div class="order-2 order-md-1">
                         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-2 gap-2">
@@ -223,7 +223,10 @@ function getStatusBadge(status) {
   const badges = {
     pendiente: '<div class="status-badge status-pendiente"><i class="fas fa-clock"></i> Pendiente</div>',
     enviado: '<div class="status-badge status-enviado"><i class="fas fa-shipping-fast"></i> Enviado</div>',
-    recibido: '<div class="status-badge status-entregado"><i class="fas fa-check-circle"></i> Entregado</div>'
+    recibido: '<div class="status-badge status-entregado"><i class="fas fa-check-circle"></i> Recibido</div>',
+    entregado: '<div class="status-badge status-entregado"><i class="fas fa-check-circle"></i> Entregado</div>',
+    completado: '<div class="status-badge status-entregado"><i class="fas fa-check-double"></i> Completado</div>',
+    cancelado: '<div class="status-badge status-cancelado text-danger"><i class="fas fa-times-circle"></i> Cancelado</div>'
   }
   return (
     badges[status] || '<div class="status-badge"><i class="fas fa-question"></i> Desconocido</div>'
@@ -241,13 +244,21 @@ function getStatusActions(shipment) {
     case "enviado":
       return `
                 <button class="btn btn-success w-100 fw-bold py-2" onclick="updateShipmentStatus(${shipment.id}, 'recibido')">
-                    <i class="fas fa-check-circle me-2"></i> Marcar Entregado
+                    <i class="fas fa-check-circle me-2"></i> Marcar Recibido
                 </button>
             `
     case "recibido":
+    case "entregado":
+    case "completado":
       return `
                 <div class="text-success text-center fw-bold w-100 py-2 border border-success rounded bg-success bg-opacity-10">
-                    <i class="fas fa-check-circle me-2"></i> Pedido Completado
+                    <i class="fas fa-check-circle me-2"></i> Envío Completado
+                </div>
+            `
+    case "cancelado":
+      return `
+                <div class="text-danger text-center fw-bold w-100 py-2 border border-danger rounded bg-danger bg-opacity-10">
+                    <i class="fas fa-times-circle me-2"></i> Envío Cancelado
                 </div>
             `
     default:
@@ -259,7 +270,10 @@ function getProgressWidth(status) {
   const progress = {
     pendiente: 25,
     enviado: 75,
-    recibido: 100
+    recibido: 100,
+    entregado: 100,
+    completado: 100,
+    cancelado: 100
   }
   return progress[status] || 0
 }
@@ -268,7 +282,10 @@ function getProgressText(status) {
   const texts = {
     pendiente: "Preparando envío...",
     enviado: "En tránsito...",
-    recibido: "Entregado"
+    recibido: "Recibido",
+    entregado: "Entregado",
+    completado: "Completado",
+    cancelado: "Cancelado"
   }
   return texts[status] || ""
 }

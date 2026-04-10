@@ -119,7 +119,9 @@ async function handleFormSubmit(event) {
             </div>
             <div class="modal-body text-start">
               <p class="text-light">Ingresa tu contraseña para autorizar la importación masiva:</p>
-              <input type="password" id="importPasswordInput" class="form-control bg-dark text-white border-secondary" placeholder="Tu contraseña">
+              <form onsubmit="return false;">
+                  <input type="password" id="importPasswordInput" class="form-control bg-dark text-white border-secondary" placeholder="Tu contraseña" autocomplete="new-password">
+              </form>
             </div>
             <div class="modal-footer border-top border-secondary">
               <button type="button" class="btn btn-outline-secondary" id="cancelPasswordBtn">Cancelar</button>
@@ -168,6 +170,7 @@ async function handleFormSubmit(event) {
   const importForm = document.getElementById("importForm")
   const formData = new FormData(importForm)
   formData.append('password', password)
+  formData.set('import_file', selectedFile)
 
   // Show progress section
   document.getElementById("importProgress").style.display = "block"
@@ -320,11 +323,13 @@ function getTypeLabel(type) {
 function getStatusBadge(status) {
   const badges = {
     exitoso: '<span class="badge badge-success">Exitoso</span>',
+    procesado: '<span class="badge badge-success">Procesado</span>',
     "completado-errores": '<span class="badge badge-warning">Con Errores</span>',
     error: '<span class="badge badge-danger">Error</span>',
     procesando: '<span class="badge badge-primary">Procesando</span>',
+    pendiente: '<span class="badge badge-secondary">Pendiente</span>'
   }
-  return badges[status] || '<span class="badge badge-secondary">Desconocido</span>'
+  return badges[status] || '<span class="badge badge-secondary">Desconocido (' + status + ')</span>'
 }
 
 function addToImportHistory(importData) {
