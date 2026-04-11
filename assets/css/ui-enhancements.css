@@ -22,35 +22,40 @@
     border-radius: 3px;
 }
 
-/* Frequent Customer Item */
+/* Frequent Customer Item — Unified Aesthetic */
 .frequent-customer-item {
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    background: rgba(16, 20, 26, 0.4);
+    padding: 0.75rem 1rem;
+    margin-bottom: 0;
+    background: rgba(16, 20, 26, 0.8);
+    border: 1px solid rgba(255, 160, 0, 0.1);
     border-left: 3px solid var(--buzz-primary-color);
-    border-radius: 4px;
+    border-radius: 6px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
 .frequent-customer-item:hover {
-    background: rgba(16, 20, 26, 0.6);
-    border-left-color: var(--buzz-primary-color);
+    background: rgba(16, 20, 26, 0.95);
+    border-color: rgba(255, 160, 0, 0.25);
+    box-shadow: 0 4px 15px rgba(255, 160, 0, 0.08);
 }
 
 .frequent-customer-name {
     font-family: var(--font-monospace);
     color: var(--buzz-text-color);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 500;
+    letter-spacing: 0.3px;
 }
 
 .frequent-customer-orders {
     font-family: var(--font-primary);
     color: var(--buzz-primary-color);
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 700;
 }
 
 /* Enhanced Status Badges */
@@ -247,20 +252,11 @@
     .frequent-customer-item {
         flex: 1 1 calc(33.333% - 1rem);
         min-width: 250px;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        background: rgba(255, 160, 0, 0.05);
-        border: 1px solid rgba(255, 160, 0, 0.1);
-        padding: 0.75rem 1rem;
-        border-radius: 8px;
-        transition: all 0.2s ease;
+        padding: 0.65rem 0.85rem;
     }
 
     .frequent-customer-item:hover {
-        background: rgba(255, 160, 0, 0.1);
-        border-color: rgba(255, 160, 0, 0.3);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
     }
 }
 

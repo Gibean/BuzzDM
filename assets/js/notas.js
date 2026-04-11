@@ -54,20 +54,39 @@ function escapeHTML(str) {
     });
 }
 
-/**
- * Valida teléfono según formato. Venezuela (+58) usa validación estricta.
- */
-function validateNotePhone(phone) {
-    const digits = (phone || '').replace(/\D/g, '');
+function validateNotePhone(fullPhone, countryCode) {
+    const digits = (fullPhone || '').replace(/\D/g, '');
     if (digits.length === 0) return { valid: true };
-    const isVenezuela = digits.startsWith('58') || digits.startsWith('0') || /^\+?\s*58/.test((phone || '').trim());
-    if (isVenezuela && typeof isValidVenezuelaPhone === 'function') {
-        return isValidVenezuelaPhone(phone);
-    }
-    if (digits.length < 10) {
-        return { valid: false, message: 'El teléfono debe tener al menos 10 dígitos.' };
+    
+    // Mínimo 8 dígitos
+    if (digits.length < 8) {
+        return { valid: false, message: 'El teléfono debe tener al menos 8 dígitos.' };
     }
     return { valid: true };
+}
+
+function parseAndSetNotePhone(fullPhone) {
+    if (!fullPhone) {
+        document.getElementById('notePhoneCountryCode').value = '+58';
+        document.getElementById('notePhone').value = '';
+        return;
+    }
+
+    const countryCodes = ["+58", "+1", "+57", "+54", "+34", "+52", "+55"];
+    let matchedCode = "+58";
+    let localNumber = fullPhone;
+
+    for (const code of countryCodes) {
+        if (fullPhone.startsWith(code)) {
+            matchedCode = code;
+            localNumber = fullPhone.substring(code.length);
+            break;
+        }
+    }
+
+    // Set fields
+    document.getElementById('notePhoneCountryCode').value = matchedCode;
+    document.getElementById('notePhone').value = localNumber;
 }
 
 function setupEventListeners() {
@@ -288,6 +307,8 @@ function openNewNoteModal(status = 'pendiente') {
     document.getElementById('noteForm').reset();
     document.getElementById('noteId').value = '';
     document.getElementById('noteStatus').value = status;
+    document.getElementById('notePhoneCountryCode').value = '+58';
+    document.getElementById('notePhone').value = '';
     document.getElementById('noteProductsContainer').innerHTML = '';
     document.getElementById('noteChecklistContainer').innerHTML = '';
     document.getElementById('noteAttachmentsContainer').innerHTML = '';
@@ -338,7 +359,7 @@ async function openEditNoteModal(id) {
             document.getElementById('noteTitle').value = note.titulo;
             document.getElementById('noteClientName').value = note.cliente_nombre || '';
             document.getElementById('notePriority').value = note.prioridad;
-            document.getElementById('notePhone').value = note.telefono || '';
+            parseAndSetNotePhone(note.telefono);
             document.getElementById('noteEmail').value = note.email || '';
             document.getElementById('noteContent').value = note.contenido || '';
             document.getElementById('noteStatus').value = note.estado;
@@ -970,9 +991,17 @@ async function handleNoteSubmit(e) {
 
     // Validación de teléfono (si se ingresó)
     const phoneEl = document.getElementById('notePhone');
-    const phone = phoneEl.value.trim();
-    if (phone) {
-        const phoneCheck = validateNotePhone(phone);
+    const countryCode = document.getElementById('notePhoneCountryCode').value;
+    let localPhone = phoneEl.value.trim();
+    let fullPhone = '';
+
+    if (localPhone) {
+        // Remove leading 0 for +58 if user types 0412...
+        if (localPhone.startsWith('0') && countryCode === '+58') {
+            localPhone = localPhone.substring(1);
+        }
+        fullPhone = countryCode + localPhone;
+        const phoneCheck = validateNotePhone(fullPhone, countryCode);
         if (!phoneCheck.valid) {
             phoneEl.classList.add('is-invalid');
             phoneEl.focus();
@@ -995,7 +1024,7 @@ async function handleNoteSubmit(e) {
         titulo: document.getElementById('noteTitle').value,
         cliente_nombre: document.getElementById('noteClientName').value,
         prioridad: document.getElementById('notePriority').value,
-        telefono: document.getElementById('notePhone').value,
+        telefono: fullPhone,
         email: document.getElementById('noteEmail').value,
         contenido: document.getElementById('noteContent').value,
         estado: document.getElementById('noteStatus').value,

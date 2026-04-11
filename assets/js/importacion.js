@@ -107,8 +107,67 @@ async function handleFormSubmit(event) {
     return
   }
 
+  // Prompt for password using a dynamically created Bootstrap modal
+  const password = await new Promise((resolve) => {
+      const modalHtml = `
+      <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content buzz-card bg-card border-secondary">
+            <div class="modal-header border-bottom border-secondary">
+              <h5 class="modal-title font-primary text-primary"><i class="fas fa-lock"></i> Autenticación Requerida</h5>
+              <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="document.getElementById('cancelPasswordBtn').click()"></button>
+            </div>
+            <div class="modal-body text-start">
+              <p class="text-light">Ingresa tu contraseña para autorizar la importación masiva:</p>
+              <input type="password" id="importPasswordInput" class="form-control bg-dark text-white border-secondary" placeholder="Tu contraseña">
+            </div>
+            <div class="modal-footer border-top border-secondary">
+              <button type="button" class="btn btn-outline-secondary" id="cancelPasswordBtn">Cancelar</button>
+              <button type="button" class="btn btn-buzz" id="confirmPasswordBtn">Autorizar</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+      const modalEl = document.getElementById('passwordModal');
+      const bsModal = new bootstrap.Modal(modalEl);
+      
+      const confirmBtn = document.getElementById('confirmPasswordBtn');
+      const cancelBtn = document.getElementById('cancelPasswordBtn');
+      const passInput = document.getElementById('importPasswordInput');
+      
+      let resolved = false;
+      const cleanup = (val) => {
+          if (resolved) return;
+          resolved = true;
+          bsModal.hide();
+          setTimeout(() => { modalEl.remove(); resolve(val); }, 300);
+      };
+      
+      confirmBtn.onclick = () => {
+          const val = passInput.value.trim();
+          if (val) cleanup(val);
+          else passInput.classList.add('is-invalid');
+      };
+
+      passInput.addEventListener('keypress', (e) => {
+          if(e.key === 'Enter') confirmBtn.click();
+      });
+      
+      cancelBtn.onclick = () => cleanup(null);
+      
+      bsModal.show();
+      setTimeout(() => passInput.focus(), 500);
+  });
+
+  if (!password) {
+      return; // Canceled by user
+  }
+
   const importForm = document.getElementById("importForm")
   const formData = new FormData(importForm)
+  formData.append('password', password)
 
   // Show progress section
   document.getElementById("importProgress").style.display = "block"
@@ -208,18 +267,18 @@ function renderImportHistory() {
     .map(
       (item) => `
         <tr>
-            <td class="font-mono">${formatDateTime(item.date)}</td>
-            <td>
+            <td class="font-mono" data-label="Fecha">${formatDateTime(item.date)}</td>
+            <td data-label="Tipo">
                 <span class="badge badge-${getTypeColor(item.type)}">${getTypeLabel(item.type)}</span>
             </td>
-            <td class="font-mono">${item.filename}</td>
-            <td>${getStatusBadge(item.status)}</td>
-            <td class="font-mono">
+            <td class="font-mono" data-label="Archivo">${item.filename}</td>
+            <td data-label="Estado">${getStatusBadge(item.status)}</td>
+            <td class="font-mono" data-label="Registros">
                 <span class="text-success">${item.records}</span>
                 ${item.errors > 0 ? `/ <span class="text-danger">${item.errors}</span>` : ""}
             </td>
-            <td class="font-mono">${item.user}</td>
-            <td>
+            <td class="font-mono" data-label="Usuario">${item.user}</td>
+            <td data-label="Acciones">
                 <button class="btn btn-outline-buzz btn-sm" onclick="viewImportDetails(${item.id})" title="Ver detalles">
                     <i class="fas fa-eye"></i>
                 </button>
