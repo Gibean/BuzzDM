@@ -669,13 +669,11 @@ function updateActiveFiltersCount() {
 
       if (backups.length === 0) {
         tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No hay backups creados</td></tr>'
-        return
-      }
-
-      // Render backups table
-      tableBody.innerHTML = backups.map(backup => {
-        const fecha = new Date(backup.fecha).toLocaleString('es-ES')
-        const tamanioMB = (backup.tamaño_bytes / 1048576).toFixed(2)
+      } else {
+        // Render backups table
+        tableBody.innerHTML = backups.map(backup => {
+          const fecha = new Date(backup.fecha).toLocaleString('es-ES')
+          const tamanioMB = (backup.tamaño_bytes / 1048576).toFixed(2)
 
         // Determine tipo badge color
         const tipoBadgeClass = backup.tipo === 'manual' ? 'badge-primary' : 'badge-info'
@@ -715,7 +713,8 @@ function updateActiveFiltersCount() {
             </td>
           </tr>
         `
-      }).join('')
+      }).join('');
+      }
 
     } catch (error) {
       console.error("Error loading backups:", error)
