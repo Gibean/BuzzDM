@@ -15,7 +15,7 @@ class BackupService {
 
     public function performBackup($type = 'manual', $userId = null, $isFallback = false) {
         $inicio = microtime(true);
-        $backupDir = dirname(__DIR__, 2) . '/backups/'; // c:\xampp\htdocs\BuzzDM\php\..\backups\
+        $backupDir = dirname(__DIR__, 2) . '/backups/'; // php/backups/
 
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0755, true);
@@ -26,17 +26,27 @@ class BackupService {
         $rutaCompleta = $backupDir . $nombreArchivo;
 
         // Use constants from backup_config.php
+        // Escape password for shell usage (handles special chars like !, @, $)
+        $escapedPass = escapeshellarg(BACKUP_DB_PASS);
         $cmd = sprintf(
             '"%s" --user=%s --password=%s --host=%s %s > "%s" 2>&1',
             MYSQLDUMP_PATH,
             BACKUP_DB_USER,
-            BACKUP_DB_PASS,
+            $escapedPass,
             BACKUP_DB_HOST,
             BACKUP_DB_NAME,
             $rutaCompleta
         );
 
-        exec($cmd, $output, $returnCode);
+        // On Windows, use a .bat wrapper for reliable redirection
+        if (PHP_OS_FAMILY === 'Windows') {
+            $batFile = sys_get_temp_dir() . '\\buzzdm_dump_' . uniqid() . '.bat';
+            file_put_contents($batFile, "@echo off\r\n" . $cmd . "\r\n");
+            exec('"' . $batFile . '"', $output, $returnCode);
+            @unlink($batFile);
+        } else {
+            exec($cmd, $output, $returnCode);
+        }
         $duracion = round((microtime(true) - $inicio) * 1000);
 
         if ($returnCode === 0 && file_exists($rutaCompleta)) {
@@ -112,32 +122,49 @@ class BackupService {
 
     public function restoreBackup($id, $userId) {
         $backup = $this->repository->findById($id);
-        if (!$backup || !file_exists($backup['ruta_archivo'])) {
-            throw new Exception("Backup no encontrado");
+        if (!$backup) {
+            throw new Exception("Backup no encontrado en la base de datos (ID: $id)");
+        }
+        if (!file_exists($backup['ruta_archivo'])) {
+            throw new Exception("Archivo de backup no encontrado en disco: " . basename($backup['ruta_archivo']));
         }
 
         $inicio = microtime(true);
 
-        // MySQL Import Command
-        $mysqlPath = 'c:\\xampp\\mysql\\bin\\mysql.exe'; // Could also use config constant if available or infer
-        if (defined('MYSQL_PATH')) $mysqlPath = constant('MYSQL_PATH');
+        // Derive mysql path from mysqldump path (same directory)
+        $mysqlPath = PHP_OS_FAMILY === 'Windows'
+            ? dirname(MYSQLDUMP_PATH) . '\\mysql.exe'
+            : 'mysql';
+        if (defined('MYSQL_PATH')) {
+            $mysqlPath = MYSQL_PATH;
+        }
+
+        // Escape password for shell usage (handles special chars like !, @, $)
+        $escapedPass = escapeshellarg(BACKUP_DB_PASS);
 
         $cmd = sprintf(
             '"%s" --user=%s --password=%s --host=%s %s < "%s" 2>&1',
             $mysqlPath,
             BACKUP_DB_USER,
-            BACKUP_DB_PASS,
+            $escapedPass,
             BACKUP_DB_HOST,
             BACKUP_DB_NAME,
             $backup['ruta_archivo']
         );
 
-        // Bat wrapper to avoid redirection issues on Windows
-        $batFile = sys_get_temp_dir() . '/restore_' . uniqid() . '.bat';
-        file_put_contents($batFile, "@echo off\n" . $cmd);
+        $output = [];
+        $returnCode = 1;
 
-        exec($batFile, $output, $returnCode);
-        unlink($batFile);
+        if (PHP_OS_FAMILY === 'Windows') {
+            // Bat wrapper for Windows (< redirection doesn't work well with exec)
+            $batFile = sys_get_temp_dir() . '\\buzzdm_restore_' . uniqid() . '.bat';
+            // IMPORTANT: Use CRLF (\r\n) for Windows batch files
+            file_put_contents($batFile, "@echo off\r\n" . $cmd . "\r\n");
+            exec('"' . $batFile . '"', $output, $returnCode);
+            @unlink($batFile);
+        } else {
+            exec($cmd, $output, $returnCode);
+        }
 
         $duracion = round((microtime(true) - $inicio) * 1000);
 
@@ -147,12 +174,13 @@ class BackupService {
                 'duracion_ms' => $duracion,
                 'resultado' => 'Exitoso'
             ]);
-            return ['success' => true, 'duracion_ms' => $duracion];
+            return ['success' => true, 'archivo' => $backup['archivo'], 'duracion_ms' => $duracion];
         } else {
-            $errorMsg = implode("\n", $output);
+            $errorMsg = !empty($output) ? implode("\n", $output) : "Código de retorno: $returnCode (sin mensaje de error capturado)";
             $this->repository->logAction($userId, 'Fallo Restauración Backup', [
                 'archivo' => $backup['archivo'],
-                'error' => $errorMsg
+                'error' => $errorMsg,
+                'return_code' => $returnCode
             ]);
             throw new Exception("Error al restaurar: " . $errorMsg);
         }

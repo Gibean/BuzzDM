@@ -1025,14 +1025,11 @@ function updateActiveFiltersCount() {
       currentUserId = null
       userModalTitle.innerHTML = '<i class="fas fa-user-plus"></i> Nuevo Usuario'
     }
-    userModal.style.display = "block"
+    window.openModal('userModal')
   }
 
-  function closeUserModal() {
-    const modal = document.getElementById("userModal")
-    if (modal) {
-      modal.style.display = "none"
-    }
+  function closeUserModal(force) {
+    window.closeModal('userModal', !!force)
     currentUserId = null
   }
 
@@ -1131,7 +1128,7 @@ function updateActiveFiltersCount() {
       } else {
         showToast(data.message || "Usuario guardado exitosamente", "success")
         loadUsers()
-        closeUserModal()
+        closeUserModal(true)
       }
     } catch (error) {
       console.error("Error:", error)
