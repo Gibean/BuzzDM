@@ -149,7 +149,7 @@
                                         <div class="input-group mb-3">
                                             <span class="input-group-text bg-dark border-secondary text-secondary"><i class="fas fa-shield-alt"></i></span>
                                             <input type="text" id="twoFactorVerifyCode" class="form-control form-control-buzz text-center fs-4 letter-spacing-2"
-                                                   maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="off">
+                                                   inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="000000" autocomplete="one-time-code" autocorrect="off" spellcheck="false">
                                         </div>
 
                                         <div class="d-grid gap-2">
