@@ -1,6 +1,7 @@
 vendor/
 backups/
 php/backups/
+diagrams/
 .env
 .env.local
 .env.example

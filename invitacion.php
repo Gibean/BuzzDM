@@ -33,7 +33,7 @@ $invitados = [
         'titulo'  => 'Sra.',
     ],
     '05' => [
-        'nombre'  => 'Lic. Yosmar Hernández',
+        'nombre'  => 'Lic. Yosmar Pérez',
         'rol'     => 'Representante de la Comunidad',
         'prefijo' => 'Estimada',
         'titulo'  => 'Licenciada',

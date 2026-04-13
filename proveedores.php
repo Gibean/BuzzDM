@@ -11,58 +11,17 @@
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/css/modal-enhanced.css">
     <link rel="stylesheet" href="assets/css/toast.css">
+    <link rel="stylesheet" href="assets/css/filter-layout.css">
     <style>
-        .proveedores-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .proveedor-card {
-            background: var(--card-bg, #1a1f28);
-            border: 1px solid var(--card-border, rgba(255,160,0,0.2));
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-        }
-        .proveedor-card:hover {
-            border-color: var(--buzz-primary-color, #ffa000);
-            transform: translateY(-2px);
-        }
-        .proveedor-nombre {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--buzz-text-primary, #fff);
-            margin-bottom: 0.5rem;
-        }
-        .proveedor-info {
-            font-size: 0.875rem;
-            color: var(--buzz-text-muted, #888);
-            margin-bottom: 0.25rem;
-        }
-        .proveedor-info i {
-            width: 20px;
-            color: var(--buzz-primary-color, #ffa000);
-        }
-        .proveedor-actions {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--card-border, rgba(255,160,0,0.2));
-        }
-        .proveedor-actions button {
-            flex: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.35rem;
-            white-space: nowrap;
-        }
         .empty-state {
             text-align: center;
             padding: 3rem;
             color: var(--buzz-text-muted, #888);
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
         /* Products table in modal */
         .productos-table {
@@ -84,32 +43,71 @@
             color: var(--buzz-primary-color, #ffa000);
             font-weight: 600;
         }
-        .empty-state i {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        .content-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,160,0,0.2);
-        }
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin: 0;
-        }
-        .page-title i {
-            margin-right: 0.5rem;
-            color: var(--buzz-primary-color, #ffa000);
-        }
-        .page-subtitle {
-            margin: 0.25rem 0 0 0;
+        /* Proveedor info in table - subtle text */
+        .proveedor-contacto-cell {
+            font-size: 0.85rem;
             color: var(--buzz-text-muted, #888);
-            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .proveedor-contacto-cell i {
+            width: 16px;
+            color: var(--buzz-primary-color, #ffa000);
+            margin-right: 0.25rem;
+            font-size: 0.8rem;
+        }
+        .proveedor-contacto-cell .contacto-item {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+        .proveedor-nombre-cell {
+            font-weight: 600;
+            color: var(--buzz-text-primary, #fff);
+        }
+        .proveedor-rif-badge {
+            font-size: 0.75rem;
+            font-family: 'Courier New', monospace;
+            color: var(--buzz-primary-color, #ffa000);
+            background: rgba(255, 160, 0, 0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .proveedor-direccion-cell {
+            font-size: 0.85rem;
+            color: var(--buzz-text-muted, #888);
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* Table column distribution */
+        .table-buzz.table-proveedores {
+            table-layout: fixed;
+        }
+        .table-proveedores .col-nombre { width: 18%; }
+        .table-proveedores .col-rif { width: 12%; }
+        .table-proveedores .col-contacto { width: 30%; }
+        .table-proveedores .col-direccion { width: 25%; }
+        .table-proveedores .col-acciones { width: 15%; text-align: right; }
+        .table-proveedores td:last-child {
+            text-align: right;
+            white-space: nowrap;
+        }
+        /* Responsive table for proveedores */
+        @media (max-width: 768px) {
+            .table-buzz .hide-mobile {
+                display: none;
+            }
+            .proveedor-contacto-cell .contacto-item {
+                max-width: 160px;
+            }
+            .table-proveedores .col-nombre { width: 25%; }
+            .table-proveedores .col-rif { width: 15%; }
+            .table-proveedores .col-contacto { width: 35%; }
+            .table-proveedores .col-acciones { width: 25%; }
         }
     </style>
 </head>
@@ -126,12 +124,49 @@
         require_once 'php/top_navbar.php';
         ?>
 
-        <!-- Lista de proveedores -->
-        <div id="proveedoresContainer">
-            <div class="text-center py-4">
-                <i class="fas fa-spinner fa-spin fa-2x"></i>
-                <p class="mt-2 text-muted">Cargando proveedores...</p>
+        <!-- Filters -->
+        <div class="buzz-card mb-4 pb-3">
+            <div class="filter-wrapper">
+                <div class="filter-group filter-search">
+                    <label class="text-muted">Buscar proveedor</label>
+                    <div class="position-relative">
+                        <input type="text" class="form-control form-control-buzz" id="searchProveedorInput" placeholder="Nombre, RIF, email o teléfono...">
+                        <i class="fas fa-search position-absolute end-0 top-50 translate-middle-y me-3 text-muted"></i>
+                    </div>
+                </div>
+                <div class="filter-group filter-actions">
+                    <button class="btn btn-outline-buzz btn-filter-action" onclick="limpiarFiltroProveedores()" title="Limpiar filtros">
+                        <i class="fas fa-times"></i><span class="btn-text">Limpiar</span>
+                    </button>
+                </div>
             </div>
+        </div>
+
+        <!-- Suppliers Table -->
+        <div class="buzz-card">
+            <div class="table-responsive">
+                <table class="table table-buzz table-proveedores">
+                    <thead>
+                        <tr>
+                            <th class="col-nombre">Nombre</th>
+                            <th class="col-rif">RIF</th>
+                            <th class="col-contacto">Contacto</th>
+                            <th class="col-direccion hide-mobile">Dirección</th>
+                            <th class="col-acciones">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="proveedoresTableBody">
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p class="mt-2 text-muted">Cargando proveedores...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Pagination -->
+            <div id="proveedoresPagination" class="buzz-pagination"></div>
         </div>
 
         <?php require_once 'php/system_footer.php'; ?>
@@ -246,6 +281,9 @@
         // =====================================================
 
         let proveedores = [];
+        let proveedoresFiltrados = [];
+        let currentPageProv = 1;
+        const proveedoresPerPage = 15;
 
         document.addEventListener('DOMContentLoaded', function() {
             cargarProveedores();
@@ -258,7 +296,23 @@
             if (typeof initEmailValidation === 'function') {
                 initEmailValidation(document.getElementById('proveedorEmail'));
             }
+
+            // Search filter listener
+            const searchInput = document.getElementById('searchProveedorInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    currentPageProv = 1;
+                    filtrarYRenderProveedores();
+                });
+            }
         });
+
+        function limpiarFiltroProveedores() {
+            const searchInput = document.getElementById('searchProveedorInput');
+            if (searchInput) searchInput.value = '';
+            currentPageProv = 1;
+            filtrarYRenderProveedores();
+        }
 
         async function cargarProveedores() {
             try {
@@ -267,7 +321,7 @@
 
                 if (data.success) {
                     proveedores = data.proveedores || [];
-                    renderProveedores();
+                    filtrarYRenderProveedores();
                 } else {
                     showToast('Error al cargar proveedores: ' + data.message, 'danger');
                 }
@@ -277,44 +331,95 @@
             }
         }
 
-        function renderProveedores() {
-            const container = document.getElementById('proveedoresContainer');
+        function filtrarYRenderProveedores() {
+            const searchTerm = (document.getElementById('searchProveedorInput')?.value || '').toLowerCase().trim();
 
-            if (!proveedores || proveedores.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-truck"></i>
-                        <h5>No hay proveedores registrados</h5>
-                        <p>Haz clic en "Nuevo Proveedor" para agregar el primero.</p>
-                    </div>
+            if (!searchTerm) {
+                proveedoresFiltrados = [...proveedores];
+            } else {
+                proveedoresFiltrados = proveedores.filter(p => {
+                    return (p.nombre && p.nombre.toLowerCase().includes(searchTerm)) ||
+                           (p.rif && p.rif.toLowerCase().includes(searchTerm)) ||
+                           (p.email && p.email.toLowerCase().includes(searchTerm)) ||
+                           (p.telefono && p.telefono.toLowerCase().includes(searchTerm)) ||
+                           (p.direccion && p.direccion.toLowerCase().includes(searchTerm));
+                });
+            }
+
+            renderProveedores();
+        }
+
+        function renderProveedores() {
+            const tbody = document.getElementById('proveedoresTableBody');
+
+            if (!proveedoresFiltrados || proveedoresFiltrados.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="fas fa-truck"></i>
+                                <h5>No hay proveedores registrados</h5>
+                                <p>Haz clic en "Nuevo Proveedor" para agregar el primero.</p>
+                            </div>
+                        </td>
+                    </tr>
                 `;
+                // Clear pagination
+                const pagContainer = document.getElementById('proveedoresPagination');
+                if (pagContainer) pagContainer.innerHTML = '';
                 return;
             }
 
-            container.innerHTML = `
-                <div class="proveedores-grid">
-                    ${proveedores.map(p => `
-                        <div class="proveedor-card">
-                            <div class="proveedor-nombre">${escapeHtml(p.nombre)}</div>
-                            ${p.rif ? `<div class="proveedor-info"><i class="fas fa-id-card"></i> ${escapeHtml(p.rif)}</div>` : ''}
-                            ${p.telefono ? `<div class="proveedor-info"><i class="fas fa-phone"></i> ${escapeHtml(p.telefono)}</div>` : ''}
-                            ${p.email ? `<div class="proveedor-info"><i class="fas fa-envelope"></i> ${escapeHtml(p.email)}</div>` : ''}
-                            ${p.direccion ? `<div class="proveedor-info"><i class="fas fa-map-marker-alt"></i> ${escapeHtml(p.direccion)}</div>` : ''}
-                            <div class="proveedor-actions">
-                                <button class="btn btn-outline-info btn-sm" onclick="verProductosProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\'")}')">
-                                    <i class="fas fa-boxes"></i> Productos
-                                </button>
-                                <button class="btn btn-outline-buzz btn-sm" onclick="editarProveedor(${p.id})">
-                                    <i class="fas fa-edit"></i> Editar
-                                </button>
-                                <button class="btn btn-outline-danger btn-sm" onclick="eliminarProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\'")}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
+            // Paginate
+            const totalPages = Math.ceil(proveedoresFiltrados.length / proveedoresPerPage);
+            if (currentPageProv > totalPages) currentPageProv = totalPages;
+            const startIdx = (currentPageProv - 1) * proveedoresPerPage;
+            const endIdx = startIdx + proveedoresPerPage;
+            const pageItems = proveedoresFiltrados.slice(startIdx, endIdx);
+
+            tbody.innerHTML = pageItems.map(p => {
+                // Build contact info
+                let contactoHtml = '';
+                if (p.telefono) contactoHtml += `<span class="contacto-item"><i class="fas fa-phone"></i> ${escapeHtml(p.telefono)}</span>`;
+                if (p.email) contactoHtml += `<span class="contacto-item"><i class="fas fa-envelope"></i> ${escapeHtml(p.email)}</span>`;
+                if (!contactoHtml) contactoHtml = '<span class="text-muted">—</span>';
+
+                return `<tr>
+                    <td class="proveedor-nombre-cell">${escapeHtml(p.nombre)}</td>
+                    <td>${p.rif ? `<span class="proveedor-rif-badge">${escapeHtml(p.rif)}</span>` : '<span class="text-muted">—</span>'}</td>
+                    <td class="proveedor-contacto-cell">${contactoHtml}</td>
+                    <td class="proveedor-direccion-cell hide-mobile" title="${escapeHtml(p.direccion || '')}">${p.direccion ? escapeHtml(p.direccion) : '<span class="text-muted">—</span>'}</td>
+                    <td>
+                        <button class="btn-action btn-edit me-1" onclick="verProveedor(${p.id})" title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn-action btn-edit me-1" onclick="verProductosProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\\'")}')" title="Ver productos">
+                            <i class="fas fa-boxes"></i>
+                        </button>
+                        <button class="btn-action btn-edit me-1" onclick="editarProveedor(${p.id})" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn-action btn-delete" onclick="eliminarProveedor(${p.id}, '${escapeHtml(p.nombre).replace(/'/g, "\\\'")}')" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>`;
+            }).join('');
+
+            // Render pagination
+            if (typeof renderPaginationControls === 'function') {
+                renderPaginationControls({
+                    containerId: 'proveedoresPagination',
+                    currentPage: currentPageProv,
+                    totalPages: totalPages,
+                    totalItems: proveedoresFiltrados.length,
+                    itemsPerPage: proveedoresPerPage,
+                    onPageChange: (page) => {
+                        currentPageProv = page;
+                        renderProveedores();
+                    }
+                });
+            }
         }
 
 
@@ -323,6 +428,49 @@
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
+        }
+
+        function verProveedor(id) {
+            const p = proveedores.find(prov => prov.id == id);
+            if (!p) return;
+
+            const infoRow = (icon, label, value) => {
+                if (!value) return '';
+                return `<div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <i class="fas fa-${icon}" style="color: var(--buzz-primary-color, #ffa000); width: 18px; margin-top: 2px;"></i>
+                    <div>
+                        <div style="font-size: 0.75rem; color: var(--buzz-text-muted, #888); text-transform: uppercase; letter-spacing: 0.5px;">${label}</div>
+                        <div style="color: var(--buzz-text-primary, #fff);">${escapeHtml(value)}</div>
+                    </div>
+                </div>`;
+            };
+
+            let html = `<div class="modal-buzz" style="display: flex;">
+                <div class="modal-content-buzz" style="max-width: 550px;">
+                    <div class="modal-header-buzz">
+                        <h5 class="font-primary text-primary"><i class="fas fa-truck"></i> ${escapeHtml(p.nombre)}</h5>
+                        <button type="button" class="close-buzz" onclick="this.closest('.modal-buzz').remove()">&times;</button>
+                    </div>
+                    <div class="modal-body-buzz">
+                        ${infoRow('id-card', 'RIF / Identificación', p.rif)}
+                        ${infoRow('phone', 'Teléfono', p.telefono)}
+                        ${infoRow('envelope', 'Email', p.email)}
+                        ${infoRow('map-marker-alt', 'Dirección', p.direccion)}
+                        ${infoRow('sticky-note', 'Notas', p.notas)}
+                        ${!p.rif && !p.telefono && !p.email && !p.direccion && !p.notas ? '<div class="empty-state" style="padding:1.5rem;"><i class="fas fa-info-circle"></i><p>Sin información de contacto registrada.</p></div>' : ''}
+                    </div>
+                    <div class="modal-footer-buzz">
+                        <button type="button" class="btn btn-outline-buzz" onclick="this.closest('.modal-buzz').remove()">
+                            <i class="fas fa-times me-2"></i>Cerrar
+                        </button>
+                        <button type="button" class="btn btn-buzz" onclick="this.closest('.modal-buzz').remove(); editarProveedor(${p.id})">
+                            <i class="fas fa-edit me-2"></i>Editar
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+
+            document.body.insertAdjacentHTML('beforeend', html);
         }
 
         async function verProductosProveedor(id, nombre) {

@@ -234,7 +234,7 @@ function updateToast(toastId, message, type = 'info') {
 function dismissToast(btn) {
     const card = btn.closest('.toast-card');
     card.classList.add('hiding');
-    card.addEventListener('animationend', () => {
+    card.addEventListener('transitionend', () => {
         card.remove();
         updateClearButtonVisibility();
     });
@@ -246,7 +246,7 @@ function clearAllToasts() {
     toasts.forEach((card, index) => {
         setTimeout(() => {
             card.classList.add('hiding');
-            card.addEventListener('animationend', () => card.remove());
+            card.addEventListener('transitionend', () => card.remove());
         }, index * 50); // Staggered removal
     });
     setTimeout(updateClearButtonVisibility, toasts.length * 50 + 300);
