@@ -250,11 +250,17 @@ class CompanyService {
      */
     private function sendVerificationEmail(string $email, string $adminName, string $companyName, string $code): void {
         require_once __DIR__ . '/../../../vendor/autoload.php';
-        require_once __DIR__ . '/../../config.php';
+        require_once __DIR__ . '/../../email_config.php';
 
         try {
             $mail = new PHPMailer\PHPMailer\PHPMailer(true);
             $config = getMailerConfig();
+
+            // Si no hay configuración SMTP en entorno local, registrar en log y continuar sin error fatal
+            if (empty($config['host']) || empty($config['username'])) {
+                error_log("Aviso: Configuración SMTP no establecida. Código OTP generado para $email: $code");
+                return;
+            }
 
             $mail->isSMTP();
             $mail->Host       = $config['host'];
