@@ -21,8 +21,42 @@ if (!$input) {
     $input = $_POST;
 }
 
+$action = $_GET['action'] ?? ($input['action'] ?? 'register');
+
 try {
     $companyService = new CompanyService();
+
+    if ($action === 'verify_code') {
+        $email = $input['email'] ?? '';
+        $code = $input['code'] ?? '';
+
+        if (empty($email) || empty($code)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'El correo y el código de 6 dígitos son obligatorios.']);
+            exit;
+        }
+
+        $result = $companyService->verifyEmailCode($email, $code);
+        http_response_code(200);
+        echo json_encode($result);
+        exit;
+    }
+
+    if ($action === 'resend_code') {
+        $email = $input['email'] ?? '';
+        if (empty($email)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'El correo electrónico es obligatorio.']);
+            exit;
+        }
+
+        $result = $companyService->resendVerificationCode($email);
+        http_response_code(200);
+        echo json_encode($result);
+        exit;
+    }
+
+    // Default action: register
     $result = $companyService->createTrialEnvironment([
         'company_name'       => $input['company_name'] ?? '',
         'admin_email'        => $input['admin_email'] ?? '',
@@ -34,14 +68,14 @@ try {
     http_response_code(201);
     echo json_encode([
         'success' => true,
-        'message' => '¡Entorno de demostración creado exitosamente! Puedes iniciar sesión ahora.',
+        'requires_verification' => true,
+        'message' => 'Se ha enviado un código de 6 dígitos a tu correo electrónico.',
         'data' => [
             'company_id'     => $result['company_id'],
             'company_name'   => $result['company_name'],
             'admin_email'    => $result['admin_email'],
             'expires_at'     => $result['expires_at'],
-            'days_remaining' => $result['days_remaining'],
-            'login_url'      => 'login.php'
+            'days_remaining' => $result['days_remaining']
         ]
     ]);
 
@@ -54,5 +88,5 @@ try {
 } catch (Exception $e) {
     error_log("Error in api_register_demo: " . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => 'Error interno al aprovisionar el entorno de prueba.']);
+    echo json_encode(['success' => false, 'message' => 'Error interno al procesar la solicitud: ' . $e->getMessage()]);
 }

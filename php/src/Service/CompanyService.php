@@ -47,7 +47,7 @@ class CompanyService {
 
         $this->pdo->beginTransaction();
         try {
-            // 1. Crear Empresa (15 días de prueba)
+            // 1. Crear Empresa (15 días de prueba, inicialmente pendiente de verificación de correo)
             $expiresAt = (new DateTime())->modify('+15 days')->format('Y-m-d H:i:s');
             $stmt = $this->pdo->prepare("
                 INSERT INTO empresa (
@@ -55,7 +55,7 @@ class CompanyService {
                     trial_ends_at, is_demo, status, creado_at
                 ) VALUES (
                     :nombre, 'J', :rif, :email, :admin_email, :fingerprint,
-                    :expires_at, 1, 'active', NOW()
+                    :expires_at, 1, 'pending_verification', NOW()
                 )
             ");
             $demoRif = 'J-' . str_pad((string)mt_rand(10000000, 99999999), 9, '0', STR_PAD_LEFT);
@@ -116,21 +116,180 @@ class CompanyService {
                 mkdir($uploadDir, 0755, true);
             }
 
+            // 6. Generar y enviar código de verificación de 6 dígitos
+            $otpCode = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+            $otpExpires = (new DateTime())->modify('+15 minutes')->format('Y-m-d H:i:s');
+
+            $stmtOtp = $this->pdo->prepare("
+                INSERT INTO email_verification_codes (empresa_id, email, codigo, expiracion, creado_at)
+                VALUES (:empresa_id, :email, :codigo, :expiracion, NOW())
+            ");
+            $stmtOtp->execute([
+                ':empresa_id' => $companyId,
+                ':email'      => $adminEmail,
+                ':codigo'     => $otpCode,
+                ':expiracion' => $otpExpires
+            ]);
+
+            // Enviar email con PHPMailer
+            $this->sendVerificationEmail($adminEmail, $adminName, $companyName, $otpCode);
+
             $this->pdo->commit();
 
             return [
                 'success' => true,
+                'requires_verification' => true,
                 'company_id' => $companyId,
                 'user_id' => $userId,
                 'company_name' => $companyName,
                 'admin_email' => $adminEmail,
                 'expires_at' => $expiresAt,
-                'days_remaining' => 15
+                'days_remaining' => 15,
+                'message' => 'Código de verificación enviado a tu correo electrónico.'
             ];
 
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
+        }
+    }
+
+    /**
+     * Valida el código OTP de 6 dígitos y activa la empresa demo
+     */
+    public function verifyEmailCode(string $email, string $code): array {
+        $email = strtolower(trim($email));
+        $code = trim($code);
+
+        $stmt = $this->pdo->prepare("
+            SELECT id, empresa_id, expiracion, usado
+            FROM email_verification_codes
+            WHERE email = :email AND codigo = :codigo AND usado = 0
+            ORDER BY id DESC
+            LIMIT 1
+        ");
+        $stmt->execute([':email' => $email, ':codigo' => $code]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) {
+            throw new InvalidArgumentException('El código de verificación es incorrecto o ya fue utilizado.');
+        }
+
+        if (new DateTime() > new DateTime($row['expiracion'])) {
+            throw new RuntimeException('El código de verificación ha expirado. Por favor solicita uno nuevo.');
+        }
+
+        // Marcar código como usado
+        $this->pdo->prepare("UPDATE email_verification_codes SET usado = 1 WHERE id = ?")->execute([$row['id']]);
+
+        // Activar la empresa
+        $empresaId = (int)$row['empresa_id'];
+        $this->pdo->prepare("UPDATE empresa SET status = 'active' WHERE id = ?")->execute([$empresaId]);
+
+        // Obtener usuario administrador de la empresa para sesión
+        $stmtUser = $this->pdo->prepare("SELECT id, nombre, email, rol FROM usuarios WHERE empresa_id = ? AND rol = 'admin' LIMIT 1");
+        $stmtUser->execute([$empresaId]);
+        $user = $stmtUser->fetch(PDO::FETCH_ASSOC);
+
+        if ($user) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['usuario_id'] = $user['id'];
+            $_SESSION['usuario_nombre'] = $user['nombre'];
+            $_SESSION['usuario_rol'] = $user['rol'];
+            $_SESSION['empresa_id'] = $empresaId;
+            $_SESSION['is_demo'] = true;
+            $_SESSION['demo_dias_restantes'] = 15;
+        }
+
+        return [
+            'success' => true,
+            'message' => '¡Correo verificado con éxito! Tu prueba demo de 15 días ha sido activada.',
+            'company_id' => $empresaId,
+            'redirect_url' => 'dashboard'
+        ];
+    }
+
+    /**
+     * Reenvía un nuevo código de verificación
+     */
+    public function resendVerificationCode(string $email): array {
+        $email = strtolower(trim($email));
+
+        $stmt = $this->pdo->prepare("SELECT id, nombre FROM empresa WHERE admin_email = ? AND status = 'pending_verification' LIMIT 1");
+        $stmt->execute([$email]);
+        $empresa = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$empresa) {
+            throw new InvalidArgumentException('No existe ninguna cuenta pendiente de verificación con ese correo.');
+        }
+
+        // Invalidar códigos anteriores
+        $this->pdo->prepare("UPDATE email_verification_codes SET usado = 1 WHERE email = ?")->execute([$email]);
+
+        // Generar nuevo código
+        $newCode = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+        $newExpires = (new DateTime())->modify('+15 minutes')->format('Y-m-d H:i:s');
+
+        $this->pdo->prepare("
+            INSERT INTO email_verification_codes (empresa_id, email, codigo, expiracion, creado_at)
+            VALUES (?, ?, ?, ?, NOW())
+        ")->execute([(int)$empresa['id'], $email, $newCode, $newExpires]);
+
+        $this->sendVerificationEmail($email, 'Administrador', $empresa['nombre'], $newCode);
+
+        return [
+            'success' => true,
+            'message' => 'Hemos enviado un nuevo código de verificación a tu correo.'
+        ];
+    }
+
+    /**
+     * Envía el correo con el código OTP usando PHPMailer
+     */
+    private function sendVerificationEmail(string $email, string $adminName, string $companyName, string $code): void {
+        require_once __DIR__ . '/../../../vendor/autoload.php';
+        require_once __DIR__ . '/../../config.php';
+
+        try {
+            $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+            $config = getMailerConfig();
+
+            $mail->isSMTP();
+            $mail->Host       = $config['host'];
+            $mail->SMTPAuth   = true;
+            $mail->Username   = $config['username'];
+            $mail->Password   = $config['password'];
+            $mail->SMTPSecure = $config['secure'];
+            $mail->Port       = $config['port'];
+            $mail->CharSet    = 'UTF-8';
+
+            $mail->setFrom($config['from_email'], $config['from_name']);
+            $mail->addAddress($email, $adminName);
+
+            $mail->isHTML(true);
+            $mail->Subject = "Código de Verificación: $code - BUZZ Data Manager";
+            $mail->Body    = "
+                <div style='font-family: Arial, sans-serif; background: #10141a; color: #dfe5eb; padding: 30px;'>
+                    <div style='max-width: 520px; margin: 0 auto; background: #1a1f28; border: 1px solid #343a40; border-radius: 8px; padding: 25px;'>
+                        <h2 style='color: #ffa000; margin-top: 0;'>BUZZ Data Manager</h2>
+                        <p>Hola <strong>" . htmlspecialchars($adminName) . "</strong>,</p>
+                        <p>Gracias por registrar tu empresa <strong>" . htmlspecialchars($companyName) . "</strong>. Para activar tus 15 días de prueba gratuita, ingresa el siguiente código:</p>
+                        <div style='text-align: center; margin: 25px 0;'>
+                            <span style='font-family: monospace; font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #ffa000; background: #10141a; padding: 10px 25px; border-radius: 6px; border: 1px dashed #ffa000; display: inline-block;'>$code</span>
+                        </div>
+                        <p style='font-size: 13px; color: #c5ccd5;'>Este código expira en 15 minutos.</p>
+                        <hr style='border: 0; border-top: 1px solid #343a40; margin: 20px 0;'>
+                        <p style='font-size: 11px; color: #888; margin-bottom: 0;'>Si tú no solicitaste este registro, puedes ignorar este mensaje.</p>
+                    </div>
+                </div>
+            ";
+            $mail->AltBody = "Tu código de verificación para BUZZ Data Manager es: $code (Válido por 15 minutos).";
+
+            $mail->send();
+        } catch (Exception $e) {
+            error_log("Error al enviar email de verificación OTP ($code) a $email: " . $e->getMessage());
         }
     }
 
