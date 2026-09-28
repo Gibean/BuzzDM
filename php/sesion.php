@@ -220,6 +220,7 @@ if (isset($_SESSION['usuario_id'])) {
             exit();
         }
     }
+}
 
 
 // --- Lógica de Control de Acceso Basada en Roles ---
