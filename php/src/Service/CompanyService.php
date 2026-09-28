@@ -51,15 +51,17 @@ class CompanyService {
             $expiresAt = (new DateTime())->modify('+15 days')->format('Y-m-d H:i:s');
             $stmt = $this->pdo->prepare("
                 INSERT INTO empresa (
-                    nombre, email, admin_email, device_fingerprint,
+                    nombre, tipo_rif, rif, email, admin_email, device_fingerprint,
                     trial_ends_at, is_demo, status, creado_at
                 ) VALUES (
-                    :nombre, :email, :admin_email, :fingerprint,
+                    :nombre, 'J', :rif, :email, :admin_email, :fingerprint,
                     :expires_at, 1, 'active', NOW()
                 )
             ");
+            $demoRif = 'J-' . str_pad((string)mt_rand(10000000, 99999999), 9, '0', STR_PAD_LEFT);
             $stmt->execute([
                 ':nombre' => $companyName,
+                ':rif' => $demoRif,
                 ':email' => $adminEmail,
                 ':admin_email' => $adminEmail,
                 ':fingerprint' => $fingerprint,

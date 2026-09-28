@@ -6,7 +6,7 @@
  * (Productos, Clientes, Proveedores, Inventario) cuando su período de prueba finaliza.
  */
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 require_once __DIR__ . '/../../db.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -115,7 +115,7 @@ class DemoExportService {
         $this->styleHeader($sheet, 'A1:G1');
 
         $stmt = $this->pdo->prepare("
-            SELECT id, rif, nombre, contacto, email, telefono, direccion
+            SELECT id, rif, nombre, contacto_nombre, email, telefono, direccion
             FROM proveedores
             WHERE empresa_id = :empresa_id AND deleted_at IS NULL
             ORDER BY nombre ASC
