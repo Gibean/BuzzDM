@@ -167,16 +167,48 @@ $pdo = getDbConnection(); // Call the function to get the PDO object
 if (isset($_SESSION['usuario_id'])) {
     $usuarioId = $_SESSION['usuario_id'];
 
-    // Consultar el rol y nombre del usuario
-    $query = "SELECT nombre, rol FROM usuarios WHERE id = ?";
-    $stmt = $pdo->prepare($query); // Use $pdo
-    $stmt->bindParam(1, $usuarioId, PDO::PARAM_INT); // Use bindParam
+    // Consultar el rol, nombre y empresa_id del usuario
+    $query = "SELECT u.nombre, u.rol, COALESCE(u.empresa_id, 1) as empresa_id,
+                     e.nombre as empresa_nombre, e.is_demo, e.status as empresa_status, e.trial_ends_at,
+                     TIMESTAMPDIFF(DAY, NOW(), e.trial_ends_at) as demo_dias_restantes
+              FROM usuarios u
+              LEFT JOIN empresa e ON e.id = COALESCE(u.empresa_id, 1)
+              WHERE u.id = ?";
+    $stmt = $pdo->prepare($query);
+    $stmt->bindParam(1, $usuarioId, PDO::PARAM_INT);
     $stmt->execute();
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC); // Fetch directly
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($usuario) { // Check if user was found
+    if ($usuario) {
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
         $_SESSION['usuario_rol'] = $usuario['rol'];
+        $_SESSION['empresa_id'] = (int)$usuario['empresa_id'];
+        $_SESSION['empresa_nombre'] = $usuario['empresa_nombre'] ?? 'Mi Empresa';
+        $_SESSION['is_demo'] = (bool)($usuario['is_demo'] ?? false);
+        $_SESSION['demo_dias_restantes'] = max(0, (int)($usuario['demo_dias_restantes'] ?? 0));
+
+        // --- Middleware de Control de Expiración SaaS Demo ---
+        if ($_SESSION['is_demo'] && !empty($usuario['trial_ends_at'])) {
+            $trialExpires = new DateTime($usuario['trial_ends_at']);
+            $ahora = new DateTime();
+
+            if ($ahora > $trialExpires || $usuario['empresa_status'] === 'expired') {
+                $_SESSION['demo_expired'] = true;
+                if ($is_api_call) {
+                    header('Content-Type: application/json');
+                    http_response_code(403);
+                    echo json_encode([
+                        'success' => false, 
+                        'code' => 'TRIAL_EXPIRED',
+                        'message' => 'El período de prueba de 15 días ha finalizado. Por favor exporta tus datos.'
+                    ]);
+                    exit;
+                } elseif ($current_page !== 'demo_expired.php' && $current_page !== 'logout.php') {
+                    header('Location: demo_expired.php');
+                    exit;
+                }
+            }
+        }
     } else {
         // Si el usuario no se encuentra en la DB, destruir sesión y redirigir
         session_unset();
@@ -189,8 +221,6 @@ if (isset($_SESSION['usuario_id'])) {
         }
     }
 
-    // No need for $stmt->close() with PDO
-}
 
 // --- Lógica de Control de Acceso Basada en Roles ---
 

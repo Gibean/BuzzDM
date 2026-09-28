@@ -19,6 +19,15 @@ class ProductService {
     public function createProduct($data) {
         $this->validateProductData($data);
 
+        // Validación de límite operativo para versión Demo (SaaS)
+        $companyId = (int)($_SESSION['empresa_id'] ?? 1);
+        $isDemo = (bool)($_SESSION['is_demo'] ?? false);
+        $maxProducts = (int)($_ENV['DEMO_MAX_PRODUCTS'] ?? 50);
+
+        if ($isDemo && $this->repository->countByCompanyId($companyId) >= $maxProducts) {
+            throw new Exception("Límite de prueba alcanzado: Has registrado el máximo permitido de {$maxProducts} productos para la versión de demostración.");
+        }
+
         // Check duplicate SKU
         if ($this->repository->findBySku($data['sku'])) {
             throw new Exception("El SKU '{$data['sku']}' ya existe.");

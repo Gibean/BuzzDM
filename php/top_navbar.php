@@ -25,9 +25,13 @@ $nav_actions  = $nav_actions  ?? '';
         <span class="top-navbar__subtitle">/ <?php echo htmlspecialchars($nav_subtitle); ?></span>
         <?php endif; ?>
     </div>
-    <?php if ($nav_actions !== ''): ?>
-    <div class="top-navbar__actions">
+    <div class="top-navbar__actions" style="display: flex; align-items: center; gap: 12px;">
+        <?php if (!empty($_SESSION['is_demo'])): ?>
+        <div class="demo-trial-badge d-none d-sm-inline-flex align-items-center gap-2 px-2 py-1 rounded" style="background: rgba(255, 160, 0, 0.12); border: 1px solid rgba(255, 160, 0, 0.3); font-size: 0.72rem; color: var(--buzz-primary-color, #ffa000);">
+            <i class="fas fa-hourglass-half"></i>
+            <span>Prueba: <strong><?php echo (int)($_SESSION['demo_dias_restantes'] ?? 0); ?> días restantes</strong></span>
+        </div>
+        <?php endif; ?>
         <?php echo $nav_actions; ?>
     </div>
-    <?php endif; ?>
 </nav>

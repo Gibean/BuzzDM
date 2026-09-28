@@ -27,6 +27,12 @@ class ProductRepository {
         return $stmt->fetchColumn() > 0;
     }
 
+    public function countByCompanyId(int $companyId): int {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM productos WHERE empresa_id = ? AND deleted_at IS NULL");
+        $stmt->execute([$companyId]);
+        return (int)$stmt->fetchColumn();
+    }
+
     public function findAll($filters = []) {
         $page = isset($filters['page']) ? max(1, intval($filters['page'])) : 1;
         $limit = isset($filters['limit']) ? max(1, intval($filters['limit'])) : 10;
