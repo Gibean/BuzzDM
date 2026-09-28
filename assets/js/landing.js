@@ -184,4 +184,178 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    // ============================================
+    // REGISTRO DEMO SAAS - MULTI-TENANT & FINGERPRINT
+    // ============================================
+
+    const modalOverlay = document.getElementById('demoModalOverlay');
+    const btnOpenHero = document.getElementById('btnOpenDemoModal');
+    const btnOpenCta = document.getElementById('btnOpenDemoModalCta');
+    const btnCloseModal = document.getElementById('btnCloseDemoModal');
+    const formRegisterDemo = document.getElementById('formRegisterDemo');
+    const alertBox = document.getElementById('demoAlertBox');
+    const btnSubmit = document.getElementById('btnSubmitDemo');
+    const inputFingerprint = document.getElementById('device_fingerprint');
+
+    // Inicializar FingerprintJS del cliente
+    let clientVisitorId = null;
+    if (window.FingerprintJS) {
+        FingerprintJS.load()
+            .then(fp => fp.get())
+            .then(result => {
+                clientVisitorId = result.visitorId;
+                if (inputFingerprint) {
+                    inputFingerprint.value = clientVisitorId;
+                }
+            })
+            .catch(err => {
+                console.warn('FingerprintJS fallback to backend generation:', err);
+            });
+    }
+
+    function openModal() {
+        if (!modalOverlay) return;
+        modalOverlay.style.display = 'flex';
+        // Forzar reflow para animación CSS
+        setTimeout(() => {
+            modalOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            const firstInput = document.getElementById('company_name');
+            if (firstInput) firstInput.focus();
+        }, 10);
+    }
+
+    function closeModal() {
+        if (!modalOverlay) return;
+        modalOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+        setTimeout(() => {
+            modalOverlay.style.display = 'none';
+            if (alertBox) {
+                alertBox.style.display = 'none';
+                alertBox.className = 'demo-alert';
+                alertBox.innerHTML = '';
+            }
+        }, 300);
+    }
+
+    if (btnOpenHero) btnOpenHero.addEventListener('click', openModal);
+    if (btnOpenCta) btnOpenCta.addEventListener('click', openModal);
+    if (btnCloseModal) btnCloseModal.addEventListener('click', closeModal);
+
+    // Cerrar al presionar Escape o clic fuera
+    if (modalOverlay) {
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) {
+                closeModal();
+            }
+        });
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
+            closeModal();
+        }
+    });
+
+    // Toggle de visibilidad de contraseña
+    const btnTogglePassword = document.getElementById('btnTogglePassword');
+    const inputPassword = document.getElementById('admin_password');
+    const toggleIcon = document.getElementById('togglePasswordIcon');
+
+    if (btnTogglePassword && inputPassword && toggleIcon) {
+        btnTogglePassword.addEventListener('click', function() {
+            const isPassword = inputPassword.getAttribute('type') === 'password';
+            inputPassword.setAttribute('type', isPassword ? 'text' : 'password');
+            toggleIcon.className = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+        });
+    }
+
+    // Envío del formulario de registro
+    if (formRegisterDemo) {
+        formRegisterDemo.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Asegurar que el input de huella digital esté poblado
+            if (inputFingerprint && clientVisitorId && !inputFingerprint.value) {
+                inputFingerprint.value = clientVisitorId;
+            }
+
+            const companyName = document.getElementById('company_name').value.trim();
+            const adminName = document.getElementById('admin_name').value.trim();
+            const adminEmail = document.getElementById('admin_email').value.trim();
+            const adminPassword = document.getElementById('admin_password').value;
+
+            // Validaciones rápidas del lado del cliente
+            if (companyName.length < 3) {
+                showAlert('El nombre de la empresa debe tener al menos 3 caracteres.', 'error');
+                return;
+            }
+            if (!adminEmail.includes('@') || !adminEmail.includes('.')) {
+                showAlert('Por favor ingresa un correo electrónico válido.', 'error');
+                return;
+            }
+            if (adminPassword.length < 8) {
+                showAlert('La contraseña debe tener al menos 8 caracteres.', 'error');
+                return;
+            }
+
+            // Estado visual de carga
+            setLoading(true);
+
+            try {
+                const response = await fetch('php/api_register_demo.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        company_name: companyName,
+                        admin_name: adminName,
+                        admin_email: adminEmail,
+                        admin_password: adminPassword,
+                        device_fingerprint: inputFingerprint ? inputFingerprint.value : null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    showAlert(data.message + '<br><small>Redirigiendo al inicio de sesión en 2 segundos...</small>', 'success');
+                    formRegisterDemo.reset();
+                    setTimeout(() => {
+                        window.location.href = data.data && data.data.login_url ? data.data.login_url : 'login.php';
+                    }, 2000);
+                } else {
+                    showAlert(data.message || 'No fue posible registrar la empresa demo.', 'error');
+                    setLoading(false);
+                }
+            } catch (err) {
+                console.error('Error al registrar empresa demo:', err);
+                showAlert('Error de conexión con el servidor. Por favor verifica que Apache y la base de datos estén activos.', 'error');
+                setLoading(false);
+            }
+        });
+    }
+
+    function showAlert(msg, type) {
+        if (!alertBox) return;
+        alertBox.className = 'demo-alert ' + type;
+        alertBox.innerHTML = msg;
+        alertBox.style.display = 'block';
+    }
+
+    function setLoading(isLoading) {
+        if (!btnSubmit) return;
+        btnSubmit.disabled = isLoading;
+        const btnText = btnSubmit.querySelector('.btn-text');
+        const btnSpinner = btnSubmit.querySelector('.btn-spinner');
+
+        if (btnText && btnSpinner) {
+            btnText.style.display = isLoading ? 'none' : 'inline-block';
+            btnSpinner.style.display = isLoading ? 'inline-block' : 'none';
+        }
+    }
 });
