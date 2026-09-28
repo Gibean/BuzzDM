@@ -802,7 +802,15 @@
                         })
                     });
 
-                    const data = await response.json();
+                    const rawText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (parseErr) {
+                        console.error('Server response was not JSON:', rawText);
+                        showAlert('Error en la respuesta del servidor: ' + (rawText.replace(/<[^>]*>?/gm, '').substring(0, 120) || 'Respuesta inválida.'));
+                        return;
+                    }
 
                     if (response.ok && data.success) {
                         registeredEmail = adminEmail;
@@ -817,7 +825,7 @@
                     }
                 } catch (err) {
                     console.error('Error:', err);
-                    showAlert('Error de comunicación con el servidor. Verifica tu conexión.');
+                    showAlert('Error al procesar la solicitud: ' + (err.message || 'Verifica tu conexión.'));
                 } finally {
                     setButtonLoading(btnSubmitRegister, false);
                 }
@@ -881,7 +889,14 @@
                         })
                     });
 
-                    const data = await response.json();
+                    const rawText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (parseErr) {
+                        showAlert('Error en la respuesta del servidor: ' + (rawText.replace(/<[^>]*>?/gm, '').substring(0, 120) || 'Respuesta inválida.'));
+                        return;
+                    }
 
                     if (response.ok && data.success) {
                         showAlert(data.message + '<br><small>Redirigiendo a tu panel...</small>', 'success');
@@ -893,7 +908,7 @@
                     }
                 } catch (err) {
                     console.error('Error:', err);
-                    showAlert('Error al procesar la verificación.');
+                    showAlert('Error al procesar la verificación: ' + (err.message || ''));
                 } finally {
                     setButtonLoading(btnSubmitVerify, false);
                 }
@@ -916,7 +931,15 @@
                         body: JSON.stringify({ email: registeredEmail })
                     });
 
-                    const data = await response.json();
+                    const rawText = await response.text();
+                    let data;
+                    try {
+                        data = JSON.parse(rawText);
+                    } catch (parseErr) {
+                        showAlert('Error en la respuesta: ' + rawText.substring(0, 80));
+                        btnResendCode.disabled = false;
+                        return;
+                    }
 
                     if (response.ok && data.success) {
                         showAlert(data.message, 'info');
