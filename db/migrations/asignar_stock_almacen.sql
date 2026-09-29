@@ -1,6 +1,13 @@
 -- =====================================================
 -- MIGRACIÓN: Asignar stock de productos al almacén principal
 -- Ejecutar después de tener almacenes y productos creados
+--
+-- !! SUPERADA — NO EJECUTAR EN INSTALACIONES MULTI-TENANT !!
+-- Este script opera sobre TODOS los productos y warehouses del sistema sin
+-- filtrar por empresa_id, lo que viola el aislamiento de tenants. El
+-- backfill equivalente con filtrado por tenant vive ahora en
+-- db/migrations/saas_integrity_002.sql (paso 4).
+-- Se conserva sólo como referencia histórica del modelo monolítico.
 -- =====================================================
 
 -- 1. Verificar el almacén principal

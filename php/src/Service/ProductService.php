@@ -20,11 +20,14 @@ class ProductService {
         $this->validateProductData($data);
 
         // Validación de límite operativo para versión Demo (SaaS)
-        $companyId = (int)($_SESSION['empresa_id'] ?? 1);
-        $isDemo = (bool)($_SESSION['is_demo'] ?? false);
+        // El tenant y la bandera de demo se leen del contexto, no de $_SESSION:
+        // un repositorio que resuelve el empresa_id por su cuenta y un servicio
+        // que lo resuelve por la sesión se desincronizan en cuanto uno de los
+        // dos cambia (CLI, cron, tests, API).
+        $isDemo = TenantContext::isDemo();
         $maxProducts = (int)($_ENV['DEMO_MAX_PRODUCTS'] ?? 50);
 
-        if ($isDemo && $this->repository->countByCompanyId($companyId) >= $maxProducts) {
+        if ($isDemo && $this->repository->countForTenant() >= $maxProducts) {
             throw new Exception("Límite de prueba alcanzado: Has registrado el máximo permitido de {$maxProducts} productos para la versión de demostración.");
         }
 

@@ -1,53 +1,56 @@
 <?php
-require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/BaseRepository.php';
 
-class ClienteRepository {
-    private $pdo;
+class ClienteRepository extends BaseRepository
+{
+    public function findById($id)
+    {
+        $where = ['id = ?'];
+        $params = [$id];
+        $this->scopeTenant($where, $params, '', "ClienteRepository::findById($id)");
 
-    public function __construct() {
-        $this->pdo = Database::getConnection();
+        $stmt = $this->pdo->prepare("SELECT * FROM clientes WHERE " . implode(' AND ', $where));
+        $stmt->execute($params);
+        return $this->assertTenantRow($stmt->fetch(PDO::FETCH_ASSOC) ?: null);
     }
 
-    public function findById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM clientes WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function findAll($filters = []) {
+    public function findAll($filters = [])
+    {
         $searchParam = isset($filters['search']) && $filters['search'] !== '' ? '%' . $filters['search'] . '%' : '%';
-        $sql = "SELECT * FROM clientes WHERE (id LIKE ? OR nombre LIKE ? OR email LIKE ? OR telefono LIKE ?)";
+        $where = ["(id LIKE ? OR nombre LIKE ? OR email LIKE ? OR telefono LIKE ?)"];
         $params = [$searchParam, $searchParam, $searchParam, $searchParam];
 
+        $this->scopeTenant($where, $params, '', 'ClienteRepository::findAll');
+
         if (empty($filters['show_deleted'])) {
-            $sql .= " AND deleted_at IS NULL";
+            $where[] = 'deleted_at IS NULL';
         }
 
         // Type filter: 'vip' or 'regular'
         if (!empty($filters['type'])) {
             if ($filters['type'] === 'vip') {
-                $sql .= " AND vip = 1";
+                $where[] = 'vip = 1';
             } elseif ($filters['type'] === 'regular') {
-                $sql .= " AND vip = 0";
+                $where[] = 'vip = 0';
             }
         }
 
         // Date filters
         if (!empty($filters['dateFrom'])) {
-            $sql .= " AND DATE(creado_at) >= ?";
+            $where[] = 'DATE(creado_at) >= ?';
             $params[] = $filters['dateFrom'];
         }
 
         if (!empty($filters['dateTo'])) {
-            $sql .= " AND DATE(creado_at) <= ?";
+            $where[] = 'DATE(creado_at) <= ?';
             $params[] = $filters['dateTo'];
         }
 
-        $sql .= " ORDER BY creado_at DESC";
+        $sql = 'SELECT * FROM clientes WHERE ' . implode(' AND ', $where) . ' ORDER BY creado_at DESC';
 
         // Add Pagination limits if needed here
         if (isset($filters['limit']) && isset($filters['offset'])) {
-            $sql .= " LIMIT " . (int)$filters['limit'] . " OFFSET " . (int)$filters['offset'];
+            $sql .= ' LIMIT ' . (int)$filters['limit'] . ' OFFSET ' . (int)$filters['offset'];
         }
 
         $stmt = $this->pdo->prepare($sql);
@@ -55,7 +58,15 @@ class ClienteRepository {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function findFrequent($limit = 5) {
+    public function findFrequent($limit = 5)
+    {
+        // Ambos lados del JOIN se acotan al tenant. Filtrar sólo c no basta:
+        // el COUNT(p.id) seguiría contando pedidos de otra empresa si algún
+        // cliente compartiera id, y además aparecerían clientes ajenos.
+        $where = ['c.deleted_at IS NULL', 'p.empresa_id = c.empresa_id'];
+        $params = [];
+        $this->scopeTenant($where, $params, 'c', 'ClienteRepository::findFrequent');
+
         $stmt = $this->pdo->prepare("
             SELECT
                 c.id,
@@ -66,51 +77,61 @@ class ClienteRepository {
                 clientes c
             JOIN
                 pedidos p ON c.id = p.cliente_id
-            WHERE
-                c.deleted_at IS NULL
+            WHERE " . implode(' AND ', $where) . "
             GROUP BY
                 c.id, c.nombre, c.email
             ORDER BY
                 total_orders DESC
             LIMIT " . (int)$limit
         );
-        $stmt->execute();
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function create($data) {
-        $stmt = $this->pdo->prepare("INSERT INTO clientes (id, nombre, email, telefono, direccion, notas, vip) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        return $stmt->execute([
-            $data['id'],
-            $data['nombre'],
-            $data['email'] ?? null,
-            $data['telefono'] ?? null,
-            $data['direccion'] ?? null,
-            $data['notas'] ?? null,
-            $data['vip'] ? 1 : 0
-        ]);
+    public function create($data)
+    {
+        // El id lo aporta el llamante (numeración compartida con otros módulos),
+        // por eso se pasa dentro de $data en lugar de dejar que lo genere MySQL.
+        return $this->insertTenant('clientes', [
+            'id' => $data['id'],
+            'nombre' => $data['nombre'],
+            'email' => $data['email'] ?? null,
+            'telefono' => $data['telefono'] ?? null,
+            'direccion' => $data['direccion'] ?? null,
+            'notas' => $data['notas'] ?? null,
+            'vip' => $data['vip'] ? 1 : 0,
+        ], 'ClienteRepository::create') > 0;
     }
 
-    public function update($id, $data) {
-        $stmt = $this->pdo->prepare("UPDATE clientes SET nombre = ?, email = ?, telefono = ?, direccion = ?, notas = ?, vip = ? WHERE id = ?");
-        return $stmt->execute([
-            $data['nombre'],
-            $data['email'] ?? null,
-            $data['telefono'] ?? null,
-            $data['direccion'] ?? null,
-            $data['notas'] ?? null,
-            $data['vip'] ? 1 : 0,
-            $id
-        ]);
+    public function update($id, $data)
+    {
+        return $this->applyTenantUpdate('clientes', [
+            'nombre' => $data['nombre'],
+            'email' => $data['email'] ?? null,
+            'telefono' => $data['telefono'] ?? null,
+            'direccion' => $data['direccion'] ?? null,
+            'notas' => $data['notas'] ?? null,
+            'vip' => $data['vip'] ? 1 : 0,
+        ], (int)$id, "ClienteRepository::update($id)");
     }
 
-    public function softDelete($id) {
-        $stmt = $this->pdo->prepare("UPDATE clientes SET deleted_at = NOW() WHERE id = ?");
-        return $stmt->execute([$id]);
+    public function softDelete($id)
+    {
+        return $this->applyTenantUpdate(
+            'clientes',
+            ['deleted_at' => date('Y-m-d H:i:s')],
+            (int)$id,
+            "ClienteRepository::softDelete($id)"
+        );
     }
 
-    public function restore($id) {
-        $stmt = $this->pdo->prepare("UPDATE clientes SET deleted_at = NULL WHERE id = ?");
-        return $stmt->execute([$id]);
+    public function restore($id)
+    {
+        return $this->applyTenantUpdate(
+            'clientes',
+            ['deleted_at' => null],
+            (int)$id,
+            "ClienteRepository::restore($id)"
+        );
     }
 }

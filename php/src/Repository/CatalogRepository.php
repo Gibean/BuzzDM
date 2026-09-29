@@ -1,32 +1,42 @@
 <?php
-require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/BaseRepository.php';
 
 /**
  * CatalogRepository - Handles DB operations for master catalogs
  * Supports: categorias, marcas, colores, materiales
  */
-class CatalogRepository {
-    private $pdo;
-
+class CatalogRepository extends BaseRepository
+{
     // Allowed catalog tables
     private $allowedCatalogs = ['categorias', 'marcas', 'colores', 'materiales'];
 
-    public function __construct() {
-        $this->pdo = getDbConnection();
+    public function isValidCatalog($catalog) {
+        return in_array($catalog, $this->allowedCatalogs, true);
     }
 
-    public function isValidCatalog($catalog) {
-        return in_array($catalog, $this->allowedCatalogs);
+    private function assertValidCatalog($catalog) {
+        if (!$this->isValidCatalog($catalog)) {
+            // El nombre de la tabla se interpola en el SQL, así que la lista
+            // blanca es la única barrera contra inyección: si se relaja, esto
+            // pasa a ser arbitrario.
+            throw new Exception("Catálogo no válido: $catalog");
+        }
     }
 
     /**
      * Get all items from a catalog
      */
     public function findAll($catalog) {
-        if (!$this->isValidCatalog($catalog)) {
-            throw new Exception("Catálogo no válido: $catalog");
-        }
-        $stmt = $this->pdo->query("SELECT * FROM $catalog ORDER BY nombre");
+        $this->assertValidCatalog($catalog);
+
+        $where = ['1=1'];
+        $params = [];
+        $this->scopeTenant($where, $params, '', "CatalogRepository::findAll($catalog)");
+
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM `$catalog` WHERE " . implode(' AND ', $where) . ' ORDER BY nombre'
+        );
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -34,13 +44,29 @@ class CatalogRepository {
      * Get summary data for all catalogs (for dropdowns)
      */
     public function getSummary() {
-        return [
-            'marcas' => $this->pdo->query("SELECT id, nombre FROM marcas ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC),
-            'categorias' => $this->pdo->query("SELECT id, nombre FROM categorias ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC),
-            'proveedores' => $this->pdo->query("SELECT id, nombre FROM proveedores ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC),
-            'colores' => $this->pdo->query("SELECT id, nombre FROM colores ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC),
-            'materiales' => $this->pdo->query("SELECT id, nombre FROM materiales ORDER BY nombre")->fetchAll(PDO::FETCH_ASSOC)
-        ];
+        // Este método alimenta los desplegables del formulario de producto.
+        // Sin filtro devolvía los catálogos de todas las empresas a la vez:
+        // un cliente demo podía ver y asignar la marca o el proveedor que otra
+        // empresa había creado, y el nombre de esos proveedores es información
+        // comercial de un tercero.
+        $resumen = [];
+        foreach (['marcas', 'categorias', 'proveedores', 'colores', 'materiales'] as $tabla) {
+            $where = ['1=1'];
+            $params = [];
+            $this->scopeTenant($where, $params, '', "CatalogRepository::getSummary($tabla)");
+
+            if ($tabla === 'proveedores') {
+                $where[] = 'deleted_at IS NULL';
+            }
+
+            $stmt = $this->pdo->prepare(
+                "SELECT id, nombre FROM `$tabla` WHERE " . implode(' AND ', $where) . ' ORDER BY nombre'
+            );
+            $stmt->execute($params);
+            $resumen[$tabla] = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+
+        return $resumen;
     }
 
     /**
@@ -59,71 +85,86 @@ class CatalogRepository {
      * Find by ID
      */
     public function findById($catalog, $id) {
-        if (!$this->isValidCatalog($catalog)) {
-            throw new Exception("Catálogo no válido: $catalog");
-        }
-        $stmt = $this->pdo->prepare("SELECT * FROM $catalog WHERE id = ?");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+        $this->assertValidCatalog($catalog);
+
+        $where = ['id = ?'];
+        $params = [$id];
+        $this->scopeTenant($where, $params, '', "CatalogRepository::findById($catalog, $id)");
+
+        $stmt = $this->pdo->prepare(
+            "SELECT * FROM `$catalog` WHERE " . implode(' AND ', $where)
+        );
+        $stmt->execute($params);
+        return $this->assertTenantRow($stmt->fetch(PDO::FETCH_ASSOC) ?: null);
     }
 
     /**
      * Create a new item
      */
     public function create($catalog, array $data) {
-        switch ($catalog) {
-            case 'categorias':
-                $stmt = $this->pdo->prepare("INSERT INTO categorias (nombre, descripcion) VALUES (?, ?)");
-                $stmt->execute([$data['nombre'], $data['descripcion'] ?? '']);
-                break;
-            case 'marcas':
-                $stmt = $this->pdo->prepare("INSERT INTO marcas (nombre, descripcion, sitio_web) VALUES (?, ?, ?)");
-                $stmt->execute([$data['nombre'], $data['descripcion'] ?? '', $data['sitio_web'] ?? '']);
-                break;
-            case 'colores':
-                $stmt = $this->pdo->prepare("INSERT INTO colores (nombre, codigo_hex) VALUES (?, ?)");
-                $stmt->execute([$data['nombre'], $data['codigo_hex'] ?? '#000000']);
-                break;
-            case 'materiales':
-                $stmt = $this->pdo->prepare("INSERT INTO materiales (nombre) VALUES (?)");
-                $stmt->execute([$data['nombre']]);
-                break;
-            default:
-                throw new Exception("Catálogo no soportado para creación");
-        }
-        return $this->pdo->lastInsertId();
+        $this->assertValidCatalog($catalog);
+
+        $columnas = match ($catalog) {
+            'categorias' => ['nombre' => $data['nombre'], 'descripcion' => $data['descripcion'] ?? ''],
+            'marcas' => [
+                'nombre' => $data['nombre'],
+                'descripcion' => $data['descripcion'] ?? '',
+                'sitio_web' => $data['sitio_web'] ?? '',
+            ],
+            'colores' => [
+                'nombre' => $data['nombre'],
+                'codigo_hex' => $data['codigo_hex'] ?? '#000000',
+            ],
+            'materiales' => ['nombre' => $data['nombre']],
+        };
+
+        return $this->insertTenant($catalog, $columnas, "CatalogRepository::create($catalog)");
     }
 
     /**
      * Update an item
      */
     public function update($catalog, $id, array $data) {
-        switch ($catalog) {
-            case 'categorias':
-                $stmt = $this->pdo->prepare("UPDATE categorias SET nombre = ?, descripcion = ? WHERE id = ?");
-                return $stmt->execute([$data['nombre'], $data['descripcion'] ?? '', $id]);
-            case 'marcas':
-                $stmt = $this->pdo->prepare("UPDATE marcas SET nombre = ?, descripcion = ?, sitio_web = ? WHERE id = ?");
-                return $stmt->execute([$data['nombre'], $data['descripcion'] ?? '', $data['sitio_web'] ?? '', $id]);
-            case 'colores':
-                $stmt = $this->pdo->prepare("UPDATE colores SET nombre = ?, codigo_hex = ? WHERE id = ?");
-                return $stmt->execute([$data['nombre'], $data['codigo_hex'] ?? '#000000', $id]);
-            case 'materiales':
-                $stmt = $this->pdo->prepare("UPDATE materiales SET nombre = ? WHERE id = ?");
-                return $stmt->execute([$data['nombre'], $id]);
-            default:
-                throw new Exception("Catálogo no soportado para actualización");
-        }
+        $this->assertValidCatalog($catalog);
+
+        $columnas = match ($catalog) {
+            'categorias' => ['nombre' => $data['nombre'], 'descripcion' => $data['descripcion'] ?? ''],
+            'marcas' => [
+                'nombre' => $data['nombre'],
+                'descripcion' => $data['descripcion'] ?? '',
+                'sitio_web' => $data['sitio_web'] ?? '',
+            ],
+            'colores' => [
+                'nombre' => $data['nombre'],
+                'codigo_hex' => $data['codigo_hex'] ?? '#000000',
+            ],
+            'materiales' => ['nombre' => $data['nombre']],
+        };
+
+        return $this->applyTenantUpdate(
+            $catalog,
+            $columnas,
+            (int)$id,
+            "CatalogRepository::update($catalog, $id)"
+        );
     }
 
     /**
      * Delete an item
+     *
+     * Borrado físico, no lógico: es el comportamiento previo y las claves
+     * foráneas de productos hacia catálogos están en ON DELETE SET NULL, así
+     * que los productos no se pierden, pero sí quedan sin marca ni categoría.
+     * Conviene una baja lógica en el futuro; mientras tanto lo que se corrige
+     * aquí es que no se pueda borrar el catálogo de otra empresa.
      */
     public function delete($catalog, $id) {
-        if (!$this->isValidCatalog($catalog)) {
-            throw new Exception("Catálogo no válido: $catalog");
-        }
-        $stmt = $this->pdo->prepare("DELETE FROM $catalog WHERE id = ?");
-        return $stmt->execute([$id]);
+        $this->assertValidCatalog($catalog);
+
+        return $this->deleteTenant(
+            $catalog,
+            (int)$id,
+            "CatalogRepository::delete($catalog, $id)"
+        ) > 0;
     }
 }

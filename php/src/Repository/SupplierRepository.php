@@ -1,79 +1,86 @@
 <?php
-require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/BaseRepository.php';
 
-class SupplierRepository {
-    private $pdo;
+class SupplierRepository extends BaseRepository
+{
+    public function findAll()
+    {
+        $where = ['deleted_at IS NULL'];
+        $params = [];
+        $this->scopeTenant($where, $params, '', 'SupplierRepository::findAll');
 
-    public function __construct() {
-        $this->pdo = getDbConnection();
-    }
-
-    public function findAll() {
         $stmt = $this->pdo->prepare("
-            SELECT id, nombre, rif, telefono, email, direccion, notas, creado_at
+            SELECT id, empresa_id, nombre, rif, telefono, email, direccion, notas, creado_at
             FROM proveedores
-            WHERE deleted_at IS NULL
+            WHERE " . implode(' AND ', $where) . "
             ORDER BY nombre ASC
         ");
-        $stmt->execute();
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function search($query, $limit = 10) {
+    public function search($query, $limit = 10)
+    {
+        $where = ['deleted_at IS NULL', '(nombre LIKE ? OR contacto_nombre LIKE ?)'];
+        $params = ['%' . $query . '%', '%' . $query . '%'];
+        $this->scopeTenant($where, $params, '', 'SupplierRepository::search');
+
         $stmt = $this->pdo->prepare("
             SELECT id, nombre, contacto_nombre, telefono
             FROM proveedores
-            WHERE deleted_at IS NULL
-              AND (nombre LIKE ? OR contacto_nombre LIKE ?)
+            WHERE " . implode(' AND ', $where) . "
             ORDER BY nombre ASC
-            LIMIT ?
+            LIMIT " . (int)$limit . "
         ");
-        $searchTerm = '%' . $query . '%';
-        $stmt->execute([$searchTerm, $searchTerm, $limit]);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function findById($id) {
-        $stmt = $this->pdo->prepare("SELECT * FROM proveedores WHERE id = ? AND deleted_at IS NULL");
-        $stmt->execute([$id]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+    public function findById($id)
+    {
+        $where = ['id = ?', 'deleted_at IS NULL'];
+        $params = [$id];
+        $this->scopeTenant($where, $params, '', "SupplierRepository::findById($id)");
+
+        $stmt = $this->pdo->prepare(
+            'SELECT * FROM proveedores WHERE ' . implode(' AND ', $where)
+        );
+        $stmt->execute($params);
+        return $this->assertTenantRow($stmt->fetch(PDO::FETCH_ASSOC) ?: null);
     }
 
-    public function create(array $data) {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO proveedores (nombre, rif, telefono, email, direccion, notas)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ");
-        $stmt->execute([
-            $data['nombre'],
-            $data['rif'] ?? null,
-            $data['telefono'] ?? null,
-            $data['email'] ?? null,
-            $data['direccion'] ?? null,
-            $data['notas'] ?? null
-        ]);
-        return $this->pdo->lastInsertId();
+    public function create(array $data)
+    {
+        return $this->insertTenant('proveedores', [
+            'nombre' => $data['nombre'],
+            'rif' => $data['rif'] ?? null,
+            'telefono' => $data['telefono'] ?? null,
+            'email' => $data['email'] ?? null,
+            'direccion' => $data['direccion'] ?? null,
+            'notas' => $data['notas'] ?? null,
+        ], 'SupplierRepository::create');
     }
 
-    public function update($id, array $data) {
-        $stmt = $this->pdo->prepare("
-            UPDATE proveedores
-            SET nombre = ?, rif = ?, telefono = ?, email = ?, direccion = ?, notas = ?, actualizado_at = NOW()
-            WHERE id = ? AND deleted_at IS NULL
-        ");
-        return $stmt->execute([
-            $data['nombre'],
-            $data['rif'] ?? null,
-            $data['telefono'] ?? null,
-            $data['email'] ?? null,
-            $data['direccion'] ?? null,
-            $data['notas'] ?? null,
-            $id
-        ]);
+    public function update($id, array $data)
+    {
+        return $this->applyTenantUpdate('proveedores', [
+            'nombre' => $data['nombre'],
+            'rif' => $data['rif'] ?? null,
+            'telefono' => $data['telefono'] ?? null,
+            'email' => $data['email'] ?? null,
+            'direccion' => $data['direccion'] ?? null,
+            'notas' => $data['notas'] ?? null,
+            'actualizado_at' => date('Y-m-d H:i:s'),
+        ], (int)$id, "SupplierRepository::update($id)");
     }
 
-    public function delete($id) {
-        $stmt = $this->pdo->prepare("UPDATE proveedores SET deleted_at = NOW() WHERE id = ?");
-        return $stmt->execute([$id]);
+    public function delete($id)
+    {
+        return $this->applyTenantUpdate(
+            'proveedores',
+            ['deleted_at' => date('Y-m-d H:i:s')],
+            (int)$id,
+            "SupplierRepository::delete($id)"
+        );
     }
 }

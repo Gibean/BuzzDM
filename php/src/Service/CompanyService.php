@@ -110,13 +110,61 @@ class CompanyService {
                 ]);
             }
 
-            // 5. Crear directorio de uploads aislado para la empresa
+            // 5. Inyectar ajustes y catálogos base del tenant
+            //
+            //    Sin esto la demo nueva nace con los desplegables vacíos y con
+            //    los ajustes en NULL: el nombre de la tienda saldría en blanco
+            //    en la factura y la moneda sería indeterminada. Los ajustes se
+            //    copian de los valores de la empresa principal porque son
+            //    preferencias de negocio, no datos privados.
+            $defaultSettings = [
+                'store_name' => [$companyName, 'Nombre mostrado en factura y sitio'],
+                'currency' => ['VES', 'Moneda del sistema'],
+                'tax_percent' => ['16.00', 'Porcentaje de IVA aplicado a ventas'],
+                'backup_fallback_enabled' => ['0', 'Habilitar sistema de backup automático fallback'],
+            ];
+            $stmtCfg = $this->pdo->prepare("
+                INSERT INTO configuraciones (empresa_id, clave, valor, descripcion, fecha_actualizacion)
+                VALUES (:empresa_id, :clave, :valor, :desc, NOW())
+            ");
+            foreach ($defaultSettings as $clave => [$valor, $descripcion]) {
+                $stmtCfg->execute([
+                    ':empresa_id' => $companyId,
+                    ':clave' => $clave,
+                    ':valor' => $valor,
+                    ':desc' => $descripcion,
+                ]);
+            }
+
+            // Colores y materiales: catálogos por empresa (migración 003), así
+            // que una demo nueva necesita su propio juego y no puede leer el
+            // de la empresa principal.
+            $demoColores = [
+                ['Negro', '#000000'], ['Blanco', '#FFFFFF'], ['Azul', '#1E5AA8'],
+                ['Rojo', '#C62828'], ['Verde', '#2E7D32'], ['Gris', '#757575'],
+            ];
+            $stmtColor = $this->pdo->prepare("
+                INSERT INTO colores (empresa_id, nombre, codigo_hex) VALUES (:empresa_id, :nombre, :hex)
+            ");
+            foreach ($demoColores as [$nombre, $hex]) {
+                $stmtColor->execute([':empresa_id' => $companyId, ':nombre' => $nombre, ':hex' => $hex]);
+            }
+
+            $demoMateriales = ['Algodón', 'Poliéster', 'Denim', 'Lana', 'Sintético', 'Lino'];
+            $stmtMat = $this->pdo->prepare("
+                INSERT INTO materiales (empresa_id, nombre) VALUES (:empresa_id, :nombre)
+            ");
+            foreach ($demoMateriales as $nombre) {
+                $stmtMat->execute([':empresa_id' => $companyId, ':nombre' => $nombre]);
+            }
+
+            // 6. Crear directorio de uploads aislado para la empresa
             $uploadDir = __DIR__ . "/../../../assets/img/uploads/companies/{$companyId}/";
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
 
-            // 6. Generar y enviar código de verificación de 6 dígitos
+            // 7. Generar y enviar código de verificación de 6 dígitos
             $otpCode = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
             $otpExpires = (new DateTime())->modify('+15 minutes')->format('Y-m-d H:i:s');
 

@@ -161,6 +161,7 @@ if (!isset($_SESSION['usuario_id'])) {
 
 // Conexión a la base de datos
 require_once __DIR__ . '/db.php'; // This now provides the getDbConnection() function
+require_once __DIR__ . '/src/Tenant/TenantContext.php';
 $pdo = getDbConnection(); // Call the function to get the PDO object
 
 // Verificar si el usuario está logeado y obtener su rol
@@ -168,11 +169,11 @@ if (isset($_SESSION['usuario_id'])) {
     $usuarioId = $_SESSION['usuario_id'];
 
     // Consultar el rol, nombre y empresa_id del usuario
-    $query = "SELECT u.nombre, u.rol, COALESCE(u.empresa_id, 1) as empresa_id,
+    $query = "SELECT u.nombre, u.rol, u.empresa_id,
                      e.nombre as empresa_nombre, e.is_demo, e.status as empresa_status, e.trial_ends_at,
                      TIMESTAMPDIFF(DAY, NOW(), e.trial_ends_at) as demo_dias_restantes
               FROM usuarios u
-              LEFT JOIN empresa e ON e.id = COALESCE(u.empresa_id, 1)
+              LEFT JOIN empresa e ON e.id = u.empresa_id
               WHERE u.id = ?";
     $stmt = $pdo->prepare($query);
     $stmt->bindParam(1, $usuarioId, PDO::PARAM_INT);
@@ -180,6 +181,20 @@ if (isset($_SESSION['usuario_id'])) {
     $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($usuario) {
+        // Sin empresa_id no hay tenant válido: se rechaza la sesión en lugar de
+        // caer al tenant 1 por defecto, que era como los datos de una empresa
+        // demo acababan mezclados con los de la empresa principal.
+        if (empty($usuario['empresa_id'])) {
+            session_unset();
+            session_destroy();
+            if ($is_api_call) {
+                json_auth_error('Tu usuario no está asociado a ninguna empresa. Contacta al administrador.');
+            } else {
+                header('Location: login?error=sin_empresa');
+                exit();
+            }
+        }
+
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
         $_SESSION['usuario_rol'] = $usuario['rol'];
         $_SESSION['empresa_id'] = (int)$usuario['empresa_id'];
@@ -187,18 +202,26 @@ if (isset($_SESSION['usuario_id'])) {
         $_SESSION['is_demo'] = (bool)($usuario['is_demo'] ?? false);
         $_SESSION['demo_dias_restantes'] = max(0, (int)($usuario['demo_dias_restantes'] ?? 0));
 
-        // --- Middleware de Control de Expiración SaaS Demo ---
-        if ($_SESSION['is_demo'] && !empty($usuario['trial_ends_at'])) {
-            $trialExpires = new DateTime($usuario['trial_ends_at']);
-            $ahora = new DateTime();
+        // Todo lo que se ejecute a partir de aquí hereda este tenant.
+        TenantContext::set((int)$usuario['empresa_id'], $_SESSION['is_demo']);
 
-            if ($ahora > $trialExpires || $usuario['empresa_status'] === 'expired') {
+        // --- Middleware de Control de Expiración SaaS Demo ---
+        if ($_SESSION['is_demo'] && $usuario['empresa_status'] !== null) {
+            $trialVencido = $usuario['empresa_status'] === 'expired'
+                || $usuario['empresa_status'] === 'suspended';
+
+            $trialAgotado = false;
+            if (!empty($usuario['trial_ends_at'])) {
+                $trialAgotado = (new DateTime()) > new DateTime($usuario['trial_ends_at']);
+            }
+
+            if ($trialVencido || $trialAgotado) {
                 $_SESSION['demo_expired'] = true;
                 if ($is_api_call) {
                     header('Content-Type: application/json');
                     http_response_code(403);
                     echo json_encode([
-                        'success' => false, 
+                        'success' => false,
                         'code' => 'TRIAL_EXPIRED',
                         'message' => 'El período de prueba de 15 días ha finalizado. Por favor exporta tus datos.'
                     ]);
