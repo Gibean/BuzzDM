@@ -297,7 +297,7 @@
                         <div class="col-md-4">
                             <div class="stat-card">
                                 <div class="stat-label">VERSIÓN</div>
-                                <div class="stat-value">v1.1.0.0</div>
+                                <div class="stat-value">v1.2</div>
                                 <div class="stat-sub">Build 2026.04</div>
                             </div>
                         </div>
@@ -327,10 +327,6 @@
                                     <i class="fas fa-envelope"></i>
                                     <span>buzzdatamanager@gmail.com</span>
                                 </div>
-                                <div class="support-item" style="justify-content: center;">
-                                    <i class="fas fa-phone"></i>
-                                    <span>+58 412 875 9068</span>
-                                </div>
                             </div>
                             
                             <!-- Manual Button - Prominent -->
@@ -353,9 +349,10 @@
                                 <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA Logo" class="legal-logo mb-3" style="width: 55px; opacity: 0.9;">
                                 
                                 <div class="license-text">
-                                    <p class="mb-2">© 2025-2026 <b>Derechos de Autor:</b><br> Gisvel Aray y Yeicson Acosta.</p>
-                                    <p class="mb-2"><b>Licencia de Uso Exclusivo:</b><br> Librería Txiki C.A.</p>
-                                    <p class="mb-0 mt-3" style="font-size: 0.70rem; opacity: 0.8; line-height: 1.4;"><b>Derechos de Propiedad y Redistribución:</b><br> Universidad Politécnica Territorial "José Antonio Anzoátegui" (UPTJAA).</p>
+                                    <p class="mb-2">© 2025-2026 <b>Desarrollado por:</b><br> Gisvel Aray y Yeicson Acosta.</p>
+                                    <p class="mb-2"><b>Uso:</b> Proyecto académico con fines demostrativos y educativos.</p>
+                                    <p class="mb-2"><b>Licencia:</b> CC BY-NC-SA 4.0</p>
+                                    <p class="mb-0 mt-3" style="font-size: 0.70rem; opacity: 0.8; line-height: 1.4;">Proyecto académico demostrativo. Queda prohibida su comercialización por terceros. El escudo identifica el contexto académico del trabajo: la universidad no es titular del código ni autoriza su redistribución.</p>
                                 </div>
                             </div>
                         </div>

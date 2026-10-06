@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once 'sesion.php';
 require_once 'db.php'; // Provides $pdo
 
 try {
@@ -9,10 +10,12 @@ try {
             estado_pago,
             COUNT(*) as total_pedidos
         FROM pedidos
+        WHERE empresa_id = :empresa_id
         GROUP BY estado_pago;
     ";
 
-    $stmt = $pdo->query($query);
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['empresa_id' => TenantContext::require('api_sales_by_status_chart')]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $labels = [];

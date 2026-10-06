@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/php/security.php';
+
+// Las cabeceras deben emitirse antes de cualquier salida HTML.
+sendSecurityHeaders();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -499,7 +505,7 @@
                                 id="admin_name"
                                 name="admin_name"
                                 required
-                                placeholder="Ej: Gisvel Aray"
+                                placeholder="Ej: Gisvel Aray y Yeicson Acosta"
                             >
                         </div>
 
@@ -594,8 +600,8 @@
                 <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; color: var(--buzz-text-muted); font-size: 0.68rem; line-height: 1.6;">
                     <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA" style="width: 36px; opacity: 0.8; display: block; margin: 0 auto 0.5rem;">
                     <p style="margin: 0;">&copy; 2025-2026 <strong style="color: var(--buzz-text-color);">Gisvel Aray y Yeicson Acosta</strong></p>
-                    <p style="margin: 0;">Licencia de uso: <strong style="color: var(--buzz-text-color);">Librería Txiki C.A.</strong></p>
-                    <p style="margin: 0; font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">Derechos institucionales: UPTJAA</p>
+                    <p style="margin: 0;">Licencia: <strong style="color: var(--buzz-text-color);">CC BY-NC-SA 4.0</strong></p>
+                    <p style="margin: 0; font-size: 0.6rem; opacity: 0.6; margin-top: 2px;">Proyecto académico demostrativo</p>
                 </div>
 
             </div>
@@ -604,7 +610,7 @@
 
     <!-- Scripts -->
     <script src="https://openfpcdn.io/fingerprintjs/v4"></script>
-    <script>
+    <script nonce="<?= cspNonce() ?>">
         // Hexagon Canvas Background
         const canvas = document.getElementById('hexagonCanvas');
         if (canvas) {

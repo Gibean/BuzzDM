@@ -1,4 +1,11 @@
 <?php
+
+// Solo ejecucion desde linea de comandos: estos scripts introspeccionan el esquema
+// y algunos escriben en la base de datos. Sobre HTTP devuelven 403.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit("403 - Solo ejecutable desde CLI.\n");
+}
 /**
  * Comprueba que las tablas que los repositorios dan por tenant tengan la
  * columna empresa_id. Uso: php db/tools/_check_tenant_columns.php

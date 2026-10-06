@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 class CargoRepository {
     private $pdo;
@@ -158,14 +159,15 @@ class CargoRepository {
 
     public function createHeader($data) {
         $sql = "INSERT INTO cargos_existencias
-                (codigo, fecha, concepto, concepto_otro, proveedor_id, almacen_id,
+                (empresa_id, codigo, fecha, concepto, concepto_otro, proveedor_id, almacen_id,
                  referencia_externa, notas, registrado_por, estado)
                 VALUES
-                (:codigo, :fecha, :concepto, :concepto_otro, :proveedor_id, :almacen_id,
+                (:empresa_id, :codigo, :fecha, :concepto, :concepto_otro, :proveedor_id, :almacen_id,
                  :referencia, :notas, :usuario_id, :estado)";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            ':empresa_id' => TenantContext::require('CargoRepository::createHeader'),
             ':codigo' => $data['codigo'],
             ':fecha' => $data['fecha'],
             ':concepto' => $data['concepto'],
@@ -284,14 +286,15 @@ class CargoRepository {
 
             // Insert new price (use INSERT IGNORE to handle duplicate key on same date)
             $sqlInsert = "INSERT INTO precios_proveedor
-                          (producto_id, proveedor_id, precio_compra, fecha_registro, cargo_id, es_ultimo)
-                          VALUES (?, ?, ?, ?, ?, 1)
+                          (empresa_id, producto_id, proveedor_id, precio_compra, fecha_registro, cargo_id, es_ultimo)
+                          VALUES (?, ?, ?, ?, ?, ?, 1)
                           ON DUPLICATE KEY UPDATE
                             precio_compra = VALUES(precio_compra),
                             cargo_id = VALUES(cargo_id),
                             es_ultimo = 1";
             $stmtInsert = $this->pdo->prepare($sqlInsert);
             $stmtInsert->execute([
+                TenantContext::require('CargoRepository::registrarPrecios'),
                 $detalle['producto_id'],
                 $proveedorId,
                 $detalle['costo_unitario'],

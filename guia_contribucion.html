@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía de Contribución con Git — Buzz Data Manager</title>
+  <meta name="description" content="Guía paso a paso para colaborar y contribuir al proyecto académico de código abierto Buzz Data Manager con Git y GitHub.">
+  <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/landing/landing.css?v=3.2.0">
+
+  <style>
+    .guide-page {
+      padding: var(--space-20) 0 var(--space-24);
+      max-width: 860px;
+      margin-inline: auto;
+    }
+    .guide-header {
+      margin-bottom: var(--space-12);
+      border-bottom: 1px solid var(--c-border);
+      padding-bottom: var(--space-8);
+    }
+    .guide-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: var(--text-xs);
+      font-weight: 700;
+      color: var(--c-accent);
+      background: var(--c-accent-dim);
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-4);
+    }
+    .guide-title {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 700;
+      color: var(--c-text-1);
+      line-height: 1.2;
+      margin-bottom: var(--space-4);
+    }
+    .guide-lead {
+      font-size: var(--text-lg);
+      color: var(--c-text-2);
+      line-height: 1.65;
+    }
+    .guide-step {
+      margin-bottom: var(--space-12);
+    }
+    .guide-step-title {
+      font-size: var(--text-xl);
+      font-weight: 600;
+      color: var(--c-text-1);
+      margin-bottom: var(--space-3);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .guide-step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--c-surface-alt);
+      border: 1px solid var(--c-border);
+      color: var(--c-accent);
+      font-size: var(--text-xs);
+      font-weight: 700;
+    }
+    .guide-step p {
+      color: var(--c-text-2);
+      margin-bottom: var(--space-4);
+      font-size: var(--text-base);
+    }
+    .code-block {
+      background: #080b10;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      color: #cbd5e1;
+      overflow-x: auto;
+      margin-bottom: var(--space-4);
+      line-height: 1.6;
+    }
+    .code-comment { color: #64748b; }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--c-accent);
+      margin-bottom: var(--space-8);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body class="buzz-landing">
+
+  <header class="site-header">
+    <div class="container">
+      <div class="nav-wrapper">
+        <a href="index.html" class="brand-logo-wrap" aria-label="Volver a Inicio">
+          <img src="assets/img/logov1_long.png" alt="Buzz Data Manager" class="brand-logo-img" width="148" height="34">
+        </a>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <a href="index.html" class="btn btn-ghost" style="font-size:var(--text-sm);">← Volver a la Demo</a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="btn btn-primary" style="font-size:var(--text-xs);padding:0.45rem 1rem;">
+            <i class="fa-brands fa-github"></i> Ver Repositorio
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="guide-page">
+
+      <a href="index.html" class="back-btn">← Volver a la portada de la demo</a>
+
+      <div class="guide-header">
+        <span class="guide-badge"><i class="fa-solid fa-code-branch"></i> Código Abierto · Proyecto Académico</span>
+        <h1 class="guide-title">Guía de Contribución con Git</h1>
+        <p class="guide-lead">
+          Buzz Data Manager es un proyecto académico de código abierto. Si deseas colaborar con correcciones de errores, optimizaciones de consultas o mejoras en la interfaz, sigue este flujo estándar de trabajo con Git.
+        </p>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="guide-step">
+        <h2 class="guide-step-title"><span class="guide-step-num">1</span> Clonar el repositorio y configurar el entorno</h2>
+        <p>Asegúrate de tener Git instalado y un entorno local con PHP 8.x y MySQL (como XAMPP). Clona el repositorio oficial:</p>
+        <div class="code-block">
+          <span class="code-comment"># Clonar repositorio localmente</span><br>
+          git clone https://github.com/tu-usuario/BuzzDM.git<br>
+          cd BuzzDM
+        </div>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="guide-step">
+        <h2 class="guide-step-title"><span class="guide-step-num">2</span> Crear una rama para tu mejora (Feature Branch)</h2>
+        <p>Nunca hagas commits directos sobre la rama <code>main</code>. Crea una rama descriptiva para tu tarea:</p>
+        <div class="code-block">
+          <span class="code-comment"># Asegúrate de estar actualizado con main</span><br>
+          git checkout main<br>
+          git pull origin main<br><br>
+          <span class="code-comment"># Crear y cambiar a tu nueva rama</span><br>
+          git checkout -b feature/optimizacion-inventario
+        </div>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="guide-step">
+        <h2 class="guide-step-title"><span class="guide-step-num">3</span> Convención de Mensajes de Commit (Conventional Commits)</h2>
+        <p>Seguimos el estándar de Conventional Commits en español o inglés técnico:</p>
+        <div class="code-block">
+          feat(inventario): agregar filtro rápido por categoría en listado<br>
+          fix(pedidos): corregir validación de stock al despachar orden<br>
+          docs(readme): actualizar requisitos mínimos de PHP y MySQL<br>
+          refactor(db): optimizar consulta en search_api.php
+        </div>
+        <p>Para registrar tus cambios:</p>
+        <div class="code-block">
+          git add .<br>
+          git commit -m "feat(inventario): agregar filtro rápido por categoría"
+        </div>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="guide-step">
+        <h2 class="guide-step-title"><span class="guide-step-num">4</span> Publicar la rama y abrir Pull Request (PR)</h2>
+        <p>Sube tu rama a tu repositorio remoto en GitHub:</p>
+        <div class="code-block">
+          git push -u origin feature/optimizacion-inventario
+        </div>
+        <p>Luego dirígete a GitHub y haz clic en <strong>"Compare & pull request"</strong>. Describe los cambios realizados, el problema que resuelve y las pruebas ejecutadas.</p>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="guide-step">
+        <h2 class="guide-step-title"><span class="guide-step-num">5</span> Contacto Académico</h2>
+        <p>Si tienes dudas sobre la arquitectura o deseas proponer una colaboración de investigación, escríbenos directamente a:</p>
+        <div class="code-block">
+          buzzdatamanager@gmail.com
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container" style="text-align:center;">
+      <span class="footer-legal">
+        &copy; 2026 Buzz Data Manager. Software libre para fines de demostración e investigación académica.
+      </span>
+    </div>
+  </footer>
+
+</body>
+</html>

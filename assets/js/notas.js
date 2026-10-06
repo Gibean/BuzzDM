@@ -515,7 +515,7 @@ function addChecklistItem(tarea = '', completada = 0) {
             <div class="input-group-text bg-transparent border-0">
                 <input type="checkbox" class="form-check-input mt-0 check-done" ${completada == 1 ? 'checked' : ''} onchange="updateChecklistProgress()">
             </div>
-            <input type="text" class="form-control form-control-buzz check-task" value="${tarea}" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addChecklistItem();}">
+            <input type="text" class="form-control form-control-buzz check-task" value="${escapeHTML(tarea)}" placeholder="Nueva tarea..." onkeydown="if(event.key==='Enter'){event.preventDefault(); addChecklistItem();}">
             <button type="button" class="btn btn-outline-buzz" onclick="addChecklistItem()" title="Añadir otra"><i class="fas fa-plus"></i></button>
             <button type="button" class="btn btn-outline-danger" onclick="this.closest('.checklist-item').remove(); updateChecklistProgress();">
                 <i class="fas fa-trash"></i>
@@ -561,11 +561,11 @@ function addAttachmentRow(nombre = '', url = '') {
     div.className = 'row g-2 mb-2 attachment-row align-items-center';
     div.innerHTML = `
         <div class="col-4">
-            <input type="text" class="form-control form-control-buzz form-control-sm adj-name" value="${nombre}" placeholder="Nombre (ej: PDF)">
+            <input type="text" class="form-control form-control-buzz form-control-sm adj-name" value="${escapeHTML(nombre)}" placeholder="Nombre (ej: PDF)">
         </div>
         <div class="col-7">
             <div class="input-group input-group-sm">
-                <input type="text" class="form-control form-control-buzz adj-url" value="${url}" placeholder="URL del enlace" onkeydown="if(event.key==='Enter'){event.preventDefault(); addAttachmentRow();}">
+                <input type="text" class="form-control form-control-buzz adj-url" value="${escapeHTML(url)}" placeholder="URL del enlace" onkeydown="if(event.key==='Enter'){event.preventDefault(); addAttachmentRow();}">
                 <button type="button" class="btn btn-outline-buzz" onclick="addAttachmentRow()" title="Añadir otro"><i class="fas fa-plus"></i></button>
                 ${url ? `<a href="${url}" target="_blank" class="btn btn-outline-buzz"><i class="fas fa-external-link-alt"></i></a>` : ''}
             </div>
@@ -1112,7 +1112,7 @@ function addProductRow(data = null) {
         <div class="col-8 position-relative">
             <div class="input-group input-group-sm">
                 <input type="text" class="form-control form-control-buzz product-search"
-                    value="${data ? `${data.nombre} (${data.sku})` : ''}"
+                    value="${data ? escapeHTML(`${data.nombre} (${data.sku})`) : ''}"
                     placeholder="Buscar por nombre o SKU..." ${data ? 'readonly' : ''}>
                 <button type="button" class="btn btn-outline-buzz" onclick="addProductRow()" title="Vincular otro"><i class="fas fa-plus"></i></button>
             </div>

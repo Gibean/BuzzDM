@@ -5,6 +5,10 @@
  */
 
 require_once __DIR__ . '/php/config.php';
+require_once __DIR__ . '/php/security.php';
+
+// Las cabeceras deben emitirse antes de cualquier salida HTML.
+sendSecurityHeaders();
 
 $baseUrl = base_url();
 
@@ -30,7 +34,7 @@ $invitaciones = [
     [
         'key'    => '04',
         'nombre' => 'Sheira Jaramillo',
-        'rol'    => 'Gerente General — Txiki C.A.',
+        'rol'    => 'Gerente General — Proyecto académico demostrativo',
         'icon'   => '🏢',
     ],
     [
@@ -317,7 +321,7 @@ $invitaciones = [
 
 <div class="toast" id="toast">✓ Link copiado al portapapeles</div>
 
-<script>
+<script nonce="<?= cspNonce() ?>">
 function copyLink(link, btn) {
     navigator.clipboard.writeText(link).then(() => {
         btn.classList.add('copied');

@@ -275,7 +275,7 @@
     <script src="assets/js/utils.js"></script>
     <script src="assets/js/modal.js"></script>
     <script src="assets/js/confirmation_modal.js"></script>
-    <script>
+    <script nonce="<?= cspNonce() ?>">
         // =====================================================
         // PROVEEDORES MANAGEMENT
         // =====================================================

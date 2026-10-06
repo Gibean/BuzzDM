@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../Tenant/TenantContext.php';
+
 /**
  * RequisicionRepository
  * Data access layer for purchase requisitions
@@ -39,10 +41,12 @@ class RequisicionRepository {
                 FROM precios_proveedor pp
                 JOIN proveedores p ON p.id = pp.proveedor_id
                 WHERE pp.producto_id = ? AND pp.es_ultimo = 1
+                  AND pp.empresa_id = ? AND p.empresa_id = ?
                 ORDER BY pp.precio_compra ASC
                 LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$productoId]);
+        $tenantId = TenantContext::require('RequisicionRepository::getBestSupplierFromPrices');
+        $stmt->execute([$productoId, $tenantId, $tenantId]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
@@ -59,10 +63,12 @@ class RequisicionRepository {
                 WHERE dce.producto_id = ?
                   AND ce.estado = 'confirmado'
                   AND ce.proveedor_id IS NOT NULL
+                  AND ce.empresa_id = ? AND prov.empresa_id = ?
                 ORDER BY dce.costo_unitario ASC, ce.fecha DESC
                 LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$productoId]);
+        $tenantId = TenantContext::require('RequisicionRepository::getBestSupplierFromCargos');
+        $stmt->execute([$productoId, $tenantId, $tenantId]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
@@ -74,9 +80,11 @@ class RequisicionRepository {
                        p.costo_ultimo as precio_compra, NULL as fecha_registro
                 FROM productos p
                 LEFT JOIN proveedores prov ON prov.id = p.proveedor_id
-                WHERE p.id = ? AND p.proveedor_id IS NOT NULL";
+                WHERE p.id = ? AND p.proveedor_id IS NOT NULL
+                  AND p.empresa_id = ? AND prov.empresa_id = ?";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$productoId]);
+        $tenantId = TenantContext::require('RequisicionRepository::getDefaultSupplier');
+        $stmt->execute([$productoId, $tenantId, $tenantId]);
         return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
 
@@ -85,8 +93,12 @@ class RequisicionRepository {
      * Used for auto-populating new requisitions
      */
     public function getProductosStockBajo(): array {
-        $sql = "SELECT * FROM vw_productos_stock_bajo_activos";
-        $stmt = $this->pdo->query($sql);
+        // La vista proyecta empresa_id desde la migración 007. Sin el filtro,
+        // una requisición del tenant 31 ofrecía para comprar los productos
+        // críticos de todos los tenants del servidor, con su nombre y su stock.
+        $sql = "SELECT * FROM vw_productos_stock_bajo_activos WHERE empresa_id = ?";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([TenantContext::require('RequisicionRepository::getProductosStockBajo')]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -193,10 +205,11 @@ class RequisicionRepository {
     }
 
     public function createHeader(array $data): int {
-        $sql = "INSERT INTO requisiciones (codigo, fecha_solicitud, estado, prioridad, notas, usuario_id)
-                VALUES (?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO requisiciones (empresa_id, codigo, fecha_solicitud, estado, prioridad, notas, usuario_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            TenantContext::require('RequisicionRepository::createHeader'),
             $data['codigo'],
             $data['fecha_solicitud'],
             $data['estado'] ?? 'pendiente',

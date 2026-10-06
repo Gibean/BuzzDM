@@ -2,10 +2,38 @@
 // Inicia la sesión en cada página que lo requiera
 
 require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/security.php';
+
+// Cabeceras de endurecimiento (CSP con nonce + HSTS) antes de emitir salida.
+sendSecurityHeaders();
 
 use function PHPSTORM_META\map;
 
+/**
+ * Endurece la cookie de sesion antes de iniciarla.
+ *
+ * Sin esto, PHP usa los valores de php.ini: en el servidor de desarrollo eran
+ * session.cookie_httponly vacio y session.cookie_samesite vacio, es decir una
+ * cookie de sesion legible por JavaScript y sin proteccion SameSite.
+ */
 if (session_status() == PHP_SESSION_NONE) {
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')
+        || ((int)($_SERVER['SERVER_PORT'] ?? 0) === 443);
+
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => '/',
+        'secure'   => $isHttps,
+        'httponly' => true,   // inaccesible desde document.cookie
+        'samesite' => 'Lax',  // no se envia en peticiones POST de terceros
+    ]);
+
+    // Evita que PHP acepte un identificador de sesion no emitido por el servidor
+    // (session fixation). php.ini traia session.use_strict_mode=0.
+    ini_set('session.use_strict_mode', '1');
+    ini_set('session.use_only_cookies', '1');
+
     session_start();
 }
 
@@ -109,54 +137,15 @@ function json_auth_error($message) {
     exit;
 }
 
-/**
- * Check if request has valid dev token (only for development mode)
- * This allows Swagger UI and other API testing tools to bypass session auth
- * @return bool Whether dev token is valid
- */
-function checkDevToken() {
-    // Load .env if not already loaded
-    if (!getenv('APP_ENV')) {
-        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/..');
-        $dotenv->safeLoad();
-    }
-
-    // Only allow dev token in development mode
-    if (getenv('APP_ENV') !== 'development') {
-        return false;
-    }
-
-    $devToken = getenv('DEV_API_TOKEN');
-    if (empty($devToken)) {
-        return false;
-    }
-
-    // Check X-Dev-Token header
-    $headerToken = $_SERVER['HTTP_X_DEV_TOKEN'] ?? '';
-    if (!empty($headerToken) && hash_equals($devToken, $headerToken)) {
-        return true;
-    }
-
-    return false;
-}
-
-// Si no existe la variable de sesión del ID de usuario, verificar dev token como alternativa
+// Sin sesión activa no hay acceso. No existe bypass por token de desarrollo:
+// concede administrador completo con una sola cabecera HTTP, y el valor del token
+// se publicaba en openapi.yaml (accesible sin autenticación).
 if (!isset($_SESSION['usuario_id'])) {
-    // Check if dev token is provided (for API testing)
-    if ($is_api_call && checkDevToken()) {
-        // Dev token valid - set a fake admin session for API testing
-        $_SESSION['usuario_id'] = 1; // Assume admin user ID 1
-        $_SESSION['usuario_nombre'] = 'API Dev User';
-        $_SESSION['usuario_rol'] = 'admin';
-        $_SESSION['is_dev_token_session'] = true;
-    } else {
-        if ($is_api_call) {
-            json_auth_error('No autenticado. Por favor, inicia sesión.');
-        } else {
-            header('Location: login');
-            exit();
-        }
+    if ($is_api_call) {
+        json_auth_error('No autenticado. Por favor, inicia sesión.');
     }
+    header('Location: login');
+    exit();
 }
 
 // Conexión a la base de datos

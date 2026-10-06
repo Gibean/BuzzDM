@@ -29,8 +29,44 @@ const MIGRATIONS_DIR = __DIR__ . '/../db/migrations';
 function splitSqlStatements(string $sql): array
 {
     $statements = [];
+
+    // Fase 1: reparto por DELIMITER.
+    //
+    // El cuerpo de un trigger (BEGIN ... END) contiene ';' internos, así que
+    // partir por ';' lo destroza en sentencias sueltas que MySQL rechaza. El
+    // convenio de mysql-cli es declarar DELIMITER antes y después, y el runner
+    // tenía que ignorarlo: por eso las dos migraciones con trigger que hay en
+    // el repositorio se aplicaron a mano y el runner solo las auto-registró.
+    // Sin esto no hay forma de corregir un trigger por migración.
+    $delimiter = ';';
+    $buffer = '';
+
+    foreach (preg_split('/\R/', $sql) as $linea) {
+        if (preg_match('/^\s*DELIMITER\s+(\S+)\s*$/i', $linea, $m)) {
+            // Lo que precede al DELIMITER ya es una región completa.
+            $statements = array_merge($statements, splitByDelimiter($buffer, $delimiter));
+            $buffer = '';
+            $delimiter = $m[1];
+            continue;
+        }
+        $buffer .= $linea . "\n";
+    }
+
+    $statements = array_merge($statements, splitByDelimiter($buffer, $delimiter));
+
+    return array_values(array_filter(array_map('trim', $statements), static fn($s) => $s !== ''));
+}
+
+/**
+ * Parte un fragmento por el delimitador indicado, respetando cadenas,
+ * identificadores entre acentos graves y comentarios.
+ */
+function splitByDelimiter(string $sql, string $delimiter): array
+{
+    $statements = [];
     $current = '';
     $len = strlen($sql);
+    $dl = strlen($delimiter);
     $inSingle = $inDouble = $inBacktick = $inLineComment = $inBlockComment = false;
 
     for ($i = 0; $i < $len; $i++) {
@@ -77,12 +113,14 @@ function splitSqlStatements(string $sql): array
             $inDouble = !$inDouble;
         } elseif ($ch === '`' && !$inSingle && !$inDouble) {
             $inBacktick = !$inBacktick;
-        } elseif ($ch === ';' && !$inSingle && !$inDouble && !$inBacktick) {
+        } elseif ($ch === $delimiter[0] && substr($sql, $i, $dl) === $delimiter
+                  && !$inSingle && !$inDouble && !$inBacktick) {
             $trimmed = trim($current);
             if ($trimmed !== '') {
                 $statements[] = $trimmed;
             }
             $current = '';
+            $i += $dl - 1;
             continue;
         }
 

@@ -18,8 +18,9 @@ if (!isset($_ENV['DB_HOST']) || empty($_ENV['DB_HOST'])) {
             $dotenv = Dotenv\Dotenv::createMutable($envPath, '.env');
             $dotenv->safeLoad();
         }
-        // Then .env.local overrides (for local development)
-        if (file_exists($envPath . '/.env.local')) {
+        // Then .env.local overrides (for local development only)
+        $isProd = (getenv('APP_ENV') ?: $_ENV['APP_ENV'] ?? '') === 'production';
+        if (!$isProd && file_exists($envPath . '/.env.local')) {
             $dotenvLocal = Dotenv\Dotenv::createMutable($envPath, '.env.local');
             $dotenvLocal->safeLoad();
         }
@@ -27,8 +28,11 @@ if (!isset($_ENV['DB_HOST']) || empty($_ENV['DB_HOST'])) {
 }
 
 // Secret token for cron/API access - FROM .ENV
+// Sin valor por defecto: un fallback fijo permitiria a cualquiera disparar un dump
+// completo de la base de datos. Si no esta definido, los endpoints que lo consumen
+// rechazan la peticion en vez de aceptarla.
 if (!defined('BACKUP_SECRET_TOKEN')) {
-    define('BACKUP_SECRET_TOKEN', $_ENV['BACKUP_SECRET_TOKEN'] ?? 'INSECURE_DEFAULT_CHANGE_ME');
+    define('BACKUP_SECRET_TOKEN', (string)($_ENV['BACKUP_SECRET_TOKEN'] ?? getenv('BACKUP_SECRET_TOKEN') ?: ''));
 }
 
 // Interval between automatic backups (in hours)
@@ -84,5 +88,20 @@ if (!defined('MYSQL_PATH')) {
 // Minimum time between fallback backup checks (seconds)
 if (!defined('BACKUP_CHECK_COOLDOWN')) {
     define('BACKUP_CHECK_COOLDOWN', 300); // 5 minutes
+}
+
+// Verificacion TLS en las llamadas internas por HTTP.
+//
+// Las llamadas de backup_check.php a auto_backup.php y tasa_bcv_update.php se
+// hacen con fire-and-forget. Con CURLOPT_SSL_VERIFYPEER=false, un atacante
+// situado en la ruta de red puede intercaptar la peticion y capturar el token
+// de BACKUP_SECRET_TOKEN.
+//
+// El valor por defecto es verificar. Solo se desactiva si el certificado del
+// servidor es autofirmado (habitual en XAMPP local) mediante
+// BACKUP_SKIP_TLS_VERIFY=1 en el entorno. No afecta a peticiones http://
+// plano, donde SSL no interviene.
+if (!defined('BACKUP_SKIP_TLS_VERIFY')) {
+    define('BACKUP_SKIP_TLS_VERIFY', getenv('BACKUP_SKIP_TLS_VERIFY') === '1');
 }
 

@@ -639,3 +639,346 @@ if (document.readyState === 'loading') {
 } else {
     enableMobileTableCards();
 }
+// =========================================================================
+// BUZZ DATA MANAGER - PALETA DE COMANDOS GLOBAL (CTRL + K)
+// =========================================================================
+// Atajo de navegación entre módulos del ERP. Se abre con Ctrl+K o Cmd+K.
+//
+// Los módulos NO están escritos aquí a mano: se leen del sidebar que ya ha
+// renderizado el servidor. Eso tiene dos consecuencias deliberadas:
+//
+//   1. Los permisos no se duplican. El sidebar decide qué enlaces existen
+//      según $_SESSION['usuario_rol'] y simplemente no imprime los que el
+//      usuario no puede usar. Leyéndolo, la paleta hereda esa decisión; si se
+//      escribiera una lista aparte, algún día divergirían y la paleta ofrecería
+//      enlaces a páginas que responden "no autorizado".
+//   2. La lista no se queda obsoleta. Añadir un módulo al menú lo añade a la
+//      paleta sin tocar este fichero.
+//
+// Cuando no hay sidebar (manual.php usa otra plantilla) se recurre a un
+// mínimo universal, no a la lista completa: es el camino que falla cerrado.
+(function initBuzzCommandPalette() {
+    if (window._buzzCmdPaletteInitialized) return;
+
+    // Vistas que el sidebar muestra a cualquier rol. Es el plan B para las
+    // páginas sin sidebar: mejor ofrecer poco y correcto que una lista completa
+    // con enlaces que el usuario no puede abrir.
+    const MODULOS_FALLBACK = [
+        { titulo: 'Dashboard', url: 'dashboard', icono: 'fas fa-home', categoria: 'General' },
+        { titulo: 'Pedidos', url: 'pedidos', icono: 'fas fa-shopping-cart', categoria: 'Operaciones' },
+        { titulo: 'Envíos', url: 'envios', icono: 'fas fa-truck', categoria: 'Operaciones' },
+        { titulo: 'Notas', url: 'todo', icono: 'fas fa-tasks', categoria: 'Herramientas' },
+        { titulo: 'Ajustes', url: 'ajustes', icono: 'fas fa-sliders-h', categoria: 'Sistema' },
+        { titulo: 'Acerca de', url: 'about', icono: 'fas fa-info-circle', categoria: 'Sistema' }
+    ];
+
+    function leerModulosDelSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        if (!sidebar) return null;
+
+        const modulos = [];
+        const vistos = new Set();
+
+        sidebar.querySelectorAll('.nav-item').forEach((item) => {
+            // Categoría = título del desplegable padre. Los enlaces sueltos (sin
+            // padre) caen en "General", que es justo lo que son.
+            const toggle = item.querySelector('.nav-dropdown-toggle .nav-text-enhanced');
+            const categoria = toggle ? toggle.textContent.trim() : 'General';
+
+            item.querySelectorAll('a[href]').forEach((a) => {
+                // El propio desplegable no navega: su href="#" es un contenedor.
+                if (a.classList.contains('nav-dropdown-toggle')) return;
+
+                const url = (a.getAttribute('href') || '').trim();
+                // Los enlaces internos ya vienen sin extensión desde el servidor,
+                // que es como los emite el .htaccess. Se respetan tal cual en vez
+                // de reescribirlos a .php, que provocaría un 301 en cada clic.
+                if (!url || url === '#' || /^javascript:/i.test(url) || url.charAt(0) === '#') return;
+                if (vistos.has(url)) return;
+                vistos.add(url);
+
+                const etiqueta = a.querySelector('.nav-text-enhanced') || a;
+                const icono = a.querySelector('i');
+                modulos.push({
+                    titulo: (etiqueta.textContent || '').trim(),
+                    url: url,
+                    icono: icono ? icono.className : 'fas fa-circle',
+                    categoria: categoria
+                });
+            });
+        });
+
+        return modulos.length ? modulos : null;
+    }
+
+    function inicializar() {
+        // La bandera se pone aquí y no antes: si algo falla durante el montaje,
+        // no debe quedar marcada como inicializada o la paleta quedaría muerta
+        // en esta página sin ningún error visible que lo explique.
+        window._buzzCmdPaletteInitialized = true;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            #buzzCmdOverlay[hidden] { display: none; }
+            #buzzCmdOverlay {
+                position: fixed; inset: 0; background: rgba(10, 14, 20, 0.75);
+                backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+                z-index: 100000; display: flex; align-items: flex-start; justify-content: center;
+                padding-top: 12vh;
+            }
+            #buzzCmdBox {
+                background: #151b26; border: 1px solid #2d3848; border-radius: 12px;
+                width: 100%; max-width: 580px; box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+                overflow: hidden; font-family: system-ui, -apple-system, sans-serif;
+                color: #e2e8f0;
+            }
+            #buzzCmdInputWrap {
+                display: flex; align-items: center; gap: 10px;
+                padding: 14px 18px; border-bottom: 1px solid #232d3d; background: #111620;
+            }
+            #buzzCmdInput {
+                width: 100%; background: transparent; border: none; outline: none;
+                color: #f1f5f9; font-size: 15px;
+            }
+            #buzzCmdInput::placeholder { color: #64748b; }
+            #buzzCmdList { max-height: 320px; overflow-y: auto; padding: 6px; margin: 0; list-style: none; }
+            .buzz-cmd-item {
+                display: flex; align-items: center; justify-content: space-between;
+                padding: 9px 12px; border-radius: 6px; cursor: pointer; font-size: 14px;
+                color: #94a3b8; transition: background 0.15s, color 0.15s;
+            }
+            .buzz-cmd-item:hover, .buzz-cmd-item[aria-selected="true"] {
+                background: rgba(255, 160, 0, 0.15); color: #f8fafc;
+            }
+            .buzz-cmd-item[aria-selected="true"] .buzz-cmd-cat {
+                background: rgba(255, 160, 0, 0.25); color: #ffa000;
+            }
+            .buzz-cmd-item .buzz-cmd-cat {
+                font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap;
+                background: #1e2634; color: #64748b; font-family: monospace;
+            }
+            .buzz-cmd-empty { padding: 16px; text-align: center; color: #64748b; font-size: 13px; }
+            .buzz-cmd-mark { color: #ffa000; font-weight: 600; }
+            #buzzCmdFooter {
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 8px 14px; border-top: 1px solid #232d3d; background: #0c1017;
+                font-size: 11px; color: #64748b; font-family: monospace;
+            }
+            /* Botón de acceso: es lo que convierte el atajo en algo descubrible.
+               Sin él la paleta existe pero nadie la encuentra. */
+            #buzzCmdTrigger {
+                display: flex; align-items: center; gap: 8px; width: 100%;
+                margin: 0 0 14px; padding: 8px 10px; cursor: pointer;
+                background: rgba(255,255,255,0.04); color: #94a3b8;
+                border: 1px solid #2d3848; border-radius: 8px;
+                font-size: 13px; font-family: inherit; transition: background 0.15s, color 0.15s;
+            }
+            #buzzCmdTrigger:hover { background: rgba(255,160,0,0.12); color: #e2e8f0; }
+            #buzzCmdTrigger .buzz-cmd-trigger-label { flex: 1; text-align: left; }
+            kbd.buzz-cmd-kbd {
+                font-family: monospace; font-size: 11px; padding: 2px 6px;
+                background: #1e2634; border: 1px solid #2d3848; border-radius: 4px; color: #94a3b8;
+            }
+            @media (prefers-reduced-motion: reduce) {
+                #buzzCmdOverlay, .buzz-cmd-item { transition: none !important; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- Trigger -------------------------------------------------------
+        // Un único punto de inserción para todas las plantillas, en vez de
+        // editar cada cabecera: primero la cabecera del sidebar y, si la página
+        // usa otra plantilla (manual.php), la cabecera de la documentación.
+        const iconoTrigger = '<i class="fas fa-search buzz-cmd-trigger-icon" aria-hidden="true"></i>';
+        const htmlTrigger =
+            '<button type="button" id="buzzCmdTrigger" aria-haspopup="dialog">' +
+            iconoTrigger +
+            '<span class="buzz-cmd-trigger-label">Buscar módulo</span>' +
+            '<kbd class="buzz-cmd-kbd">Ctrl K</kbd>' +
+            '</button>';
+
+        let ancla = document.querySelector('.sidebar-header-enhanced');
+        if (!ancla) ancla = document.querySelector('.docs-header');
+        if (ancla) ancla.insertAdjacentHTML('beforeend', htmlTrigger);
+
+        // --- Overlay -------------------------------------------------------
+        const overlay = document.createElement('div');
+        overlay.id = 'buzzCmdOverlay';
+        overlay.hidden = true;
+        overlay.innerHTML =
+            '<div id="buzzCmdBox" role="dialog" aria-modal="true" aria-label="Paleta de comandos">' +
+                '<div id="buzzCmdInputWrap">' +
+                    '<i class="fas fa-search" style="color:#ffa000;font-size:14px;" aria-hidden="true"></i>' +
+                    '<input type="text" id="buzzCmdInput" placeholder="Ir a un módulo..." autocomplete="off"' +
+                        ' role="combobox" aria-expanded="true" aria-controls="buzzCmdList"' +
+                        ' aria-autocomplete="list" aria-label="Buscar módulo">' +
+                    '<kbd class="buzz-cmd-kbd">ESC</kbd>' +
+                '</div>' +
+                '<ul id="buzzCmdList" role="listbox" aria-label="Módulos disponibles"></ul>' +
+                '<div id="buzzCmdFooter">' +
+                    '<span>Navega con &uarr; &darr; y pulsa Enter</span>' +
+                    '<span>BuzzDM</span>' +
+                '</div>' +
+            '</div>';
+        document.body.appendChild(overlay);
+
+        const input = overlay.querySelector('#buzzCmdInput');
+        const list = overlay.querySelector('#buzzCmdList');
+        const trigger = document.getElementById('buzzCmdTrigger');
+
+        const modulos = leerModulosDelSidebar() || MODULOS_FALLBACK;
+        let filtrados = [];
+        let indice = -1;
+        let elementoPrevio = null;
+
+        // Resalta lo que el usuario ha escrito para que un nombre largo no
+        // obligue a recorrerlo entero con el ratón.
+        function resaltar(texto, consulta) {
+            if (!consulta) return escapar(texto);
+            const pos = texto.toLowerCase().indexOf(consulta.toLowerCase());
+            if (pos === -1) return escapar(texto);
+            return escapar(texto.slice(0, pos))
+                + '<span class="buzz-cmd-mark">' + escapar(texto.slice(pos, pos + consulta.length)) + '</span>'
+                + escapar(texto.slice(pos + consulta.length));
+        }
+
+        function escapar(valor) {
+            return String(valor == null ? '' : valor)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function filtrar(texto) {
+            const q = (texto || '').toLowerCase().trim();
+            if (!q) return modulos.slice();
+
+            return modulos.filter((m) =>
+                m.titulo.toLowerCase().includes(q) ||
+                m.categoria.toLowerCase().includes(q) ||
+                m.url.toLowerCase().includes(q)
+            );
+        }
+
+        function pintar() {
+            list.innerHTML = '';
+            indice = filtrados.length ? 0 : -1;
+
+            if (!filtrados.length) {
+                list.innerHTML = '<li class="buzz-cmd-empty" role="presentation">No hay módulos que coincidan</li>';
+                input.removeAttribute('aria-activedescendant');
+                return;
+            }
+
+            filtrados.forEach((m, i) => {
+                const li = document.createElement('li');
+                li.id = 'buzzCmdItem' + i;
+                li.className = 'buzz-cmd-item';
+                li.setAttribute('role', 'option');
+                li.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+                li.innerHTML =
+                    '<span class="buzz-cmd-main" style="display:flex;align-items:center;gap:10px;">' +
+                        '<i class="' + escapar(m.icono) + '" style="color:#ffa000;width:16px;text-align:center;" aria-hidden="true"></i>' +
+                        '<span>' + resaltar(m.titulo, input.value.trim()) + '</span>' +
+                    '</span>' +
+                    '<span class="buzz-cmd-cat">' + escapar(m.categoria) + '</span>';
+                li.addEventListener('click', () => ir(m));
+                list.appendChild(li);
+            });
+
+            sincronizarSeleccion();
+        }
+
+        function sincronizarSeleccion() {
+            const items = list.querySelectorAll('.buzz-cmd-item');
+            items.forEach((el, i) => el.setAttribute('aria-selected', i === indice ? 'true' : 'false'));
+
+            if (indice >= 0 && items[indice]) {
+                items[indice].scrollIntoView({ block: 'nearest' });
+                input.setAttribute('aria-activedescendant', items[indice].id);
+            } else {
+                input.removeAttribute('aria-activedescendant');
+            }
+        }
+
+        function mover(delta) {
+            const total = filtrados.length;
+            if (!total) return;
+            indice = (indice + delta + total) % total;
+            sincronizarSeleccion();
+        }
+
+        function ir(modulo) {
+            cerrar();
+            window.location.href = modulo.url;
+        }
+
+        function abrir() {
+            elementoPrevio = document.activeElement;
+            overlay.hidden = false;
+            input.value = '';
+            filtrados = filtrar('');
+            pintar();
+            document.body.style.overflow = 'hidden';
+            input.focus();
+            if (trigger) trigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function cerrar() {
+            overlay.hidden = true;
+            document.body.style.overflow = '';
+            if (trigger) trigger.removeAttribute('aria-expanded');
+            // Devolver el foco evita que al cerrarla el usuario quede con el
+            // foco en un input oculto y tenga que tabular para salir.
+            if (elementoPrevio && typeof elementoPrevio.focus === 'function') elementoPrevio.focus();
+        }
+
+        input.addEventListener('input', () => {
+            filtrados = filtrar(input.value);
+            pintar();
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown') { e.preventDefault(); mover(1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); mover(-1); }
+            else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (indice >= 0 && filtrados[indice]) ir(filtrados[indice]);
+            }
+        });
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) cerrar();
+        });
+
+        if (trigger) {
+            trigger.addEventListener('click', abrir);
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const abierto = !overlay.hidden;
+
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K')) {
+                e.preventDefault();
+                abierto ? cerrar() : abrir();
+                return;
+            }
+
+            // Escape global: si la paleta está abierta se cierra aunque el foco
+            // no esté en el input. Antes solo respondía el input, así que al
+            // perder el foco la paleta quedaba bloqueada.
+            if (e.key === 'Escape' && abierto) {
+                e.preventDefault();
+                cerrar();
+            }
+        });
+    }
+
+    // El script se carga al final del body, pero se protege igual: si mañana
+    // alguien lo incluye en el <head>, aquí se espera al DOM en vez de fallar
+    // con document.body === null.
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', inicializar, { once: true });
+    } else {
+        inicializar();
+    }
+})();

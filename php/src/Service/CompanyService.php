@@ -19,9 +19,34 @@ class CompanyService {
     }
 
     /**
-     * Registra y aprovisiona un entorno de prueba de 15 días
+     * Registra y aprovisiona una empresa nueva.
+     *
+     * Este método es el único punto donde nace una empresa, y distingue dos
+     * tipos que hasta ahora no se distinguían:
+     *
+     *   - Demo (is_demo = 1): prueba gratuita de 15 días, con huella digital
+     *     para impedir que un mismo navegador registre varias, y verificación
+     *     de correo antes de activarse.
+     *   - Empresa real (is_demo = 0): sin caducidad, sin huella digital y sin
+     *     bloqueo por dispositivo.
+     *
+     * Antes esta clase fijaba is_demo = 1 en el INSERT, así que no existía
+     * ninguna forma de crear una empresa que no fuera demo. Todo el resto del
+     * sistema (cron de caducidad, DeviceFingerprintService, sesion.php y el
+     * banner de top_navbar.php) ya discriminaba por is_demo, de modo que la
+     * empresa real no necesita más cambios que esta entrada.
+     *
+     * @param array $data     company_name, admin_email, admin_password, admin_name,
+     *                        y opcionalmente device_fingerprint, rif, email
+     * @param array $opciones is_demo, trial_days, status, require_fingerprint,
+     *                        require_email_verification
      */
-    public function createTrialEnvironment(array $data): array {
+    private function provisionCompany(array $data, array $opciones): array {
+        $isDemo = (bool)($opciones['is_demo'] ?? false);
+        $trialDays = array_key_exists('trial_days', $opciones) ? $opciones['trial_days'] : null;
+        $requireFingerprint = (bool)($opciones['require_fingerprint'] ?? $isDemo);
+        $requireEmailVerification = (bool)($opciones['require_email_verification'] ?? true);
+
         $companyName = trim($data['company_name'] ?? '');
         $adminEmail = strtolower(trim($data['admin_email'] ?? ''));
         $adminPassword = $data['admin_password'] ?? '';
@@ -39,33 +64,51 @@ class CompanyService {
             throw new InvalidArgumentException("La contraseña debe tener al menos 8 caracteres.");
         }
 
-        // Generar y validar huella digital
-        $fingerprint = $this->fingerprintService->generateFingerprint($clientFp);
-        if ($this->fingerprintService->isDeviceOrEmailBlocked($fingerprint, $adminEmail)) {
-            throw new RuntimeException("Ya se ha registrado una prueba de demostración desde este dispositivo o correo electrónico.");
+        // La huella digital solo se calcula y se aplica a las demos: es el
+        // mecanismo antia abusedel trial gratuito. Una empresa real no puede
+        // quedar bloqueada por un navegador, así que se guarda a NULL.
+        $fingerprint = null;
+        if ($requireFingerprint) {
+            $fingerprint = $this->fingerprintService->generateFingerprint($clientFp);
+            if ($this->fingerprintService->isDeviceOrEmailBlocked($fingerprint, $adminEmail)) {
+                throw new RuntimeException("Ya se ha registrado una prueba de demostración desde este dispositivo o correo electrónico.");
+            }
         }
 
         $this->pdo->beginTransaction();
         try {
-            // 1. Crear Empresa (15 días de prueba, inicialmente pendiente de verificación de correo)
-            $expiresAt = (new DateTime())->modify('+15 days')->format('Y-m-d H:i:s');
+            // 1. Crear Empresa. Las demos nacen pendientes de verificación de
+            //    correo; una empresa real nace activa y usable de inmediato.
+            $expiresAt = $trialDays !== null
+                ? (new DateTime())->modify('+' . (int)$trialDays . ' days')->format('Y-m-d H:i:s')
+                : null;
+            $initialStatus = $requireEmailVerification ? 'pending_verification' : ($opciones['status'] ?? 'active');
+
             $stmt = $this->pdo->prepare("
                 INSERT INTO empresa (
                     nombre, tipo_rif, rif, email, admin_email, device_fingerprint,
                     trial_ends_at, is_demo, status, creado_at
                 ) VALUES (
                     :nombre, 'J', :rif, :email, :admin_email, :fingerprint,
-                    :expires_at, 1, 'pending_verification', NOW()
+                    :expires_at, :is_demo, :status, NOW()
                 )
             ");
-            $demoRif = 'J-' . str_pad((string)mt_rand(10000000, 99999999), 9, '0', STR_PAD_LEFT);
+            // El RIF solo se genera si no viene dado: una empresa real debe
+            // declarar el suyo, y un RIF inventado en una factura es un problema
+            // fiscal, no un detalle de maquetación.
+            $companyRif = trim((string)($data['rif'] ?? ''));
+            if ($companyRif === '') {
+                $companyRif = 'J-' . str_pad((string)mt_rand(10000000, 99999999), 9, '0', STR_PAD_LEFT);
+            }
             $stmt->execute([
                 ':nombre' => $companyName,
-                ':rif' => $demoRif,
-                ':email' => $adminEmail,
+                ':rif' => $companyRif,
+                ':email' => $data['email'] ?? $adminEmail,
                 ':admin_email' => $adminEmail,
                 ':fingerprint' => $fingerprint,
-                ':expires_at' => $expiresAt
+                ':expires_at' => $expiresAt,
+                ':is_demo' => $isDemo ? 1 : 0,
+                ':status' => $initialStatus,
             ]);
             $companyId = (int)$this->pdo->lastInsertId();
 
@@ -96,13 +139,13 @@ class CompanyService {
             ]);
             $userId = (int)$this->pdo->lastInsertId();
 
-            // 4. Inyectar categorías demo esenciales
-            $demoCategories = ['General', 'Papelería y Oficina', 'Tecnología'];
+// 4. Inyectar categorías base del tenant
+            $baseCategories = ['General', 'Papelería y Oficina', 'Tecnología'];
             $stmtCat = $this->pdo->prepare("
                 INSERT INTO categorias (empresa_id, nombre, descripcion) 
                 VALUES (:empresa_id, :nombre, :desc)
             ");
-            foreach ($demoCategories as $cat) {
+            foreach ($baseCategories as $cat) {
                 $stmtCat->execute([
                     ':empresa_id' => $companyId,
                     ':nombre' => $cat,
@@ -112,11 +155,11 @@ class CompanyService {
 
             // 5. Inyectar ajustes y catálogos base del tenant
             //
-            //    Sin esto la demo nueva nace con los desplegables vacíos y con
+            //    Sin esto la empresa nueva nace con los desplegables vacíos y con
             //    los ajustes en NULL: el nombre de la tienda saldría en blanco
-            //    en la factura y la moneda sería indeterminada. Los ajustes se
-            //    copian de los valores de la empresa principal porque son
-            //    preferencias de negocio, no datos privados.
+            //    en la factura y la moneda sería indeterminada. Los valores son
+            //    preferencias de negocio neutras, no datos de ninguna otra
+            //    empresa: no hay nada que copiar de ningún tenant.
             $defaultSettings = [
                 'store_name' => [$companyName, 'Nombre mostrado en factura y sitio'],
                 'currency' => ['VES', 'Moneda del sistema'],
@@ -137,69 +180,115 @@ class CompanyService {
             }
 
             // Colores y materiales: catálogos por empresa (migración 003), así
-            // que una demo nueva necesita su propio juego y no puede leer el
-            // de la empresa principal.
-            $demoColores = [
+            // que toda empresa nueva necesita su propio juego y no puede leer
+            // el de ninguna otra.
+            $baseColores = [
                 ['Negro', '#000000'], ['Blanco', '#FFFFFF'], ['Azul', '#1E5AA8'],
                 ['Rojo', '#C62828'], ['Verde', '#2E7D32'], ['Gris', '#757575'],
             ];
             $stmtColor = $this->pdo->prepare("
                 INSERT INTO colores (empresa_id, nombre, codigo_hex) VALUES (:empresa_id, :nombre, :hex)
             ");
-            foreach ($demoColores as [$nombre, $hex]) {
+            foreach ($baseColores as [$nombre, $hex]) {
                 $stmtColor->execute([':empresa_id' => $companyId, ':nombre' => $nombre, ':hex' => $hex]);
             }
 
-            $demoMateriales = ['Algodón', 'Poliéster', 'Denim', 'Lana', 'Sintético', 'Lino'];
+            $baseMateriales = ['Algodón', 'Poliéster', 'Denim', 'Lana', 'Sintético', 'Lino'];
             $stmtMat = $this->pdo->prepare("
                 INSERT INTO materiales (empresa_id, nombre) VALUES (:empresa_id, :nombre)
             ");
-            foreach ($demoMateriales as $nombre) {
+            foreach ($baseMateriales as $nombre) {
                 $stmtMat->execute([':empresa_id' => $companyId, ':nombre' => $nombre]);
             }
 
             // 6. Crear directorio de uploads aislado para la empresa
             $uploadDir = __DIR__ . "/../../../assets/img/uploads/companies/{$companyId}/";
             if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
+                mkdir($uploadDir, 0750, true);
             }
 
-            // 7. Generar y enviar código de verificación de 6 dígitos
-            $otpCode = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
-            $otpExpires = (new DateTime())->modify('+15 minutes')->format('Y-m-d H:i:s');
+            // 7. Verificación de correo, solo si el tipo de empresa la exige.
+            //    Una empresa real puede querer activarse sin depender del
+            //    correo, así que el código se genera únicamente cuando aplica.
+            $otpCode = null;
+            if ($requireEmailVerification) {
+                $otpCode = str_pad((string)random_int(100000, 999999), 6, '0', STR_PAD_LEFT);
+                $otpExpires = (new DateTime())->modify('+15 minutes')->format('Y-m-d H:i:s');
 
-            $stmtOtp = $this->pdo->prepare("
-                INSERT INTO email_verification_codes (empresa_id, email, codigo, expiracion, creado_at)
-                VALUES (:empresa_id, :email, :codigo, :expiracion, NOW())
-            ");
-            $stmtOtp->execute([
-                ':empresa_id' => $companyId,
-                ':email'      => $adminEmail,
-                ':codigo'     => $otpCode,
-                ':expiracion' => $otpExpires
-            ]);
+                $stmtOtp = $this->pdo->prepare("
+                    INSERT INTO email_verification_codes (empresa_id, email, codigo, expiracion, creado_at)
+                    VALUES (:empresa_id, :email, :codigo, :expiracion, NOW())
+                ");
+                $stmtOtp->execute([
+                    ':empresa_id' => $companyId,
+                    ':email'      => $adminEmail,
+                    ':codigo'     => $otpCode,
+                    ':expiracion' => $otpExpires
+                ]);
 
-            // Enviar email con PHPMailer
-            $this->sendVerificationEmail($adminEmail, $adminName, $companyName, $otpCode);
+                // Enviar email con PHPMailer
+                $this->sendVerificationEmail($adminEmail, $adminName, $companyName, $otpCode);
+            }
 
             $this->pdo->commit();
 
             return [
                 'success' => true,
-                'requires_verification' => true,
+                'requires_verification' => $requireEmailVerification,
                 'company_id' => $companyId,
                 'user_id' => $userId,
                 'company_name' => $companyName,
                 'admin_email' => $adminEmail,
+                'is_demo' => $isDemo,
                 'expires_at' => $expiresAt,
-                'days_remaining' => 15,
-                'message' => 'Código de verificación enviado a tu correo electrónico.'
+                'days_remaining' => $trialDays !== null ? (int)$trialDays : null,
+                'message' => $requireEmailVerification
+                    ? 'Código de verificación enviado a tu correo electrónico.'
+                    : 'Empresa creada correctamente.'
             ];
 
         } catch (Exception $e) {
             $this->pdo->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Registra una prueba de demostración gratuita de 15 días.
+     *
+     * Es el flujo que usa registro.php: la empresa nace con is_demo = 1, con
+     * huella digital (para que un mismo navegador no cree varias) y pendiente
+     * de verificación de correo.
+     */
+    public function createTrialEnvironment(array $data): array {
+        return $this->provisionCompany($data, [
+            'is_demo' => true,
+            'trial_days' => 15,
+            'require_fingerprint' => true,
+            'require_email_verification' => true,
+        ]);
+    }
+
+    /**
+     * Registra una empresa real: sin caducidad, sin huella digital y sin
+     * bloqueo por dispositivo.
+     *
+     * Es el equivalente del alta tradicional. El resto del sistema ya la
+     * distingue de una demo sin tocar nada más: el cron de caducidad, la
+     * DeviceFingerprintService y la comprobación de trial de sesion.php solo
+     * actúan sobre is_demo = 1.
+     *
+     * Por defecto exige verificar el correo antes de dejar usarla. Con
+     * $skipEmailVerification = true nace activa, para altas made por un
+     * administrador del servidor que ya conoce al cliente.
+     */
+    public function createCompany(array $data, bool $skipEmailVerification = false): array {
+        return $this->provisionCompany($data, [
+            'is_demo' => false,
+            'trial_days' => null,
+            'require_fingerprint' => false,
+            'require_email_verification' => !$skipEmailVerification,
+        ]);
     }
 
     /**
@@ -234,6 +323,14 @@ class CompanyService {
         $empresaId = (int)$row['empresa_id'];
         $this->pdo->prepare("UPDATE empresa SET status = 'active' WHERE id = ?")->execute([$empresaId]);
 
+        // El tipo de empresa se lee de la base, no se supone. Antes se fijaba
+        // is_demo = true aquí, lo que convertía en demo cualquier empresa que
+        // pasara por la verificación de correo.
+        $stmtEmpresa = $this->pdo->prepare("SELECT is_demo, trial_ends_at FROM empresa WHERE id = ?");
+        $stmtEmpresa->execute([$empresaId]);
+        $empresa = $stmtEmpresa->fetch(PDO::FETCH_ASSOC) ?: ['is_demo' => 0, 'trial_ends_at' => null];
+        $isDemo = (bool)$empresa['is_demo'];
+
         // Obtener usuario administrador de la empresa para sesión
         $stmtUser = $this->pdo->prepare("SELECT id, nombre, email, rol FROM usuarios WHERE empresa_id = ? AND rol = 'admin' LIMIT 1");
         $stmtUser->execute([$empresaId]);
@@ -247,14 +344,19 @@ class CompanyService {
             $_SESSION['usuario_nombre'] = $user['nombre'];
             $_SESSION['usuario_rol'] = $user['rol'];
             $_SESSION['empresa_id'] = $empresaId;
-            $_SESSION['is_demo'] = true;
-            $_SESSION['demo_dias_restantes'] = 15;
+            $_SESSION['is_demo'] = $isDemo;
+            if ($isDemo) {
+                $_SESSION['demo_dias_restantes'] = 15;
+            }
         }
 
         return [
             'success' => true,
-            'message' => '¡Correo verificado con éxito! Tu prueba demo de 15 días ha sido activada.',
+            'message' => $isDemo
+                ? '¡Correo verificado con éxito! Tu prueba demo de 15 días ha sido activada.'
+                : '¡Correo verificado con éxito! Tu empresa ha sido activada.',
             'company_id' => $empresaId,
+            'is_demo' => $isDemo,
             'redirect_url' => 'dashboard'
         ];
     }

@@ -1,0 +1,39 @@
+# ============================================================================
+# BuzzDM - assets/img/uploads/
+# ============================================================================
+# Logos de empresa. Misma barrera que /uploads: solo imagenes, sin interpretes.
+# ============================================================================
+
+Options -Indexes
+
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh .asp .aspx
+    RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh .asp .aspx
+</IfModule>
+
+<FilesMatch "\.(?i:php|phtml|php[3-8]|pht|phar|cgi|pl|py|sh|asp|aspx|jsp|html?|js|xml|ini|log|sql|bak|conf|htaccess)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# El bloque de svg que estaba aqui era inalcanzable: el patron de negado de
+# arriba ya incluye "svg", asi que este FilesMatch nunca se evaluaba y el
+# comentario que lo justificaba era incorrecto. SettingsService.php solo acepta
+# png/jpg y re-codifica a .webp, de modo que aqui solo hay imagenes raster.
+# svg permanece en la lista de negados como defensa en profundidad: un SVG
+# puede contener <script> y servirse como documento.

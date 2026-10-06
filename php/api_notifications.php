@@ -31,6 +31,19 @@ try {
     }
 
     elseif ($method === 'POST') {
+        // Todas las acciones POST de este endpoint modifican estado. Sin token
+        // CSRF, cualquier sitio podria marcar notificaciones como leidas o
+        // borrar las del usuario mediante el navegador con su sesion abierta.
+        $csrf = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+        if (!validateCsrfToken($csrf)) {
+            http_response_code(403);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Error de seguridad: token CSRF inválido o ausente.',
+            ]);
+            exit;
+        }
+
         if ($action === 'mark_read') {
             $id = $_POST['id'] ?? null;
             if ($id === 'all') {
@@ -72,9 +85,26 @@ try {
 
             if (empty($message)) throw new Exception("El mensaje es requerido");
 
-            $stmt = $pdo->prepare("INSERT INTO notificaciones (usuario_id, tipo, titulo, mensaje, enlace) VALUES (?, ?, ?, ?, ?)");
+            $empresaId = TenantContext::require('api_notifications:create');
 
-            if ($stmt->execute([$targetUserId, $type, $title, $message, $link])) {
+            // El destinatario tiene que pertenecer a la empresa activa. Sin esta
+            // comprobacion, un POST con user_id ajeno escribe una fila que lleva
+            // nuestra empresa_id pero aparece en la bandeja del otro tenant.
+            $stmtDestino = $pdo->prepare("SELECT empresa_id FROM usuarios WHERE id = ?");
+            $stmtDestino->execute([$targetUserId]);
+            $empresaDestino = $stmtDestino->fetchColumn();
+
+            if ($empresaDestino === false) {
+                throw new Exception("El usuario destinatario no existe");
+            }
+
+            if ((int)$empresaDestino !== $empresaId) {
+                throw new Exception("No se puede notificar a un usuario de otra empresa");
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO notificaciones (empresa_id, usuario_id, tipo, titulo, mensaje, enlace) VALUES (?, ?, ?, ?, ?, ?)");
+
+            if ($stmt->execute([$empresaId, $targetUserId, $type, $title, $message, $link])) {
                 echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
             } else {
                 throw new Exception("Error al crear la notificación");

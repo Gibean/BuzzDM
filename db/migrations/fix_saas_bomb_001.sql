@@ -4,7 +4,7 @@
 --
 -- CONTEXTO:
 -- saas_multitenant_setup.sql marcó la empresa principal del sistema
--- (empresa.id = 1, Librería Txiki) con is_demo = 1 y un trial_ends_at
+-- (empresa.id = 1) con is_demo = 1 y un trial_ends_at
 -- de 15 días. El cronjob php/cron/demo_cleanup.php selecciona
 --   WHERE is_demo = 1 AND status = 'expired'
 -- y ejecuta un DELETE FROM empresa con ON DELETE CASCADE, lo que habría

@@ -1,207 +1,546 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BUZZ Data Manager - Sistema de Gestión Empresarial</title>
-    <meta name="description" content="Sistema profesional de gestión empresarial para control de inventario, pedidos, clientes y reportes.">
-    <link rel="canonical" href="https://buzzdatamanager.com/">
-
-    <!-- Open Graph (Facebook, WhatsApp, Discord, etc.) -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://buzzdatamanager.com/">
-    <meta property="og:title" content="BUZZ Data Manager - Sistema de Gestión Empresarial">
-    <meta property="og:description" content="Control total de inventario, pedidos y clientes en una plataforma profesional. Reportes avanzados, respaldos automáticos y seguridad de nivel empresarial.">
-    <meta property="og:image" content="https://buzzdatamanager.com/assets/img/logov1_long.png">
-    <meta property="og:site_name" content="BUZZ Data Manager">
-    <meta property="og:locale" content="es_ES">
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="BUZZ Data Manager - Sistema de Gestión Empresarial">
-    <meta name="twitter:description" content="Control total de inventario, pedidos y clientes en una plataforma profesional.">
-    <meta name="twitter:image" content="https://buzzdatamanager.com/assets/img/logov1_long.png">
-
-    <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="assets/css/styles.css">
-    <link rel="stylesheet" href="assets/css/landing.css?v=1.4.2-saas">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buzz Data Manager - ERP Open Source para PYMEs | Demo de 14 Días</title>
+  <meta name="description" content="ERP modular open-source para PYMEs. Inventario multialmacén, pedidos, requisiciones inteligentes y kanban. Demo 14 días sin tarjeta.">
+  <link rel="canonical" href="https://buzzdatamanager.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://buzzdatamanager.com/">
+  <meta property="og:title" content="Buzz Data Manager - ERP para PYMEs">
+  <meta property="og:description" content="Control de inventario, pedidos y requisiciones inteligentes. Demo 14 días sin tarjeta.">
+  <meta property="og:image" content="assets/img/logov1_long.png">
+  <meta property="og:locale" content="es_ES">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="shortcut icon" href="assets/img/logov1_icon.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..700;1,14..32,300..400&family=Orbitron:wght@600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="assets/landing/landing.css?v=3.6.1">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"Buzz Data Manager","operatingSystem":"Web","applicationCategory":"BusinessApplication","offers":{"@type":"Offer","price":"0","priceCurrency":"USD","description":"Demo de 14 días con acceso completo sin tarjeta de credito."}}</script>
 </head>
-<body class="landing-page">
+<body class="buzz-landing">
 
-    <!-- ============================================
-         HERO SECTION
-         ============================================ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container">
+      <div class="nav-wrapper">
+        <a href="#home" class="brand-logo-wrap" aria-label="Inicio Buzz Data Manager">
+          <img src="assets/img/logov1_long.png" alt="Buzz Data Manager" class="brand-logo-img" width="180" height="44">
+        </a>
+        <nav class="main-navigation" aria-label="Navegación principal">
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#modulos" class="nav-link" aria-haspopup="true">Producto <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></a>
+              <div class="mega-menu" role="region" aria-label="Menu Producto">
+                <div>
+                  <div class="mega-col-title">Módulos</div>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i><div><div class="mega-item-title">Inventario Multialmacén</div><div class="mega-item-desc">Stock en tiempo real, alertas y movimientos</div></div></a>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i><div><div class="mega-item-title">Gestión de Pedidos</div><div class="mega-item-desc">Flujos de venta, despachos y control de stock (sin facturación fiscal)</div></div></a>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-brain" aria-hidden="true"></i><div><div class="mega-item-title">Requisiciones Inteligentes</div><div class="mega-item-desc">Reabastecimiento predictivo</div></div></a>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-table-columns" aria-hidden="true"></i><div><div class="mega-item-title">Tableros Kanban</div><div class="mega-item-desc">Visibilidad de procesos sin friccion</div></div></a>
+                </div>
+                <div>
+                  <div class="mega-col-title">Capacidades</div>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-file-import" aria-hidden="true"></i><div><div class="mega-item-title">Importacion Masiva</div><div class="mega-item-desc">Excel y CSV sin perdida de datos</div></div></a>
+                  <a href="#modulos" class="mega-item"><i class="fa-solid fa-chart-line" aria-hidden="true"></i><div><div class="mega-item-title">Estadisticas y BI</div><div class="mega-item-desc">Rentabilidad y reportes exportables</div></div></a>
+                  <a href="#productividad" class="mega-item"><i class="fa-solid fa-keyboard" aria-hidden="true"></i><div><div class="mega-item-title">Paleta de Acciones</div><div class="mega-item-desc">Velocidad con Ctrl+K</div></div></a>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a href="#diferenciadores" class="nav-link" aria-haspopup="true">Soluciones <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></a>
+              <div class="mega-menu" style="width:300px;grid-template-columns:1fr;">
+                <div>
+                  <div class="mega-col-title">Sectores</div>
+                  <a href="#diferenciadores" class="mega-item"><i class="fa-solid fa-store" aria-hidden="true"></i><div><div class="mega-item-title">Comercio y Retail</div><div class="mega-item-desc">Tiendas y almacenes sincronizados</div></div></a>
+                  <a href="#diferenciadores" class="mega-item"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><div><div class="mega-item-title">Distribucion y Mayoristas</div><div class="mega-item-desc">Despachos rápidos y reposición</div></div></a>
+                  <a href="#diferenciadores" class="mega-item"><i class="fa-solid fa-gears" aria-hidden="true"></i><div><div class="mega-item-title">Talleres y Manufactura</div><div class="mega-item-desc">Insumos y control diario</div></div></a>
+                </div>
+              </div>
+            </li>
+            <li class="nav-item">
+              <a href="#diferenciadores" class="nav-link" aria-haspopup="true">Recursos <i class="fa-solid fa-chevron-down" aria-hidden="true"></i></a>
+              <div class="mega-menu" style="width:280px;grid-template-columns:1fr;">
+                <div>
+                  <div class="mega-col-title">Documentación</div>
+                  <a href="manual.php" class="mega-item"><i class="fa-solid fa-book-open" aria-hidden="true"></i><div><div class="mega-item-title">Manual de Usuario</div><div class="mega-item-desc">Guias para tu equipo</div></div></a>
+                  <a href="about.php" class="mega-item"><i class="fa-solid fa-code-branch" aria-hidden="true"></i><div><div class="mega-item-title">Filosofía Open Source</div><div class="mega-item-desc">Código abierto y soberanía</div></a>
+                </div>
+              </div>
+            </li>
+            
+            
+          </ul>
+        </nav>
+        <div class="nav-actions">
+          <a href="login" class="btn-login">Iniciar sesión</a>
+          <a href="registro" class="btn btn-primary nav-cta">Acceder a la demo</a>
+        </div>
+        <button class="mobile-toggle" id="mobileNavToggle" aria-label="Abrir menú de navegación" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+    <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+      <div style="padding-bottom:1rem;margin-bottom:0.75rem;border-bottom:1px solid var(--c-border);display:flex;align-items:center;">
+        <img src="assets/img/logov1_long.png" alt="Buzz Data Manager" style="height:36px;width:auto;">
+      </div>
+      <a href="#modulos" class="nav-link">Módulos del sistema</a>
+      <a href="#productividad" class="nav-link">Productividad</a>
+      <a href="#diferenciadores" class="nav-link">Por qué BuzzDM</a>
+            <a href="manual.php" class="nav-link">Documentación</a>
+      <hr class="rule" style="margin-block:1rem;">
+      <a href="login" class="btn btn-ghost">Iniciar sesión</a>
+      <a href="registro" class="btn btn-primary" style="justify-content:center;">Acceder a la demo</a>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- =====================================================================
+         HERO - Asimetrico: texto izquierda, producto derecha
+         ===================================================================== -->
     <section class="hero-section" id="home">
-        <!-- Animated Hexagon Background -->
-        <canvas id="hexagonCanvas" class="hexagon-canvas"></canvas>
+      <div class="container">
+        <div class="hero-grid">
 
-        <!-- Hero Content -->
-        <div class="hero-content">
-            <img src="assets/img/logov1.png" alt="BUZZ Logo" class="hero-logo">
-
-            <h1 class="hero-title">SISTEMA DE GESTIÓN EMPRESARIAL</h1>
-
-            <p class="hero-subtitle">
-                Control total de inventario, pedidos y clientes en una plataforma profesional
-            </p>
-
-            <div class="hero-buttons">
-                <a href="registro" class="btn-hero-primary">
-                    <i class="fas fa-play-circle"></i> Probar Demo (15 Días)
-                </a>
-                <a href="login" class="btn-hero-secondary">
-                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-                </a>
-                <a href="#features" class="btn-hero-tertiary">
-                    <i class="fas fa-info-circle"></i> Conocer Más
-                </a>
+          <div class="hero-content">
+            <span class="hero-eyebrow">Proyecto Académico &middot; Demo en Línea de 14 Días</span>
+            <h1 class="hero-h1">Buzz<span class="accent">DM</span>.<br>Tu operación,<br>bajo control.</h1>
+            <p class="hero-sub">ERP open source para pequeñas y medianas empresas. Inventario multialmacén, requisiciones inteligentes y kanban de operaciones en una plataforma sin contratos ni letra pequena.</p>
+            <div>
+              <div class="hero-cta-row">
+                <a href="registro" class="btn btn-primary">Probar BuzzDM gratis</a>
+                <div class="expert-wrap" id="expertWrap">
+                  <button class="expert-trigger" id="expertTrigger" type="button" aria-expanded="false">
+                    Hablar con un experto <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                  </button>
+                  <div class="expert-menu" id="expertMenu">
+                    <a href="mailto:buzzdatamanager@gmail.com?subject=Consulta%20Microempresa" class="expert-option">
+                      <strong>Microempresa</strong>1 a 5 empleados
+                    </a>
+                    <a href="mailto:buzzdatamanager@gmail.com?subject=Consulta%20Pyme" class="expert-option">
+                      <strong>Pequeña empresa</strong>6 a 25 empleados
+                    </a>
+                    <a href="mailto:buzzdatamanager@gmail.com?subject=Consulta%20Mediana" class="expert-option">
+                      <strong>Mediana empresa</strong>26 a 100+ empleados
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <p class="hero-microcopy">Sin tarjeta de crédito. Acceso inmediato. 14 días completos.</p>
             </div>
-        </div>
+          </div>
 
-        <!-- Scroll Indicator -->
-        <div class="scroll-indicator">
-            <i class="fas fa-chevron-down"></i>
+          <div class="hero-product">
+            <div class="product-panel" role="img" aria-label="Panel de control de BuzzDM con metricas de inventario en tiempo real">
+              <div class="panel-toolbar">
+                <div style="display:flex;align-items:center;gap:9px;">
+                  <img src="assets/img/logov1_icon.png" alt="BuzzDM" style="height:22px;width:auto;flex-shrink:0;">
+                  <span class="panel-toolbar-title">Dashboard &middot; Almacén Central</span>
+                </div>
+                <span class="panel-toolbar-badge">Demo activa</span>
+              </div>
+              <div class="panel-body">
+                <div class="panel-kpis">
+                  <div class="panel-kpi"><div class="panel-kpi-val">1,480</div><div class="panel-kpi-lbl">SKUs activos</div></div>
+                  <div class="panel-kpi"><div class="panel-kpi-val">99.4%</div><div class="panel-kpi-lbl">Entrega a tiempo</div></div>
+                  <div class="panel-kpi"><div class="panel-kpi-val">-68%</div><div class="panel-kpi-lbl">Tiempo de entrada</div></div>
+                </div>
+                <table class="panel-table">
+                  <thead>
+                    <tr><th scope="col">Referencia</th><th scope="col">Almacen</th><th scope="col">Stock</th><th scope="col">Estado</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><strong>KIT-MOTOR-200</strong></td><td>Central Principal</td><td>420 uds.</td><td><span class="status-tag ok">Óptimo</span></td></tr>
+                    <tr><td><strong>MOD-SEN-44B</strong></td><td>Nave Sur</td><td>18 uds.</td><td><span class="status-tag warn">Stock bajo</span></td></tr>
+                    <tr><td><strong>VALV-HP-09</strong></td><td>Taller Reparación</td><td>115 uds.</td><td><span class="status-tag ready">Listo</span></td></tr>
+                    <tr><td><strong>EJE-CIG-780</strong></td><td>Almacén Norte</td><td>67 uds.</td><td><span class="status-tag ok">Óptimo</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
         </div>
+      </div>
     </section>
 
-    <!-- ============================================
-         FEATURES SECTION
-         ============================================ -->
-    <section class="features-section" id="features">
-        <h2 class="section-title">Características Principales</h2>
-        <p class="section-subtitle">
-            Herramientas profesionales diseñadas para optimizar la gestión de tu negocio
+    <!-- MODULES -->
+    <section class="modules-section" id="modulos">
+      <div class="container">
+        <div class="modules-header">
+          <div>
+            <span class="eyebrow" style="margin-bottom:1rem;display:block;">Módulos del sistema</span>
+            <h2 class="section-title">Un ecosistema que crece con tu empresa</h2>
+          </div>
+          <div class="modules-header-right">
+            <p class="section-body" style="max-width:540px;font-size:1rem;">
+              Activa los módulos que necesitas. Software enfocado 100% en el control de stock, compras y despachos diarios.
+              <strong>BuzzDM no incluye facturación fiscal ni enredos tributarios:</strong> tus datos se exportan limpios para tu software contable habitual.
+            </p>
+          </div>
+        </div>
+
+        <!-- Boton Con/Sin BuzzDM destacado y centrado debajo del encabezado -->
+        <div class="switch-center-wrap">
+          <div class="switch-control-pill" role="group" aria-label="Selector de escenario con o sin BuzzDM">
+            <span class="switch-status-label" id="labelOff" title="Ver problemas del día a día manual">
+              <span>Sin BuzzDM</span>
+              <small>Caos manual y disperso</small>
+            </span>
+            <button class="toggle-btn-featured active" id="moduleSwitchBtn" type="button" role="switch" aria-checked="true" aria-label="Alternar entre escenario con y sin BuzzDM">
+              <span class="toggle-knob-featured"></span>
+            </button>
+            <span class="switch-status-label is-active" id="labelOn" title="Ver ERP operativo unificado">
+              <span>Con BuzzDM</span>
+              <small>ERP operativo unificado</small>
+            </span>
+          </div>
+        </div>
+
+        <div class="modules-container" id="modulesContainer"></div>
+        <div class="modules-footer">
+          <a href="#diferenciadores" class="modules-footer-link">Ver todas las funciones <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="quote-section">
+      <div class="container">
+        <div class="quote-inner">
+          <span class="quote-mark" aria-hidden="true">"</span>
+          <blockquote class="quote-text">
+            Tener el inventario de libros y papelería al día era un caos constante entre el almacén y el mostrador. Con BuzzDM pudimos organizar las existencias, planificar las compras antes del inicio de temporada y saber qué reponer sin perder horas en hojas de cálculo.
+          </blockquote>
+          <div class="quote-byline">
+            <div class="quote-avatar" aria-hidden="true">MC</div>
+            <div>
+              <div class="quote-author">Maria Castro</div>
+              <div class="quote-role">Gerente General &middot; Proyecto académico demostrativo</div>
+              <div class="quote-result">Caso real de validación operativa en PYME</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIDEO (PRESENTACION ACADEMICA CENTRADA) -->
+    <section class="video-section" id="demovideo">
+      <div class="container">
+        <div class="video-header">
+          <span class="eyebrow" style="margin-bottom:1rem;display:block;">Demostración Técnica</span>
+          <h2 class="section-title">Presentación académica del proyecto</h2>
+          <p class="section-body">
+            Recorrido explicativo sobre la arquitectura, el diseño de la base de datos y la operación en tiempo real de los módulos de inventario, pedidos y compras del ERP.
+          </p>
+        </div>
+        <div class="video-frame">
+          <!-- Wistia Player Embed Oficial -->
+          <script src="https://fast.wistia.com/player.js" async></script>
+          <script src="https://fast.wistia.com/embed/9wdn2starm.js" async type="module"></script>
+          <style>wistia-player[media-id='9wdn2starm']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/9wdn2starm/swatch'); display: block; filter: blur(5px); padding-top:56.25%; }</style>
+          <wistia-player media-id="9wdn2starm" aspect="1.7777777777777777">
+            <div class="wistia_preload_transcript_outer_wrapper" style="width: 100%; height: 100%; display:flex; justify-content:center; align-items: center; margin-top:-56.25%;">
+              <div class="wistia_preload_transcript_inner_wrapper" style="overflow: auto;">
+                <p class="wistia_preload_transcript_text" aria-hidden="true" tabindex="-1" style="text-align: justify; font-size: 5px !important;">Muchas empresas en crecimiento enfrentan el mismo problema. Lo que registra el sistema no refleja lo que realmente hay en el almacén. Pedidos sin stock, compras duplicadas, datos dispersos en hojas de cálculo que nadie controla. Bust Data Manager es una herramienta útil para resolver eso. Es un sistema ERP orientado a la gestión de inventario, ventas, clientes y logística. El backend está construido en PHP 8.1 con María d b como motor de base de datos. El frontend usa HTML 5, Bootstrap 5.3 y JavaScript sin frameworks pesados, lo que mantiene la carga rápida y el mantenimiento simple. La arquitectura sigue un patrón derivado de MVC. Cada módulo tiene 3 responsabilidades claramente separadas. El controller recibe la petición HTTP. El service aplica la lógica de negocio y el repository accede a la base de datos. Esto hace que el sistema sea mantenible extensible, sin afectar el resto del código. El resultado son 26 endpoints documentados bajo Open API 3.0, consultables directamente desde el Swager UI integrado. Boost Data Manager está organizado en 4 grupos funcionales. El grupo de productos cubre el inventario completo, productos físicos, servicios y kits organizados por categorías, marcas y almacenes con sus respectivos proveedores. El grupo de operaciones es donde ocurre el trabajo diario, gestión de clientes, creación de pedidos, control de envíos, entradas de mercancía, requisiciones de compra y transferencias entre almacenes. El grupo de herramientas incluye un tablero de tareas tipo Kanban y la importación masiva de datos desde Excel, y el grupo de sistema cubre la administración de usuarios, generación de reportes, backups automáticos y configuración general. Vemos 2 módulos en acción. El módulo de inventario gestiona el stock bajo el modelo de costo promedio ponderado. Cada vez que entra mercancía, el sistema recalcula automáticamente el costo unitario promedio. Esto simplifica la valoración para operaciones de mercancía general. Cada entrada de mercancía pasa por un ciclo de vida controlada, borrador, confirmado o anulado. El momento crítico es la confirmación. Un trigger SQL suma automáticamente las cantidades al almacén correspondiente. Si hay un error, otro trigger revierte todo. No hay movimiento sin respaldo de auditoría, ninguno, y el sistema no solo mueve stock, lo clasifica en tiempo real. Cada producto tiene un estado que se actualiza solo, verde si hay suficiente, amarillo si está bajo el mínimo, rojo si se agotó. La seguridad no es un módulo separado en boss data, está en el núcleo del sistema. El control de acceso es por roles, administrador, supervisor y operador, con permisos definidos en base de datos por módulo, no en código. La autenticación usa cifrado de crip. Al 10º intento fallido, la cuenta se bloquea automáticamente y el administrador recibe una notificación inmediata. Las cuentas administrativas requieren doble factor de autenticación con Google Authenticator, implementado de forma nativa sin servicios externos. A nivel de infraestructura, todas las consultas a base de datos están parametrizadas para prevenir inyección SQL. Boost Data Manager elimina trabajo manual. 3 automatizaciones que lo demuestran. 1º, cuando un producto cae bajo su stock mínimo, el sistema genera la alerta al administrador sin intervención humana. Ningún producto se agota sin aviso previo. 2º, y esta es la más impactante operativamente, las requisiciones inteligentes. Un clic en auto stock consulta todos los productos bajo su mínimo y rellena la solicitud de compra con las cantidades necesarias y el proveedor con mejor precio histórico. Lo que antes tomaba tiempo, toma un clic. 3º, 6 triggers SQL activos automatizan la actualización de stock, el registro de movimientos y el log de auditoría en cada operación. Entre otras automatizaciones, backups diarios automáticos e importación masiva desde Excel con validación fila por fila. La base de datos tiene 30 tablas y 16 vistas SQL, que precalculan los datos más consultados, inventario crítico, top de productos vendidos, historial de importaciones. La integridad referencial está garantizada mediante foreign keys, y el soft delete asegura que ningún registro maestro se elimine físicamente. Todo tiene historial. El sistema está validado para más de 100000 productos, 10000 pedidos mensuales y múltiples almacenes con ubicaciones internas, y los 26 endpoints documentados en Open API 3.0 permiten que cualquier frontend futuro, tienda en línea, aplicación móvil, se integre sin modificar el backend. Bus Data Manager está en producción en bus data manager punto com como sistema de gestión de pedidos para la librería Chiqui en El Tigre, estado Anzoategui. Es un sistema completo pensado para pequeñas y medianas empresas. Inventario, ventas, logística, seguridad y automatización.</p>
+              </div>
+            </div>
+          </wistia-player>
+        </div>
+
+        <p class="video-credit" style="margin-top: 0.75rem; font-size: 0.76rem; font-style: italic; color: var(--c-text-3); text-align: center;">
+          Agradecimiento especial a P. Bencomo por su ayuda con la edición del video.
         </p>
-
-        <div class="features-grid">
-            <!-- Feature 1: Inventory -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <h3 class="feature-title">Gestión de Inventario</h3>
-                <p class="feature-description">
-                    Control completo de productos, stock y movimientos con alertas automáticas de inventario bajo.
-                </p>
-            </div>
-
-            <!-- Feature 2: Orders -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                </div>
-                <h3 class="feature-title">Procesamiento de Pedidos</h3>
-                <p class="feature-description">
-                    Sistema eficiente para gestionar pedidos, seguimiento de estados y control de entregas.
-                </p>
-            </div>
-
-            <!-- Feature 3: Clients -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <h3 class="feature-title">Base de Clientes</h3>
-                <p class="feature-description">
-                    Administración centralizada de clientes con historial completo de transacciones.
-                </p>
-            </div>
-
-            <!-- Feature 4: Reports -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3 class="feature-title">Reportes Avanzados</h3>
-                <p class="feature-description">
-                    Análisis detallados y reportes personalizables para toma de decisiones informadas.
-                </p>
-            </div>
-
-            <!-- Feature 5: Backups -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-database"></i>
-                </div>
-                <h3 class="feature-title">Respaldos Automáticos</h3>
-                <p class="feature-description">
-                    Sistema de backups programados para garantizar la seguridad de tu información.
-                </p>
-            </div>
-
-            <!-- Feature 6: Security -->
-            <div class="feature-card">
-                <div class="feature-icon">
-                    <i class="fas fa-shield-alt"></i>
-                </div>
-                <h3 class="feature-title">Seguridad Avanzada</h3>
-                <p class="feature-description">
-                    Control de acceso por roles, auditoría de acciones y protección de datos empresariales.
-                </p>
-            </div>
-        </div>
+        <p class="video-summary-note" style="margin-top: 1.25rem; font-size: 0.88rem; color: var(--c-text-2); max-width: 780px; margin-inline: auto; line-height: 1.6; text-align: center;">
+          Este video corresponde a la presentación técnica oficial grabada para la defensa del sistema, donde se expone la arquitectura multi-tenant y base de datos, los flujos operativos de almacén y reposición en tiempo real, y los resultados prácticos de validación con usuarios.
+        </p>
+      </div>
     </section>
 
-    <!-- ============================================
-         STATS SECTION
-         ============================================ -->
-    <section class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" data-target="100" data-suffix="%">0%</div>
-                <div class="stat-label">Confiabilidad</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-number" data-target="24" data-suffix="/7">0/7</div>
-                <div class="stat-label">Disponibilidad</div>
-            </div>
-
-            <div class="stat-card">
-                <div class="stat-number" data-target="100" data-suffix="%">0%</div>
-                <div class="stat-label">Seguridad</div>
-            </div>
+    <!-- PRODUCTIVITY -->
+    <section class="productivity-section" id="productividad">
+      <div class="container">
+        <div class="productivity-header">
+          <span class="eyebrow" style="margin-bottom:1rem;display:block;">Rendimiento</span>
+          <h2 class="section-title">Operaciones a la velocidad del trabajo real</h2>
+          <p class="productivity-claim">Hasta un 72% menos de tiempo en entrada de datos. Consultas con respuesta inferior a 45 ms.</p>
         </div>
+        <div class="productivity-cols">
+          <div class="productivity-col">
+            <div class="productivity-col-num" aria-hidden="true">01</div>
+            <h3 class="productivity-col-title">Búsqueda universal</h3>
+            <p class="productivity-col-body">Encuentra cualquier SKU entre más de 50,000 referencias en menos de 50 ms. Índices optimizados en memoria, sin esperas.</p>
+          </div>
+          <div class="productivity-col">
+            <div class="productivity-col-num" aria-hidden="true">02</div>
+            <h3 class="productivity-col-title">Entrada numérica fluida</h3>
+            <p class="productivity-col-body">Diseñado para lectores de código de barras y terminales de mostrador. Avance automático con Tab, sin ratón.</p>
+          </div>
+          <div class="productivity-col">
+            <div class="productivity-col-num" aria-hidden="true">03</div>
+            <h3 class="productivity-col-title">Exportaciones en un clic</h3>
+            <p class="productivity-col-body">Datos contables, clientes e inventario disponibles en CSV, Excel o SQL cuando los necesites, sin tickets de soporte.</p>
+          </div>
+        </div>
+        <div class="ctrl-k-demo">
+          <div>
+            <div class="ctrl-k-desc-eyebrow">Paleta de modulos</div>
+            <h3 class="ctrl-k-desc-title">Navega todo el ERP con <span class="ctrl-k-kbd">Ctrl</span> <span class="ctrl-k-kbd">K</span></h3>
+            <p class="ctrl-k-desc-body">Atajo del sistema, no de esta web: dentro del ERP, Ctrl+K filtra y abre los modulos que tienes permitidos. La lista se arma leyendo tu menu lateral.</p>
+          </div>
+          <div>
+            <div class="ctrl-k-ui" aria-label="Vista previa de la paleta de comandos Ctrl+K">
+              <div class="ctrl-k-search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <span>Ir a un modulo&hellip;</span>
+              </div>
+              <ul class="ctrl-k-results-list" role="list">
+                <li class="ctrl-k-row is-selected" role="listitem">
+                  <span class="ctrl-k-row-left"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>Pedidos</span>
+                  <span class="kbd">Enter</span>
+                </li>
+                <li class="ctrl-k-row" role="listitem">
+                  <span class="ctrl-k-row-left"><i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>Requisiciones</span>
+                  <span class="kbd">Operaciones</span>
+                </li>
+                <li class="ctrl-k-row" role="listitem">
+                  <span class="ctrl-k-row-left"><i class="fa-solid fa-file-import" aria-hidden="true"></i>Importacion</span>
+                  <span class="kbd">Herramientas</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:3rem;">
+          <a href="#comparativa-detalle" class="btn btn-ghost">
+            Comparar con ERPs tradicionales <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
     </section>
 
-    <!-- ============================================
-         CTA SECTION
-         ============================================ -->
-    <section class="cta-section">
-        <div class="cta-content">
-            <h2 class="cta-title">¿Listo para Optimizar tu Negocio?</h2>
-            <p class="cta-text">
-                Prueba BUZZ Data Manager sin costo por 15 días con aprovisionamiento instantáneo de tu propia empresa.
-            </p>
-            <div class="hero-buttons">
-                <a href="registro" class="btn-hero-primary">
-                    <i class="fas fa-rocket"></i> Comenzar Prueba Gratis
-                </a>
-                <a href="login" class="btn-hero-secondary">
-                    <i class="fas fa-sign-in-alt"></i> Ya tengo cuenta
-                </a>
-            </div>
+    <!-- DIFFERENTIATORS -->
+    <section class="differentiators-section" id="diferenciadores">
+      <div class="container">
+        <div class="diff-intro">
+          <span class="eyebrow" style="margin-bottom:1rem;display:block;">Por qué BuzzDM</span>
+          <h2 class="section-title">Seis razones sólidas</h2>
+          <p class="section-body" style="margin-top:1rem;font-size:1rem;">Sin complejidades forzadas, sin trampas de licencia. Un ERP open source centrado en los problemas reales de tu negocio.</p>
         </div>
+        <ol class="diff-list" aria-label="Razones para elegir BuzzDM">
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">01</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Abierto y transparente</h3>
+              <p class="diff-desc">Código open source auditado por la comunidad. Sabes exactamente qué hace el software con la información de tu empresa.</p>
+              <a href="about.php" class="diff-link">Filosofía de código abierto <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">02</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Ecosistema e integraciones</h3>
+              <p class="diff-desc">API REST documentada. Conecta balanzas, impresoras termicas, lectores de codigo de barras y tiendas electronicas sin desarrollo a medida.</p>
+              <a href="api_docs/" class="diff-link">Documentación de API <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">03</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Sin dependencia de consultores</h3>
+              <p class="diff-desc">"El software corporativo vive de cobrarte por soporte tecnico. BuzzDM esta disenado para que nunca necesites intermediarios."</p>
+              <a href="#acceso-demo" class="diff-link">Nuestro modelo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">04</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Tus datos son tuyos</h3>
+              <p class="diff-desc">Exporta tu base completa en SQL o CSV en cualquier momento. Sin bloqueos propietarios, sin costes de salida si decides migrar.</p>
+              <a href="importacion.php" class="diff-link">Política de datos libres <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">05</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Sin cargos ocultos</h3>
+              <p class="diff-desc">Demo de 14 días completa y sin tarjeta. Sin comisiones por transaccion, sin costes por usuario adicional y sin permanencia forzada.</p>
+              <a href="#acceso-demo" class="diff-link">Condiciones de la demo <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+          <li class="diff-item">
+            <span class="diff-num" aria-hidden="true">06</span>
+            <div class="diff-body">
+              <h3 class="diff-title">Instalacion ligera, sin sobredimensionar</h3>
+              <p class="diff-desc">Corre sobre PHP y MySQL estandar. Sin infraestructura costosa ni contratos de nube forzados. Tu servidor, tus reglas.</p>
+              <a href="#comparativa-detalle" class="diff-link">Ver comparativa <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+            </div>
+          </li>
+        </ol>
+        <div class="comparison-section" id="comparativa-detalle">
+          <div class="comp-label">BuzzDM frente a las alternativas</div>
+          <div class="comp-table-wrap">
+            <table class="comp-table">
+              <thead>
+                <tr>
+                  <th scope="col">Criterio</th>
+                  <th scope="col">Buzz Data Manager</th>
+                  <th scope="col">ERPs tradicionales</th>
+                  <th scope="col">Hojas de calculo</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>Puesta en marcha</td><td class="comp-col-buzz">Menos de 10 minutos</td><td>3 a 6 meses</td><td>Inmediato (manual)</td></tr>
+                <tr><td>Coste inicial</td><td class="comp-col-buzz">14 días gratis (Open Source)</td><td>Licencia + consultoría cara</td><td>Bajo, pero costoso en errores</td></tr>
+                <tr><td>Stock en tiempo real</td><td class="comp-col-buzz">Automatico, multialmacén</td><td>Lento y rígido</td><td>Propenso a desfases</td></tr>
+                <tr><td>Soberanía de datos</td><td class="comp-col-buzz">100% tuya, exportable</td><td>Atrapado en su nube</td><td>Disperso en correos</td></tr>
+                <tr><td>Curva de aprendizaje</td><td class="comp-col-buzz">Rápida e intuitiva</td><td>Cursos complejos</td><td>Desigual por usuario</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- ============================================
-         FOOTER
-         ============================================ -->
-    <footer class="landing-footer">
-        <div class="footer-content">
-            <p>&copy; 2026 BUZZ Data Manager. Sistema de Gestión Empresarial.</p>
+    <!-- PROOF -->
+    <section class="proof-section">
+      <div class="container">
+        <div class="proof-grid">
+          <div>
+            <span class="eyebrow" style="margin-bottom:2rem;display:block;">Validación del sistema en entorno real</span>
+            <div class="stats-list">
+              <div class="stat-row"><div class="stat-num">1</div><div class="stat-meta"><div class="stat-label">Caso piloto en entorno real</div><div class="stat-sub">Validado en Proyecto académico demostrativo (almacen y mostrador)</div></div></div>
+              <div class="stat-row"><div class="stat-num">6</div><div class="stat-meta"><div class="stat-label">Módulos operativos desarrollados</div><div class="stat-sub">Inventario, pedidos, compras, kanban, importacion y BI</div></div></div>
+              <div class="stat-row"><div class="stat-num">&lt; 50ms</div><div class="stat-meta"><div class="stat-label">Tiempo de respuesta indexado</div><div class="stat-sub">Pruebas locales sobre stack nativo PHP y MySQL</div></div></div>
+            </div>
+          </div>
+          <div class="testimonial-block">
+            <blockquote class="testimonial-quote">Pasamos de perder pedidos por no saber si había existencias en el depósito a despachar ágilmente múltiples pedidos en el mismo día sin complicaciones. Las requisiciones inteligentes nos salvaron de quedarnos sin productos en temporada alta.</blockquote>
+            <div class="testimonial-byline">
+              <div class="testimonial-avatar" aria-hidden="true">MC</div>
+              <div><div class="testimonial-name">Maria Castro</div><div class="testimonial-role">Gerente General &middot; Proyecto académico demostrativo</div></div>
+            </div>
+            <div class="testimonial-result"><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i>+38% en velocidad de preparación y despacho</div>
+          </div>
         </div>
-    </footer>
+      </div>
+    </section>
 
-    <!-- Scripts -->
-    <script src="assets/js/landing.js?v=1.4.3-saas"></script>
+    <!-- FINAL CTA -->
+    <section class="final-cta-section" id="acceso-demo">
+      <div class="container">
+        <div class="final-cta-inner">
+          <h2 class="final-h2">Comprueba el funcionamiento del ERP.</h2>
+          <p class="final-sub">14 días de acceso completo a la demo académica. Evalúa BuzzDM con datos de prueba o importa tu catálogo.</p>
+          <div class="final-cta-row">
+            <a href="registro" class="btn btn-primary" style="font-size:1.05rem;padding:0.9rem 1.75rem;">Acceder a la demo</a>
+            <p class="final-microcopy">Acceso instantáneo</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-col-title">Comunidad</div>
+          <ul class="footer-links">
+            <li><a href="about.php">Código abierto y filosofía</a></li>
+            <li><a href="https://github.com/Gibean/BuzzDM" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="guia_contribucion.html">Guía de contribución Git</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Recursos técnicos</div>
+          <ul class="footer-links">
+            <li><a href="manual.php">Manual de usuario</a></li>
+            <li><a href="api_docs/">Documentación API REST</a></li>
+            <li><a href="guia_contribucion.html">Requisitos de servidor local</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Funciones</div>
+          <ul class="footer-links">
+            <li class="footer-static-item">Control de Inventario</li>
+            <li class="footer-static-item">Ventas y Despachos</li>
+            <li class="footer-static-item">Requisiciones Inteligentes</li>
+            <li class="footer-static-item">Tableros Kanban</li>
+            <li class="footer-static-item">Importación Masiva Excel</li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Proyecto Académico</div>
+          <ul class="footer-links">
+            <li><a href="about.php">Acerca del proyecto</a></li>
+            <li><button class="btn btn-ghost" style="font-size:0.875rem;padding:0;" id="openPrivacyModal" type="button">Política de privacidad</button></li>
+            <li><button class="btn btn-ghost" style="font-size:0.875rem;padding:0;" id="openTermsModal" type="button">Términos de evaluación</button></li>
+            <li><button class="btn btn-ghost" style="font-size:0.875rem;padding:0;" id="openCookiesModal" type="button">Política de cookies</button></li>
+            <li><a href="mailto:buzzdatamanager@gmail.com">buzzdatamanager@gmail.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div style="max-width: 820px;">
+          <div class="footer-legal" style="line-height: 1.6; font-size: 0.82rem; color: var(--c-text-3);">&copy; 2026 Buzz Data Manager fue desarrollado como proyecto académico de grado orientado a la investigación y optimización operativa de pequeñas y medianas empresas (PYMEs). Derechos de autor referentes al desarrollo del código y arquitectura de software: Gisvel Aray y Yeicson Acosta. Distribuido libremente bajo filosofía de código abierto (Open Source). Derechos reservados, no se permite redistribución comercial.</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <select class="lang-select" aria-label="Seleccionar idioma"><option value="es" selected>ES</option><option value="en">EN</option></select>
+          <div class="footer-social">
+            <a href="https://github.com/Gibean/BuzzDM" target="_blank" rel="noopener noreferrer" aria-label="Repositorio de Buzz Data Manager en GitHub"><i class="fa-brands fa-github" aria-hidden="true"></i></a>
+            <a href="guia_contribucion.html" aria-label="Guía de contribución Git"><i class="fa-solid fa-code-branch" aria-hidden="true"></i></a>
+            <a href="mailto:buzzdatamanager@gmail.com" aria-label="Correo de contacto"><i class="fa-solid fa-envelope" aria-hidden="true"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- MODALS -->
+    <div class="modal-overlay" id="privacyModal" role="dialog" aria-modal="true" aria-labelledby="privacyModalTitle">
+    <div class="modal-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
+      <button class="modal-close" data-modal="privacyModal" aria-label="Cerrar">&times;</button>
+      <h3 class="modal-title" id="privacyModalTitle">Política de Privacidad</h3>
+      <div class="modal-body" id="privacyContent"><p>Cargando...</p></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="termsModal" role="dialog" aria-modal="true" aria-labelledby="termsModalTitle">
+    <div class="modal-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
+      <button class="modal-close" data-modal="termsModal" aria-label="Cerrar">&times;</button>
+      <h3 class="modal-title" id="termsModalTitle">Términos del Servicio</h3>
+      <div class="modal-body" id="termsContent"><p>Cargando...</p></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="cookiesModal" role="dialog" aria-modal="true" aria-labelledby="cookiesModalTitle">
+    <div class="modal-card" style="max-width:640px;max-height:80vh;overflow-y:auto;">
+      <button class="modal-close" data-modal="cookiesModal" aria-label="Cerrar">&times;</button>
+      <h3 class="modal-title" id="cookiesModalTitle">Política de Cookies</h3>
+      <div class="modal-body" id="cookiesContent"><p>Cargando...</p></div>
+    </div>
+  </div>
+
+  <!-- COOKIE BANNER -->
+  <div class="cookie-banner" id="cookieBanner" role="alertdialog" aria-describedby="cookieBannerDesc" aria-label="Aviso de cookies">
+    <p id="cookieBannerDesc">
+      Utilizamos cookies esenciales para el funcionamiento del sitio. Sin cookies de publicidad ni rastreo de terceros.
+      <button class="btn btn-ghost" id="openCookiePolicyBtn" type="button" style="display:inline;font-size:inherit;color:var(--c-accent);text-decoration:underline;cursor:pointer;">Leer política de cookies</button>.
+    </p>
+    <div class="cookie-actions">
+      <button class="cookie-accept" id="cookieAccept" type="button">Aceptar</button>
+      <button class="cookie-decline" id="cookieDecline" type="button">Solo esenciales</button>
+    </div>
+  </div>
+
+  <script src="assets/landing/landing-content.js?v=3.6.1"></script>
+  <script src="assets/landing/landing.js?v=3.6.1"></script>
 </body>
 </html>

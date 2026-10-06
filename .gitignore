@@ -1,16 +1,46 @@
 vendor/
 backups/
 php/backups/
+# Aplicacion de diagramas: dependencias de Node y subproyecto separado.
+# Se excluye entero de versionado por decision; su package.json encaja 10
+# vulnerabilidades npm que aun no se han revisado.
 diagrams/
+# Secretos reales. .env.example SI se versiona: es una plantilla sin valores.
 .env
 .env.local
-.env.example
 .env.development.local
 .env.test.local
 .env.production.local
-templates/Datos_Ejemplo_Catalogos.xlsx
-templates/Datos_Ejemplo_Productos.xlsx
-templates/Datos_Ejemplo_Clientes.xlsx
-templates/Datos_Ejemplo_Proveedores.xlsx
+
+# ============================================================================
+# Datos de tenants: nunca se versionan.
+# ============================================================================
+# El esquema limpio que se instala SI se versiona (db/schema.sql) y es la unica
+# fuente de verdad para una instalacion nueva. Los .sql de abajo son volcados con
+# datos reales de empresas y usuarios: se conservan solo en el servidor y en el
+# respaldo local. db/tools/ y db/*.sql sueltos que ya se aplicaron se eliminaron.
+db/dbuzz*.sql
+db/liberar_programa.sql
+db/mock_libreria_inserts.sql
+db/mock_data/
+php/generate_mocks.php
+php/backups/legacy/
+
+# Plantilla de despliegue especifico (Hostinger): se genera localmente.
+db/template_hostinger.sql
+
+# Logos subidos por los tenants: son imagenes de terceros que se crean en
+# ejecucion. Solo se versiona el .htaccess que protege la carpeta.
+assets/img/uploads/*
+!assets/img/uploads/.htaccess
+assets/img/uploads/companies/
+
+# Datos de ejemplo en Excel: contienen informacion de clientes real.
+templates/Datos_Ejemplo_*.xlsx
+
 # BORRAR
 tmp_fix_detalles.php
+# Notas operativas locales: rutas de servidor y hallazgos internos.
+# Ademas bloqueado en .htaccess: ignorarlo en git no lo protege del servidor web.
+PLAN_ACCION.md
+diff_output.txt

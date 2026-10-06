@@ -16,6 +16,17 @@ $nav_subtitle = $nav_subtitle ?? '';
 $nav_actions  = $nav_actions  ?? '';
 ?>
 <nav class="top-navbar">
+    <?php
+    // Token CSRF disponible para todo el JavaScript de la pagina.
+    //
+    // notifications.js lo carga desde todas las paginas (via este componente) y
+    // lo lee con document.querySelector('[name="csrf_token"]'). Antes solo lo
+    // emitian admin.php y el formulario de importacion, asi que en el resto de
+    // paginas el selector devolvia null y el endpoint rechazaba la peticion con
+    // 403. El valor es el mismo que genera getCsrfToken(), por lo que no afecta
+    // a admin.js, que sigue funcionando con su propio campo.
+    ?>
+    <?= csrfField() ?>
     <div class="top-navbar__title-block">
         <button class="top-navbar__toggle" id="sidebarToggle" aria-label="Toggle menu">
             <i class="fas fa-bars"></i>

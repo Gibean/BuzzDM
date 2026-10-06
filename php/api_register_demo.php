@@ -4,14 +4,12 @@
  * POST /php/api_register_demo.php
  */
 
-ob_start();
 header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/src/Service/CompanyService.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    ob_clean();
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Método no permitido.']);
     exit;
@@ -33,14 +31,12 @@ try {
         $code = $input['code'] ?? '';
 
         if (empty($email) || empty($code)) {
-            ob_clean();
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'El correo y el código de 6 dígitos son obligatorios.']);
             exit;
         }
 
         $result = $companyService->verifyEmailCode($email, $code);
-        ob_clean();
         http_response_code(200);
         echo json_encode($result);
         exit;
@@ -49,14 +45,12 @@ try {
     if ($action === 'resend_code') {
         $email = $input['email'] ?? '';
         if (empty($email)) {
-            ob_clean();
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'El correo electrónico es obligatorio.']);
             exit;
         }
 
         $result = $companyService->resendVerificationCode($email);
-        ob_clean();
         http_response_code(200);
         echo json_encode($result);
         exit;
@@ -71,7 +65,6 @@ try {
         'device_fingerprint' => $input['device_fingerprint'] ?? null,
     ]);
 
-    ob_clean();
     http_response_code(201);
     echo json_encode([
         'success' => true,
@@ -87,15 +80,12 @@ try {
     ]);
 
 } catch (InvalidArgumentException $e) {
-    ob_clean();
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } catch (RuntimeException $e) {
-    ob_clean();
     http_response_code(409); // Conflict / Blocked
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 } catch (Exception $e) {
-    ob_clean();
     error_log("Error in api_register_demo: " . $e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Error interno al procesar la solicitud: ' . $e->getMessage()]);

@@ -16,6 +16,15 @@ class ImportController {
             $action = $_GET['action'] ?? null;
 
             if ($method === 'POST') {
+                // La importacion escribe filas en la base de datos. Sin token CSRF,
+                // una pagina externa podria hacer que el navegador de un usuario
+                // con sesion abierta enviase un archivo en su nombre.
+                $token = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+                if (!validateCsrfToken($token)) {
+                    http_response_code(403);
+                    $this->jsonResponse(false, [], 'Error de seguridad: token CSRF inválido o ausente.');
+                }
+
                 $this->processImport();
             } elseif ($method === 'GET') {
                 $this->getHistory();
@@ -62,6 +71,14 @@ class ImportController {
         $fileTmpPath = $_FILES['import_file']['tmp_name'];
         $fileName = $_FILES['import_file']['name'];
         $userId = $_SESSION['usuario_id'] ?? null;
+
+        // Cap de tamano explicito. php/api_import.php sube memory_limit a 512M y
+        // max_execution_time a 300s, asi que sin este limite un .xlsx crafted
+        // (filas/indices sin acotar en el lector) puede agotar CPU o memoria.
+        $maxBytes = 10 * 1024 * 1024;
+        if (($_FILES['import_file']['size'] ?? 0) > $maxBytes) {
+            $this->jsonResponse(false, [], 'El archivo excede el tamaño máximo permitido (10 MB).');
+        }
 
         // Validate MIME Type (Edge Case: Corrupted/Invalid Files)
         $allowedMimeTypes = [

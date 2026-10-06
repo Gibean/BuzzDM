@@ -340,6 +340,8 @@ async function performAction(action, id) {
         const formData = new FormData();
         formData.append('action', action);
         formData.append('id', id);
+        // Requisito del endpoint desde la validacion CSRF.
+        formData.append('csrf_token', document.querySelector('[name="csrf_token"]')?.value || '');
 
         await fetch(notifApiBase + 'api_notifications.php', {
             method: 'POST',

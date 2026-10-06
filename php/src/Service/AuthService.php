@@ -43,12 +43,45 @@ class AuthService {
             throw new Exception($message);
         }
 
-        if (!password_verify($password, $user['password'])) {
-            return $this->handleFailedLogin($user, $email);
-        }
+if (!password_verify($password, $user['password'])) {
+              return $this->handleFailedLogin($user, $email);
+          }
 
-        return $this->handleSuccessfulLogin($user, $email);
-    }
+          // Rehash transparente: si el hash almacenado usa un algoritmo o un
+          // coste menor que el actual, se vuelve a calcular al iniciar sesion y
+          // se sobrescribe. Asi las contrasenas existentes migran solas al
+          // siguiente cambio de parametros, sin forzar un restablecimiento.
+          $this->actualizarHashSiProcede($user, $password);
+
+          return $this->handleSuccessfulLogin($user, $email);
+      }
+
+      /**
+       * Recalcula el hash si el algoritmo o el coste ya no son los recomendados.
+       *
+       * No propaga el error: un fallo al reescribir el hash no debe impedir el
+       * acceso a un usuario que se ha autenticado correctamente.
+       *
+       * @param array  $usuario
+       * @param string $password
+       */
+      private function actualizarHashSiProcede($usuario, $password) {
+          $opciones = ['cost' => 12];
+
+          if (password_needs_rehash($usuario['password'], PASSWORD_DEFAULT, $opciones)) {
+              try {
+                  $nuevo = password_hash($password, PASSWORD_DEFAULT, $opciones);
+                  if ($this->repository->updatePassword($usuario['id'], $nuevo)) {
+                      error_log(
+                          'BUZZ AuthService: hash de contraseña actualizado para usuario '
+                          . (int) $usuario['id']
+                      );
+                  }
+              } catch (Exception $e) {
+                  error_log('BUZZ AuthService: no se pudo actualizar el hash: ' . $e->getMessage());
+              }
+          }
+      }
 
     private function handleFailedLogin($user, $email) {
         $newAttempts = ($user['intentos_fallidos'] ?? 0) + 1;
@@ -56,6 +89,26 @@ class AuthService {
         $logDetail = 'Contraseña incorrecta';
 
         if ($newAttempts >= 10) {
+            // El bloqueo permanente (estado='bloqueado') deja la cuenta inutilizable
+            // hasta una intervencion manual en la base de datos. Para el usuario que
+            // creo la empresa eso seria especialmente grave: basta con conocer su
+            // email para dejar sin acceso a toda la organizacion. Se comprueba que
+            // su email sea el admin_email de su empresa, que es como CompanyService
+            // identifica al propietario al dar de alta la compania.
+            //
+            // El propietario no se bloquea de forma permanente; sigue acumulando
+            // intentos y el RateLimiter aplica un cooldown temporal por IP y email.
+            if ($this->esPropietario($user)) {
+                $this->repository->updateFailedAttempts($user['id'], $newAttempts);
+                $logDetail = 'Intentos agotados en cuenta de propietario (sin bloqueo permanente)';
+                $this->repository->logLoginAttempt($user['id'], 'Denegado', $logDetail);
+
+                throw new Exception(
+                    'Demasiados intentos. Por seguridad esta cuenta quedara bloqueada '
+                    . 'temporalmente; contacta al administrador del sistema.'
+                );
+            }
+
             $this->repository->blockUser($user['id'], $newAttempts);
             $message = 'Demasiados intentos, usuario bloqueado.';
             $logDetail = 'Usuario bloqueado por máximos intentos';
@@ -68,6 +121,39 @@ class AuthService {
 
         $this->repository->logLoginAttempt($user['id'], 'Denegado', $logDetail);
         throw new Exception($message);
+    }
+
+    /**
+     * Indica si el usuario es el propietario de su empresa.
+     *
+     * El propietario es el usuario cuyo email coincide con empresa.admin_email,
+     * que es el valor que CompanyService::provisionCompany() graba al crear la
+     * empresa y su primer usuario. No hace falta anadir una columna nueva: esa
+     * ya es la relacion que existe en el esquema.
+     *
+     * @param array $usuario
+     * @return bool
+     */
+    private function esPropietario($usuario) {
+        $email = trim((string) ($usuario['email'] ?? ''));
+        if ($email === '') {
+            return false;
+        }
+
+        try {
+            $pdo = getDbConnection();
+            $stmt = $pdo->prepare(
+                'SELECT 1 FROM empresa WHERE admin_email = ? LIMIT 1'
+            );
+            $stmt->execute([$email]);
+            return (bool) $stmt->fetchColumn();
+        } catch (Exception $e) {
+            // Si no se puede comprobar, se asume que NO es propietario. Es el
+            // lado conservador en cuanto a no saltarse el bloqueo por un fallo
+            // transitorio de base de datos.
+            error_log('BUZZ AuthService: no se pudo verificar propietario: ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function handleSuccessfulLogin($user, $email) {
@@ -104,6 +190,15 @@ class AuthService {
 
         // Cleanup expired sessions before creating a new one (prevents table bloat)
         $this->repository->cleanupExpiredSessions();
+
+        // Session fixation: se emite un identificador de sesion nuevo al
+        // autenticarse, de modo que un ID previo (?PHPSESSID=... o una cookie
+        // fijada antes del login) deja de ser utilizable. Con delete_old_session
+        // en true se destruye tambien el fichero de sesion anterior, para que no
+        // quede disponible tras el cambio de privilegio.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_regenerate_id(true);
+        }
 
         // Create API session token
         $token = bin2hex(random_bytes(32));
@@ -340,7 +435,27 @@ class AuthService {
      * Handle logout
      */
     public function logout() {
-        session_destroy();
+        // El logout tambien regenera: si el navegador conserva la cookie y solo
+        // se destruye el almacenamiento, el identificador sigue siendo valido y
+        //Session fixation + "cerrar sesion sin cerrar" quedarian abiertos.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $_SESSION = [];
+
+            if (ini_get('session.use_cookies')) {
+                $params = session_get_cookie_params();
+                setcookie(session_name(), '', [
+                    'expires'  => time() - 42000,
+                    'path'     => $params['path'],
+                    'domain'   => $params['domain'],
+                    'secure'   => $params['secure'],
+                    'httponly' => $params['httponly'],
+                    'samesite' => $params['samesite'] ?? 'Lax',
+                ]);
+            }
+
+            session_destroy();
+        }
+
         return ['success' => true, 'message' => 'Sesión cerrada.', 'redirect' => 'login'];
     }
 }

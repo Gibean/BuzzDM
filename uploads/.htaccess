@@ -1,0 +1,52 @@
+# ============================================================================
+# BuzzDM - uploads/
+# ============================================================================
+# Esta directorio solo debe servir imagenes. No existe ninguna barrera de
+# ejecucion por defecto: httpd-xampp.conf mapea <FilesMatch "\.php$"> al
+# handler PHP en todo el arbol htdocs, asi que un .php que aterrizase aqui se
+# ejecutaria. Aunque hoy los endpoints de subida fuerzan la extension y re-codifican
+# la imagen con GD, cualquier regresion futura (o un upload en otra ruta) convertiria
+# esto en ejecucion remota de codigo.
+# ============================================================================
+
+Options -Indexes
+
+# Sin ejecucion de interpretes bajo ninguna circunstancia
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>
+
+# Desregistrar cualquier handler heredado para estos tipos y negarlos
+<IfModule mod_mime.c>
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh .asp .aspx
+    RemoveType .php .phtml .php3 .php4 .php5 .php7 .php8 .pht .phar .cgi .pl .py .sh .asp .aspx
+</IfModule>
+
+<FilesMatch "\.(?i:php|phtml|php[3-8]|pht|phar|cgi|pl|py|sh|asp|aspx|jsp|html?|js|svg|xml|ini|log|sql|bak|conf|htaccess)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Solo imagenes raster. svg queda deliberadamente en la lista de negados de
+# arriba: SettingsService.php acepta unicamente png/jpg y siempre re-codifica a
+# .webp con GD, asi que un svg nunca deberia llegar aqui. Mantenerlo bloqueado
+# es defensa en profundidad frente a una regresion futura en el endpoint.
+<FilesMatch "\.(?i:jpg|jpeg|png|gif|webp)$">
+    <IfModule mod_headers.c>
+        Header set X-Content-Type-Options "nosniff"
+        Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+    </IfModule>
+</FilesMatch>

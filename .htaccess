@@ -14,11 +14,15 @@
     # Prevent clickjacking
     Header set X-Frame-Options "SAMEORIGIN"
 
-    # Enable XSS Filter
+    # Legacy XSS auditor (ignorado por navegadores modernos; la cobertura real
+    # la da la Content-Security-Policy que se anade en una fase posterior)
     Header set X-XSS-Protection "1; mode=block"
 
     # Referrer Policy
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Feature policy: no necesitamos camara/microfono/geolocalizacion
+    Header set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()"
 
     # Disable caching for API responses
     <FilesMatch "\.(php)$">
@@ -27,35 +31,73 @@
 </IfModule>
 
 # ----------------------------------------------------------------------
-# Protect Sensitive Files
+# Deny Access To Sensitive Paths
 # ----------------------------------------------------------------------
-
-# Block access to .env files
-<FilesMatch "^\.env">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-
-# Block access to debug logs
-<Files "debug_log.txt">
-    Order Allow,Deny
-    Deny from all
-</Files>
-
-# Block access to composer files
-<FilesMatch "^composer\.(json|lock)$">
-    Order Allow,Deny
-    Deny from all
-</FilesMatch>
-
-# ----------------------------------------------------------------------
-# URL Rewriting
-# ----------------------------------------------------------------------
+# Todo lo que sigue se aplica ANTES de las reglas de reescritura y con independencia
+# de ellas. Los directorios se niegan con RewriteRule (ruta relativa al directorio de
+# este .htaccess) porque un <Directory>/<Files>Require no es valido en .htaccess.
+# Esta sintaxis no depende de mod_access_compat, a diferencia de "Order Allow,Deny".
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Block .git directory access
-    RewriteRule ^\.git - [F,L]
+    # Directorios que jamas deben servirse: esquema de base de datos, scripts de
+    # diagnostico, suite de pruebas, codigo fuente del subproyecto React y el
+    # codigo de terceros. Todos ellos son alcanzables sin autenticacion.
+    RewriteRule ^(?:db|tests|diagrams|vendor|backups|php/backups|\.vscode|\.git|node_modules)(?:/|$) - [F,L]
+
+    # Scripts y notas internas sin autenticacion. generate_docs.php reescribe
+    # openapi.yaml; check_schema.php imprime el esquema de la BD.
+    RewriteRule ^(?:generate_docs|check_schema)\.php$ - [F,L]
+    RewriteRule ^(?:PLAN_ACCION\.md|diff_output\.txt)$ - [F,L]
+
+    # Solo ejecutables por CLI: cada uno tiene su propio guard php_sapi_name()!=='cli'
+    RewriteRule ^(?:php/)?(?:migrate|generate_mocks|cleanup_tokens)\.php$ - [F,L]
+
+    # NO se bloquean php/tasa_bcv_update.php ni php/check_alerts.php: la aplicacion
+    # los invoca a proposito (backup_check.php por HTTP, dashboard.php por require).
+    # El primero queda protegido por token de cron y el segundo por sesion.
+    # NO se bloquea php/cron/: en hosting compartido el cron se configura por HTTP y
+    # ya exige CRON_SECRET_KEY.
+</IfModule>
+
+# ----------------------------------------------------------------------
+# Protect Sensitive Files
+# ----------------------------------------------------------------------
+<FilesMatch "^\.?env(\.|$)">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+<Files "debug_log.txt">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</Files>
+
+<FilesMatch "^composer\.(json|lock)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# ----------------------------------------------------------------------
+# URL Rewriting (Pretty URLs)
+# ----------------------------------------------------------------------
+<IfModule mod_rewrite.c>
+    RewriteEngine On
 
     # ----------------------------------------------------------------------
     # Pretty URLs - Remove .php extension
@@ -89,14 +131,20 @@
 </IfModule>
 
 # ----------------------------------------------------------------------
-# PHP Settings (if allowed by hosting)
+# PHP Settings
 # ----------------------------------------------------------------------
+# El modulo de Apache se llama mod_php.c en builds de Unix y php_module en
+# XAMPP/Windows. Bajo PHP-FPM no existe mod_php y php_flag no esta disponible,
+# por lo que expose_php/display_errors se fijan en php.ini del servidor.
 <IfModule mod_php.c>
     # Hide PHP version
     php_flag expose_php Off
 
-    # Disable error display in production
-    # php_flag display_errors Off
+    # Never render errors to the browser: stack traces with absolute paths are
+    # an information leak. Errors go to the error log instead.
+    php_flag display_errors Off
+    php_flag display_startup_errors Off
+    php_flag log_errors On
 </IfModule>
 
 # ----------------------------------------------------------------------
@@ -105,11 +153,16 @@
 Options -Indexes
 
 # ----------------------------------------------------------------------
-# Block access to backup files
+# Block access to backup/database dumps
 # ----------------------------------------------------------------------
-<FilesMatch "\.(sql|sql\.gz|bak|backup)$">
-    Order Allow,Deny
-    Deny from all
+<FilesMatch "\.(sql|sql\.gz|bak|backup|dump|log|ini|sh|bat|ps1)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order Allow,Deny
+        Deny from all
+    </IfModule>
 </FilesMatch>
 
 # ----------------------------------------------------------------------

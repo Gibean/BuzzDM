@@ -143,10 +143,28 @@ function checkAndRunBcvSync() {
 }
 
 /**
+ * Indica si las llamadas internas por HTTP deben verificar el certificado TLS.
+ *
+ * Solo se relaja con BACKUP_SKIP_TLS_VERIFY=1, necesario en XAMPP local por el
+ * certificado autofirmado. En produccion se verifica siempre.
+ */
+function backupSslVerifyEnabled(): bool {
+    if (defined('BACKUP_SKIP_TLS_VERIFY')) {
+        return BACKUP_SKIP_TLS_VERIFY !== true;
+    }
+
+    return getenv('BACKUP_SKIP_TLS_VERIFY') !== '1';
+}
+
+/**
  * Trigger the BCV sync script asynchronously
+ *
+ * El endpoint exige token: se propaga BACKUP_SECRET_TOKEN para que la
+ * sincronizacion solo pueda dispararse desde el propio servidor.
  */
 function triggerBcvSyncAsync() {
-    $url = app_url('php/tasa_bcv_update.php');
+    $token = defined('BACKUP_SECRET_TOKEN') ? BACKUP_SECRET_TOKEN : '';
+    $url = app_url('php/tasa_bcv_update.php') . '?token=' . urlencode($token);
 
     // Fire and forget
     if (function_exists('curl_init')) {
@@ -154,11 +172,14 @@ function triggerBcvSyncAsync() {
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT_MS, 500);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, backupSslVerifyEnabled());
         @curl_exec($ch);
         curl_close($ch);
     } else {
-        $context = stream_context_create(['http' => ['timeout' => 0.5, 'ignore_errors' => true]]);
+        $context = stream_context_create([
+            'http' => ['timeout' => 0.5, 'ignore_errors' => true],
+            'ssl' => ['verify_peer' => backupSslVerifyEnabled(), 'verify_peer_name' => backupSslVerifyEnabled()],
+        ]);
         @file_get_contents($url, false, $context);
     }
 }
@@ -170,7 +191,9 @@ function triggerBcvSyncAsync() {
 function triggerBackupAsync() {
     $backupUrl = getBackupUrl();
 
-    error_log("BUZZ Backup: Triggering async backup at URL: " . $backupUrl);
+    // La URL lleva BACKUP_SECRET_TOKEN en el query string: registrarla tal cual
+    // escribiria el secreto en el log de errores, desde donde se podria leer.
+    error_log("BUZZ Backup: Triggering async backup at URL: " . redactSecretsFromUrl($backupUrl));
 
     // Method 1: Use curl with very short timeout (non-blocking)
     if (function_exists('curl_init')) {
@@ -179,7 +202,7 @@ function triggerBackupAsync() {
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT_MS, 500); // 500ms timeout
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT_MS, 500);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, backupSslVerifyEnabled());
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
 
         // Execute and immediately close - fire and forget
@@ -205,6 +228,44 @@ function triggerBackupAsync() {
 
     @file_get_contents($backupUrl, false, $context);
     error_log("BUZZ Backup: Fallback triggered via file_get_contents");
+}
+
+/**
+ * Sustituye los valores sensibles del query string para poder registrar la URL.
+ *
+ * Conserva el esquema, host, ruta y nombre de cada parametro, de modo que el
+ * log sigue siendo util para diagnostico pero no sirve para robar el token.
+ *
+ * @param string $url
+ * @return string
+ */
+function redactSecretsFromUrl($url) {
+    $sensitive = ['token', 'secret', 'key', 'api_key', 'apikey', 'password', 'pass', 'auth'];
+
+    $parts = parse_url($url);
+    if ($parts === false || empty($parts['query'])) {
+        return $url;
+    }
+
+    $redacted = [];
+    parse_str($parts['query'], $params);
+
+    foreach ($params as $name => $value) {
+        $isSensitive = false;
+        foreach ($sensitive as $needle) {
+            if (stripos((string) $name, $needle) !== false) {
+                $isSensitive = true;
+                break;
+            }
+        }
+        $redacted[] = $name . '=' . ($isSensitive ? '[REDACTED]' : $value);
+    }
+
+    $base = (isset($parts['scheme']) ? $parts['scheme'] . '://' : '')
+        . (isset($parts['host']) ? $parts['host'] : '')
+        . (isset($parts['path']) ? $parts['path'] : '');
+
+    return $base . '?' . implode('&', $redacted);
 }
 
 /**

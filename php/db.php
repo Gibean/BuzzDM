@@ -21,7 +21,11 @@ if (class_exists('Dotenv\\Dotenv')) {
         $dotenv = Dotenv\Dotenv::createMutable($dotenv_path, '.env');
         $dotenv->safeLoad();
     }
-    if (file_exists($dotenv_path . '.env.local')) {
+    // .env.local es para desarrollo local. En produccion solo manda .env: mantenerlo
+    // cargable permitia que un archivo de desarrollo (APP_ENV=development, APP_DEBUG=true)
+    // alterara el comportamiento del sitio desplegado.
+    $isProd = (getenv('APP_ENV') ?: $_ENV['APP_ENV'] ?? '') === 'production';
+    if (!$isProd && file_exists($dotenv_path . '.env.local')) {
         $dotenvLocal = Dotenv\Dotenv::createMutable($dotenv_path, '.env.local');
         $dotenvLocal->safeLoad();
     }

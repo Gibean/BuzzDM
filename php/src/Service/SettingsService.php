@@ -75,9 +75,11 @@ class SettingsService {
         }
 
         $uploadDir = __DIR__ . '/../../../assets/img/uploads/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);
-        }
+if (!is_dir($uploadDir)) {
+                // 0750, no 0777: el directorio lo escribe el servidor web, no cualquier
+                // proceso del sistema.
+                mkdir($uploadDir, 0750, true);
+            }
 
         // Convert to WebP using GD
         $image = null;

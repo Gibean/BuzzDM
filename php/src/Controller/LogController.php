@@ -2,6 +2,11 @@
 // Autoload handled by composer
 use OpenApi\Attributes as OA;
 
+// resolveLogEmpresaId() vive en el helper de bitácora. Los otros controladores
+// lo cargan en su línea 3; este necesita lo mismo para poder atribuir la fila a
+// una empresa, ya que logs.empresa_id es NOT NULL.
+require_once __DIR__ . '/../helpers/logger.php';
+
 #[OA\Tag(name: "Logs", description: "Audit Logs")]
 class LogController {
     private $service;
@@ -77,21 +82,28 @@ class LogController {
         // Log to database
         global $pdo;
 
+        // `logs` solo tiene id, empresa_id, usuario_id, accion, detalles y fecha.
+        // Este INSERT pedia ademas `usuario`, `ip_address`, `user_agent` y
+        // `fecha_hora`, que no existen: el POST fallaba con "Unknown column" y
+        // devolvia HTTP 400. El nombre de usuario, la IP y el user agent viajan
+        // dentro de detalles, que es texto libre.
         $stmt = $pdo->prepare("
-            INSERT INTO logs (usuario, accion, detalles, ip_address, user_agent, fecha_hora)
-            VALUES (?, ?, ?, ?, ?, NOW())
+            INSERT INTO logs (empresa_id, usuario_id, accion, detalles, fecha)
+            VALUES (?, ?, ?, ?, NOW())
         ");
 
-        $details = "Cierre automático por inactividad ({$minutes} minutos)";
-        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
+        $details = json_encode([
+            'mensaje' => "Cierre automatico por inactividad ({$minutes} minutos)",
+            'usuario_nombre' => $userName,
+            'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
+            'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+        ], JSON_UNESCAPED_UNICODE);
 
         $stmt->execute([
-            $userName,
+            resolveLogEmpresaId(),
+            $userId,
             'logout_inactivity',
             $details,
-            $ip,
-            $userAgent
         ]);
 
         $this->jsonResponse(true, ['logged' => true], 'Log de inactividad registrado');

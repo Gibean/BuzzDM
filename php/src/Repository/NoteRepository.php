@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 class NoteRepository {
     private $pdo;
@@ -116,10 +117,11 @@ class NoteRepository {
 
     public function create(array $data) {
         $stmt = $this->pdo->prepare("
-            INSERT INTO notas_kanban (titulo, cliente_nombre, telefono, email, contenido, estado, prioridad, usuario_id, fecha_entrega, etiquetas, miembros)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO notas_kanban (empresa_id, titulo, cliente_nombre, telefono, email, contenido, estado, prioridad, usuario_id, fecha_entrega, etiquetas, miembros)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
         $stmt->execute([
+            TenantContext::require('NoteRepository::create'),
             $data['titulo'],
             $data['cliente_nombre'] ?? null,
             $data['telefono'] ?? null,

@@ -12,6 +12,46 @@
 
 header('Content-Type: application/json');
 
+// Autenticacion para acceso por HTTP.
+//
+// El endpoint no debe quedar abierto: sin esto, cualquiera que conozca la URL
+// podria disparar sincronizaciones ilimitadas contra el BCV y el proveedor
+// externo (degradacion de servicio y spam de requests). Se admite:
+//   - CLI, para el cron del hosting;
+//   - HTTP con el token compartido BACKUP_SECRET_TOKEN, que es lo que envia
+//     backup_check.php;
+//   - HTTP con sesion autenticada, que es el boton "sincronizar" del dashboard.
+//
+// La comparacion del token falla cerrada si el token no esta definido.
+if (php_sapi_name() !== 'cli') {
+    require_once __DIR__ . '/backup_config.php';
+
+    $providedToken = (string)($_GET['token'] ?? ($_SERVER['HTTP_X_CRON_TOKEN'] ?? ''));
+    $tokenOk = BACKUP_SECRET_TOKEN !== ''
+        && $providedToken !== ''
+        && hash_equals(BACKUP_SECRET_TOKEN, $providedToken);
+
+    // Sesion autenticada: solo se comprueba el identificador, no se carga
+    // sesion.php porque su logica de permisos cerraria el endpoint.
+    if (!$tokenOk) {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $sessionOk = !empty($_SESSION['usuario_id']);
+    } else {
+        $sessionOk = false;
+    }
+
+    if (!$tokenOk && !$sessionOk) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'error'   => 'Unauthorized',
+        ]);
+        exit;
+    }
+}
+
 // Definir si es carga silenciosa (llamada desde backup_check / fallback)
 $isSilent = isset($is_fallback_call) && $is_fallback_call;
 $is_api_call = (php_sapi_name() !== 'cli' && !$isSilent);

@@ -706,12 +706,12 @@ paths:
                   example: 'Nueva descripción'
                 estado:
                   type: string
-                  enum: [pendiente, en_progreso, completado]
                   example: en_progreso
+                  enum: [pendiente, en_progreso, completado]
                 prioridad:
                   type: string
-                  enum: [baja, media, alta]
                   example: media
+                  enum: [baja, media, alta]
               type: object
             example:
               id: 1
@@ -745,13 +745,13 @@ paths:
                 estado:
                   description: Status
                   type: string
-                  enum: [pendiente, en_progreso, completado]
                   example: pendiente
+                  enum: [pendiente, en_progreso, completado]
                 prioridad:
                   description: Priority
                   type: string
-                  enum: [baja, media, alta]
                   example: alta
+                  enum: [baja, media, alta]
                 fecha_vencimiento:
                   description: 'Due date'
                   type: string
@@ -876,13 +876,13 @@ paths:
                 estado_pago:
                   description: 'Payment status'
                   type: string
-                  enum: [pagado, 'no pagado']
                   example: pagado
+                  enum: [pagado, 'no pagado']
                 estado_envio:
                   description: 'Shipping status'
                   type: string
-                  enum: [pendiente, enviado, entregado]
                   example: pendiente
+                  enum: [pendiente, enviado, entregado]
                 fecha_creacion:
                   description: 'Order date'
                   type: string
@@ -1058,8 +1058,8 @@ paths:
                   example: 1
                 estado:
                   type: string
-                  enum: [activo, inactivo]
                   example: activo
+                  enum: [activo, inactivo]
               type: object
             example:
               sku: PROD-001
@@ -1591,8 +1591,8 @@ paths:
                   example: NuevoPass456!
                 rol:
                   type: string
-                  enum: [admin, supervisor, operador]
                   example: admin
+                  enum: [admin, supervisor, operador]
                 activo:
                   type: boolean
                   example: true
@@ -1636,8 +1636,8 @@ paths:
                 rol:
                   description: Role
                   type: string
-                  enum: [admin, supervisor, operador]
                   example: supervisor
+                  enum: [admin, supervisor, operador]
                 activo:
                   description: 'Active status'
                   type: boolean
@@ -1807,11 +1807,6 @@ components:
       type: apiKey
       name: PHPSESSID
       in: cookie
-    devTokenAuth:
-      type: apiKey
-      description: 'Development token for API testing (only works when APP_ENV=development). Value: ***REMOVED***'
-      name: X-Dev-Token
-      in: header
 tags:
   -
     name: Auth

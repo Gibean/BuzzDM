@@ -39,23 +39,23 @@ try {
     // DomPDF Options
     $options = new Options();
     $options->set('isHtml5ParserEnabled', true);
-    $options->set('isRemoteEnabled', true);
-    $options->set('isPhpEnabled', true); // Enable PHP for dynamic page numbering
+    // isRemoteEnabled permite a Dompdf traer http(s):// durante el render: con el activo,
+    // un SVG/BMP/font malicioso en el HTML actua como oraculo de existencia de archivos y
+    // agotador de recursos. El logo se resuelve como ruta local (ver resolveLogoPath()).
+    $options->set('isRemoteEnabled', false);
+    // isPhpEnabled evalua <script type="text/php">. La numeracion de paginas usa ahora la
+    // Canvas API despues de render(), asi que no queda PHP embebido que ejecutar.
+    $options->set('isPhpEnabled', false);
+    $options->set('chroot', realpath(__DIR__ . '/..'));
     $dompdf = new Dompdf($options);
 
     // Get Company Data
     $stmtEmpresa = $pdo->query("SELECT rif, nombre, direccion, telefono, email, logo_svg FROM empresa LIMIT 1");
     $empresa = $stmtEmpresa->fetch(PDO::FETCH_ASSOC);
 
-    // Setup URLs for assets
-    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
-    $host = $_SERVER['HTTP_HOST'];
-    $scriptRoot = str_replace('\\', '/', dirname(dirname($_SERVER['SCRIPT_NAME'])));
-    $baseUrl = $protocol . "://" . $host . rtrim($scriptRoot, '/') . '/';
-
-    // Logo path - use company logo if available, otherwise default
-    $logoFile = (!empty($empresa['logo_svg'])) ? $empresa['logo_svg'] : 'assets/img/logov1.png';
-    $rutaLogo = $baseUrl . $logoFile;
+    // Logo: ruta local absoluta y contenida en el proyecto. Nada de URL, porque
+    // isRemoteEnabled esta desactivado.
+    $rutaLogo = resolveLogoPath($empresa['logo_svg'] ?? '');
 
     // Handle multiple report types (from POST form)
     $tiposRaw = $_POST['tipo'] ?? '';
@@ -77,26 +77,22 @@ try {
         $fullHtml .= generateReportSection($tipo, $reportData, $empresa, $rutaLogo);
     }
 
-    // Add footer script ONCE at the end (not per report section)
-    $generationDateTime = date('d/m/Y H:i:s');
-    $fullHtml .= '
-    <script type="text/php">
-        if (isset($pdf)) {
-            $font = $fontMetrics->getFont("Helvetica", "normal");
-            $size = 8;
-            $pageText = "pág " . $PAGE_NUM . " de " . $PAGE_COUNT;
-            $x = 520;
-            $y = 815;
-            $pdf->page_text($x, $y, $pageText, $font, $size, array(0.4, 0.4, 0.4));
-            $pdf->page_text(50, $y, "Generado: ' . $generationDateTime . ' | BuzzDM", $font, $size, array(0.4, 0.4, 0.4));
-        }
-    </script>';
-
     $fullHtml .= '</body></html>';
 
     $dompdf->loadHtml($fullHtml);
     $dompdf->setPaper('A4', 'portrait');
     $dompdf->render();
+
+    // Pie de pagina via Canvas API. Antes se hacia con <script type="text/php">, que exige
+    // isPhpEnabled=true (evaluacion de PHP dentro del HTML del documento).
+    $generationDateTime = date('d/m/Y H:i:s');
+    $canvas = $dompdf->getCanvas();
+    $font = $canvas->getFontMetrics()->getFont('Helvetica', 'normal');
+    $pageCount = $canvas->get_page_count();
+    for ($page = 0; $page < $pageCount; $page++) {
+        $canvas->page_text($page, 520, 815, 'pág ' . ($page + 1) . ' de ' . $pageCount, $font, 8, [0.4, 0.4, 0.4]);
+        $canvas->page_text($page, 50, 815, 'Generado: ' . $generationDateTime . ' | BuzzDM', $font, 8, [0.4, 0.4, 0.4]);
+    }
 
     $fileName = "Reporte_BuzzDM_" . date('Ymd_His') . ".pdf";
     $dompdf->stream($fileName, ["Attachment" => false]);
@@ -107,6 +103,45 @@ try {
 }
 
 // --- Helper Functions ---
+
+/**
+ * Resuelve el logo a una ruta local absoluta contenida en el proyecto.
+ *
+ * isRemoteEnabled esta desactivado, asi que el <img src> debe ser una ruta del sistema de
+ * archivos. Se restringe al directorio de uploads y al directorio de imagenes para que un
+ * valor manipulado en la BD no pueda leer rutas arbitrarias del servidor.
+ */
+function resolveLogoPath($logoFile) {
+    $root = realpath(__DIR__ . '/..');
+    $candidates = [];
+
+    $logoFile = trim((string)$logoFile);
+    if ($logoFile !== '' && basename($logoFile) === $logoFile && preg_match('/^[\w.\-]+\.(webp|png|jpe?g|gif|svg)$/i', $logoFile)) {
+        // Solo el nombre de archivo (lo que guarda SettingsService: {rif}.webp)
+        $candidates[] = $root . '/assets/img/uploads/' . $logoFile;
+    }
+
+    $candidates[] = $root . '/assets/img/logov1.png';
+
+    $allowedRoots = [
+        realpath($root . '/assets/img/uploads'),
+        realpath($root . '/assets/img'),
+    ];
+
+    foreach ($candidates as $candidate) {
+        $real = realpath($candidate);
+        if ($real === false || !is_file($real)) {
+            continue;
+        }
+        foreach ($allowedRoots as $allowed) {
+            if ($allowed !== false && str_starts_with($real, $allowed . DIRECTORY_SEPARATOR)) {
+                return $real;
+            }
+        }
+    }
+
+    return $root . '/assets/img/logov1.png';
+}
 
 function getReportStyles() {
     return "

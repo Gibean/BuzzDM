@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+require_once 'sesion.php';
 require_once 'db.php'; // Provides $pdo
 
 try {
@@ -9,20 +10,26 @@ try {
     $days = isset($_GET['days']) ? intval($_GET['days']) : 30;
     $days = max(1, min($days, 365)); // Clamp between 1 and 365
 
-    // Consulta para obtener las ventas diarias del período especificado
+    // Consulta para obtener las ventas diarias del per��odo especificado
     // Usa pedidos.total como fuente de verdad (monto final del pedido)
+    // El filtro por empresa_id es lo que impide que la gráfica del dashboard
+    // de un tenant incluya las ventas de los demás.
     $query = "
         SELECT
             DATE(p.fecha_creacion) as fecha,
             SUM(p.total) as total_ventas
         FROM pedidos p
-        WHERE p.fecha_creacion >= CURDATE() - INTERVAL :days DAY
+        WHERE p.empresa_id = :empresa_id
+          AND p.fecha_creacion >= CURDATE() - INTERVAL :days DAY
         GROUP BY DATE(p.fecha_creacion)
         ORDER BY fecha ASC;
     ";
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute(['days' => $days]);
+    $stmt->execute([
+        'empresa_id' => TenantContext::require('api_sales_chart'),
+        'days' => $days,
+    ]);
     $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $data = [

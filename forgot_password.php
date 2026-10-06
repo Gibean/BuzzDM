@@ -1,3 +1,9 @@
+<?php
+require_once __DIR__ . '/php/security.php';
+
+// Las cabeceras deben emitirse antes de cualquier salida HTML.
+sendSecurityHeaders();
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -158,7 +164,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script nonce="<?= cspNonce() ?>">
         document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('forgotPasswordForm');
             const alertContainer = document.getElementById('alertContainer');

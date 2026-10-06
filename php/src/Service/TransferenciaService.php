@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../Repository/TransferenciaRepository.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 class TransferenciaService {
 
@@ -316,11 +317,11 @@ class TransferenciaService {
         $pdo = $this->repository->getPdo();
 
         // Upsert stock_ubicacion
-        $sql = "INSERT INTO stock_ubicacion (producto_id, almacen_id, cantidad)
-                VALUES (?, ?, ?)
+        $sql = "INSERT INTO stock_ubicacion (empresa_id, producto_id, almacen_id, cantidad)
+                VALUES (?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE cantidad = cantidad + VALUES(cantidad)";
         $stmt = $pdo->prepare($sql);
-        $stmt->execute([$productoId, $almacenId, $cantidad]);
+        $stmt->execute([TenantContext::require('TransferenciaService::incrementarStock'), $productoId, $almacenId, $cantidad]);
 
         // Update global stock in productos
         $sql = "UPDATE productos SET stock = stock + ? WHERE id = ?";

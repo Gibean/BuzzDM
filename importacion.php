@@ -29,8 +29,9 @@
         <!--  Upload Section  -->
         <div class="buzz-card mb-4">
             <h5 class="font-primary text-primary mb-3">SUBIR ARCHIVO</h5>
-            <form id="importForm" action="php/api_import.php" method="POST" enctype="multipart/form-data">
-                <div class="row">
+<form id="importForm" action="php/api_import.php" method="POST" enctype="multipart/form-data">
+                    <?= csrfField() ?>
+                    <div class="row">
                     <div class="col-md-8">
                         <div class="upload-area border border-dashed border-secondary rounded p-4 text-center" id="uploadArea">
                             <i class="fas fa-cloud-upload-alt text-primary" style="font-size: 3rem;"></i>
@@ -171,7 +172,7 @@
     <!-- Notification Container -->
     <div id="notificationContainer"></div>
 
-    <script>
+    <script nonce="<?= cspNonce() ?>">
         // Logic moved to assets/js/importacion.js
     </script>
 

@@ -1,4 +1,11 @@
 <?php
+
+// Solo ejecucion desde linea de comandos: estos scripts introspeccionan el esquema
+// y algunos escriben en la base de datos. Sobre HTTP devuelven 403.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit("403 - Solo ejecutable desde CLI.\n");
+}
 /** Tablas con empresa_id pero sin FK hacia empresa.id. */
 require_once __DIR__ . '/../../php/config.php';
 require_once __DIR__ . '/../../php/db.php';

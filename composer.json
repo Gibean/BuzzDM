@@ -1,6 +1,5 @@
 {
   "require": {
-    "monolog/monolog": "^2.8",
     "phpoffice/phpspreadsheet": "^5.0",
     "dompdf/dompdf": "^3.1",
     "phpmailer/phpmailer": "^6.9",
@@ -8,13 +7,22 @@
     "pragmarx/google2fa": "^9.0",
     "bacon/bacon-qr-code": "^3.0",
     "symfony/dom-crawler": "^7.4",
-    "symfony/css-selector": "^7.4"
+    "symfony/css-selector": "^7.4",
+    "php": "^8.2"
   },
   "autoload": {
-    "classmap": ["php/src/"],
-    "files": ["php/api_docs_config.php"]
+    "classmap": ["php/src/"]
   },
   "require-dev": {
     "zircote/swagger-php": "^6.0"
-  }
+  },
+  "config": {
+    "platform": {
+      "php": "8.2.12"
+    },
+    "sort-packages": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true,
+  "license": "proprietary"
 }

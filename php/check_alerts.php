@@ -35,9 +35,19 @@ if (isset($_SESSION['usuario_rol']) && in_array($_SESSION['usuario_rol'], ['admi
             $existingNotif = $stmtCheck->fetch(PDO::FETCH_ASSOC);
 
             // Check actual stock
-            // Ensure v_low_stock view exists, otherwise query table directly
-            $stmtStock = $pdo->query("SELECT COUNT(*) FROM v_low_stock");
-            $lowCount = $stmtStock->fetchColumn();
+            // La vista proyecta empresa_id (migración 007), así que el recuento
+            // se limita a la empresa de la sesión. Sin este WHERE el contador
+            // sumaba el stock crítico de todos los tenants del servidor.
+            $empresaId = (int)($_SESSION['empresa_id'] ?? 0);
+            if ($empresaId > 0) {
+                $stmtStock = $pdo->prepare("SELECT COUNT(*) FROM v_low_stock WHERE empresa_id = ?");
+                $stmtStock->execute([$empresaId]);
+            } else {
+                // Sin empresa en sesión no se puede saber a quién pertenece el
+                // stock: no se notifica nada en lugar de notificar de más.
+                $lowCount = 0;
+            }
+            $lowCount = $lowCount ?? 0;
 
             if ($lowCount > 0) {
                 $msg = "Hay $lowCount productos con existencias críticas. Se recomienda reabastecer.";

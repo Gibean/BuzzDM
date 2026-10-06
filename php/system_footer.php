@@ -5,12 +5,13 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/security.php';
 
 // Get current time for display
 $currentTime = date('H:i');
 $currentDate = date('d/m/Y');
 $lastUpdate = date('H:i');
-$systemVersion = 'v1.1.0.0';
+$systemVersion = 'v1.2';
 
 // Get company name from database
 $companyName = '';
@@ -43,9 +44,9 @@ try {
         </div>
     </div>
     <div class="system-footer-right">
-        <div class="system-footer-item hide-mobile" style="font-size: 0.65rem; opacity: 0.7; gap: 6px;" title="Derechos de Propiedad y Redistribución Institucional: Universidad Politécnica Territorial José Antonio Anzoátegui">
+        <div class="system-footer-item hide-mobile" style="font-size: 0.65rem; opacity: 0.7; gap: 6px;" title="Proyecto de contexto académico. La universidad indicada es el contexto del trabajo; no es titular de este código ni autoriza su redistribución.">
             <img src="assets/img/recursosinv/Logo_Uptjaa.svg" alt="UPTJAA" style="width: 16px; height: 16px; object-fit: contain; flex-shrink: 0;">
-            <span class="footer-value" style="white-space: nowrap;">&copy; 2026 Gisvel Aray &amp; Yeicson Acosta &mdash; UPTJAA</span>
+            <span class="footer-value" style="white-space: nowrap;">&copy; 2026 Gisvel Aray y Yeicson Acosta</span>
         </div>
         <?php if (!empty($companyName)): ?>
         <div class="system-footer-item">
@@ -60,7 +61,7 @@ try {
     </div>
 </footer>
 
-<script>
+<script nonce="<?= cspNonce() ?>">
 // Update time every second
 function updateFooterTime() {
     const now = new Date();

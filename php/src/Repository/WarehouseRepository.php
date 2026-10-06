@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 class WarehouseRepository {
     private $pdo;
@@ -52,10 +53,11 @@ class WarehouseRepository {
     }
 
     public function createWarehouse($data) {
-        $sql = "INSERT INTO almacenes (codigo, nombre, direccion, telefono, tipo, es_principal, activo, notas)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO almacenes (empresa_id, codigo, nombre, direccion, telefono, tipo, es_principal, activo, notas)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            TenantContext::require('WarehouseRepository::createWarehouse'),
             !empty($data['codigo']) ? $data['codigo'] : null, // Allow null for trigger auto-generation
             $data['nombre'],
             $data['direccion'] ?? null,
@@ -154,10 +156,11 @@ class WarehouseRepository {
     }
 
     public function createLocation($data) {
-        $sql = "INSERT INTO ubicaciones (almacen_id, codigo, nombre, pasillo, estante, nivel, capacidad_maxima, activo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO ubicaciones (empresa_id, almacen_id, codigo, nombre, pasillo, estante, nivel, capacidad_maxima, activo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            TenantContext::require('WarehouseRepository::createLocation'),
             $data['almacen_id'],
             $data['codigo'],
             $data['nombre'],

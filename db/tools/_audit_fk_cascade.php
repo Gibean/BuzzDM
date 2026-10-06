@@ -1,4 +1,11 @@
 <?php
+
+// Solo ejecucion desde linea de comandos: estos scripts introspeccionan el esquema
+// y algunos escriben en la base de datos. Sobre HTTP devuelven 403.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(403);
+    exit("403 - Solo ejecutable desde CLI.\n");
+}
 /**
  * Auditoría de reglas FK: detecta CASCADE que puedan borrar datos de más.
  * Uso: php db/tools/_audit_fk_cascade.php

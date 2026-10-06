@@ -1,33 +1,43 @@
 <?php
-require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/BaseRepository.php';
 
 /**
- * ShipmentRepository - Handles DB operations for shipments
+ * ShipmentRepository
+ *
+ * La pantalla de envíos lee de `pedidos`, así que comparte aislamiento con
+ * OrderRepository. El fallo que importa aquí es updateStatus(): hacía
+ * `UPDATE pedidos SET estado_envio = ? WHERE id = ?` sin filtro de empresa, de
+ * modo que un administrador de la empresa 14 podía cambiar el estado de envío de
+ * un pedido de la empresa 1 con solo adivinar el id. Devolvía true porque el
+ * UPDATE sí afectaba una fila, así que la interfaz confirmaba un cambio que no
+ * le pertenecía.
  */
-class ShipmentRepository {
-    private $pdo;
-
-    public function __construct() {
-        $this->pdo = getDbConnection();
-    }
-
-    /**
-     * Get all shipments with filters
-     */
+class ShipmentRepository extends BaseRepository
+{
     public function findAll($filters = []) {
-        $sql_from = "FROM pedidos p LEFT JOIN clientes c ON p.cliente_id = c.id WHERE p.deleted_at IS NULL";
+        $where = ["p.deleted_at IS NULL"];
         $params = [];
 
         if (!empty($filters['search'])) {
             $search = '%' . $filters['search'] . '%';
-            $sql_from .= " AND (p.id LIKE ? OR p.referencia LIKE ? OR c.nombre LIKE ? OR p.direccion_envio LIKE ? OR p.tracking_number LIKE ?)";
-            $params = array_merge($params, [$search, $search, $search, $search, $search]);
+            $where[] = "(p.id LIKE ? OR p.referencia LIKE ? OR c.nombre LIKE ? OR p.direccion_envio LIKE ? OR p.tracking_number LIKE ?)";
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
+            $params[] = $search;
         }
 
         if (!empty($filters['status'])) {
-            $sql_from .= " AND p.estado_envio = ?";
+            $where[] = "p.estado_envio = ?";
             $params[] = $filters['status'];
         }
+
+        $this->scopeTenant($where, $params, 'p', 'ShipmentRepository::findAll');
+
+        $sql_from = "FROM pedidos p
+                    LEFT JOIN clientes c ON p.cliente_id = c.id AND c.empresa_id = p.empresa_id
+                    WHERE " . implode(' AND ', $where);
 
         // Get total
         $totalStmt = $this->pdo->prepare("SELECT COUNT(p.id) " . $sql_from);
@@ -51,29 +61,27 @@ class ShipmentRepository {
         $sql = "SELECT $select $sql_from ORDER BY $orderBy";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($params);
+        $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         return [
-            'shipments' => $stmt->fetchAll(PDO::FETCH_ASSOC),
+            'shipments' => $orders,
             'total' => $total
         ];
     }
 
     /**
      * Update shipment status
+     *
+     * Devuelve false si el pedido no existe o es de otra empresa, en lugar de
+     * un true que confirmaría al usuario un cambio sobre datos ajenos.
      */
     public function updateStatus($id, $status, $trackingNumber = null) {
-        $sql = "UPDATE pedidos SET estado_envio = ?";
-        $params = [$status];
+        $data = ['estado_envio' => $status];
 
         if ($trackingNumber !== null) {
-            $sql .= ", tracking_number = ?";
-            $params[] = $trackingNumber;
+            $data['tracking_number'] = $trackingNumber;
         }
 
-        $sql .= " WHERE id = ?";
-        $params[] = $id;
-
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute($params);
+        return $this->applyTenantUpdate('pedidos', $data, (int)$id, "ShipmentRepository::updateStatus($id)");
     }
 }

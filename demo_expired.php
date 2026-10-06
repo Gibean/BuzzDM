@@ -7,6 +7,10 @@
 require_once __DIR__ . '/php/config.php';
 require_once __DIR__ . '/php/db.php';
 require_once __DIR__ . '/php/src/Service/DemoExportService.php';
+require_once __DIR__ . '/php/security.php';
+
+// Debe emitirse antes de iniciar la sesion y antes de cualquier salida.
+sendSecurityHeaders();
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

@@ -132,7 +132,7 @@ if (isset($_SESSION['message'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/common.js"></script>
-    <script>
+    <script nonce="<?= cspNonce() ?>">
         // Logo upload handling
         const logoInput = document.getElementById('logoInput');
         const uploadArea = document.getElementById('uploadArea');

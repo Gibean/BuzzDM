@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 /**
  * LocationRepository - Handles DB operations for warehouse locations
@@ -55,10 +56,11 @@ class LocationRepository {
      * Create location
      */
     public function create($data) {
-        $sql = "INSERT INTO ubicaciones (almacen_id, codigo, nombre, pasillo, estante, nivel, capacidad_maxima, activo)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO ubicaciones (empresa_id, almacen_id, codigo, nombre, pasillo, estante, nivel, capacidad_maxima, activo)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            TenantContext::require('LocationRepository::create'),
             $data['almacen_id'],
             trim($data['codigo']),
             trim($data['nombre'] ?? ''),

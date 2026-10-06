@@ -19,9 +19,12 @@ require_once __DIR__ . '/src/Service/BackupService.php';
 
 // Auth logic for HTTP
 if (php_sapi_name() !== 'cli') {
-    $providedToken = $_GET['token'] ?? '';
-    if ($providedToken !== BACKUP_SECRET_TOKEN) {
+    $providedToken = (string)($_GET['token'] ?? '');
+    // Fail closed. Antes, con BACKUP_SECRET_TOKEN sin definir y sin ?token, la
+    // comparacion '' !== '' era falsa y la peticion pasaba sin autenticacion.
+    if (BACKUP_SECRET_TOKEN === '' || $providedToken === '' || !hash_equals(BACKUP_SECRET_TOKEN, $providedToken)) {
         http_response_code(403);
+        header('Content-Type: application/json');
         echo json_encode(['success' => false, 'error' => 'Unauthorized']);
         exit;
     }

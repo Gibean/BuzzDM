@@ -4,6 +4,7 @@
  */
 
 require_once __DIR__ . '/../../db.php';
+require_once __DIR__ . '/../Tenant/TenantContext.php';
 
 class TransferenciaRepository {
     private $pdo;
@@ -159,12 +160,13 @@ class TransferenciaRepository {
      */
     public function create($data) {
         $sql = "INSERT INTO transferencias_almacen
-                (almacen_origen_id, almacen_destino_id, fecha_solicitud,
+                (empresa_id, almacen_origen_id, almacen_destino_id, fecha_solicitud,
                  motivo, notas, referencia_externa, solicitado_por, estado)
-                VALUES (?, ?, ?, ?, ?, ?, ?, 'borrador')";
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'borrador')";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            TenantContext::require('TransferenciaRepository::create'),
             $data['almacen_origen_id'],
             $data['almacen_destino_id'],
             $data['fecha_solicitud'],

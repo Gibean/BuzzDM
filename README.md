@@ -28,7 +28,7 @@ Sistema de gestión empresarial desarrollado en PHP.
 
 ## 📋 Requisitos Previos
 
-- **XAMPP** (o cualquier servidor con PHP 8.1+)
+- **XAMPP** (o cualquier servidor con PHP 8.2+, que es el mínimo que exige `composer.json`)
 - **Composer** (gestor de dependencias de PHP)
 
 ---
@@ -94,6 +94,48 @@ extension=openssl
 
 4. Espera a que se descarguen todas las dependencias. Esto creará la carpeta `vendor/`
 
+5. Aplica las migraciones de base de datos (solo desde CLI):
+
+   ```bash
+   php php/migrate.php
+   ```
+
+   Sin este paso, el limitador de intentos (`rate_limits`) funciona en modo
+   permisivo y avisa por log, en vez de proteger el login. La migración
+   `password_reset_token_hash.sql` sí degrada sin romperse: mientras no esté
+   aplicada, los tokens de recuperación se guardan en claro como antes.
+
+### Variables de entorno
+
+Copia `.env.example` a `.env` y ajústalo. Las variables sensibles **no** tienen
+valor por defecto: si faltan, los endpoints que las consumen rechazan la petición
+en vez de aceptarla con un secreto predecible.
+
+| Variable | Para qué sirve |
+|----------|----------------|
+| `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` | Conexión a MySQL |
+| `APP_ENV` | `production` desactiva la carga de `.env.local` |
+| `APP_URL` | URL base para enlaces y correos |
+| `BACKUP_SECRET_TOKEN` | Autoriza `auto_backup.php` y `tasa_bcv_update.php` |
+| `CRON_SECRET_KEY` | Secreto de las tareas de `php/cron/` |
+| `BACKUP_SKIP_TLS_VERIFY` | Ponlo en `1` solo si tu certificado es autofirmado (XAMPP local) |
+| `RATE_LIMIT_PROXIES` | Lista separada por comas de proxies de confianza (IP exacta o CIDR). Vacía por defecto |
+
+> No existe bypass de autenticación por header: el antiguo `X-Dev-Token` se
+> eliminó junto con `DEV_API_TOKEN`, que ya no se usa en ninguna parte.
+
+Si la aplicación se sirve **detrás de un proxy o CDN**, conviene declarar en
+`RATE_LIMIT_PROXIES` las IP o rangos CIDR de ese proxy. El limitador de intentos
+solo entonces toma la IP real de `X-Forwarded-For`. Con la variable vacía usa
+siempre `REMOTE_ADDR`, que es el único valor que el cliente no puede falsear: es
+la opción segura, pero todos los usuarios que compartan proxy se contabilizan
+como una sola IP. Al activar los proxies de confianza se acepta la cabecera
+desde ese proxy, así que su lista debe incluir únicamente proxies que tú
+controlas.
+
+Ajustes opcionales de PHP para producción: `session.cookie_httponly=1`,
+`session.use_strict_mode=1`, `display_errors=Off` y `expose_php=Off`.
+
 ### Paso 3: Verificar la instalación
 
 La instalación fue exitosa si:
@@ -107,19 +149,27 @@ La instalación fue exitosa si:
 
 | Paquete | Versión | Descripción |
 |---------|---------|-------------|
-| `monolog/monolog` | ^2.8 | Sistema de logging |
 | `phpoffice/phpspreadsheet` | ^5.0 | Manejo de archivos Excel |
 | `dompdf/dompdf` | ^3.1 | Generación de PDFs |
 | `phpmailer/phpmailer` | ^6.9 | Envío de emails |
 | `vlucas/phpdotenv` | ^5.6 | Variables de entorno |
 | `pragmarx/google2fa` | ^9.0 | Autenticación de dos factores |
 | `bacon/bacon-qr-code` | ^3.0 | Generación de códigos QR |
+| `symfony/dom-crawler` | ^7.4 | Extracción de datos para reportes |
+| `symfony/css-selector` | ^7.4 | Selectores CSS para el crawler |
+
+> `monolog/monolog` se eliminó: el proyecto no tenía ninguna referencia a él.
 
 ### Dependencias de desarrollo
 
 | Paquete | Versión | Descripción |
 |---------|---------|-------------|
 | `zircote/swagger-php` | ^6.0 | Documentación de API |
+
+> `swagger-php` solo se usa al regenerar `openapi.yaml` con `php generate_docs.php`
+> (uso exclusivo de CLI). `php/api_docs_config.php` ya **no** forma parte del
+> autoload de producción, así que `composer install --no-dev` funciona sin cambios.
+>
 
 ---
 

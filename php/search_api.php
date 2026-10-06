@@ -1,4 +1,5 @@
 <?php
+require_once 'sesion.php';
 require_once 'db.php';
 
 header('Content-Type: application/json');
@@ -14,14 +15,19 @@ if (empty($action) || (empty($query) && $action !== 'search_users')) {
 
 $conn = getDbConnection();
 
+// Sin este filtro el buscador devolvia clientes, productos y usuarios de todas
+// las empresas a cualquiera que pidiera la URL, y sin pedir siquiera sesion. Con
+// query vacio en search_users la fuga era de 10 nombres y correos de golpe.
+$empresaId = TenantContext::require('search_api');
+
 switch ($action) {
 
 
     case 'search_clients':
         try {
-            $stmt = $conn->prepare("SELECT id, nombre, email, telefono FROM clientes WHERE nombre LIKE ? OR id LIKE ? LIMIT 10");
+            $stmt = $conn->prepare("SELECT id, nombre, email, telefono FROM clientes WHERE empresa_id = ? AND (nombre LIKE ? OR id LIKE ?) LIMIT 10");
             $searchTerm = '%' . $query . '%';
-            $stmt->execute([$searchTerm, $searchTerm]); // PDO execute with array of parameters
+            $stmt->execute([$empresaId, $searchTerm, $searchTerm]); // PDO execute with array of parameters
             $clients = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all results
             echo json_encode(['success' => true, 'clients' => $clients]);
         } catch (PDOException $e) {
@@ -31,9 +37,9 @@ switch ($action) {
 
     case 'search_products':
         try {
-            $stmt = $conn->prepare("SELECT id, sku, nombre, precio, stock FROM productos WHERE nombre LIKE ? OR sku LIKE ? LIMIT 10");
+            $stmt = $conn->prepare("SELECT id, sku, nombre, precio, stock FROM productos WHERE empresa_id = ? AND (nombre LIKE ? OR sku LIKE ?) LIMIT 10");
             $searchTerm = '%' . $query . '%';
-            $stmt->execute([$searchTerm, $searchTerm]); // PDO execute with array of parameters
+            $stmt->execute([$empresaId, $searchTerm, $searchTerm]); // PDO execute with array of parameters
             $products = $stmt->fetchAll(PDO::FETCH_ASSOC); // Fetch all results
             echo json_encode(['success' => true, 'products' => $products]);
         } catch (PDOException $e) {
@@ -45,12 +51,12 @@ switch ($action) {
         try {
             // Allow loading all users if query is short or empty
             if (strlen($query) < 1) {
-                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios LIMIT 10");
-                $stmt->execute();
+                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios WHERE empresa_id = ? LIMIT 10");
+                $stmt->execute([$empresaId]);
             } else {
-                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios WHERE nombre LIKE ? LIMIT 10");
+                $stmt = $conn->prepare("SELECT id, nombre, email FROM usuarios WHERE empresa_id = ? AND nombre LIKE ? LIMIT 10");
                 $searchTerm = '%' . $query . '%';
-                $stmt->execute([$searchTerm]);
+                $stmt->execute([$empresaId, $searchTerm]);
             }
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode(['success' => true, 'users' => $users]);

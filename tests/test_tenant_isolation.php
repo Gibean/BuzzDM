@@ -21,8 +21,16 @@ require_once __DIR__ . '/../php/db.php';
 require_once __DIR__ . '/../php/src/Tenant/TenantContext.php';
 require_once __DIR__ . '/../php/src/Repository/ProductRepository.php';
 
-const TENANT_A = 1;   // Empresa principal, con los 400 productos existentes
-const TENANT_B = 14;  // Empresa de demostración, sin catálogo
+// Las dos empresas las crea la propia prueba y se borran al terminar.
+//
+// Antes eran ids fijos que existian en la base de desarrollo (la empresa 1 y la
+// demo que el visitor acababa de registrar). Eso ataba las pruebas a un catalogo
+// externo y a una demovariable: en una base recien limpiada fallaban con un error
+// de foreign key antes de comprobar nada. Ojo al'ordre de estas dos lineas: el
+// fixture usa define(), y un define() NO pisa a un const ya declarado en el
+// mismo archivo. Con const TENANT_A = 1 delante, el fixture se creaba pero
+// las pruebas seguian operando sobre la empresa 1.
+require_once __DIR__ . '/_tenant_fixture.php';
 
 const SKU_A = 'ISO-TEST-A';
 const SKU_B = 'ISO-TEST-B';

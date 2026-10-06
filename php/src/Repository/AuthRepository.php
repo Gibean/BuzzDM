@@ -83,24 +83,70 @@ class AuthRepository {
     }
 
     /**
+     * Whether the token_hash column exists, i.e. the migration has been applied
+     *
+     * Lets the app run before and after the migration, so a forgotten
+     * "php php/migrate.php" cannot break password recovery.
+     */
+    private function tieneTokenHash() {
+        static $existe = null;
+        if ($existe !== null) {
+            return $existe;
+        }
+
+        $stmt = $this->pdo->prepare("
+            SELECT COUNT(*) FROM information_schema.COLUMNS
+            WHERE TABLE_SCHEMA = DATABASE()
+              AND TABLE_NAME = 'password_reset_tokens'
+              AND COLUMN_NAME = 'token_hash'
+        ");
+        $stmt->execute();
+        $existe = ((int) $stmt->fetchColumn()) > 0;
+
+        return $existe;
+    }
+
+    /**
      * Create password reset token
+     *
+     * Stores SHA-256(token) rather than the token. A reset token is a
+     * single-use password: whoever can read this table can take over the
+     * account. Only falls back to the plaintext column while the migration
+     * has not been applied yet.
      */
     public function createPasswordResetToken($userId, $token, $expiration) {
+        if ($this->tieneTokenHash()) {
+            $stmt = $this->pdo->prepare("INSERT INTO password_reset_tokens (usuario_id, token_hash, expiracion) VALUES (?, ?, ?)");
+            return $stmt->execute([$userId, hash('sha256', $token), $expiration]);
+        }
+
         $stmt = $this->pdo->prepare("INSERT INTO password_reset_tokens (usuario_id, token, expiracion) VALUES (?, ?, ?)");
         return $stmt->execute([$userId, $token, $expiration]);
     }
 
     /**
      * Get password reset token data
+     *
+     * The token arrives in the URL and is hashed before the lookup. Rows
+     * created before the migration keep validating because it backfilled
+     * token_hash from the plaintext token.
      */
     public function getTokenData($token) {
+        if ($this->tieneTokenHash()) {
+            $columna = 'prt.token_hash';
+            $valor = hash('sha256', $token);
+        } else {
+            $columna = 'prt.token';
+            $valor = $token;
+        }
+
         $stmt = $this->pdo->prepare("
             SELECT prt.id, prt.usuario_id, prt.expiracion, prt.usado, u.email, u.nombre, u.estado
             FROM password_reset_tokens prt
             INNER JOIN usuarios u ON prt.usuario_id = u.id
-            WHERE prt.token = ? LIMIT 1
+            WHERE $columna = ? LIMIT 1
         ");
-        $stmt->execute([$token]);
+        $stmt->execute([$valor]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 

@@ -169,26 +169,30 @@ class ImportService {
 
                     // DB Operation
                     try {
-                        // Check Exists
-                        $checkVal = $rowData[$config['columns'][$uniqueKey]['db']];
-                        $stmtCheck = $pdo->prepare("SELECT id FROM {$tableName} WHERE {$config['columns'][$uniqueKey]['db']} = ?");
-                        $stmtCheck->execute([$checkVal]);
-                        $exists = $stmtCheck->fetchColumn();
+                        $keyColumn = $config['columns'][$uniqueKey]['db'];
+                        $checkVal = $rowData[$keyColumn];
+
+                        // La clave única (sku, documentoid, nombreempresa...) es
+                        // única POR EMPRESA, no global. Antes el SELECT iba sin
+                        // empresa_id, así que el tenant 14 encontraba el SKU del
+                        // tenant 1 y actualizaba su producto en vez de crear el
+                        // suyo: una importación desde el tenant equivocado
+                        // modificaba el catálogo de otra empresa.
+                        $exists = $this->repository->rowExistsByKey($tableName, $keyColumn, $checkVal);
 
                         if ($exists) {
                             // Update
-                            $setParts = [];
-                            $params = [];
-                            foreach ($rowData as $col => $val) {
-                                if ($col !== $config['columns'][$uniqueKey]['db']) {
-                                    $setParts[] = "$col = ?";
-                                    $params[] = $val;
-                                }
+                            if ($keyColumn !== null) {
+                                unset($rowData[$keyColumn]);
                             }
-                            if(!empty($setParts)){
-                                $params[] = $checkVal;
-                                $sql = "UPDATE {$tableName} SET " . implode(', ', $setParts) . " WHERE {$config['columns'][$uniqueKey]['db']} = ?";
-                                $pdo->prepare($sql)->execute($params);
+                            if (!empty($rowData)) {
+                                $this->repository->updateRowByKey(
+                                    $tableName,
+                                    $keyColumn,
+                                    $checkVal,
+                                    $rowData,
+                                    "ImportService::processFile($entity, fila $rowIndex)"
+                                );
                                 $stats['updated']++;
                             }
                         } else {
@@ -201,20 +205,28 @@ class ImportService {
                                 }
                             }
 
-                            $cols = array_keys($rowData);
-                            $placeholders = array_fill(0, count($cols), '?');
-                            $sql = "INSERT INTO {$tableName} (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $placeholders) . ")";
-                            $pdo->prepare($sql)->execute(array_values($rowData));
-
-                            $newId = $pdo->lastInsertId();
+                            // empresa_id lo añade insertRow(). Este INSERT antes
+                            // lo omitía y el DEFAULT 1 mandaba todo el catálogo
+                            // importado por el tenant 14 a la empresa 1.
+                            $newId = $this->repository->insertRow(
+                                $tableName,
+                                $rowData,
+                                "ImportService::processFile($entity, fila $rowIndex)"
+                            );
                             $stats['inserted']++;
 
                             // Special Logic: Initial Stock
                             if ($entity === 'Productos' && !empty($rowData['stock']) && $rowData['stock'] > 0) {
                                 $stmtMov = $pdo->prepare("INSERT INTO movimientos_inventario
-                                    (producto_id, usuario_id, tipo_movimiento, cantidad, justificacion, stock_anterior, stock_actual)
-                                    VALUES (?, ?, 'entrada', ?, 'Carga Inicial Importación', 0, ?)");
-                                $stmtMov->execute([$newId, $userId, $rowData['stock'], $rowData['stock']]);
+                                    (empresa_id, producto_id, usuario_id, tipo_movimiento, cantidad, justificacion, stock_anterior, stock_actual)
+                                    VALUES (?, ?, ?, 'entrada', ?, 'Carga Inicial Importación', 0, ?)");
+                                $stmtMov->execute([
+                                    $this->repository->tenantIdParaImport(),
+                                    $newId,
+                                    $userId,
+                                    $rowData['stock'],
+                                    $rowData['stock'],
+                                ]);
                             }
                         }
                         $stats['processed']++;
