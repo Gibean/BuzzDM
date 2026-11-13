@@ -44,3 +44,6 @@ tmp_fix_detalles.php
 # Ademas bloqueado en .htaccess: ignorarlo en git no lo protege del servidor web.
 PLAN_ACCION.md
 diff_output.txt
+# Politica y deuda de seguridad: local hasta que se resuelva el modelo ACL.
+SECURITY.md
+PLAN_SEGURIDAD.md
