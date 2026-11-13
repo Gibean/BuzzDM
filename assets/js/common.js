@@ -797,8 +797,9 @@ if (document.readyState === 'loading') {
             '<kbd class="buzz-cmd-kbd">Ctrl K</kbd>' +
             '</button>';
 
-        let ancla = document.querySelector('.sidebar-header-enhanced');
-        if (!ancla) ancla = document.querySelector('.docs-header');
+        // Solo se inyecta en la cabecera del sidebar. La pagina /manual usa
+        // .docs-header y no debe mostrar el buscador de modulos.
+        const ancla = document.querySelector('.sidebar-header-enhanced');
         if (ancla) ancla.insertAdjacentHTML('beforeend', htmlTrigger);
 
         // --- Overlay -------------------------------------------------------
@@ -952,25 +953,25 @@ if (document.readyState === 'loading') {
 
         if (trigger) {
             trigger.addEventListener('click', abrir);
+
+            document.addEventListener('keydown', (e) => {
+                const abierto = !overlay.hidden;
+
+                if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K')) {
+                    e.preventDefault();
+                    abierto ? cerrar() : abrir();
+                    return;
+                }
+
+                // Escape global: si la paleta está abierta se cierra aunque el foco
+                // no esté en el input. Antes solo respondía el input, así que al
+                // perder el foco la paleta quedaba bloqueada.
+                if (e.key === 'Escape' && abierto) {
+                    e.preventDefault();
+                    cerrar();
+                }
+            });
         }
-
-        document.addEventListener('keydown', (e) => {
-            const abierto = !overlay.hidden;
-
-            if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'k' || e.key === 'K')) {
-                e.preventDefault();
-                abierto ? cerrar() : abrir();
-                return;
-            }
-
-            // Escape global: si la paleta está abierta se cierra aunque el foco
-            // no esté en el input. Antes solo respondía el input, así que al
-            // perder el foco la paleta quedaba bloqueada.
-            if (e.key === 'Escape' && abierto) {
-                e.preventDefault();
-                cerrar();
-            }
-        });
     }
 
     // El script se carga al final del body, pero se protege igual: si mañana

@@ -281,7 +281,8 @@ try {
                     <?php else: ?>
                         <div class="currency-content empty-state">
                             <div class="empty-icon"><i class="fas fa-dollar-sign"></i></div>
-                            <p class="font-mono text-muted mb-0">NODES_OFFLINE.</p>
+                            <p class="font-mono text-muted mb-1">SIN TASAS SINCRONIZADAS.</p>
+                            <p class="text-muted small mb-0">Pulsa el botón de sincronización para cargar BCV, Euro y USDT.</p>
                         </div>
                     <?php endif; ?>
                 </div>
