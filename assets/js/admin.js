@@ -6,6 +6,13 @@
   let currentTab = "users"
   let currentUserId = null
 
+  function escapeHtml(text) {
+    if (text == null) return ''
+    const div = document.createElement("div")
+    div.textContent = String(text)
+    return div.innerHTML
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     initAdmin()
     setupEventListeners()
@@ -457,8 +464,8 @@ function updateActiveFiltersCount() {
       .map(
         (user) => `
         <tr>
-            <td class="font-mono">${user.nombre}</td>
-            <td class="font-mono">${user.email}</td>
+            <td class="font-mono">${escapeHtml(user.nombre)}</td>
+            <td class="font-mono">${escapeHtml(user.email)}</td>
             <td>
                 <span class="badge badge-${
                   user.rol === "admin" ? "warning" : "primary"
@@ -634,7 +641,7 @@ function updateActiveFiltersCount() {
         (log) => `
         <tr>
             <td class="font-mono" style="font-size: 0.85em;">${formatDateTime(log.fecha)}</td>
-            <td class="font-mono">${log.nombre_usuario || "Sistema"}</td>
+            <td class="font-mono">${log.nombre_usuario ? escapeHtml(log.nombre_usuario) : "Sistema"}</td>
             <td>
                 <span class="badge badge-${getActionColor(log.accion)}">
                     ${log.accion}

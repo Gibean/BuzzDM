@@ -1152,7 +1152,7 @@ function initProductAutocomplete(row) {
                         return `
                             <a href="#" class="list-group-item list-group-item-action py-1 px-2 small ${isOutOfStock ? 'opacity-50' : ''}"
                             onclick="selectProductForNote(event, ${p.id}, '${p.nombre}', '${p.sku}', ${p.stock}, this)">
-                                <strong>${p.nombre}</strong> <span class="text-muted small">(${p.sku})</span>
+                                <strong>${escapeHTML(p.nombre)}</strong> <span class="text-muted small">(${escapeHTML(p.sku)})</span>
                                 <div class="d-flex justify-content-between align-items-center mt-1">
                                     <span class="text-primary fw-bold">${formatCurrency(p.precio)}</span>
                                     ${stockInfo}

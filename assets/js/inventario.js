@@ -54,6 +54,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Catalogs cache
   let catalogos = { marcas: [], categorias: [], proveedores: [] }
+  function escapeHtml(text) {
+    if (text == null) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+  }
 
   // Load catalogs on page load
   cargarCatalogos()
@@ -682,13 +688,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (productMarca) {
           productMarca.innerHTML = '<option value="">Seleccionar marca...</option>'
           catalogos.marcas.forEach(m => {
-            productMarca.innerHTML += `<option value="${m.id}">${m.nombre}</option>`
+            productMarca.innerHTML += `<option value="${m.id}">${escapeHtml(m.nombre)}</option>`
           })
           // También llenar el filtro si existe
           if (marcaFilter) {
             marcaFilter.innerHTML = '<option value="">Todas las marcas</option>'
             catalogos.marcas.forEach(m => {
-              marcaFilter.innerHTML += `<option value="${m.id}">${m.nombre}</option>`
+              marcaFilter.innerHTML += `<option value="${m.id}">${escapeHtml(m.nombre)}</option>`
             })
           }
         }
@@ -697,13 +703,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (productCategoria) {
           productCategoria.innerHTML = '<option value="">Sin categoría</option>'
           catalogos.categorias.forEach(c => {
-            productCategoria.innerHTML += `<option value="${c.id}">${c.nombre}</option>`
+            productCategoria.innerHTML += `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`
           })
           // También llenar el filtro si existe
           if (categoriaFilter) {
             categoriaFilter.innerHTML = '<option value="">Todas las categorías</option>'
             catalogos.categorias.forEach(c => {
-              categoriaFilter.innerHTML += `<option value="${c.id}">${c.nombre}</option>`
+              categoriaFilter.innerHTML += `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`
             })
           }
         }
@@ -712,7 +718,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (productProveedor) {
           productProveedor.innerHTML = '<option value="">Sin proveedor</option>'
           catalogos.proveedores.forEach(p => {
-            productProveedor.innerHTML += `<option value="${p.id}">${p.nombre}</option>`
+            productProveedor.innerHTML += `<option value="${p.id}">${escapeHtml(p.nombre)}</option>`
           })
         }
       }
@@ -853,8 +859,8 @@ document.addEventListener("DOMContentLoaded", function () {
       <div class="kit-componente-row" data-idx="${idx}">
         <div class="row align-items-center py-2 border-bottom border-secondary">
           <div class="col-md-5">
-            <span class="font-mono text-accent">${c.sku || ''}</span>
-            <span class="ms-2">${c.nombre || ''}</span>
+            <span class="font-mono text-accent">${escapeHtml(c.sku || '')}</span>
+            <span class="ms-2">${escapeHtml(c.nombre || '')}</span>
           </div>
           <div class="col-md-2">
             <input type="number" class="form-control form-control-buzz form-control-sm"
@@ -966,8 +972,8 @@ document.addEventListener("DOMContentLoaded", function () {
                  ${alreadyInKit ? '' : `onclick="selectKitComponent(${p.id}, '${p.sku}', '${(p.nombre || '').replace(/'/g, "\\'")}', ${p.precio || 0}, ${p.stock || 0})"`}>
               <div class="d-flex justify-content-between align-items-center">
                 <div>
-                  <span class="font-mono text-accent">${p.sku}</span>
-                  <span class="ms-2">${p.nombre}</span>
+                  <span class="font-mono text-accent">${escapeHtml(p.sku)}</span>
+                  <span class="ms-2">${escapeHtml(p.nombre)}</span>
                   ${alreadyInKit ? '<span class="badge bg-warning ms-2">Ya en kit</span>' : ''}
                 </div>
                 <div class="text-end">

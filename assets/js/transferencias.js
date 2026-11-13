@@ -289,7 +289,7 @@ function agregarLineaProducto(producto = null) {
                     <input type="text"
                            class="form-control form-control-buzz sku-input"
                            placeholder="Buscar SKU..."
-                           value="${producto?.sku || ''}"
+                           value="${escapeHtml(producto?.sku || '')}"
                            ${producto ? 'readonly' : ''}
                            autocomplete="off">
                     <div class="autocomplete-results"></div>
@@ -297,7 +297,7 @@ function agregarLineaProducto(producto = null) {
             </div>
             <div class="linea-col col-nombre">
                 <span class="nombre-display ${producto ? '' : 'placeholder'}">
-                    ${producto?.nombre || 'Selecciona un producto...'}
+                    ${producto?.nombre ? escapeHtml(producto.nombre) : 'Selecciona un producto...'}
                 </span>
             </div>
             <div class="linea-col col-stock">
@@ -397,11 +397,11 @@ async function buscarProductos(query, resultsContainer, lineaId) {
                 resultsContainer.innerHTML = productosFiltrados.map(p => `
                     <div class="autocomplete-item"
                          data-id="${p.id}"
-                         data-sku="${p.sku}"
+                         data-sku="${escapeHtml(p.sku)}"
                          data-nombre="${escapeHtml(p.nombre)}"
                          data-stock="${p.stock_disponible}"
                          onclick="seleccionarProducto('${lineaId}', this)">
-                        <span class="ac-sku">${p.sku}</span>
+                        <span class="ac-sku">${escapeHtml(p.sku)}</span>
                         <span class="ac-nombre">${escapeHtml(p.nombre)}</span>
                         <span class="ac-stock">Disp: ${p.stock_disponible}</span>
                     </div>

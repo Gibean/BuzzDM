@@ -12,6 +12,13 @@ let filters = {};
 let currentRequisicion = null;
 let lineaIndex = 0;
 
+function escapeHtml(text) {
+    if (text == null) return '';
+    const div = document.createElement('div');
+    div.textContent = String(text);
+    return div.innerHTML;
+}
+
 // ===========================================
 // INITIALIZATION
 // ===========================================
@@ -303,11 +310,11 @@ function addProductRow(data = null) {
             <input type="hidden" class="proveedor-sugerido-id" name="lineas[${idx}][proveedor_sugerido_id]" value="${data?.proveedor_sugerido_id || ''}">
             <input type="text" class="form-control form-control-sm product-search"
                    placeholder="Buscar SKU..."
-                   value="${data?.sku || ''}"
+                   value="${escapeHtml(data?.sku || '')}"
                    data-idx="${idx}"
                    autocomplete="off">
         </td>
-        <td class="product-name">${data?.producto_nombre || '<span class="text-muted">-</span>'}</td>
+        <td class="product-name">${data?.producto_nombre ? escapeHtml(data.producto_nombre) : '<span class="text-muted">-</span>'}</td>
         <td class="stock-actual text-center ${getStockClass(data?.stock_actual)}">${data?.stock_actual ?? '-'}</td>
         <td>
             <input type="number" class="form-control form-control-sm cantidad-input"
@@ -317,7 +324,7 @@ function addProductRow(data = null) {
         </td>
         <td class="proveedor-sugerido">
             ${data?.proveedor_sugerido_nombre
-                ? `<span class="badge bg-success-subtle text-success">${data.proveedor_sugerido_nombre}</span>`
+                ? `<span class="badge bg-success-subtle text-success">${escapeHtml(data.proveedor_sugerido_nombre)}</span>`
                 : '<span class="badge bg-warning-subtle text-warning">Sin datos</span>'}
         </td>
         <td class="precio-sugerido text-end">${data?.precio_sugerido ? formatCurrency(data.precio_sugerido) : '-'}</td>
@@ -383,8 +390,8 @@ function showProductDropdown(input, products) {
     dropdown.style.width = Math.max(300, rect.width) + 'px';
 
     dropdown.innerHTML = products.map(p => `
-        <div class="autocomplete-item" data-product='${JSON.stringify(p)}'>
-            <strong>${p.sku}</strong> - ${p.nombre}
+        <div class="autocomplete-item" data-product='${escapeHtml(JSON.stringify(p))}'>
+            <strong>${escapeHtml(p.sku)}</strong> - ${escapeHtml(p.nombre)}
             <span class="text-muted ms-2">(Stock: ${p.stock})</span>
         </div>
     `).join('');
@@ -427,7 +434,7 @@ async function selectProduct(input, product) {
             const s = result.suggestion;
             row.querySelector('.proveedor-sugerido-id').value = s.proveedor_id;
             row.querySelector('.proveedor-sugerido').innerHTML =
-                `<span class="badge bg-success-subtle text-success" title="Fuente: ${s.fuente}">${s.proveedor_nombre}</span>`;
+                `<span class="badge bg-success-subtle text-success" title="Fuente: ${escapeHtml(s.fuente)}">${escapeHtml(s.proveedor_nombre)}</span>`;
             row.querySelector('.precio-sugerido').textContent = formatCurrency(s.precio_compra);
         } else {
             row.querySelector('.proveedor-sugerido').innerHTML =

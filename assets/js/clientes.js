@@ -2,6 +2,13 @@
 let currentCustomerPage = 1 // If pagination is needed later
 const customersPerPage = 10 // If pagination is needed later
 
+function escapeHtml(text) {
+  if (text == null) return "";
+  const div = document.createElement("div");
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
 // Main function to fetch and render customers
 async function fetchAndRenderCustomers() {
   const customersListContainer = document.getElementById("customersList")
@@ -108,9 +115,9 @@ function renderCustomers(customers) {
                         return `
                           <tr ${isDeleted ? 'class="table-danger"' : ""}>
                               <td>${customer.id}${deletedBadge}</td>
-                              <td>${customer.nombre}</td>
-                              <td>${customer.email || "N/A"}</td>
-                              <td>${customer.telefono || "N/A"}</td>
+                              <td>${escapeHtml(customer.nombre)}</td>
+                              <td>${customer.email ? escapeHtml(customer.email) : "N/A"}</td>
+                              <td>${customer.telefono ? escapeHtml(customer.telefono) : "N/A"}</td>
                               <td>${
                                 customer.vip == 1
                                   ? '<i class="fas fa-star text-warning"></i> Sí'
@@ -145,7 +152,7 @@ async function fetchAndRenderFrequentCustomers() {
         .map(
           (customer) => `
             <div class="frequent-customer-item">
-                <span class="frequent-customer-name">${customer.nombre}</span>
+                <span class="frequent-customer-name">${escapeHtml(customer.nombre)}</span>
                 <span class="frequent-customer-orders">${customer.total_orders} pedidos</span>
             </div>
         `

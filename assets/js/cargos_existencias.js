@@ -269,11 +269,11 @@ function renderizarTablaCargos(cargos) {
     tbody.innerHTML = cargos.map(cargo => `
         <tr class="row-${cargo.estado}">
             <td>
-                <span class="font-mono text-primary">${cargo.codigo}</span>
+                <span class="font-mono text-primary">${escapeHtml(cargo.codigo)}</span>
             </td>
             <td>${formatearFecha(cargo.fecha)}</td>
-            <td>${cargo.concepto_texto}</td>
-            <td>${cargo.proveedor_nombre || '<span class="text-muted">-</span>'}</td>
+            <td>${escapeHtml(cargo.concepto_texto)}</td>
+            <td>${cargo.proveedor_nombre ? escapeHtml(cargo.proveedor_nombre) : '<span class="text-muted">-</span>'}</td>
             <td class="text-center">${cargo.total_productos}</td>
             <td class="text-center">${cargo.total_unidades}</td>
             <td class="font-mono">${formatearMoneda(cargo.valor_total)}</td>
@@ -395,14 +395,14 @@ function agregarLineaProducto(producto = null) {
                 <input type="text"
                        class="form-control form-control-buzz sku-input"
                        placeholder="BUSCAR SKU..."
-                       value="${producto?.sku || ''}"
+                       value="${escapeHtml(producto?.sku || '')}"
                        ${producto ? 'readonly' : ''}
                        autocomplete="off">
                 <div class="autocomplete-results"></div>
             </div>
             <div class="linea-col col-nombre">
                 <span class="nombre-display ${producto ? '' : 'placeholder'}">
-                    ${producto?.nombre || 'Selecciona un producto...'}
+                    ${producto?.nombre ? escapeHtml(producto.nombre) : 'Selecciona un producto...'}
                 </span>
             </div>
             <div class="linea-col col-precio-compra-input" style="display: ${esCompra ? 'block' : 'none'};">
@@ -502,11 +502,11 @@ async function buscarProductos(query, resultsContainer, lineaId) {
                 resultsContainer.innerHTML = productosFiltrados.map(p => `
                     <div class="autocomplete-item"
                          data-id="${p.id}"
-                         data-sku="${p.sku}"
+                         data-sku="${escapeHtml(p.sku)}"
                          data-nombre="${escapeHtml(p.nombre)}"
                          data-precio="${p.precio}"
                          onclick="seleccionarProducto('${lineaId}', this)">
-                        <span class="ac-sku">${p.sku}</span>
+                        <span class="ac-sku">${escapeHtml(p.sku)}</span>
                         <span class="ac-nombre">${escapeHtml(p.nombre)}</span>
                         <span class="ac-stock">Stock: ${p.stock}</span>
                     </div>
@@ -866,7 +866,7 @@ function mostrarModalDetalle(cargo) {
             </div>
             <div class="info-item">
                 <span class="info-label">Proveedor</span>
-                <span class="info-value">${cargo.proveedor_nombre || '-'}</span>
+                <span class="info-value">${cargo.proveedor_nombre ? escapeHtml(cargo.proveedor_nombre) : '-'}</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Referencia</span>

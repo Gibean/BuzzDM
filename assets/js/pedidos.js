@@ -2,6 +2,13 @@
 let currentPage = 1;
 const ordersPerPage = 10;
 
+function escapeHtml(text) {
+  if (text == null) return '';
+  const div = document.createElement('div');
+  div.textContent = String(text);
+  return div.innerHTML;
+}
+
 // Main function to fetch and render orders
 async function fetchAndRenderOrders() {
   const ordersListContainer = document.getElementById("ordersList")
@@ -123,9 +130,9 @@ function renderOrders(orders) {
                 </div>
                 <div class="col-md-3">
                     <div class="font-mono">${
-                      order.customer || "Cliente no especificado"
+                      order.customer ? escapeHtml(order.customer) : "Cliente no especificado"
                     }</div>
-                    <small class="text-muted">${order.email || "N/A"}</small>
+                    <small class="text-muted">${order.email ? escapeHtml(order.email) : "N/A"}</small>
                 </div>
                 <div class="col-md-2">
                     <div class="font-mono">${formatCurrency(order.total)}</div>
@@ -256,7 +263,7 @@ async function toggleOrderProducts(button, orderId) {
         productsDiv.dataset.loaded = true
       } catch (error) {
         console.error("Error fetching order products:", error)
-        productsDiv.innerHTML = `<div class="p-3 text-danger">Error al cargar productos: ${error.message}</div>`
+        productsDiv.innerHTML = `<div class="p-3 text-danger">Error al cargar productos: ${escapeHtml(error.message)}</div>`
       }
     }
   }
@@ -443,7 +450,7 @@ async function editOrder(orderId) {
         newRow.innerHTML = `
                     <div class="col-md-5">
                         <input type="text" class="form-control form-control-buzz product-search-input" placeholder="Nombre o SKU del producto" value="${
-                          product ? product.product_name : ""
+                          product ? escapeHtml(product.product_name) : ""
                         }">
                         <input type="hidden" class="product-id-input" value="${
                           product ? product.producto_id : ""
@@ -525,7 +532,7 @@ async function editOrder(orderId) {
                                         : ""
                                     }"
                                        data-product-id="${p.id}"
-                                       data-product-name="${p.nombre}"
+                                       data-product-name="${escapeHtml(p.nombre)}"
                                        data-product-price="${p.precio}"
                                        data-product-stock="${p.stock}"
                                        ${
@@ -533,8 +540,8 @@ async function editOrder(orderId) {
                                            ? 'style="pointer-events: none; opacity: 0.6;"'
                                            : ""
                                        }>
-                                        ${p.nombre} (SKU: ${
-                    p.sku
+                                        ${escapeHtml(p.nombre)} (SKU: ${
+                    escapeHtml(p.sku)
                   }) - ${formatCurrency(p.precio)} ${stockInfo}
                                     </a>
                                 `
@@ -781,8 +788,8 @@ async function openOrderModal() {
             (client) => `
                     <a href="#" class="list-group-item list-group-item-action"
                        data-client-id="${client.id}"
-                       data-client-name="${client.nombre}">
-                        ${client.nombre} (${client.id})
+                       data-client-name="${escapeHtml(client.nombre)}">
+                        ${escapeHtml(client.nombre)} (${client.id})
                     </a>
                 `
           )
@@ -914,7 +921,7 @@ async function openOrderModal() {
                                 : ""
                             }"
                                data-product-id="${product.id}"
-                               data-product-name="${product.nombre}"
+                               data-product-name="${escapeHtml(product.nombre)}"
                                data-product-price="${product.precio}"
                                data-product-stock="${product.stock}"
                                ${
@@ -922,8 +929,8 @@ async function openOrderModal() {
                                    ? 'style="pointer-events: none; opacity: 0.8;"'
                                    : ""
                                }>
-                                ${product.nombre} (SKU: ${
-                product.sku
+                                ${escapeHtml(product.nombre)} (SKU: ${
+                escapeHtml(product.sku)
               }) - ${formatCurrency(product.precio)} ${stockInfo}
                             </a>
                         `
